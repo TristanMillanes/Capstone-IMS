@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGENRO IMS | Secure Login</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+
+    <main class="main-container">
+        <div class="blob-c"></div>
+        <div class="blob-d"></div>
+
+        <section class="left-section">
+            <div class="overlay">
+                <div class="badge">Provincial Government</div>
+                <span class="eyebrow">Environmental and Natural Resources Office</span>
+
+                <h1>
+                    <span class="typing-wrapper">
+                        <span class="text-gradient" id="typingText"></span>
+                        <span class="typing-cursor">|</span>
+                    </span>
+                </h1>
+
+                <p>
+                    A secure and smart portal for managing official records,
+                    documents, and digital repository of Quezon Province PGENRO.
+                </p>
+                
+                <div class="features">
+                    <div class="f-item">
+                        <i data-lucide="shield-check"></i>
+                        Secure
+                    </div>
+                    <div class="f-item">
+                        <i data-lucide="zap"></i>
+                        Fast
+                    </div>
+                    <div class="f-item">
+                        <i data-lucide="file-text"></i>
+                        Smart
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="right-section">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo-wrapper">
+                        <i data-lucide="leaf" class="logo-icon"></i>
+                    </div>
+                    <h2>Welcome Back</h2>
+                    <p>Enter your credentials to access the portal</p>
+                </div>
+
+                <div id="messageBox" class="message-box"></div>
+
+                <form id="loginForm" novalidate>
+                    <div class="input-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="mail" class="input-icon"></i>
+                            <input 
+                                id="email" 
+                                type="email" 
+                                placeholder="name@pgenro.gov.ph"
+                                autocomplete="email"
+                                required
+                            >
+                        </div>
+                        <small class="error-text" id="emailError"></small>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper">
+                            <i data-lucide="lock" class="input-icon"></i>
+                            <input 
+                                id="password" 
+                                type="password" 
+                                placeholder="••••••••"
+                                autocomplete="current-password"
+                                required
+                            >
+
+                            <button type="button" class="toggle-password" id="togglePassword">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                        <small class="error-text" id="passwordError"></small>
+                    </div>
+
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe">
+                            Remember me
+                        </label>
+                        <a href="#" class="forgot-link">Forgot Password?</a>
+                    </div>
+
+                    <button type="submit" class="login-btn" id="loginBtn">
+                        <span id="loginText">Sign In</span>
+                        <i data-lucide="arrow-right" id="loginIcon"></i>
+                    </button>
+
+                    <div class="separator">
+                        <span>New to the system?</span>
+                    </div>
+
+                    <a href="requestACC.html" class="alt-btn">
+                        Request Access Account
+                    </a>
+                </form>
+                
+                <footer class="card-footer">
+                    &copy; 2026 Provincial Government of Quezon. All rights reserved.
+                </footer>
+            </div>
+        </section>
+    </main>
+    <script type="module" src="/User/loginD.js"></script>
+    <script src="/User/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Homepage</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="homepage.css" />
+</head>
+<body>
+
+  <header class="navbar">
+    <div class="logo-area">
+      <div class="logo-icon">
+        <i data-lucide="leaf"></i>
+      </div>
+      <div>
+        <h2>PGENRO IMS</h2>
+        <span>Information Management System</span>
+      </div>
+    </div>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#home" class="active">Home</a>
+      <a href="#modules">Modules</a>
+      <a href="#features">Features</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <!-- REPLACE THIS PART:
+<div class="nav-buttons">
+  <a href="login.html" class="login-btn">Login</a>
+  <a href="request-account.html" class="request-btn">Request Account</a>
+</div>
+-->
+
+<!-- WITH THIS -->
+<div class="profile-menu">
+  <button class="profile-btn" id="profileBtn">
+    <div class="profile-avatar">
+      <i data-lucide="user"></i>
+    </div>
+    <span>Profile</span>
+    <i data-lucide="chevron-down" class="chevron"></i>
+  </button>
+
+  <div class="profile-dropdown" id="profileDropdown">
+    <div class="profile-info">
+      <div class="profile-avatar large">
+        <i data-lucide="user"></i>
+      </div>
+      <div>
+        <h4>PGENRO User</h4>
+        <p>Authorized Account</p>
+      </div>
+    </div>
+
+    <a href="dashboard.html">
+      <i data-lucide="layout-dashboard"></i>
+      Dashboard
+    </a>
+
+    <a href="settings.html">
+      <i data-lucide="settings"></i>
+      Account Settings
+    </a>
+
+    <button id="logoutBtn" class="logout-btn">
+      <i data-lucide="log-out"></i>
+      Logout
+    </button>
+    <script src="/User/homepage.js"></script>
+  </div>
+</div>

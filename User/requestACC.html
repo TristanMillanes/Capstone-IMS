@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request Access | PGENRO IMS</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="requestACC.css">
+</head>
+<body>
+
+    <main class="viewport-wrapper">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+
+        <section class="request-card">
+            <header class="request-header">
+                <span class="header-badge">Access Request</span>
+
+                <div class="icon-circle">
+                    <i data-lucide="user-plus"></i>
+                </div>
+
+                <h1>Request Access Account</h1>
+                <p>
+                    Submit your official information to request access to the
+                    PGENRO Information Management System.
+                </p>
+            </header>
+
+            <div id="messageBox" class="message-box" role="alert"></div>
+
+            <form id="requestForm" novalidate>
+                <div class="form-grid">
+
+                    <fieldset class="form-column">
+                        <legend class="column-title">Personal Information</legend>
+
+                        <div class="input-group">
+                            <label for="fullName">Full Name <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="user"></i>
+                                <input 
+                                    type="text" 
+                                    id="fullName" 
+                                    placeholder="Ex: John Dela Cruz"
+                                    required
+                                >
+                            </div>
+                            <small class="error-text"></small>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="email">Email Address <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="mail"></i>
+                                <input 
+                                    type="email" 
+                                    id="email" 
+                                    placeholder="official@pgenro.gov.ph"
+                                    required
+                                >
+                            </div>
+                            <small class="error-text"></small>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="contact">Contact Number</label>
+                            <div class="input-wrapper">
+                                <i data-lucide="smartphone"></i>
+                                <input 
+                                    type="text" 
+                                    id="contact" 
+                                    placeholder="0912 345 6789"
+                                    maxlength="13"
+                                >
+                            </div>
+                            <small class="error-text"></small>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="form-column">
+                        <legend class="column-title">Work Information</legend>
+
+                        <div class="input-group">
+                            <label for="position">Position / Title <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="briefcase"></i>
+                                <input 
+                                    type="text" 
+                                    id="position" 
+                                    placeholder="Ex: Staff Analyst"
+                                    required
+                                >
+                            </div>
+                            <small class="error-text"></small>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="section">Section / Unit <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="landmark"></i>
+                                <select id="section" required>
+                                    <option value="" disabled selected>Choose office...</option>
+                                    <option value="Administrative Division">Administrative Division</option>
+                                    <option value="Technical Division">Technical Division</option>
+                                    <option value="Monitoring Section">Monitoring Section</option>
+                                    <option value="Records Section">Records Section</option>
+                                </select>
+                            </div>
+                            <small class="error-text"></small>
+                        </div>
+
+                        <div class="input-group">
+                            <label for="role">Requested Permission <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="fingerprint"></i>
+                                <select id="role" required>
+                                    <option value="" disabled selected>Assign role...</option>
+                                    <option value="Staff Access">Staff Access</option>
+                                    <option value="Records Specialist">Records Specialist</option>
+                                    <option value="Admin Controller">Admin Controller</option>
+                                </select>
+                            </div>
+                            <small class="error-text"></small>
+                        </div>
+                    </fieldset>
+                </div>
+
+                <div class="input-group reason-group">
+                    <label for="reason">Reason for Access <span>*</span></label>
+                    <div class="input-wrapper textarea-wrapper">
+                        <i data-lucide="message-circle"></i>
+                        <textarea 
+                            id="reason" 
+                            placeholder="State your official reason for requesting access..."
+                            maxlength="200"
+                            required
+                        ></textarea>
+                    </div>
+                    <div class="char-count">
+                        <span id="charCount">0</span>/200 characters
+                    </div>
+                    <small class="error-text"></small>
+                </div>
+
+                <div class="terms-area">
+                    <label class="custom-checkbox">
+                        <input type="checkbox" id="agreeTerms">
+                        <span>I confirm that the provided information is valid and intended for official use only.</span>
+                    </label>
+                    <small id="termsError" class="error-text"></small>
+                </div>
+
+                <div class="button-row">
+                    <button type="submit" class="btn-submit">
+                        Submit Application
+                    </button>
+
+                    <button type="button" id="clearBtn" class="btn-clear">
+                        Clear
+                    </button>
+                </div>
+
+                <div class="footer-link">
+                    Already registered?
+                    <a href="login.html">Sign in instead</a>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <script src="requestACC.js"></script>
+</body>
+</html>
