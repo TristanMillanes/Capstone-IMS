@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Communication Module</title>
+  <link rel="stylesheet" href="Communication.css" />
+</head>
+
+<body>
+  <div class="container">
+
+    <a href="homepage.html" class="back-btn">← Back to Homepage</a>
+
+    <div class="header">
+      <h1>PGENRO Information Management System</h1>
+      <p>Incoming and Outgoing Communication Management Module</p>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>Total Records</h3>
+        <h2 id="totalRecords">0</h2>
+      </div>
+      <div class="card">
+        <h3>Incoming Communications</h3>
+        <h2 id="incomingCount">0</h2>
+      </div>
+      <div class="card">
+        <h3>Outgoing Communications</h3>
+        <h2 id="outgoingCount">0</h2>
+      </div>
+      <div class="card">
+        <h3>Pending Records</h3>
+        <h2 id="pendingCount">0</h2>
+      </div>
+    </div>
+
+    <div class="main">
+
+      <div class="form-box">
+        <h2 id="formTitle">Add Communication</h2>
+
+        <form id="communicationForm">
+          <input type="hidden" id="editIndex">
+
+          <label>Communication Type</label>
+          <select id="type" required>
+            <option value="">Select Type</option>
+            <option value="Incoming">Incoming</option>
+            <option value="Outgoing">Outgoing</option>
+          </select>
+
+          <label>Control Number</label>
+          <input type="text" id="controlNo" readonly>
+
+          <label>Document Type</label>
+          <select id="documentType" required>
+            <option value="">Select Document Type</option>
+            <option>Request Letter</option>
+            <option>Endorsement Letter</option>
+            <option>Transmittal Letter</option>
+            <option>Response Letter</option>
+            <option>Notice of Meeting</option>
+            <option>Invitation</option>
+            <option>Report</option>
+            <option>Memorandum</option>
+            <option>Other Communication</option>
+          </select>
+
+          <label>Subject / Title</label>
+          <input type="text" id="subject" placeholder="Enter subject" required>
+
+          <label>Source / Recipient Office</label>
+          <input type="text" id="office" placeholder="Example: Governor's Office" required>
+
+          <label>Date Received / Released</label>
+          <input type="date" id="date" required>
+
+          <label>Status</label>
+          <select id="status" required>
+            <option value="">Select Status</option>
+            <option>Pending</option>
+            <option>Received</option>
+            <option>Forwarded</option>
+            <option>Released</option>
+            <option>Archived</option>
+          </select>
+
+          <label>Upload Document Soft Copy</label>
+          <input type="file" id="documentFile" accept=".pdf,.png,.jpg,.jpeg">
+
+          <button type="button" class="ocr-btn" onclick="extractOCR()">
+            Read Document using OCR
+          </button>
+
+          <label>Extracted Document Text</label>
+          <textarea id="ocrText" placeholder="OCR result will appear here. You can edit this text."></textarea>
+
+          <div id="pageViewer" class="page-viewer"></div>
+
+          <label>Remarks</label>
+          <textarea id="remarks" placeholder="Enter remarks"></textarea>
+
+          <button type="submit" class="btn" id="submitBtn">Save Record</button>
+        </form>
+      </div>
+
+      <div class="table-box">
+        <h2>Communication Records</h2>
+
+        <div class="tabs">
+          <button class="tab-btn active" onclick="setFilter('All', this)">All</button>
+          <button class="tab-btn" onclick="setFilter('Incoming', this)">Incoming</button>
+          <button class="tab-btn" onclick="setFilter('Outgoing', this)">Outgoing</button>
+        </div>
+
+        <div class="tools">
+          <input type="text" id="searchInput" placeholder="Search control no., subject, office..." oninput="displayRecords()">
+          <select id="statusFilter" onchange="displayRecords()">
+            <option value="All">All Status</option>
+            <option>Pending</option>
+            <option>Received</option>
+            <option>Forwarded</option>
+            <option>Released</option>
+            <option>Archived</option>
+          </select>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Control No.</th>
+              <th>Type</th>
+              <th>Document</th>
+              <th>Subject</th>
+              <th>Office</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th>File</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTable"></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="Communication.js"></script>
+</body>
+</html>
