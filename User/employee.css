@@ -1,0 +1,254 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(3, 45, 28, 0.88), rgba(3, 45, 28, 0.88)),
+    url("logo/enro.png");
+  background-size: 420px;
+  background-repeat: no-repeat;
+  background-position: center;
+  color: #1f2937;
+}
+
+.container {
+  width: 95%;
+  max-width: 1350px;
+  margin: 30px auto;
+}
+
+header {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(16px);
+  padding: 32px;
+  border-radius: 24px;
+  margin-bottom: 25px;
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.18);
+  border-left: 7px solid #198754;
+}
+
+header h1 {
+  font-size: 34px;
+  color: #064e3b;
+  font-weight: 800;
+}
+
+header p {
+  margin-top: 8px;
+  color: #4b5563;
+}
+
+.form-card,
+.table-card {
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(18px);
+  padding: 26px;
+  border-radius: 24px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.16);
+  margin-bottom: 25px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.form-card h2,
+.table-card h2 {
+  margin-bottom: 18px;
+  color: #064e3b;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 14px 15px;
+  border: 1px solid #d1d5db;
+  border-radius: 14px;
+  outline: none;
+  font-size: 14px;
+  background: #f9fafb;
+  color: #111827;
+  transition: 0.25s ease;
+}
+
+input:focus,
+select:focus {
+  background: #ffffff;
+  border-color: #198754;
+  box-shadow: 0 0 0 4px rgba(25, 135, 84, 0.14);
+}
+
+button {
+  margin-top: 20px;
+  padding: 14px 22px;
+  background: linear-gradient(135deg, #198754, #0f5132);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  box-shadow: 0 10px 22px rgba(25, 135, 84, 0.3);
+  transition: 0.25s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 28px rgba(25, 135, 84, 0.4);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.table-header input {
+  max-width: 320px;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 18px;
+  border: 1px solid #e5e7eb;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+thead {
+  background: linear-gradient(135deg, #064e3b, #198754);
+  color: white;
+}
+
+th {
+  padding: 15px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+td {
+  padding: 15px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 14px;
+  color: #374151;
+}
+
+tbody tr {
+  transition: 0.2s ease;
+}
+
+tbody tr:hover {
+  background: #ecfdf5;
+}
+
+.status {
+  padding: 7px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-block;
+}
+
+.Active {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.Inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.OnLeave {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.action-btn {
+  padding: 8px 12px;
+  margin: 3px;
+  border-radius: 10px;
+  font-size: 12px;
+  box-shadow: none;
+}
+
+.edit {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+}
+
+.delete {
+  background: linear-gradient(135deg, #dc2626, #991b1b);
+}
+
+.edit:hover,
+.delete:hover {
+  transform: translateY(-1px);
+}
+
+@media (max-width: 1000px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 700px) {
+  .container {
+    width: 92%;
+  }
+
+  header h1 {
+    font-size: 25px;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-header input {
+    max-width: 100%;
+  }
+}
+.top-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.add-employee-btn {
+  background: linear-gradient(135deg, #198754, #0f5132);
+  color: white;
+  border: none;
+  padding: 14px 22px;
+  border-radius: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 22px rgba(25, 135, 84, 0.3);
+}
+
+.hidden {
+  display: none;
+}   

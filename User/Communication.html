@@ -4,150 +4,249 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PGENRO IMS | Communication Module</title>
-  <link rel="stylesheet" href="Communication.css" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="communication.css" />
 </head>
 
 <body>
-  <div class="container">
+  <header class="navbar">
+    <a href="homepage.html" class="logo-area">
+      <div class="logo-icon">
+        <img src="../logo/enro.png" class="logo-image" alt="PGENRO Logo">
+      </div>
+      <div>
+        <h2>Provincial Government</h2>
+        <span>Environmental and Natural Resources Office</span>
+      </div>
+    </a>
 
-    <a href="homepage.html" class="back-btn">← Back to Homepage</a>
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
 
-    <div class="header">
-      <h1>PGENRO Information Management System</h1>
-      <p>Incoming and Outgoing Communication Management Module</p>
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>IMS Modules</h3>
+      <p>Quick access menu</p>
     </div>
 
-    <div class="cards">
-      <div class="card">
-        <h3>Total Records</h3>
-        <h2 id="totalRecords">0</h2>
-      </div>
-      <div class="card">
-        <h3>Incoming Communications</h3>
-        <h2 id="incomingCount">0</h2>
-      </div>
-      <div class="card">
-        <h3>Outgoing Communications</h3>
-        <h2 id="outgoingCount">0</h2>
-      </div>
-      <div class="card">
-        <h3>Pending Records</h3>
-        <h2 id="pendingCount">0</h2>
-      </div>
+    <ul class="modules-list">
+      <li><a href="homepage.html"><i data-lucide="home"></i><span>Dashboard</span></a></li> 
+      <li><a href="communication.html" class="active"><i data-lucide="repeat-2"></i><span>Incoming/Outgoing<br>Communication</span></a></li>
+      <li><a href="travelorder.html"><i data-lucide="map-pin"></i><span>Travel Order</span></a></li>
+      <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memo</span></a></li>
+      <li><a href="employee.html"><i data-lucide="users"></i><span>Employee Records</span></a></li>
+      <li><a href="inventory.html"><i data-lucide="box"></i><span>Inventory</span></a></li>
+      <li><a href="visitorslog.html"><i data-lucide="user-check"></i><span>Visitor's Log</span></a></li>
+      <li><a href="servicerequest.html"><i data-lucide="wrench"></i><span>Service Request</span></a></li>
+      <li><a href="ics.html"><i data-lucide="clipboard-list"></i><span>ICS</span></a></li>
+    </ul>
+  </aside>
+
+  <div class="form-modal" id="formModal">
+    <div class="modal-header">
+      <h2 id="formTitle">Encoding Communication Record</h2>
+      <button class="modal-close" id="formModalClose">
+        <i data-lucide="x"></i>
+      </button>
     </div>
 
-    <div class="main">
+    <div class="modal-body">
+      <form id="communicationForm">
+        <input type="hidden" id="editIndex">
 
-      <div class="form-box">
-        <h2 id="formTitle">Add Communication</h2>
+        <div class="form-row">
+          <div>
+            <label>Communication Type</label>
+            <select id="type" required>
+              <option value="">Select Type</option>
+              <option value="Incoming">Incoming</option>
+              <option value="Outgoing">Outgoing</option>
+            </select>
+          </div>
 
-        <form id="communicationForm">
-          <input type="hidden" id="editIndex">
+          <div>
+            <label>Control No.</label>
+            <input type="text" id="controlNo" readonly placeholder="Auto-generated">
+          </div>
+        </div>
 
-          <label>Communication Type</label>
-          <select id="type" required>
-            <option value="">Select Type</option>
-            <option value="Incoming">Incoming</option>
-            <option value="Outgoing">Outgoing</option>
-          </select>
+        <label>Document Type</label>
+        <select id="documentType" required>
+          <option value="">Select Document Type</option>
+          <option>Request Letter</option>
+          <option>Endorsement Letter</option>
+          <option>Transmittal Letter</option>
+          <option>Response Letter</option>
+          <option>Notice of Meeting</option>
+          <option>Invitation</option>
+          <option>Report</option>
+          <option>Memorandum</option>
+          <option>Other Communication</option>
+        </select>
 
-          <label>Control Number</label>
-          <input type="text" id="controlNo" readonly>
+        <div class="form-row">
+          <div>
+            <label>Date Received / Released</label>
+            <input type="date" id="date" required>
+          </div>
 
-          <label>Document Type</label>
-          <select id="documentType" required>
-            <option value="">Select Document Type</option>
-            <option>Request Letter</option>
-            <option>Endorsement Letter</option>
-            <option>Transmittal Letter</option>
-            <option>Response Letter</option>
-            <option>Notice of Meeting</option>
-            <option>Invitation</option>
-            <option>Report</option>
-            <option>Memorandum</option>
-            <option>Other Communication</option>
-          </select>
+          <div>
+            <label>Status</label>
+            <select id="status" required>
+              <option value="">Select Status</option>
+              <option>Pending</option>
+              <option>Received</option>
+              <option>Forwarded</option>
+              <option>Released</option>
+              <option>Archived</option>
+            </select>
+          </div>
+        </div>
 
-          <label>Subject / Title</label>
-          <input type="text" id="subject" placeholder="Enter subject" required>
+        <label>Received From / Recipient Office</label>
+        <textarea id="office" required placeholder="Example: Governor's Office / PICTO"></textarea>
 
-          <label>Source / Recipient Office</label>
-          <input type="text" id="office" placeholder="Example: Governor's Office" required>
+        <label>Subject Matter / Particulars</label>
+        <textarea id="subject" required placeholder="Enter subject matter or particulars"></textarea>
 
-          <label>Date Received / Released</label>
-          <input type="date" id="date" required>
+        <label>Date Forwarded / Action Taken</label>
+        <textarea id="dateForwarded" placeholder="Example: Forwarded to Admin Division"></textarea>
 
-          <label>Status</label>
-          <select id="status" required>
-            <option value="">Select Status</option>
-            <option>Pending</option>
-            <option>Received</option>
-            <option>Forwarded</option>
-            <option>Released</option>
-            <option>Archived</option>
-          </select>
+        <label>Remarks</label>
+        <textarea id="remarks" placeholder="Enter remarks"></textarea>
 
+        <div class="upload-box">
           <label>Upload Document Soft Copy</label>
           <input type="file" id="documentFile" accept=".pdf,.png,.jpg,.jpeg">
 
           <button type="button" class="ocr-btn" onclick="extractOCR()">
-            Read Document using OCR
+            <i data-lucide="scan-text"></i>
+            Read Document Using OCR
           </button>
+        </div>
 
-          <label>Extracted Document Text</label>
-          <textarea id="ocrText" placeholder="OCR result will appear here. You can edit this text."></textarea>
+        <label>Extracted Document Text</label>
+        <textarea id="ocrText" placeholder="OCR result will appear here."></textarea>
 
-          <div id="pageViewer" class="page-viewer"></div>
+        <div id="pageViewer" class="page-viewer"></div>
 
-          <label>Remarks</label>
-          <textarea id="remarks" placeholder="Enter remarks"></textarea>
+        <div class="form-actions">
+          <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+          <button type="submit" class="save-btn" id="submitBtn">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
-          <button type="submit" class="btn" id="submitBtn">Save Record</button>
-        </form>
+  <main class="main-content">
+    <section class="page-header">
+      <span class="page-badge">
+        <i data-lucide="mail"></i>
+        Communication Module
+      </span>
+      <h1>Incoming and Outgoing Communication</h1>
+      <p>Manage communication records, control numbers, document status, action taken, remarks, and OCR-based document text extraction.</p>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <i data-lucide="database"></i>
+        <div>
+          <p>Total Records</p>
+          <h2 id="totalRecords">0</h2>
+        </div>
       </div>
 
-      <div class="table-box">
-        <h2>Communication Records</h2>
+      <div class="stat-card">
+        <i data-lucide="inbox"></i>
+        <div>
+          <p>Incoming</p>
+          <h2 id="incomingCount">0</h2>
+        </div>
+      </div>
 
-        <div class="tabs">
-          <button class="tab-btn active" onclick="setFilter('All', this)">All</button>
-          <button class="tab-btn" onclick="setFilter('Incoming', this)">Incoming</button>
-          <button class="tab-btn" onclick="setFilter('Outgoing', this)">Outgoing</button>
+      <div class="stat-card">
+        <i data-lucide="send"></i>
+        <div>
+          <p>Outgoing</p>
+          <h2 id="outgoingCount">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i data-lucide="clock-3"></i>
+        <div>
+          <p>Pending</p>
+          <h2 id="pendingCount">0</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="records-card">
+      <div class="records-header">
+        <div class="card-title">
+          <h2>Communication Records</h2>
+          <p>Search, filter, update, and view communication records.</p>
         </div>
 
-        <div class="tools">
+        <button class="encoding-btn" id="openEncodingBtn">
+          <i data-lucide="plus-circle"></i>
+          Encoding Communication Record
+        </button>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="setFilter('All', this)">All</button>
+        <button class="tab-btn" onclick="setFilter('Incoming', this)">Incoming</button>
+        <button class="tab-btn" onclick="setFilter('Outgoing', this)">Outgoing</button>
+      </div>
+
+      <div class="tools">
+        <div class="search-field">
+          <i data-lucide="search"></i>
           <input type="text" id="searchInput" placeholder="Search control no., subject, office..." oninput="displayRecords()">
-          <select id="statusFilter" onchange="displayRecords()">
-            <option value="All">All Status</option>
-            <option>Pending</option>
-            <option>Received</option>
-            <option>Forwarded</option>
-            <option>Released</option>
-            <option>Archived</option>
-          </select>
         </div>
 
+        <select id="statusFilter" onchange="displayRecords()">
+          <option value="All">All Status</option>
+          <option>Pending</option>
+          <option>Received</option>
+          <option>Forwarded</option>
+          <option>Released</option>
+          <option>Archived</option>
+        </select>
+      </div>
+
+      <div class="table-wrapper">
         <table>
           <thead>
             <tr>
               <th>Control No.</th>
-              <th>Type</th>
-              <th>Document</th>
-              <th>Subject</th>
-              <th>Office</th>
-              <th>Date</th>
+              <th>Date Received</th>
+              <th>Received From / Recipient</th>
+              <th>Subject Matter / Particulars</th>
+              <th>Date Forwarded / Action Taken</th>
+              <th>Remarks</th>
               <th>Status</th>
-              <th>File</th>
-              <th>Action</th>
             </tr>
           </thead>
           <tbody id="recordsTable"></tbody>
         </table>
       </div>
+    </section>
+  </main>
 
-    </div>
-  </div>
-
-  <script src="Communication.js"></script>
+  <script src="communication.js"></script>
 </body>
 </html>

@@ -28,6 +28,12 @@ body {
   background: var(--bg);
   color: var(--text);
   overflow-x: hidden;
+  opacity: 1;
+  transition: opacity 0.5s ease;
+}
+
+body.fade-out {
+  opacity: 0;
 }
 
 a {
@@ -689,7 +695,35 @@ a {
   gap: 22px;
 }
 
-.module-card,
+.module-card {
+position: relative;
+overflow: hidden;
+cursor: pointer;
+transition: all .35s ease;
+}
+
+.module-card::before {
+  content:"";
+   position: absolute;
+   inset: 0;
+   background:   linear-gradient(
+            135deg,
+            rgba(255,255,255,.15),
+            transparent
+        );
+    opacity: 0;
+    transition: .35s;
+}
+
+.module-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 30px 60px rgba(15,107,61,.18);
+}
+
+.module-card:hover::before {
+    opacity: 1;
+}
+
 .feature-box {
   background: #fff;
   padding: 28px;

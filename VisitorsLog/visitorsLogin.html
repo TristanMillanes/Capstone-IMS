@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Visitors Log</title>
+  <link rel="stylesheet" href="visitorslog.css" />
+</head>
+<body>
+
+  <main class="page">
+    <section class="left-panel">
+      <div class="brand">
+        <div class="logo-wrap">
+          <img src="../logo/enro.png" alt="PGENRO Logo">
+        </div>
+        <h1>PGENRO IMS</h1>
+        <p>Digital Visitors Log Entry</p>
+      </div>
+
+      <div class="info-box">
+        <h2>Welcome, Visitor</h2>
+        <p>Please complete the form before entering the office premises.</p>
+      </div>
+
+      <div class="date-card">
+        <span id="todayDate">Loading date...</span>
+        <strong id="liveTime">--:-- --</strong>
+      </div>
+    </section>
+
+    <section class="form-panel">
+      <div class="form-card">
+
+        <div class="form-header">
+          <span class="badge">Visitor Entry Form</span>
+          <h2>Fill Out Visitor Details</h2>
+          <p>Your information will be recorded for office monitoring purposes.</p>
+        </div>
+
+        <div class="progress">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <form id="visitorForm">
+
+          <div class="form-grid">
+            <div class="input-group">
+              <label>Full Name</label>
+              <input type="text" id="fullName" placeholder="Juan Dela Cruz" required>
+              <small></small>
+            </div>
+
+            <div class="input-group">
+              <label>Contact Number</label>
+              <input type="text" id="contact" placeholder="09XXXXXXXXX" required>
+              <small></small>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label>Address / Office / Agency</label>
+            <input type="text" id="address" placeholder="Enter address, office, or agency" required>
+            <small></small>
+          </div>
+
+          <div class="input-group">
+            <label>Person / Office to Visit</label>
+            <input type="text" id="personToVisit" placeholder="Enter person or office to visit" required>
+            <small></small>
+          </div>
+
+          <div class="input-group">
+            <label>Purpose of Visit</label>
+            <textarea id="purpose" placeholder="State your purpose of visit" required></textarea>
+            <small></small>
+          </div>
+
+          <button type="submit" class="submit-btn">
+            Submit Visitor Entry
+          </button>
+
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="successModal">
+    <div class="modal-card">
+      <div class="check">✓</div>
+      <h2>Entry Submitted</h2>
+      <p>Your visitor log has been successfully recorded.</p>
+      <button onclick="closeModal()">Done</button>
+    </div>
+  </div>
+
+  <script src="visitorslog.js"></script>
+</body>
+</html>

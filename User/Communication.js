@@ -2,10 +2,22 @@ const form = document.getElementById("communicationForm");
 const typeInput = document.getElementById("type");
 const controlNoInput = document.getElementById("controlNo");
 
+const formModal = document.getElementById("formModal");
+const openEncodingBtn = document.getElementById("openEncodingBtn");
+const formModalClose = document.getElementById("formModalClose");
+const overlay = document.getElementById("overlay");
+const hamburgerMenu = document.getElementById("hamburgerMenu");
+const sidebar = document.getElementById("sidebar");
+const mainContent = document.querySelector(".main-content");
+
 let records = JSON.parse(localStorage.getItem("communicationRecords")) || [];
 let currentFilter = "All";
 let uploadedFileName = "";
 let ocrPages = [];
+
+if (window.lucide) {
+  lucide.createIcons();
+}
 
 function generateControlNumber(type) {
   const year = new Date().getFullYear();
@@ -16,6 +28,46 @@ function generateControlNumber(type) {
 
 typeInput.addEventListener("change", () => {
   controlNoInput.value = typeInput.value ? generateControlNumber(typeInput.value) : "";
+});
+
+function openEncodingModal() {
+  clearForm();
+  document.getElementById("formTitle").textContent = "Encoding Communication Record";
+  document.getElementById("submitBtn").textContent = "Save Record";
+
+  formModal.classList.add("open");
+  overlay.classList.add("active");
+
+  if (window.lucide) {
+    lucide.createIcons();
+  }
+}
+
+function closeEncodingModal() {
+  formModal.classList.remove("open");
+
+  if (!sidebar.classList.contains("open")) {
+    overlay.classList.remove("active");
+    mainContent.classList.remove("blur");
+  }
+}
+
+openEncodingBtn.addEventListener("click", openEncodingModal);
+formModalClose.addEventListener("click", closeEncodingModal);
+
+hamburgerMenu.addEventListener("click", () => {
+  sidebar.classList.toggle("open");
+  hamburgerMenu.classList.toggle("active");
+  overlay.classList.toggle("active");
+  mainContent.classList.toggle("blur");
+});
+
+overlay.addEventListener("click", () => {
+  formModal.classList.remove("open");
+  sidebar.classList.remove("open");
+  hamburgerMenu.classList.remove("active");
+  overlay.classList.remove("active");
+  mainContent.classList.remove("blur");
 });
 
 form.addEventListener("submit", function(e) {
@@ -32,11 +84,12 @@ form.addEventListener("submit", function(e) {
     type: document.getElementById("type").value,
     controlNo: document.getElementById("controlNo").value,
     documentType: document.getElementById("documentType").value,
-    subject: document.getElementById("subject").value,
-    office: document.getElementById("office").value,
     date: document.getElementById("date").value,
-    status: document.getElementById("status").value,
+    office: document.getElementById("office").value,
+    subject: document.getElementById("subject").value,
+    dateForwarded: document.getElementById("dateForwarded").value,
     remarks: document.getElementById("remarks").value,
+    status: document.getElementById("status").value,
     fileName: uploadedFileName,
     ocrText: document.getElementById("ocrText").value,
     pages: pageTexts.length ? pageTexts : ocrPages
@@ -52,17 +105,21 @@ form.addEventListener("submit", function(e) {
 
   localStorage.setItem("communicationRecords", JSON.stringify(records));
 
+  clearForm();
+  closeEncodingModal();
+  displayRecords();
+  updateDashboard();
+});
+
+function clearForm() {
   form.reset();
   uploadedFileName = "";
   ocrPages = [];
   document.getElementById("pageViewer").innerHTML = "";
   document.getElementById("editIndex").value = "";
-  document.getElementById("formTitle").textContent = "Add Communication";
+  document.getElementById("formTitle").textContent = "Encoding Communication Record";
   document.getElementById("submitBtn").textContent = "Save Record";
-
-  displayRecords();
-  updateDashboard();
-});
+}
 
 function cleanOCRText(text) {
   return text
@@ -135,22 +192,14 @@ async function extractOCR() {
 
     const result = await response.json();
 
-    console.log("OCR RESULT:", result);
-
     uploadedFileName = result.filename || uploadedFileName;
     ocrPages = result.pages || [];
 
     const extractedText = result.text || "";
-
     ocrText.value = extractedText;
 
     const autoSubject = getSubjectFromOCR(extractedText);
-
-    if (autoSubject) {
-      subjectInput.value = autoSubject;
-    } else {
-      subjectInput.value = "No subject detected";
-    }
+    subjectInput.value = autoSubject || "No subject detected";
 
     if (ocrPages.length > 0) {
       ocrPages.forEach(page => {
@@ -193,7 +242,7 @@ function displayRecords() {
       (record.subject || "").toLowerCase().includes(search) ||
       (record.office || "").toLowerCase().includes(search) ||
       (record.documentType || "").toLowerCase().includes(search) ||
-      (record.fileName || "").toLowerCase().includes(search);
+      (record.remarks || "").toLowerCase().includes(search);
 
     return matchesType && matchesStatus && matchesSearch;
   });
@@ -201,7 +250,7 @@ function displayRecords() {
   if (filteredRecords.length === 0) {
     table.innerHTML = `
       <tr>
-        <td colspan="9" class="empty">No communication records found.</td>
+        <td colspan="8" class="empty">No communication records found.</td>
       </tr>
     `;
     return;
@@ -212,18 +261,17 @@ function displayRecords() {
 
     table.innerHTML += `
       <tr>
-        <td><strong>${record.controlNo}</strong></td>
-        <td>${record.type}</td>
-        <td>${record.documentType}</td>
-        <td>${record.subject}</td>
-        <td>${record.office}</td>
-        <td>${record.date}</td>
-        <td><span class="badge ${record.status}">${record.status}</span></td>
-        <td>${record.fileName || "No file"}</td>
         <td>
-          <button class="action-btn edit" onclick="editRecord(${originalIndex})">Edit</button>
-          <button class="action-btn view" onclick="viewOCR(${originalIndex})">View OCR</button>
-          <button class="action-btn delete" onclick="deleteRecord(${originalIndex})">Delete</button>
+          <strong>${record.controlNo}</strong><br>
+          <small>${record.type} | ${record.documentType}</small>
+        </td>
+        <td>${record.date || "-"}</td>
+        <td>${record.office || "-"}</td>
+        <td>${record.subject || "-"}</td>
+        <td>${record.dateForwarded || "-"}</td>
+        <td>${record.remarks || "-"}</td>
+        <td><span class="badge ${record.status}">${record.status}</span></td>
+        <td>
         </td>
       </tr>
     `;
@@ -237,11 +285,12 @@ function editRecord(index) {
   document.getElementById("type").value = record.type;
   document.getElementById("controlNo").value = record.controlNo;
   document.getElementById("documentType").value = record.documentType;
-  document.getElementById("subject").value = record.subject;
-  document.getElementById("office").value = record.office;
   document.getElementById("date").value = record.date;
-  document.getElementById("status").value = record.status;
+  document.getElementById("office").value = record.office;
+  document.getElementById("subject").value = record.subject;
+  document.getElementById("dateForwarded").value = record.dateForwarded || "";
   document.getElementById("remarks").value = record.remarks;
+  document.getElementById("status").value = record.status;
   document.getElementById("ocrText").value = record.ocrText || "";
 
   uploadedFileName = record.fileName || "";
@@ -261,8 +310,11 @@ function editRecord(index) {
     });
   }
 
-  document.getElementById("formTitle").textContent = "Edit Communication";
+  document.getElementById("formTitle").textContent = "Edit Communication Record";
   document.getElementById("submitBtn").textContent = "Update Record";
+
+  formModal.classList.add("open");
+  overlay.classList.add("active");
 }
 
 function viewOCR(index) {
