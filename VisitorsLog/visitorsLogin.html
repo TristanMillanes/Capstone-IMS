@@ -4,96 +4,213 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PGENRO IMS | Visitors Log</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="visitorslog.css" />
 </head>
+
 <body>
+  <div id="sky-background" class="day">
+    <div class="stars"></div>
+    <div class="sun-moon" id="celestialBody"></div>
 
-  <main class="page">
-    <section class="left-panel">
-      <div class="brand">
-        <div class="logo-wrap">
-          <img src="../logo/enro.png" alt="PGENRO Logo">
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+
+    <div class="mist mist-1"></div>
+    <div class="mist mist-2"></div>
+
+    <div class="mountain-scene">
+      <svg viewBox="0 0 1440 520" preserveAspectRatio="none">
+        <path class="mountain far" d="M0 420 L150 250 L290 330 L460 170 L630 330 L790 210 L980 350 L1160 180 L1440 370 L1440 520 L0 520Z"/>
+        <path class="mountain mid" d="M0 460 L220 260 C320 140 430 130 520 210 C620 300 720 250 840 160 C970 60 1090 180 1200 290 L1440 430 L1440 520 L0 520Z"/>
+        <path class="mountain front" d="M0 520 L0 430 C170 350 280 310 410 250 C520 195 620 160 720 205 C820 245 930 340 1030 360 C1160 385 1300 330 1440 270 L1440 520Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="leaves-container"></div>
+  <div class="screen-overlay"></div>
+
+  <main class="page-layout">
+    <section class="hero-panel">
+      <div class="brand-header">
+        <div class="logo-glass">
+          <img src="../logo/enro.png" alt="PGENRO Logo" onerror="this.style.display='none'">
         </div>
-        <h1>PGENRO IMS</h1>
-        <p>Digital Visitors Log Entry</p>
+
+        <div>
+          <h1>PROVINCIAL GOVERNMENT</h1>
+          <p>Environmental and Natural Resources Office</p>
+        </div>
       </div>
 
-      <div class="info-box">
-        <h2>Welcome, Visitor</h2>
-        <p>Please complete the form before entering the office premises.</p>
+      <div class="welcome-text">
+        <span class="eyebrow">VISITORS LOG</span>
+        <h2>Welcome to the<br>Office Premises</h2>
+        <p>
+          Kindly fill out the visitors log before entering. Your entry will be recorded securely
+          for monitoring purposes.
+        </p>
       </div>
 
-      <div class="date-card">
-        <span id="todayDate">Loading date...</span>
-        <strong id="liveTime">--:-- --</strong>
+      <div class="clock-widget glass-card">
+        <div class="analog-clock">
+          <span class="clock-mark mark-12"></span>
+          <span class="clock-mark mark-3"></span>
+          <span class="clock-mark mark-6"></span>
+          <span class="clock-mark mark-9"></span>
+
+          <div class="hand hour-hand" id="hourHand"></div>
+          <div class="hand min-hand" id="minHand"></div>
+          <div class="hand sec-hand" id="secHand"></div>
+          <div class="clock-center"></div>
+        </div>
+
+        <div class="clock-details">
+          <span id="todayDate">Loading date...</span>
+
+          <div class="time-line">
+            <strong id="timeHour">00</strong>
+            <strong class="time-colon">:</strong>
+            <strong id="timeMinute">00</strong>
+            <strong class="time-colon">:</strong>
+            <strong id="timeSecond">00</strong>
+            <em id="timeAmpm">AM</em>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="form-panel">
-      <div class="form-card">
-
+      <div class="form-container glass-card">
         <div class="form-header">
-          <span class="badge">Visitor Entry Form</span>
-          <h2>Fill Out Visitor Details</h2>
-          <p>Your information will be recorded for office monitoring purposes.</p>
+          <span class="status-pulse">
+            <span class="dot"></span>
+            Registration Open
+          </span>
+
+          <h2>Visitor Log Entry</h2>
+          <p>Please complete all required fields.</p>
         </div>
 
-        <div class="progress">
-          <div class="progress-bar" id="progressBar"></div>
+        <div class="progress-track">
+          <div class="progress-fill" id="progressBar"></div>
         </div>
 
-        <form id="visitorForm">
-
-          <div class="form-grid">
+        <form id="visitorForm" novalidate>
+          <div class="form-row">
             <div class="input-group">
-              <label>Full Name</label>
-              <input type="text" id="fullName" placeholder="Juan Dela Cruz" required>
-              <small></small>
+              <div class="floating-input">
+                <input type="text" id="fullName" placeholder=" " required>
+                <label for="fullName">Full Name</label>
+              </div>
+              <span class="error-msg"></span>
             </div>
 
             <div class="input-group">
-              <label>Contact Number</label>
-              <input type="text" id="contact" placeholder="09XXXXXXXXX" required>
-              <small></small>
+              <div class="floating-input">
+                <input type="tel" id="contact" placeholder=" " maxlength="11" required>
+                <label for="contact">Mobile Number</label>
+              </div>
+              <span class="error-msg"></span>
             </div>
           </div>
 
           <div class="input-group">
-            <label>Address / Office / Agency</label>
-            <input type="text" id="address" placeholder="Enter address, office, or agency" required>
-            <small></small>
+            <div class="floating-input">
+              <input type="text" id="address" placeholder=" " required>
+              <label for="address">Address / Agency / Office</label>
+            </div>
+            <span class="error-msg"></span>
           </div>
 
           <div class="input-group">
-            <label>Person / Office to Visit</label>
-            <input type="text" id="personToVisit" placeholder="Enter person or office to visit" required>
-            <small></small>
+            <div class="floating-input">
+              <input type="text" id="personToVisit" placeholder=" " required>
+              <label for="personToVisit">Person / Department to Visit</label>
+            </div>
+            <span class="error-msg"></span>
           </div>
 
           <div class="input-group">
-            <label>Purpose of Visit</label>
-            <textarea id="purpose" placeholder="State your purpose of visit" required></textarea>
-            <small></small>
+            <div class="floating-input select-input">
+              <select id="purposeCategory" required>
+                <option value="" disabled selected hidden></option>
+
+                <optgroup label="Technical Assistance">
+                  <option value="Technical Assistance - Tree Planting">Tree Planting</option>
+                  <option value="Technical Assistance - WACS">WACS</option>
+                  <option value="Technical Assistance - 10 Year SWM Plan">10 Year SWM Plan</option>
+                  <option value="Technical Assistance - Others">Others (Please specify)</option>
+                </optgroup>
+
+                <optgroup label="I.E.C">
+                  <option value="I.E.C - Request for Speaker">Request for Speaker</option>
+                  <option value="I.E.C - Request for Information">Request for Information</option>
+                  <option value="I.E.C - Request for Interview">Request for Interview</option>
+                  <option value="I.E.C - Others">Others (Please specify)</option>
+                </optgroup>
+
+                <optgroup label="Provision of Planting Materials">
+                  <option value="Provision of Planting Materials - Native Tree Seedlings">Native Tree Seedlings</option>
+                </optgroup>
+
+                <optgroup label="Environmental Concerns & Complaints">
+                  <option value="Environmental Concerns - Solid Waste">Solid Waste</option>
+                  <option value="Environmental Concerns - Air Quality">Air Quality</option>
+                  <option value="Environmental Concerns - Water Quality">Water Quality</option>
+                  <option value="Environmental Concerns - Wildlife">Wildlife</option>
+                  <option value="Environmental Concerns - Natural Resources">Natural Resources</option>
+                  <option value="Environmental Concerns - Others">Others (Please specify)</option>
+                </optgroup>
+
+                <optgroup label="Certification">
+                  <option value="Certification - Orientation (PA Memo 2023-03)">Orientation (PA Memo 2023-03 & 2023-03B)</option>
+                  <option value="Certification - Ambulant Vendors/Stalls">Certificates for Ambulant Vendors & Stalls</option>
+                </optgroup>
+
+                <option value="Other Service not listed">Other Service not listed</option>
+              </select>
+              <label for="purposeCategory">Purpose Category</label>
+            </div>
+            <span class="error-msg"></span>
+          </div>
+
+          <div class="input-group hidden" id="otherPurposeGroup">
+            <div class="floating-input">
+              <input type="text" id="otherPurposeSpecific" placeholder=" ">
+              <label for="otherPurposeSpecific">Please specify 'Other'</label>
+            </div>
+            <span class="error-msg"></span>
           </div>
 
           <button type="submit" class="submit-btn">
-            Submit Visitor Entry
+            Submit Entry Log →
           </button>
-
         </form>
       </div>
     </section>
   </main>
 
-  <div class="modal" id="successModal">
-    <div class="modal-card">
-      <div class="check">✓</div>
-      <h2>Entry Submitted</h2>
-      <p>Your visitor log has been successfully recorded.</p>
-      <button onclick="closeModal()">Done</button>
+  <div class="modal-overlay" id="successModal" aria-hidden="true">
+    <div class="modal-content glass-card">
+      <div class="success-circle">✓</div>
+      <h2>Entry Authorized</h2>
+      <p>
+        Thank you, <strong id="visitorNameDisplay">Visitor</strong>.
+        Your visitor entry has been successfully recorded.
+      </p>
+      <button id="closeModalBtn">Acknowledge</button>
     </div>
   </div>
 
   <script src="visitorslog.js"></script>
+  <script type="module" src="visitorsData.js"></script>
 </body>
 </html>

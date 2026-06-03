@@ -1,0 +1,235 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>PGENRO IMS | Visitor'"'"'s Log</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="visitorsView.css" />
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <a href="homepage.html" class="logo-area">
+      <div class="logo-icon">
+        <img src="../logo/enro.png" class="logo-image">
+      </div>
+
+      <div>
+        <h2>Provincial Government</h2>
+        <span>Environmental and Natural Resources office</span>
+      </div>
+    </a>
+
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>IMS Modules</h3>
+        <p>Quick access menu</p>
+      </div>
+
+      <ul class="modules-list">
+        <li>
+          <a href="homepage.html">
+            <i data-lucide="home"></i>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="Communication.html">
+            <i data-lucide="repeat"></i>
+            Incoming/Outgoing Communication
+          </a>
+        </li>
+        <li>
+          <a href="#travel">
+            <i data-lucide="map-pin"></i>
+            Travel Order
+          </a>
+        </li>
+        <li>
+          <a href="#memo">
+            <i data-lucide="file-text"></i>
+            Office Memo
+          </a>
+        </li>
+        <li>
+          <a href="employee.html">
+            <i data-lucide="users"></i>
+            Employee Records
+          </a>
+        </li>
+        <li>
+          <a href="#inventory">
+            <i data-lucide="box"></i>
+            Inventory
+          </a>
+        </li>
+        <li>
+          <a href="visitorslog.html" class="active">
+            <i data-lucide="user-check"></i>
+            Visitors Log
+          </a>
+        </li>
+        <li>
+          <a href="#service">
+            <i data-lucide="wrench"></i>
+            Service Request
+          </a>
+        </li>
+        <li>
+          <a href="#ics">
+            <i data-lucide="clipboard-list"></i>
+            ICS
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <section class="page-header">
+        <span class="page-badge">
+          <i data-lucide="user-check"></i>
+          Visitor Log Module
+        </span>
+        <h1>Visitor Records and Visit Details</h1>
+        <p>View today's visitors, filter by purpose, and inspect full visit details. Records are stored in Firebase Realtime Database (localStorage fallback).</p>
+      </section>
+
+      <section class="content-grid">
+        <div class="stats-section">
+          <div class="stat-card">
+            <i data-lucide="users"></i>
+            <div>
+              <p>Total Visitors</p>
+              <h2 id="summaryTotal">0</h2>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <i data-lucide="calendar"></i>
+            <div>
+              <p>Today'"'"'s Visits</p>
+              <h2 id="summaryToday">0</h2>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <i data-lucide="filter"></i>
+            <div>
+              <p>Current Filter</p>
+              <h2 id="summaryFilter">All</h2>
+            </div>
+          </div>
+        </div>
+
+        <div class="visitors-section">
+          <div class="section-header">
+            <h2>Visitor Records</h2>
+            <p>Browse, search, and filter visitor entries.</p>
+          </div>
+
+          <div class="search-filter">
+            <div class="search-field">
+              <i data-lucide="search"></i>
+              <input id="visitorSearch" type="search" placeholder="Search by name, contact, purpose..." aria-label="Search visitors" />
+            </div>
+
+            <select id="visitorFilter" class="filter-select" aria-label="Filter visitors by purpose">
+              <option value="all">Filter by purpose</option>
+              <option value="Request for Speaker">Request for Speaker</option>
+              <option value="I.E.C - Request for Information">I.E.C - Request for Information</option>
+              <option value="Environmental Concerns - Water Quality">Environmental Concerns - Water Quality</option>
+              <option value="Technical Assistance - WACS">Technical Assistance - WACS</option>
+              <option value="Other Service not listed">Other Service not listed</option>
+            </select>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="visitor-table" aria-label="Visitor table">
+              <thead>
+                <tr>
+                  <th>Visitor</th>
+                  <th>When</th>
+                  <th>Purpose</th>
+                  <th>Visiting</th>
+                </tr>
+              </thead>
+              <tbody id="visitorTableBody"></tbody>
+            </table>
+          </div>
+
+          <div id="emptyState" class="empty-state hidden">
+            <p>No visitor records found.</p>
+            <small>Try clearing the filter or search.</small>
+          </div>
+        </div>
+      </section>
+
+      <div id="detailPanel" class="detail-panel hidden" aria-live="polite">
+        <h3 id="detailTitle">Visitor Details</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span>Full Name</span>
+            <strong id="detailName">—</strong>
+          </div>
+          <div class="detail-item">
+            <span>Contact</span>
+            <strong id="detailContact">—</strong>
+          </div>
+          <div class="detail-item">
+            <span>Address / Agency</span>
+            <strong id="detailAddress">—</strong>
+          </div>
+          <div class="detail-item">
+            <span>Person / Department</span>
+            <strong id="detailPerson">—</strong>
+          </div>
+          <div class="detail-item">
+            <span>Visit Purpose</span>
+            <strong id="detailPurpose">—</strong>
+          </div>
+          <div class="detail-item">
+            <span>Date & Time</span>
+            <strong id="detailWhen">—</strong>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <script src="../VisitorsLog/visitorsData.js"></script>
+  <script>
+    // Small check to ensure Firebase DB is available for the visitor view
+    if (window.firebaseDB) {
+      console.log('Realtime DB available for visitors view');
+    }
+  </script>
+
+  <script src="visitorsView.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+root { 
+    --primary-color: #4CAF50; /* Green */
+    --secondary-color: #f44336; /* Red */
+    --background-color: #f0f0f0; /* Light Gray */
+    --text-color: #333333; /* Dark Gray */
+    --button-color: #4CAF50; /* Green */
+    --button-hover-color: #45a049; /* Darker Green */
+}
