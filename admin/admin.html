@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>PGENRO IMS | Admin Dashboard</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="admin.css" />
+</head>
+
+<body>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <a href="#home" class="logo-area">
+      <div class="logo-icon">
+      <img src="../logo/enro.png" class="logo-image">
+      </div>
+
+      <div>
+        <h2>Provincial Government</h2>
+        <span>Environmental and Natural Resources office</span>
+      </div>
+    </a>
+
+    <nav class="nav-links" id="navLinks">
+      <a href="#home" class="active">Home</a>
+      <a href="#modules">Modules</a>
+      <a href="#features">Features</a>
+      <a href="#analytics">Charts</a>
+      <a href="#process">Process</a>
+      <a href="#contact">Contact</a>
+    </nav>
+
+    <div class="right-nav">
+      <div class="profile-menu" id="profileMenu">
+        <button class="profile-btn" id="profileBtn" type="button">
+          <div class="profile-avatar">
+            <i data-lucide="user"></i>
+          </div>
+
+          <div class="profile-text">
+            <h4>Admin User</h4>
+            <span>Administrator Account</span>
+          </div>
+
+          <i data-lucide="chevron-down" class="profile-chevron"></i>
+        </button>
+
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-header">
+            <div class="profile-avatar big">
+              <i data-lucide="user"></i>
+            </div>
+
+            <div>
+              <h3>PGENRO Admin</h3>
+              <p>Administrator Account</p>
+            </div>
+          </div>
+
+          <a href="admin.html">
+            <i data-lucide="layout-dashboard"></i>
+            Dashboard
+          </a>
+
+          <a href="../User/requestACC.html">
+            <i data-lucide="settings"></i>
+            Manage Accounts
+          </a>
+
+          <button class="logout-btn" id="logoutBtn" type="button">
+            <i data-lucide="log-out"></i>
+            Logout
+          </button>
+        </div>
+      </div>
+
+      <button class="menu-btn" id="menuBtn" type="button">
+        <i data-lucide="menu"></i>
+      </button>
+    </div>
+  </header>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <h3>IMS Admin Modules</h3>
+      </div>
+
+      <ul class="modules-list">
+        <li>
+          <a href="admin.html">
+            <i data-lucide="home"></i>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="../User/Communication.html">
+            <i data-lucide="repeat"></i>
+            Incoming/Outgoing Communication
+          </a>
+        </li>
+
+        <li>
+          <a href="#users">
+            <i data-lucide="users"></i>
+            User Management
+          </a>
+        </li>
+
+        <li>
+          <a href="#accounts">
+            <i data-lucide="user-plus"></i>
+            Account Requests
+          </a>
+        </li>
+
+        <li>
+          <a href="#audit">
+            <i data-lucide="file-check"></i>
+            Audit Logs
+          </a>
+        </li>
+
+        <li>
+          <a href="#backup">
+            <i data-lucide="hard-drive"></i>
+            Backups
+          </a>
+        </li>
+
+        <li>
+          <a href="#settings">
+            <i data-lucide="settings"></i>
+            System Settings
+          </a>
+        </li>
+
+        <li>
+          <a href="../User/Communication.html">
+            <i data-lucide="repeat"></i>
+            Communications
+          </a>
+        </li>
+
+        <li>
+          <a href="../User/employee.html">
+            <i data-lucide="users-round"></i>
+            Employee Records
+          </a>
+        </li>
+
+        <li>
+          <a href="../User/visitorsView.html">
+            <i data-lucide="user-check"></i>
+            Visitor's Log
+          </a>
+        </li>
+      </ul>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- HERO -->
+      <section class="hero" id="home">
+        <div class="hero-copy reveal">
+          <span class="badge">
+            <i data-lucide="sparkles"></i>
+            Web-Based IMS
+          </span>
+
+          <h1>
+            Welcome to <span>Admin Dashboard</span>
+            <small id="typingText">System Administration Panel</small>
+          </h1>
+
+          <p>
+            Manage user accounts, monitor system activity, oversee all modules,
+            handle account requests, and maintain IMS data integrity from a centralized
+            administrative control panel.
+          </p>
+
+          <div class="hero-actions">
+            <a href="#modules" class="primary-btn">
+              <i data-lucide="folder-open"></i>
+              Open Modules
+            </a>
+
+            <a href="#analytics" class="secondary-btn">
+              <i data-lucide="bar-chart-3"></i>
+              View Charts
+            </a>
+          </div>
+        </div>
+
+        <div class="hero-card reveal">
+          <div class="dashboard-preview">
+            <div class="preview-header">
+              <div class="window-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+              </div>
+
+              <div class="preview-title">
+                <h3>Dashboard Overview</h3>
+                <p>Recent activity summary and analytics preview.</p>
+              </div>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <i data-lucide="users"></i>
+                <h4 class="counter" data-target="0">0</h4>
+                <p>Total Users</p>
+              </div>
+
+              <div class="stat-card">
+                <i data-lucide="clock-alert"></i>
+                <h4 class="counter" data-target="0">0</h4>
+                <p>Pending Requests</p>
+              </div>
+
+              <div class="stat-card">
+                <i data-lucide="database"></i>
+                <h4 class="counter" data-target="0">0</h4>
+                <p>Records in System</p>
+              </div>
+
+              <div class="stat-card">
+                <i data-lucide="activity"></i>
+                <h4 class="counter" data-target="0">0</h4>
+                <p>Active Sessions</p>
+              </div>
+            </div>
+
+            <div class="mini-chart-card">
+              <div>
+                <h4>Weekly Document Activity</h4>
+                <p>Incoming and outgoing movement</p>
+              </div>
+
+              <div class="mini-chart-wrapper">
+                <canvas id="miniChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MODULES -->
+      <section class="modules-section" id="modules">
+        <div class="section-title reveal">
+          <span>Admin Features</span>
+          <h2>Administration Tools</h2>
+          <p>
+            Essential admin features for system management, user control, and data oversight.
+          </p>
+        </div>
+
+        <div class="modules-grid">
+          <div class="module-card reveal" id="users" data-name="User Management">
+            <i data-lucide="users"></i>
+            <h3>User Management</h3>
+            <p>
+              Create, edit, deactivate, and manage user accounts and administrator roles.
+            </p>
+          </div>
+
+          <div class="module-card reveal" id="accounts" data-name="Manage Account Request Account">
+            <i data-lucide="user-plus"></i>
+            <h3>Account Requests</h3>
+            <p>
+              Review and approve pending account access requests from authorized personnel.
+            </p>
+          </div>
+
+          <div class="module-card reveal" id="comm" data-name="Incoming Outgoing Communication">
+            <i data-lucide="repeat"></i>
+            <h3>Communications</h3>
+            <p>
+              Monitor and oversee all incoming and outgoing communication records.
+            </p>
+          </div>
+
+          <div class="module-card reveal" id="employee" data-name="Employee Records">
+            <i data-lucide="users-round"></i>
+            <h3>Employee Records</h3>
+            <p>
+              View and manage all employee profiles, assignments, and personnel data.
+            </p>
+          </div>
+
+          <div class="module-card reveal" id="visitor" data-name="Visitor Log">
+            <i data-lucide="user-check"></i>
+            <h3>Visitor's Log</h3>
+            <p>
+              Track and manage all visitor entries, purposes, and building access records.
+            </p>
+          </div>
+
+          <div class="module-card reveal" id="audit" data-name="Audit Logs">
+            <i data-lucide="file-check"></i>
+            <h3>Audit Logs</h3>
+            <p>
+              View system activity logs, user actions, and data modification history.
+            </p>
+          </div>
+
+          <div class="module-card reveal" id="backup" data-name="Backup">
+            <i data-lucide="hard-drive"></i>
+            <h3>Backups</h3>
+            <p>
+              Create, schedule, and restore system and database backups for data protection.
+            </p>
+          </div>
+
+          <div class="module-card reveal" id="settings" data-name="Settings">
+            <i data-lucide="settings"></i>
+            <h3>System Settings</h3>
+            <p>
+              Configure system preferences, security policies, and global application settings.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- FEATURES -->
+      <section class="features-section" id="features">
+        <div class="section-title reveal">
+          <span>System Features</span>
+          <h2>Admin Dashboard Highlights</h2>
+          <p>
+            These features help administrators manage users, monitor system health, and maintain data security.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-box reveal">
+            <i data-lucide="lock"></i>
+            <h3>Access Control</h3>
+            <p>
+              Manage user permissions, roles, account access levels, and security restrictions.
+            </p>
+          </div>
+
+          <div class="feature-box reveal">
+            <i data-lucide="eye"></i>
+            <h3>Activity Monitoring</h3>
+            <p>
+              Track user activities, system logs, and monitor suspicious access patterns.
+            </p>
+          </div>
+
+          <div class="feature-box reveal">
+            <i data-lucide="alert-circle"></i>
+            <h3>Alert System</h3>
+            <p>
+              Receive notifications on system errors, unusual activity, and security events.
+            </p>
+          </div>
+
+          <div class="feature-box reveal">
+            <i data-lucide="pie-chart"></i>
+            <h3>System Analytics</h3>
+            <p>
+              View comprehensive reports on system usage, performance, and user statistics.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ANALYTICS -->
+      <section class="analytics-section" id="analytics">
+        <div class="section-title reveal">
+          <span>Dashboard Charts</span>
+          <h2>Records and Activity Analytics</h2>
+          <p>
+            Visual overview of document flow, record categories, and current status.
+          </p>
+        </div>
+
+        <div class="analytics-grid">
+          <div class="chart-card large reveal">
+            <div class="chart-header">
+              <div>
+                <h3>Monthly Communication Activity</h3>
+                <p>Incoming and outgoing document records</p>
+              </div>
+
+              <span class="chart-badge">2026</span>
+            </div>
+
+            <div class="chart-wrapper line-chart">
+              <canvas id="monthlyChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card reveal">
+            <div class="chart-header">
+              <div>
+                <h3>Record Category</h3>
+                <p>Distribution by module</p>
+              </div>
+
+              <span class="chart-badge">Live</span>
+            </div>
+
+            <div class="chart-wrapper">
+              <canvas id="categoryChart"></canvas>
+            </div>
+          </div>
+
+          <div class="chart-card reveal">
+            <div class="chart-header">
+              <div>
+                <h3>Transaction Status</h3>
+                <p>Completed, pending, processing, and archived</p>
+              </div>
+
+              <span class="chart-badge">Summary</span>
+            </div>
+
+            <div class="chart-wrapper">
+              <canvas id="statusChart"></canvas>
+            </div>
+          </div>
+
+          <div class="activity-card reveal">
+            <h3>Recent Activity</h3>
+
+            <div class="activity-item">
+              <span class="activity-icon">
+                <i data-lucide="user-plus"></i>
+              </span>
+              <div>
+                <h4>New account request received</h4>
+                <p>Pending review and approval from administrator.</p>
+              </div>
+            </div>
+
+            <div class="activity-item">
+              <span class="activity-icon">
+                <i data-lucide="user-check"></i>
+              </span>
+              <div>
+                <h4>User account approved</h4>
+                <p>New user access granted and notification sent.</p>
+              </div>
+            </div>
+
+            <div class="activity-item">
+              <span class="activity-icon">
+                <i data-lucide="alert-circle"></i>
+              </span>
+              <div>
+                <h4>System backup completed</h4>
+                <p>Database backup created and stored successfully.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROCESS -->
+      <section class="process-section" id="process">
+        <div class="section-title reveal">
+          <span>Admin Workflow</span>
+          <h2>Administrative Tasks Overview</h2>
+          <p>
+            Follow these key steps to effectively manage the IMS system and users.
+          </p>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-item reveal">
+            <div class="timeline-icon">1</div>
+            <div>
+              <h3>Access Admin Dashboard</h3>
+              <p>
+                Login to the admin panel and view system overview, active users, and pending tasks.
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline-item reveal">
+            <div class="timeline-icon">2</div>
+            <div>
+              <h3>Review Account Requests</h3>
+              <p>
+                Check and approve or deny pending user account requests from the account management module.
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline-item reveal">
+            <div class="timeline-icon">3</div>
+            <div>
+              <h3>Monitor System Activity</h3>
+              <p>
+                Review audit logs and activity reports to track user actions and system performance.
+              </p>
+            </div>
+          </div>
+
+          <div class="timeline-item reveal">
+            <div class="timeline-icon">4</div>
+            <div>
+              <h3>Maintain System Security</h3>
+              <p>
+                Configure security settings, backup data, and manage user permissions as needed.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer" id="contact">
+        <div>
+          <h2>PGENRO Admin Panel</h2>
+          <p>
+            Administration and system management control center for the
+            Information Management System.
+          </p>
+        </div>
+
+        <div>
+          <h4>Quick Links</h4>
+          <a href="#users">User Management</a>
+          <a href="#accounts">Account Requests</a>
+          <a href="#audit">Audit Logs</a>
+          <a href="#settings">Settings</a>
+        </div>
+
+        <div>
+          <h4>Support</h4>
+          <p>Email: admin@pgenro.gov.ph</p>
+          <p>Office: PGENRO System Administration</p>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- JS -->
+  <script src="admin.js"></script>
+</body>
+</html>
