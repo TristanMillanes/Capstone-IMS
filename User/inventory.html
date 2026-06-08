@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Inventory Module</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="inventory.css" />
+</head>
+
+<body>
+  <header class="navbar">
+    <a href="homepage.html" class="logo-area">
+      <div class="logo-icon">
+        <img src="../logo/enro.png" class="logo-image" alt="PGENRO Logo" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <h2>Provincial Government</h2>
+        <span>Environmental and Natural Resources Office</span>
+      </div>
+    </a>
+
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>IMS Modules</h3>
+      <p>Quick access menu</p>
+    </div>
+
+    <ul class="modules-list">
+      <li><a href="homepage.html"><i data-lucide="home"></i><span>Dashboard</span></a></li> 
+      <li><a href="communication.html"><i data-lucide="repeat-2"></i><span>Incoming/Outgoing<br>Communication</span></a></li>
+      <li><a href="travelorder.html"><i data-lucide="map-pin"></i><span>Travel Order</span></a></li>
+      <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memo</span></a></li>
+      <li><a href="employee.html"><i data-lucide="users"></i><span>Employee Records</span></a></li>
+      <li><a href="inventory.html" class="active"><i data-lucide="box"></i><span>Inventory</span></a></li>
+      <li><a href="visitorsView.html"><i data-lucide="user-check"></i><span>Visitor's Log</span></a></li>
+      <li><a href="servicerequest.html"><i data-lucide="wrench"></i><span>Service Request</span></a></li>
+      <li><a href="ics.html"><i data-lucide="clipboard-list"></i><span>ICS</span></a></li>
+    </ul>
+  </aside>
+
+  <div class="form-modal" id="formModal">
+    <div class="modal-header">
+      <h2 id="formTitle">Encode Inventory Record</h2>
+      <button class="modal-close" id="formModalClose">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <form id="inventoryForm">
+        <input type="hidden" id="editIndex">
+
+        <div class="form-row">
+          <div>
+            <label>Item ID / Control No.</label>
+            <input type="text" id="itemId" readonly placeholder="Auto-generated">
+          </div>
+          <div>
+            <label>Item Name</label>
+            <input type="text" id="itemName" required placeholder="e.g. 4A BOND PAPER">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label>Unit</label>
+            <input type="text" id="itemUnit" required placeholder="e.g. REAM, BOX, PCS">
+          </div>
+          <div>
+            <label>Description</label>
+            <input type="text" id="itemDesc" placeholder="Brief description...">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div>
+            <label>Quantity (Total Stock Added)</label>
+            <input type="number" id="itemQty" required min="0" value="0">
+          </div>
+          <div>
+            <label>Total Used</label>
+            <input type="number" id="itemUsed" required min="0" value="0">
+          </div>
+        </div>
+
+        <label>Remaining Balance</label>
+        <input type="number" id="itemBalance" readonly placeholder="Auto-calculated">
+
+        <label>Remarks</label>
+        <textarea id="itemRemarks" placeholder="Enter dates, conditions, or any remarks"></textarea>
+
+        <div class="form-actions">
+          <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+          <button type="submit" class="save-btn" id="submitBtn">Save Record</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="form-modal" id="reportModal">
+    <div class="modal-header">
+      <h2>Select Items for Report</h2>
+      <button class="modal-close" id="reportModalClose">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+    <div class="modal-body">
+      <p style="margin-bottom: 16px; color: var(--muted); font-size: 14px; font-weight: 600;">
+        Check the boxes of the items you want to include in the printout.
+      </p>
+      
+      <div class="table-wrapper" style="max-height: 400px; margin-bottom: 24px;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;">
+                <input type="checkbox" id="reportSelectAll" title="Select All">
+              </th>
+              <th>Item ID</th>
+              <th>Item Name</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody id="reportTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="form-actions" style="margin-top: 0;">
+        <button type="button" class="clear-btn" id="cancelReportBtn">Cancel</button>
+        <button type="button" class="save-btn" id="confirmPrintBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <i data-lucide="printer" style="width: 18px; height: 18px;"></i> Print Selected
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <section class="page-header">
+      <span class="page-badge">
+        <i data-lucide="package"></i>
+        Inventory Module
+      </span>
+      <h1>Office Supplies & Inventory</h1>
+      <p>Manage inventory records, track stock levels, monitor item usage, and seamlessly update supplies for the office.</p>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <i data-lucide="database"></i>
+        <div>
+          <p>Total Item Types</p>
+          <h2 id="statTotalItems">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i data-lucide="layers"></i>
+        <div>
+          <p>Total Stock Quantity</p>
+          <h2 id="statTotalQty">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i data-lucide="alert-triangle"></i>
+        <div>
+          <p>Low Stock Items</p>
+          <h2 id="statLowStock">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <i data-lucide="x-circle"></i>
+        <div>
+          <p>Out of Stock</p>
+          <h2 id="statOutOfStock">0</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="records-card">
+      <div class="records-header">
+        <div class="card-title">
+          <h2>Inventory Records</h2>
+          <p>Search, filter, update, and view inventory records.</p>
+        </div>
+
+        <div class="header-actions">
+          <button class="report-btn" id="generateReportBtn">
+            <i data-lucide="printer"></i>
+            Generate Report
+          </button>
+          <button class="encoding-btn" id="openEncodingBtn">
+            <i data-lucide="plus-circle"></i>
+            Encode New Item
+          </button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab-btn active" onclick="setFilter('All', this)">All Items</button>
+        <button class="tab-btn" onclick="setFilter('In-Stock', this)">In Stock</button>
+        <button class="tab-btn" onclick="setFilter('Low-Stock', this)">Low Stock</button>
+        <button class="tab-btn" onclick="setFilter('Out-of-Stock', this)">Out of Stock</button>
+      </div>
+
+      <div class="tools">
+        <div class="search-field">
+          <i data-lucide="search"></i>
+          <input type="text" id="searchInput" placeholder="Search item name, ID, desc..." oninput="displayRecords()">
+        </div>
+      </div>
+
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Item ID</th>
+              <th>Item Details</th>
+              <th>Quantity</th>
+              <th>Used</th>
+              <th>Balance</th>
+              <th>Remarks</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="recordsTable"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="inventory.js"></script>
+</body>
+</html>

@@ -10,8 +10,7 @@ const firebaseConfig = {
   measurementId: "G-W4TPE7CHC8"
 };
 
-// Initialize Firebase (compat). Expose the Realtime Database instance as `window.firebaseDB`.
-// Make sure the page includes the Firebase SDK scripts (firebase-app-compat.js and firebase-database-compat.js)
+
 if (typeof firebase !== 'undefined') {
   try {
     if (!firebase.apps || !firebase.apps.length) {

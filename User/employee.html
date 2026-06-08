@@ -3,53 +3,135 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Employee Records</title>
+  <title>PGENRO IMS | Employee Records</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
   <link rel="stylesheet" href="employee.css" />
 </head>
 <body>
+  
+  <header class="navbar">
+    <a href="homepage.html" class="logo-area">
+      <div class="logo-icon">
+        <img src="../logo/enro.png" class="logo-image" alt="PGENRO Logo" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <h2>Provincial Government</h2>
+        <span>Environmental and Natural Resources Office</span>
+      </div>
+    </a>
 
-  <div class="container">
-    <header>
-      <h1>Employee Record Management</h1>
-      <p>Manage employee information easily</p>
-    </header>
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
 
-    <section class="form-card">
-      <h2>Add Employee</h2>
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>IMS Modules</h3>
+      <p>Quick access menu</p>
+    </div>
+
+    <ul class="modules-list">
+      <li><a href="homepage.html"><i data-lucide="home"></i><span>Dashboard</span></a></li> 
+      <li><a href="communication.html"><i data-lucide="repeat-2"></i><span>Incoming/Outgoing<br>Communication</span></a></li>
+      <li><a href="travelorder.html"><i data-lucide="map-pin"></i><span>Travel Order</span></a></li>
+      <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memo</span></a></li>
+      <li><a href="employee.html" class="active"><i data-lucide="users"></i><span>Employee Records</span></a></li>
+      <li><a href="inventory.html"><i data-lucide="box"></i><span>Inventory</span></a></li>
+      <li><a href="visitorsView.html"><i data-lucide="user-check"></i><span>Visitor's Log</span></a></li>
+      <li><a href="servicerequest.html"><i data-lucide="wrench"></i><span>Service Request</span></a></li>
+      <li><a href="ics.html"><i data-lucide="clipboard-list"></i><span>ICS</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    
+    <section class="page-header">
+      <span class="page-badge">
+        <i data-lucide="users"></i>
+        HR Module
+      </span>
+      <h1>Employee Directory</h1>
+      <p>Manage your team's information, contact details, status, and department records efficiently.</p>
+    </section>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <i data-lucide="search" class="search-icon"></i>
+        <input type="text" id="searchInput" placeholder="Search by name, ID, department...">
+      </div>
+      <button type="button" id="toggleFormBtn" class="primary-btn">
+        <i data-lucide="user-plus"></i> Add New Employee
+      </button>
+    </div>
+
+    <section class="form-card hidden" id="formSection">
+      <div class="form-header">
+        <h2>Employee Details</h2>
+        <button type="button" id="cancelBtn" class="icon-btn" title="Close">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
 
       <form id="employeeForm">
         <input type="hidden" id="editIndex">
 
-        <div class="Top-actions">
-            <button type="button" id="addEmployeeBtn">Add Employee</button>
-        </div>
-
         <div class="form-grid">
-          <input type="text" id="employeeId" placeholder="Employee ID" required>
-          <input type="text" id="fullName" placeholder="Full Name" required>
-          <input type="text" id="position" placeholder="Position" required>
-          <input type="text" id="department" placeholder="Department" required>
-          <input type="email" id="email" placeholder="Email Address" required>
-          <input type="text" id="contact" placeholder="Contact Number" required>
-          <input type="date" id="dateHired" required>
-          <select id="status" required>
-            <option value="">Select Status</option>
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
-            <option value="On Leave">On Leave</option>
-          </select>
+          <div class="input-group">
+            <label for="employeeId">Employee ID</label>
+            <input type="text" id="employeeId" placeholder="e.g. EMP-001" required>
+          </div>
+          <div class="input-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" placeholder="John Doe" required>
+          </div>
+          <div class="input-group">
+            <label for="position">Position</label>
+            <input type="text" id="position" placeholder="Software Engineer" required>
+          </div>
+          <div class="input-group">
+            <label for="department">Department</label>
+            <input type="text" id="department" placeholder="IT / HR / Sales" required>
+          </div>
+          <div class="input-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" placeholder="john@company.com" required>
+          </div>
+          <div class="input-group">
+            <label for="contact">Contact Number</label>
+            <input type="text" id="contact" placeholder="+1 234 567 890" required>
+          </div>
+          <div class="input-group">
+            <label for="dateHired">Date Hired</label>
+            <input type="date" id="dateHired" required>
+          </div>
+          <div class="input-group">
+            <label for="status">Status</label>
+            <select id="status" required>
+              <option value="" disabled selected>Select Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="On Leave">On Leave</option>
+            </select>
+          </div>
         </div>
 
-        <button type="submit" id="submitBtn">Save Employee</button>
+        <div class="form-actions">
+          <button type="submit" id="submitBtn" class="primary-btn">Save Employee</button>
+        </div>
       </form>
     </section>
 
-    <section class="table-card">
-      <div class="table-header">
-        <h2>Employee List</h2>
-        <input type="text" id="searchInput" placeholder="Search employee...">
-      </div>
-
+    <section class="table-card records-card">
       <div class="table-wrapper">
         <table>
           <thead>
@@ -62,14 +144,15 @@
               <th>Contact</th>
               <th>Date Hired</th>
               <th>Status</th>
-              <th>Action</th>
+              <th class="text-center">Action</th>
             </tr>
           </thead>
           <tbody id="employeeTable"></tbody>
         </table>
       </div>
     </section>
-  </div>
+
+  </main>
 
   <script src="employee.js"></script>
 </body>

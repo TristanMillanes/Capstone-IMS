@@ -47,18 +47,21 @@ const auth = getAuth(app);
 
 const USER_DASHBOARD = "/User/Homepage.html";
 const ADMIN_DASHBOARD = "/admin/admin.html";
+const VISITOR_LOG = "/VisitorsLog/visitorsLogin.html";
 
 
 // ===============================
-// ADMIN ACCOUNTS FROM FIREBASE AUTHENTICATION
+// ACCOUNTS FROM FIREBASE AUTHENTICATION
 // ===============================
-// Kunin mo ang UID ng admin account sa Firebase Authentication
-// Firebase Console > Authentication > Users > click admin account > copy User UID
+// Firebase Console > Authentication > Users > click account > copy User UID
 
 const adminUIDs = [
     "AzmcZqsID3gSUknToqULfoyOcy92" 
 ];
 
+const visitorsUIDs = [
+    "RLx9coBxScOJ7CLq1CeDQbz6vvD2"
+];
 
 // ===============================
 // MESSAGE FUNCTION
@@ -149,12 +152,19 @@ if (loginForm) {
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-          
+            // ---- FIX APPLIED HERE ----
             if (adminUIDs.includes(user.uid)) {
                 showMessage("Admin login successful. Redirecting...", "success");
 
                 setTimeout(() => {
                     window.location.href = ADMIN_DASHBOARD;
+                }, 1200);
+
+            } else if (visitorsUIDs.includes(user.uid)) {
+                showMessage("Visitor login successful. Redirecting...", "success");
+
+                setTimeout(() => {
+                    window.location.href = VISITOR_LOG;
                 }, 1200);
 
             } else {
@@ -164,6 +174,7 @@ if (loginForm) {
                     window.location.href = USER_DASHBOARD;
                 }, 1200);
             }
+            // --------------------------
 
         } catch (error) {
             showMessage(getAuthErrorMessage(error.code), "error");
