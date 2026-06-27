@@ -5,126 +5,236 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PGENRO IMS | Secure Login</title>
 
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Unified Modern Stylesheet -->
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
 
+    <!-- Layered Interactive Background -->
+    <div id="leavesCanvasContainer" aria-hidden="true"></div>
+    <div class="background-grid-overlay" aria-hidden="true"></div>
+
     <main class="main-container">
-        <div class="blob-c"></div>
-        <div class="blob-d"></div>
+        <!-- Ambient atmospheric background gradients -->
+        <div class="glow-orb glow-orb-primary" aria-hidden="true"></div>
+        <div class="glow-orb glow-orb-secondary" aria-hidden="true"></div>
 
+        <!-- Left Brand Presentation Pane -->
         <section class="left-section">
-            <div class="overlay">
-                <div class="badge">Provincial Government</div>
-                <span class="eyebrow">Environmental and Natural Resources Office</span>
+            <div class="left-overlay animate-stagger-container">
+                
+                <!-- Dual Badge & Live clock Header Row -->
+                <div class="brand-badge-row animate-item">
+                    <div class="brand-badge-wrapper">
+                        <!-- Mini Dual Logos in Badge -->
+                        <div class="badge-logos">
+                            <div class="mini-logo">
+                                <img src="../logo/Quezonlogo.png" alt="Quezon Logo" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
+                                <i data-lucide="award" class="badge-fallback-icon"></i>
+                            </div>
+                            <div class="mini-logo">
+                                <img src="../logo/enro.png" alt="ENRO Logo" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
+                                <i data-lucide="leaf" class="badge-fallback-icon"></i>
+                            </div>
+                        </div>
+                        <div class="badge-text-content">
+                            <span>Provincial Government of Quezon</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Live Secure System Clock -->
+                    <div class="live-clock" id="pstClock" title="Philippines Standard Time (PST)">
+                        <span class="clock-dot animate-pulse"></span>
+                        <span id="clockTime">10:00:00 PM</span>
+                    </div>
+                </div>
+                
+                <span class="eyebrow-text animate-item">Environment and Natural Resources Office</span>
 
-                <h1>
+                <h1 class="main-title animate-item">
                     <span class="typing-wrapper">
                         <span class="text-gradient" id="typingText"></span>
                         <span class="typing-cursor">|</span>
                     </span>
                 </h1>
 
-                <p>
-                    A secure and smart portal for managing official records,
-                    documents, and digital repository of Quezon Province PGENRO.
+                <p class="brand-description animate-item">
+                    A secure and smart portal for managing official records, documents, 
+                    and the centralized digital repository of Quezon Province PGENRO.
                 </p>
                 
-                <div class="features">
-                    <div class="f-item">
-                        <i data-lucide="shield-check"></i>
-                        Secure
+                <div class="feature-pills animate-item">
+                    <div class="f-pill">
+                        <i data-lucide="shield-check" aria-hidden="true"></i>
+                        <span>Secure Session</span>
                     </div>
-                    <div class="f-item">
-                        <i data-lucide="zap"></i>
-                        Fast
+                    <div class="f-pill">
+                        <i data-lucide="zap" aria-hidden="true"></i>
+                        <span>High Speed</span>
                     </div>
-                    <div class="f-item">
-                        <i data-lucide="file-text"></i>
-                        Smart
+                    <div class="f-pill">
+                        <i data-lucide="file-text" aria-hidden="true"></i>
+                        <span>Smart Archiving</span>
+                    </div>
+                </div>
+
+                <!-- Alert Card Widget -->
+                <div class="maintenance-card animate-item">
+                    <div class="maintenance-icon-wrapper">
+                        <i data-lucide="calendar-clock" aria-hidden="true"></i>
+                    </div>
+                    <div class="maintenance-details">
+                        <div class="maintenance-header-line">
+                            <h4>Routine Maintenance</h4>
+                            <span class="status-dot pulsing"></span>
+                        </div>
+                        <p>Server optimization takes place every Saturday at 10:00 PM PST.</p>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Right Side Secure Login Form Pane -->
         <section class="right-section">
-            <div class="login-card">
-                <div class="login-header">
-                    <div class="logo-wrapper">
-                        <i data-lucide="leaf" class="logo-icon"></i>
+            <div class="login-card-wrapper">
+                
+                <!-- Overlay Loader -->
+                <div class="loading-overlay" id="loadingOverlay" aria-live="assertive" aria-hidden="true">
+                    <div class="loading-content">
+                        <div class="spinner-container">
+                            <i data-lucide="loader-2" class="spinner-icon"></i>
+                        </div>
+                        <h3 id="loadingStatusHeading">Verifying Credentials</h3>
+                        <p id="loadingStatusText">Securing network handshake, please wait...</p>
                     </div>
-                    <h2>Welcome Back</h2>
-                    <p>Enter your credentials to access the portal</p>
                 </div>
 
-                <div id="messageBox" class="message-box"></div>
+                <!-- Interactive Form Card -->
+                <div class="login-card" id="loginCard">
+                    <div class="login-header">
+                        <div class="header-upper-row">
+                            <!-- Restored Brand Logos Container inside card header -->
+                            <div class="brand-logos-container">
+                                <div class="logo-wrapper logo-primary">
+                                    <img src="../logo/Quezonlogo.png" alt="Quezon Logo" class="logo-image-file" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
+                                    <i data-lucide="award" class="logo-icon" aria-hidden="true"></i>
+                                </div>
+                                <div class="logo-separator"></div>
+                                <div class="logo-wrapper logo-secondary">
+                                    <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image-file" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
+                                    <i data-lucide="leaf" class="logo-icon" aria-hidden="true"></i>
+                                </div>
+                            </div>
 
-                <form id="loginForm" novalidate>
-                    <div class="input-group">
-                        <label for="email">Email Address</label>
-                        <div class="input-wrapper">
-                            <i data-lucide="mail" class="input-icon"></i>
-                            <input 
-                                id="email" 
-                                type="email" 
-                                placeholder="name@pgenro.gov.ph"
-                                autocomplete="email"
-                                required
-                            >
+                            <div class="security-badge">
+                                <span class="badge-pulse" aria-hidden="true"></span>
+                                <span class="badge-text">SSL Active</span>
+                            </div>
                         </div>
-                        <small class="error-text" id="emailError"></small>
+                        <h2>Welcome Back</h2>
+                        <p>Enter your authorization credentials below.</p>
                     </div>
 
-                    <div class="input-group">
-                        <label for="password">Password</label>
-                        <div class="input-wrapper">
-                            <i data-lucide="lock" class="input-icon"></i>
-                            <input 
-                                id="password" 
-                                type="password" 
-                                placeholder="••••••••"
-                                autocomplete="current-password"
-                                required
-                            >
+                    <!-- Action/Status Alerts -->
+                    <div id="messageBox" class="message-box" role="alert" aria-live="polite"></div>
 
-                            <button type="button" class="toggle-password" id="togglePassword">
-                                <i data-lucide="eye"></i>
-                            </button>
+                    <form id="loginForm" novalidate class="form-stagger-container">
+                        
+                        <!-- Floating Email Field -->
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i data-lucide="mail" class="input-icon" aria-hidden="true"></i>
+                                <input 
+                                    id="email" 
+                                    type="email" 
+                                    placeholder=" "
+                                    autocomplete="email"
+                                    aria-describedby="emailError"
+                                    required
+                                >
+                                <label for="email" class="floating-label">Email Address</label>
+                            </div>
+                            <div class="error-container" id="emailErrorContainer">
+                                <div class="error-text-wrapper">
+                                    <small class="error-text" id="emailError"></small>
+                                </div>
+                            </div>
                         </div>
-                        <small class="error-text" id="passwordError"></small>
-                    </div>
 
-                    <div class="form-options">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="rememberMe">
-                            Remember me
-                        </label>
-                        <a href="#" class="forgot-link">Forgot Password?</a>
-                    </div>
+                        <!-- Floating Password Field -->
+                        <div class="input-group">
+                            <div class="input-wrapper">
+                                <i data-lucide="lock" class="input-icon" aria-hidden="true"></i>
+                                <input 
+                                    id="password" 
+                                    type="password" 
+                                    placeholder=" "
+                                    autocomplete="current-password"
+                                    aria-describedby="passwordError"
+                                    required
+                                >
+                                <label for="password" class="floating-label">Password</label>
+                                <button type="button" class="toggle-password" id="togglePassword" aria-label="Toggle password visibility">
+                                    <i data-lucide="eye" aria-hidden="true"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Strength Indicator -->
+                            <div class="strength-container" id="strengthContainer" aria-live="polite">
+                                <div class="strength-content-wrapper">
+                                    <div class="strength-bar-bg">
+                                        <div class="strength-bar-fill" id="strengthBarFill"></div>
+                                    </div>
+                                    <span class="strength-text" id="strengthText"></span>
+                                </div>
+                            </div>
 
-                    <button type="submit" class="login-btn" id="loginBtn">
-                        <span id="loginText">Sign In</span>
-                        <i data-lucide="arrow-right" id="loginIcon"></i>
-                    </button>
+                            <div class="error-container" id="passwordErrorContainer">
+                                <div class="error-text-wrapper">
+                                    <small class="error-text" id="passwordError"></small>
+                                </div>
+                            </div>
+                        </div>
 
-                    <div class="separator">
-                        <span>New to the system?</span>
-                    </div>
+                        <!-- Remember & Recovery Options -->
+                        <div class="form-options">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="rememberMe">
+                                <span class="checkbox-custom"></span>
+                                <span class="checkbox-text">Remember me</span>
+                            </label>
+                            <a href="#" class="forgot-link">Forgot password?</a>
+                        </div>
 
-                    <a href="requestACC.html" class="alt-btn">
-                        Request Access Account
-                    </a>
-                </form>
-                
-                <footer class="card-footer">
-                    &copy; 2026 Provincial Government of Quezon. All rights reserved.
-                </footer>
+                        <!-- Action Button -->
+                        <button type="submit" class="login-btn" id="loginBtn">
+                            <span id="loginText">Sign In to Dashboard</span>
+                            <i data-lucide="arrow-right" id="loginIcon" aria-hidden="true"></i>
+                        </button>
+
+                        <div class="separator">
+                            <span>Access Control</span>
+                        </div>
+
+                        <a href="requestACC.html" class="alt-btn">
+                            Request Portal Access
+                        </a>
+                    </form>
+                    
+                    <footer class="card-footer">
+                        &copy; 2026 Provincial Government of Quezon.<br>All rights reserved. Secure Portal.
+                    </footer>
+                </div>
             </div>
         </section>
     </main>
-    <script type="module" src="/User/loginD.js"></script>
-    <script src="/User/login.js"></script>
+    <script type="module" src="loginD.js"></script>
+    <script src="login.js"></script>
 </body>
 </html>

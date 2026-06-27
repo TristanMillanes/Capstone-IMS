@@ -14,6 +14,21 @@
 </head>
 <body>
   
+  <!-- TOAST ALERTS -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- INTERACTIVE DESKTOP CONTEXT MENU -->
+  <div id="customContextMenu" class="context-menu">
+    <ul>
+      <li id="menuEdit"><i data-lucide="edit-3"></i> Edit Details</li>
+      <li id="menuView"><i data-lucide="file-text"></i> View Info Folder</li>
+      <li id="menuFlag"><i data-lucide="flag"></i> Log Flag Ceremony</li>
+      <li id="menuUniform"><i data-lucide="shirt"></i> Prescribe Uniform</li>
+      <div class="menu-divider"></div>
+      <li id="menuDelete" class="menu-delete"><i data-lucide="trash-2"></i> Delete Record</li>
+    </ul>
+  </div>
+
   <header class="navbar">
     <a href="homepage.html" class="logo-area">
       <div class="logo-icon">
@@ -34,6 +49,7 @@
 
   <div class="overlay" id="overlay"></div>
 
+  <!-- NAVIGATION SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h3>IMS Modules</h3>
@@ -56,101 +72,645 @@
   <main class="main-content">
     
     <section class="page-header">
+      <div class="header-overlay-glow"></div>
       <span class="page-badge">
-        <i data-lucide="users"></i>
-        HR Module
+        <i data-lucide="shield-check"></i>
+        HR MODULE
       </span>
       <h1>Employee Directory</h1>
-      <p>Manage your team's information, contact details, status, and department records efficiently.</p>
+      <p>Access employee profiles, track professional placement records, issue uniform prescriptions, and log ceremonial compliance.</p>
     </section>
 
-    <div class="toolbar">
-      <div class="search-box">
-        <i data-lucide="search" class="search-icon"></i>
-        <input type="text" id="searchInput" placeholder="Search by name, ID, department...">
+    <!-- METRICS & KPI GRID -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon total-icon">
+          <i data-lucide="users"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Total Strength</span>
+          <h3 id="metricTotal">0</h3>
+          <span class="metric-sub">Registered Staff</span>
+        </div>
       </div>
-      <button type="button" id="toggleFormBtn" class="primary-btn">
-        <i data-lucide="user-plus"></i> Add New Employee
-      </button>
-    </div>
-
-    <section class="form-card hidden" id="formSection">
-      <div class="form-header">
-        <h2>Employee Details</h2>
-        <button type="button" id="cancelBtn" class="icon-btn" title="Close">
-          <i data-lucide="x"></i>
-        </button>
+      <div class="metric-card">
+        <div class="metric-icon active-icon">
+          <i data-lucide="user-check"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Active Duty</span>
+          <h3 id="metricActive">0</h3>
+          <span class="metric-sub" id="metricActivePct">0% of workforce</span>
+        </div>
       </div>
+      <div class="metric-card">
+        <div class="metric-icon leave-icon">
+          <i data-lucide="plane"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">On Leave</span>
+          <h3 id="metricLeave">0</h3>
+          <span class="metric-sub">Temporarily Away</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon dept-icon">
+          <i data-lucide="git-branch"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Departments</span>
+          <h3 id="metricDepts">0</h3>
+          <span class="metric-sub">Active Units</span>
+        </div>
+      </div>
+    </section>
 
-      <form id="employeeForm">
-        <input type="hidden" id="editIndex">
-
-        <div class="form-grid">
-          <div class="input-group">
-            <label for="employeeId">Employee ID</label>
-            <input type="text" id="employeeId" placeholder="e.g. EMP-001" required>
+    <!-- CONTROL PANEL TOOLBAR -->
+    <div class="toolbar-container">
+      <div class="toolbar-search-filters">
+        <div class="search-box">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" id="searchInput" placeholder="Search by name, ID, eligibility, or designation...">
+        </div>
+        
+        <div class="filter-group">
+          <!-- Employment Status Filter -->
+          <div class="select-wrapper">
+            <i data-lucide="filter" class="select-icon"></i>
+            <select id="filterEmploymentType" class="filter-select">
+              <option value="">All Employment Statuses</option>
+              <option value="01 PERMANENT">Permanent</option>
+              <option value="CASUAL">Casual</option>
+              <option value="JOB ORDER">Job Order</option>
+              <option value="CONTRACTUAL">Contractual</option>
+              <option value="CO-TERMINUS">Co-Terminus</option>
+            </select>
           </div>
-          <div class="input-group">
-            <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" placeholder="John Doe" required>
+          <div class="select-wrapper">
+            <i data-lucide="building" class="select-icon"></i>
+            <select id="filterDepartment" class="filter-select">
+              <option value="">All Departments</option>
+            </select>
           </div>
-          <div class="input-group">
-            <label for="position">Position</label>
-            <input type="text" id="position" placeholder="Software Engineer" required>
-          </div>
-          <div class="input-group">
-            <label for="department">Department</label>
-            <input type="text" id="department" placeholder="IT / HR / Sales" required>
-          </div>
-          <div class="input-group">
-            <label for="email">Email Address</label>
-            <input type="email" id="email" placeholder="john@company.com" required>
-          </div>
-          <div class="input-group">
-            <label for="contact">Contact Number</label>
-            <input type="text" id="contact" placeholder="+1 234 567 890" required>
-          </div>
-          <div class="input-group">
-            <label for="dateHired">Date Hired</label>
-            <input type="date" id="dateHired" required>
-          </div>
-          <div class="input-group">
-            <label for="status">Status</label>
-            <select id="status" required>
-              <option value="" disabled selected>Select Status</option>
+          <div class="select-wrapper">
+            <i data-lucide="activity" class="select-icon"></i>
+            <select id="filterStatus" class="filter-select">
+              <option value="">All Statuses</option>
               <option value="Active">Active</option>
               <option value="Inactive">Inactive</option>
               <option value="On Leave">On Leave</option>
             </select>
           </div>
         </div>
+      </div>
 
-        <div class="form-actions">
-          <button type="submit" id="submitBtn" class="primary-btn">Save Employee</button>
-        </div>
-      </form>
-    </section>
+      <div class="toolbar-actions">
+        <button type="button" id="exportBtn" class="secondary-btn">
+          <i data-lucide="download"></i> Export CSV
+        </button>
+        <button type="button" id="toggleFormBtn" class="primary-btn">
+          <i data-lucide="user-plus"></i> Add New Employee
+        </button>
+      </div>
+    </div>
 
+    <!-- DIRECTORY TABLE CARD -->
     <section class="table-card records-card">
+      <div class="table-header-row">
+        <div>
+          <h3>Staff Records</h3>
+          <p class="table-subtitle">Right-click any record row to access advanced actions.</p>
+        </div>
+        <span class="row-counter" id="recordCounter">Showing 0 Records</span>
+      </div>
       <div class="table-wrapper">
-        <table>
+        <table id="employeeDirectoryTable">
           <thead>
             <tr>
-              <th>ID</th>
+              <th style="width: 100px;">Employee ID</th>
               <th>Name</th>
-              <th>Position</th>
+              <th>Designation</th>
+              <th>Employment Status</th>
               <th>Department</th>
-              <th>Email</th>
-              <th>Contact</th>
-              <th>Date Hired</th>
+              <th>Contact Details</th>
               <th>Status</th>
-              <th class="text-center">Action</th>
+              <th class="text-center" style="width: 140px;">Action</th>
             </tr>
           </thead>
           <tbody id="employeeTable"></tbody>
         </table>
       </div>
     </section>
+
+    <!-- TABS CONTAINER FOR THE COMPREHENSIVE ENTRY FORM -->
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <section class="drawer-panel" id="formSection">
+      <div class="drawer-header">
+        <div>
+          <h2 id="formTitle">Employee Folder Creation</h2>
+          <p>Please navigate through the tabs to complete the employee registration.</p>
+        </div>
+        <button type="button" id="cancelBtn" class="close-drawer-btn" title="Close Panel">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <!-- STEP NAVIGATION TAB SYSTEM -->
+      <div class="form-tabs-container">
+        <button type="button" class="tab-btn active" data-tab="tabPersonal">
+          <i data-lucide="user"></i> Personal Profile
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabWork">
+          <i data-lucide="briefcase"></i> Work History
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabFamily">
+          <i data-lucide="heart"></i> Family & Links
+        </button>
+        <button type="button" class="tab-btn" data-tab="tabEdu">
+          <i data-lucide="graduation-cap"></i> Education
+        </button>
+      </div>
+
+      <form id="employeeForm" class="drawer-form">
+        <input type="hidden" id="editIndex">
+
+        <!-- TAB 1: PERSONAL & ADDRESS -->
+        <div class="tab-content active" id="tabPersonal">
+          <div class="drawer-form-body">
+            <div class="form-card-group">
+              <h4 class="form-group-header-label"><i data-lucide="id-card"></i> Personal Details</h4>
+              <div class="form-grid-3">
+                <div class="input-group">
+                  <label for="employeeId">Employee ID *</label>
+                  <input type="text" id="employeeId" placeholder="e.g. 5653" required>
+                </div>
+                <div class="input-group">
+                  <label for="firstName">First Name *</label>
+                  <input type="text" id="firstName" placeholder="MIGNON" required>
+                </div>
+                <div class="input-group">
+                  <label for="lastName">Last Name *</label>
+                  <input type="text" id="lastName" placeholder="APOLINAR" required>
+                </div>
+                <div class="input-group">
+                  <label for="middleName">Middle Name</label>
+                  <input type="text" id="middleName" placeholder="PANGANIBAN">
+                </div>
+                <div class="input-group">
+                  <label for="extName">Extension Name</label>
+                  <input type="text" id="extName" placeholder="e.g. Jr., III">
+                </div>
+                <div class="input-group">
+                  <label for="dob">Date of Birth</label>
+                  <input type="date" id="dob">
+                </div>
+                <div class="input-group span-2">
+                  <label for="birthPlace">Birth Place</label>
+                  <input type="text" id="birthPlace" placeholder="PADRE BURGOS, QUEZON">
+                </div>
+                <div class="input-group">
+                  <label for="gender">Gender</label>
+                  <select id="gender">
+                    <option value="">Select Gender</option>
+                    <option value="M">Male (M)</option>
+                    <option value="F">Female (F)</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label for="civilStatus">Civil Status</label>
+                  <select id="civilStatus">
+                    <option value="">Select Civil Status</option>
+                    <option value="SINGLE">SINGLE</option>
+                    <option value="MARRIED">MARRIED</option>
+                    <option value="DIVORCED">DIVORCED</option>
+                    <option value="WIDOWED">WIDOWED</option>
+                  </select>
+                </div>
+                <div class="input-group">
+                  <label for="religion">Religion</label>
+                  <input type="text" id="religion" placeholder="ROMAN CATHOLIC">
+                </div>
+                <div class="input-group">
+                  <label for="height">Height (cm)</label>
+                  <input type="number" step="0.1" id="height" placeholder="159.5">
+                </div>
+                <div class="input-group">
+                  <label for="weight">Weight (kg)</label>
+                  <input type="number" step="0.1" id="weight" placeholder="58">
+                </div>
+                <div class="input-group">
+                  <label for="bloodType">Blood Type</label>
+                  <input type="text" id="bloodType" placeholder="O+">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card-group">
+              <h4 class="form-group-header-label"><i data-lucide="map-pin"></i> Complete Address</h4>
+              <div class="form-grid-3">
+                <div class="input-group span-3">
+                  <label for="purok">House No. / Street / Purok</label>
+                  <input type="text" id="purok" placeholder="PUROK 1">
+                </div>
+                <div class="input-group">
+                  <label for="barangay">Barangay</label>
+                  <input type="text" id="barangay" placeholder="MARAO">
+                </div>
+                <div class="input-group">
+                  <label for="municipality">City / Municipality</label>
+                  <input type="text" id="municipality" placeholder="PADRE BURGOS">
+                </div>
+                <div class="input-group">
+                  <label for="province">Province</label>
+                  <input type="text" id="province" placeholder="QUEZON">
+                </div>
+                <div class="input-group">
+                  <label for="zipCode">Zip Code</label>
+                  <input type="text" id="zipCode" placeholder="4303">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 2: WORK & SOCIAL SECURITY -->
+        <div class="tab-content" id="tabWork">
+          <div class="drawer-form-body">
+            <div class="form-card-group">
+              <h4 class="form-group-header-label"><i data-lucide="award"></i> Official Appointment</h4>
+              <div class="form-grid-3">
+                <div class="input-group">
+                  <label for="employmentStatus">Employment Status *</label>
+                  <select id="employmentStatus" required>
+                    <option value="" disabled selected>Select Status</option>
+                    <option value="01 PERMANENT">01 PERMANENT</option>
+                    <option value="CASUAL">CASUAL</option>
+                    <option value="JOB ORDER">JOB ORDER</option>
+                    <option value="CONTRACTUAL">CONTRACTUAL</option>
+                    <option value="CO-TERMINUS">CO-TERMINUS</option>
+                  </select>
+                </div>
+                <div class="input-group span-2">
+                  <label for="designation">Designation *</label>
+                  <input type="text" id="designation" placeholder="ADMINISTRATIVE ASSISTANT" required>
+                </div>
+                <div class="input-group">
+                  <label for="department">Department *</label>
+                  <input type="text" id="department" placeholder="e.g. ENRO" required>
+                </div>
+                <div class="input-group">
+                  <label for="itemNo">Item No.</label>
+                  <input type="text" id="itemNo" placeholder="8731-5">
+                </div>
+                <div class="input-group">
+                  <label for="dateEmployed">Date Employed</label>
+                  <input type="date" id="dateEmployed">
+                </div>
+                <div class="input-group">
+                  <label for="dateAssumption">Date of Assumption</label>
+                  <input type="date" id="dateAssumption">
+                </div>
+                <div class="input-group">
+                  <label for="salaryGrade">Salary Grade</label>
+                  <input type="number" id="salaryGrade" placeholder="11">
+                </div>
+                <div class="input-group">
+                  <label for="stepNo">Step No.</label>
+                  <input type="number" id="stepNo" placeholder="1">
+                </div>
+                <div class="input-group">
+                  <label for="nosa">N.O.S.A.</label>
+                  <input type="date" id="nosa">
+                </div>
+                <div class="input-group">
+                  <label for="basicSalary">Basic Monthly Salary</label>
+                  <input type="number" step="0.01" id="basicSalary" placeholder="27000.00">
+                </div>
+                <div class="input-group span-2">
+                  <label for="eligibility">Eligibility / Licenses</label>
+                  <input type="text" id="eligibility" placeholder="RA 1080, CSC SUB PROF">
+                </div>
+                <div class="input-group">
+                  <label for="status">Directory Status</label>
+                  <select id="status" required>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="On Leave">On Leave</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card-group">
+              <h4 class="form-group-header-label"><i data-lucide="wallet"></i> Financial Identity Codes</h4>
+              <div class="form-grid-3">
+                <div class="input-group">
+                  <label for="tin">T.I.N. No.</label>
+                  <input type="text" id="tin" placeholder="935-047-388">
+                </div>
+                <div class="input-group">
+                  <label for="gsis">G.S.I.S. B.P. No.</label>
+                  <input type="text" id="gsis" placeholder="200-2108-377">
+                </div>
+                <div class="input-group">
+                  <label for="pagibig">PAG-IBIG No.</label>
+                  <input type="text" id="pagibig" placeholder="1460-0000-6461">
+                </div>
+                <div class="input-group">
+                  <label for="philhealth">PHILHEALTH No.</label>
+                  <input type="text" id="philhealth" placeholder="08-000071002-8">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: FAMILY & CONTACT LINKS -->
+        <div class="tab-content" id="tabFamily">
+          <div class="drawer-form-body">
+            <div class="form-card-group">
+              <h4 class="form-group-header-label"><i data-lucide="users-2"></i> Spouse & Family Data</h4>
+              <div class="form-grid-3">
+                <div class="input-group">
+                  <label for="spouseLastName">Spouse Last Name</label>
+                  <input type="text" id="spouseLastName" placeholder="APOLINAR">
+                </div>
+                <div class="input-group">
+                  <label for="spouseFirstName">Spouse First Name</label>
+                  <input type="text" id="spouseFirstName" placeholder="ANGELO">
+                </div>
+                <div class="input-group">
+                  <label for="spouseMiddleName">Spouse Middle Name</label>
+                  <input type="text" id="spouseMiddleName" placeholder="LALUNIO">
+                </div>
+                <div class="input-group">
+                  <label for="spouseExtName">Extension Name</label>
+                  <input type="text" id="spouseExtName" placeholder="e.g. N/A">
+                </div>
+                <div class="input-group span-2">
+                  <label for="spouseOccupation">Occupation</label>
+                  <input type="text" id="spouseOccupation" placeholder="ELEMENTARY SCHOOL PRINCIPAL">
+                </div>
+                <div class="input-group span-3">
+                  <label for="spouseEmployer">Employer / Business Name</label>
+                  <input type="text" id="spouseEmployer" placeholder="DEP ED PADRE BURGOS">
+                </div>
+                <div class="input-group">
+                  <label for="spouseContact">Contact No.</label>
+                  <input type="text" id="spouseContact" placeholder="0929 302 7382">
+                </div>
+                <div class="input-group span-2">
+                  <label for="spouseEmail">Spouse Email Address</label>
+                  <input type="email" id="spouseEmail" placeholder="spouse@email.com">
+                </div>
+              </div>
+            </div>
+
+            <div class="form-card-group">
+              <h4 class="form-group-header-label"><i data-lucide="phone-call"></i> Contact & Communication Channel</h4>
+              <div class="form-grid-3">
+                <div class="input-group">
+                  <label for="landline">Landline No.</label>
+                  <input type="text" id="landline" placeholder="N/A">
+                </div>
+                <div class="input-group">
+                  <label for="mobile1">Mobile No. 1 *</label>
+                  <input type="text" id="mobile1" placeholder="0999 520 3235" required>
+                </div>
+                <div class="input-group">
+                  <label for="mobile2">Mobile No. 2</label>
+                  <input type="text" id="mobile2" placeholder="0992 360 7984">
+                </div>
+                <div class="input-group span-2">
+                  <label for="email">Primary Email Address *</label>
+                  <input type="email" id="email" placeholder="mignon@email.com" required>
+                </div>
+                <div class="input-group">
+                  <label for="facebook">Facebook Account</label>
+                  <input type="text" id="facebook" placeholder="Mhegz Panganiban">
+                </div>
+                <div class="input-group">
+                  <label for="instagram">Instagram ID</label>
+                  <input type="text" id="instagram" placeholder="n/a">
+                </div>
+                <div class="input-group">
+                  <label for="twitter">Twitter Link</label>
+                  <input type="text" id="twitter" placeholder="n/a">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: EDUCATIONAL ATTAINMENT -->
+        <div class="tab-content" id="tabEdu">
+          <div class="drawer-form-body">
+            <div class="form-card-group">
+              <h4 class="form-group-header-label"><i data-lucide="graduation-cap"></i> Academic Credentials</h4>
+              <div class="form-grid-3">
+                <div class="input-group">
+                  <label for="eduLevel">Educational Level</label>
+                  <select id="eduLevel">
+                    <option value="">Select Level</option>
+                    <option value="ELEMENTARY">ELEMENTARY</option>
+                    <option value="SECONDARY">SECONDARY</option>
+                    <option value="VOCATIONAL">VOCATIONAL</option>
+                    <option value="COLLEGE">COLLEGE</option>
+                    <option value="GRADUATE SCHOOL">GRADUATE SCHOOL</option>
+                  </select>
+                </div>
+                <div class="input-group span-2">
+                  <label for="eduCourse">Course / Major</label>
+                  <input type="text" id="eduCourse" placeholder="MASTER IN MANAGEMENT">
+                </div>
+                <div class="input-group span-2">
+                  <label for="eduSchool">Last School Attended</label>
+                  <input type="text" id="eduSchool" placeholder="SOUTHERN LUZON STATE UNIVERSITY">
+                </div>
+                <div class="input-group">
+                  <label for="eduYear">Year Graduated</label>
+                  <input type="number" id="eduYear" placeholder="2010">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FORM FOOTER BUTTONS -->
+        <div class="drawer-actions">
+          <button type="button" id="clearFormBtn" class="tertiary-btn">Clear All Fields</button>
+          <button type="submit" id="submitBtn" class="primary-btn flex-1-btn">Save Employee Folder</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- FULL PROFILE MODAL VISUAL DOSSIER -->
+    <div class="modal-wrapper" id="profileModal">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content-box">
+        <div class="modal-header-row">
+          <div class="profile-title-card">
+            <div class="profile-avatar" id="viewAvatar">MA</div>
+            <div>
+              <h2 id="viewHeadingName">Employee Profile</h2>
+              <span class="view-status-pill" id="viewPillStatus">Active</span>
+            </div>
+          </div>
+          <div class="modal-header-actions">
+            <button type="button" class="icon-btn" onclick="printProfile()" title="Print Profile File">
+              <i data-lucide="printer"></i>
+            </button>
+            <button type="button" class="icon-btn close-modal-btn" onclick="closeProfileModal()">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="modal-body-scrollable" id="printArea">
+          <div class="profile-dossier-grid">
+            
+            <div class="dossier-card">
+              <div class="dossier-card-header"><i data-lucide="user"></i> Personal Details</div>
+              <div class="dossier-grid-items">
+                <div class="d-item"><span class="d-lbl">ID No.</span><span class="d-val" id="v_id"></span></div>
+                <div class="d-item"><span class="d-lbl">Birth Date</span><span class="d-val" id="v_dob"></span></div>
+                <div class="d-item"><span class="d-lbl">Birth Place</span><span class="d-val" id="v_pob"></span></div>
+                <div class="d-item"><span class="d-lbl">Gender</span><span class="d-val" id="v_gender"></span></div>
+                <div class="d-item"><span class="d-lbl">Civil Status</span><span class="d-val" id="v_civil"></span></div>
+                <div class="d-item"><span class="d-lbl">Religion</span><span class="d-val" id="v_religion"></span></div>
+                <div class="d-item"><span class="d-lbl">Height / Weight</span><span class="d-val" id="v_metrics"></span></div>
+                <div class="d-item"><span class="d-lbl">Blood Type</span><span class="d-val" id="v_blood"></span></div>
+              </div>
+            </div>
+
+            <div class="dossier-card">
+              <div class="dossier-card-header"><i data-lucide="briefcase"></i> Work Information</div>
+              <div class="dossier-grid-items">
+                <div class="d-item"><span class="d-lbl">Designation</span><span class="d-val" id="v_desig"></span></div>
+                <div class="d-item"><span class="d-lbl">Employment Type</span><span class="d-val" id="v_emp_status"></span></div>
+                <div class="d-item"><span class="d-lbl">Department</span><span class="d-val" id="v_dept"></span></div>
+                <div class="d-item"><span class="d-lbl">Item Code</span><span class="d-val" id="v_item"></span></div>
+                <div class="d-item"><span class="d-lbl">Date Employed</span><span class="d-val" id="v_date_employed"></span></div>
+                <div class="d-item"><span class="d-lbl">Assumption Date</span><span class="d-val" id="v_date_assumption"></span></div>
+                <div class="d-item"><span class="d-lbl">Grade / Step</span><span class="d-val" id="v_salary_gradestep"></span></div>
+                <div class="d-item"><span class="d-lbl">Basic Salary</span><span class="d-val" id="v_salary"></span></div>
+                <div class="d-item"><span class="d-lbl">N.O.S.A Date</span><span class="d-val" id="v_nosa"></span></div>
+                <div class="d-item span-d-2"><span class="d-lbl">Eligibility</span><span class="d-val" id="v_eligibility"></span></div>
+                <div class="d-item"><span class="d-lbl">Uniform Category</span><span class="d-val text-emerald-strong" id="v_uniform_display">Not Prescribed</span></div>
+                <div class="d-item"><span class="d-lbl">Flag Ceremony Compliance</span><span class="d-val text-blue-strong" id="v_flag_display">None Logged</span></div>
+              </div>
+            </div>
+
+            <div class="dossier-card">
+              <div class="dossier-card-header"><i data-lucide="file-text"></i> Financial Security Accounts</div>
+              <div class="dossier-grid-items">
+                <div class="d-item"><span class="d-lbl">T.I.N. No.</span><span class="d-val" id="v_tin"></span></div>
+                <div class="d-item"><span class="d-lbl">G.S.I.S No.</span><span class="d-val" id="v_gsis"></span></div>
+                <div class="d-item"><span class="d-lbl">PAG-IBIG ID</span><span class="d-val" id="v_pagibig"></span></div>
+                <div class="d-item"><span class="d-lbl">PHILHEALTH No.</span><span class="d-val" id="v_philhealth"></span></div>
+              </div>
+            </div>
+
+            <div class="dossier-card">
+              <div class="dossier-card-header"><i data-lucide="map-pin"></i> Complete Address</div>
+              <div class="dossier-grid-items">
+                <div class="d-item span-d-2"><span class="d-lbl">Street Address</span><span class="d-val" id="v_street"></span></div>
+                <div class="d-item"><span class="d-lbl">Barangay</span><span class="d-val" id="v_barangay"></span></div>
+                <div class="d-item"><span class="d-lbl">Municipality</span><span class="d-val" id="v_municipality"></span></div>
+                <div class="d-item"><span class="d-lbl">Province</span><span class="d-val" id="v_province"></span></div>
+                <div class="d-item"><span class="d-lbl">Zip Code</span><span class="d-val" id="v_zip"></span></div>
+              </div>
+            </div>
+
+            <div class="dossier-card">
+              <div class="dossier-card-header"><i data-lucide="graduation-cap"></i> Educational Attainment</div>
+              <div class="dossier-grid-items">
+                <div class="d-item"><span class="d-lbl">Education Level</span><span class="d-val" id="v_edu_level"></span></div>
+                <div class="d-item"><span class="d-lbl">Course / Degree</span><span class="d-val" id="v_edu_course"></span></div>
+                <div class="d-item span-d-2"><span class="d-lbl">Institution</span><span class="d-val" id="v_edu_school"></span></div>
+                <div class="d-item"><span class="d-lbl">Graduation Year</span><span class="d-val" id="v_edu_year"></span></div>
+              </div>
+            </div>
+
+            <div class="dossier-card">
+              <div class="dossier-card-header"><i data-lucide="phone-call"></i> Contact & Communication</div>
+              <div class="dossier-grid-items">
+                <div class="d-item"><span class="d-lbl">Landline No.</span><span class="d-val" id="v_landline"></span></div>
+                <div class="d-item"><span class="d-lbl">Primary Mobile</span><span class="d-val" id="v_mobile1"></span></div>
+                <div class="d-item"><span class="d-lbl">Secondary Mobile</span><span class="d-val" id="v_mobile2"></span></div>
+                <div class="d-item span-d-2"><span class="d-lbl">Official Email</span><span class="d-val" id="v_email"></span></div>
+                <div class="d-item"><span class="d-lbl">Facebook Link</span><span class="d-val" id="v_facebook"></span></div>
+                <div class="d-item"><span class="d-lbl">Instagram Handle</span><span class="d-val" id="v_instagram"></span></div>
+                <div class="d-item"><span class="d-lbl">Twitter Handle</span><span class="d-val" id="v_twitter"></span></div>
+              </div>
+            </div>
+
+            <div class="dossier-card span-d-2">
+              <div class="dossier-card-header"><i data-lucide="heart"></i> Family Information</div>
+              <div class="dossier-grid-items">
+                <div class="d-item"><span class="d-lbl">Spouse Name</span><span class="d-val" id="v_spouse_name"></span></div>
+                <div class="d-item"><span class="d-lbl">Occupation</span><span class="d-val" id="v_spouse_job"></span></div>
+                <div class="d-item span-d-2"><span class="d-lbl">Employer Name</span><span class="d-val" id="v_spouse_employer"></span></div>
+                <div class="d-item"><span class="d-lbl">Spouse Contact</span><span class="d-val" id="v_spouse_phone"></span></div>
+                <div class="d-item"><span class="d-lbl">Spouse Email</span><span class="d-val" id="v_spouse_email"></span></div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PRESCRIBE UNIFORM POPUP -->
+    <div class="modal-wrapper" id="uniformModal">
+      <div class="modal-backdrop" onclick="closeUniformModal()"></div>
+      <div class="modal-content-box" style="max-width: 440px;">
+        <div class="modal-header-row">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <i data-lucide="shirt" style="color: var(--primary);"></i>
+            <h3>Prescribe Staff Uniform</h3>
+          </div>
+          <button type="button" class="icon-btn close-modal-btn" onclick="closeUniformModal()">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <form id="uniformPrescriptionForm">
+          <input type="hidden" id="uniformEmpIndex">
+          <div class="modal-body-scrollable" style="background: #ffffff; padding: 24px;">
+            <p style="font-size: 13px; color: var(--muted); margin-bottom: 16px; line-height: 1.5;">
+              Select the uniform configuration and sizing metrics matching the custom sizing charts for this employee.
+            </p>
+            
+            <div class="input-group" style="margin-bottom: 16px;">
+              <label for="uniformType" style="font-size:11px; font-weight:800; color:var(--primary-dark); margin-bottom:6px; display:block; text-transform:uppercase;">Uniform Set Designation</label>
+              <select id="uniformType" required style="width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #e2ece6;">
+                <option value="">-- Choose Uniform Option --</option>
+                <option value="Administrative Set (Formal)">Administrative Set (Formal)</option>
+                <option value="Technical Field Set">Technical Field Set</option>
+                <option value="Office Casual Monday-Thursday Set">Office Casual Monday-Thursday Set</option>
+                <option value="General Support Staff Issue">General Support Staff Issue</option>
+              </select>
+            </div>
+
+            <div class="input-group" style="margin-bottom: 16px;">
+              <label for="uniformSize" style="font-size:11px; font-weight:800; color:var(--primary-dark); margin-bottom:6px; display:block; text-transform:uppercase;">Fitted Size Profile</label>
+              <select id="uniformSize" required style="width:100%; padding:10px 12px; border-radius:8px; border:1.5px solid #e2ece6;">
+                <option value="XS">Extra Small (XS)</option>
+                <option value="S">Small (S)</option>
+                <option value="M" selected>Medium (M)</option>
+                <option value="L">Large (L)</option>
+                <option value="XL">Extra Large (XL)</option>
+                <option value="XXL">Double Extra Large (XXL)</option>
+              </select>
+            </div>
+          </div>
+          <div class="drawer-actions">
+            <button type="button" class="tertiary-btn" onclick="closeUniformModal()">Cancel</button>
+            <button type="submit" class="primary-btn flex-1-btn">Log Uniform Prescription</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
   </main>
 

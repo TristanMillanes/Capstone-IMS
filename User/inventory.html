@@ -14,6 +14,10 @@
 </head>
 
 <body>
+  <!-- TOAST CONTAINER (Added for modern feedback alerts) -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <!-- UNCHANGED HEADER -->
   <header class="navbar">
     <a href="homepage.html" class="logo-area">
       <div class="logo-icon">
@@ -34,6 +38,7 @@
 
   <div class="overlay" id="overlay"></div>
 
+  <!-- UNCHANGED SIDEBAR -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h3>IMS Modules</h3>
@@ -53,10 +58,11 @@
     </ul>
   </aside>
 
-  <div class="form-modal" id="formModal">
+  <!-- IMPROVED FORM MODAL -->
+  <div class="form-modal" id="formModal" role="dialog" aria-labelledby="formTitle" aria-hidden="true">
     <div class="modal-header">
       <h2 id="formTitle">Encode Inventory Record</h2>
-      <button class="modal-close" id="formModalClose">
+      <button class="modal-close" id="formModalClose" aria-label="Close modal">
         <i data-lucide="x"></i>
       </button>
     </div>
@@ -67,73 +73,82 @@
 
         <div class="form-row">
           <div>
-            <label>Item ID / Control No.</label>
+            <label for="itemId">Item ID / Control No.</label>
             <input type="text" id="itemId" readonly placeholder="Auto-generated">
           </div>
           <div>
-            <label>Item Name</label>
-            <input type="text" id="itemName" required placeholder="e.g. 4A BOND PAPER">
+            <label for="itemName">Item Name</label>
+            <input type="text" id="itemName" required placeholder="e.g. A4 BOND PAPER">
           </div>
         </div>
 
         <div class="form-row">
           <div>
-            <label>Unit</label>
+            <label for="itemUnit">Unit</label>
             <input type="text" id="itemUnit" required placeholder="e.g. REAM, BOX, PCS">
           </div>
           <div>
-            <label>Description</label>
-            <input type="text" id="itemDesc" placeholder="Brief description...">
+            <label for="itemDesc">Description</label>
+            <input type="text" id="itemDesc" placeholder="Brief details (size, color, etc.)">
           </div>
         </div>
 
         <div class="form-row">
           <div>
-            <label>Quantity (Total Stock Added)</label>
+            <label for="itemQty">Quantity (Total Stock Added)</label>
             <input type="number" id="itemQty" required min="0" value="0">
           </div>
           <div>
-            <label>Total Used</label>
+            <label for="itemUsed">Total Used</label>
             <input type="number" id="itemUsed" required min="0" value="0">
           </div>
         </div>
 
-        <label>Remaining Balance</label>
-        <input type="number" id="itemBalance" readonly placeholder="Auto-calculated">
+        <div class="form-row">
+          <div>
+            <label for="itemBalance">Remaining Balance</label>
+            <input type="number" id="itemBalance" readonly placeholder="Auto-calculated">
+          </div>
+          <div>
+            <label for="itemThreshold">Low Stock Alert Threshold</label>
+            <input type="number" id="itemThreshold" required min="1" value="5">
+          </div>
+        </div>
 
-        <label>Remarks</label>
-        <textarea id="itemRemarks" placeholder="Enter dates, conditions, or any remarks"></textarea>
+        <label for="itemRemarks">Remarks</label>
+        <textarea id="itemRemarks" placeholder="Enter dates, locations, conditions, or internal notes"></textarea>
 
         <div class="form-actions">
-          <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
+          <button type="button" class="clear-btn" onclick="clearForm()">Reset Inputs</button>
           <button type="submit" class="save-btn" id="submitBtn">Save Record</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div class="form-modal" id="reportModal">
+  <!-- IMPROVED REPORT MODAL -->
+  <div class="form-modal" id="reportModal" role="dialog" aria-labelledby="reportTitle" aria-hidden="true">
     <div class="modal-header">
-      <h2>Select Items for Report</h2>
-      <button class="modal-close" id="reportModalClose">
+      <h2 id="reportTitle">Select Items for Report</h2>
+      <button class="modal-close" id="reportModalClose" aria-label="Close modal">
         <i data-lucide="x"></i>
       </button>
     </div>
     <div class="modal-body">
-      <p style="margin-bottom: 16px; color: var(--muted); font-size: 14px; font-weight: 600;">
-        Check the boxes of the items you want to include in the printout.
+      <p style="margin-bottom: 18px; color: var(--muted); font-size: 14px; font-weight: 600;">
+        Select the items below to include them in the printable inventory layout.
       </p>
       
-      <div class="table-wrapper" style="max-height: 400px; margin-bottom: 24px;">
+      <div class="table-wrapper" style="max-height: 380px; margin-bottom: 24px; border: 1px solid var(--border);">
         <table>
           <thead>
             <tr>
-              <th style="width: 40px; text-align: center;">
-                <input type="checkbox" id="reportSelectAll" title="Select All">
+              <th style="width: 50px; text-align: center;">
+                <input type="checkbox" id="reportSelectAll" title="Select All Items">
               </th>
               <th>Item ID</th>
               <th>Item Name</th>
-              <th>Balance</th>
+              <th>Current Balance</th>
             </tr>
           </thead>
           <tbody id="reportTableBody"></tbody>
@@ -141,14 +156,15 @@
       </div>
 
       <div class="form-actions" style="margin-top: 0;">
-        <button type="button" class="clear-btn" id="cancelReportBtn">Cancel</button>
+        <button type="button" class="clear-btn" id="cancelReportBtn">Cancel Selection</button>
         <button type="button" class="save-btn" id="confirmPrintBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <i data-lucide="printer" style="width: 18px; height: 18px;"></i> Print Selected
+          <i data-lucide="printer" style="width: 18px; height: 18px;"></i> Generate & Print Report
         </button>
       </div>
     </div>
   </div>
 
+  <!-- IMPROVED MAIN CONTENT AREA -->
   <main class="main-content">
     <section class="page-header">
       <span class="page-badge">
@@ -156,36 +172,45 @@
         Inventory Module
       </span>
       <h1>Office Supplies & Inventory</h1>
-      <p>Manage inventory records, track stock levels, monitor item usage, and seamlessly update supplies for the office.</p>
+      <p>Log central inventory records, monitor physical usage thresholds, manage stock flow balances, and configure reports for the Provincial Office.</p>
     </section>
 
+    <!-- IMPROVED STATS GRID -->
     <section class="stats-grid">
       <div class="stat-card">
-        <i data-lucide="database"></i>
+        <div class="stat-icon-wrapper blue">
+          <i data-lucide="database"></i>
+        </div>
         <div>
-          <p>Total Item Types</p>
+          <p>Unique Item Types</p>
           <h2 id="statTotalItems">0</h2>
         </div>
       </div>
 
       <div class="stat-card">
-        <i data-lucide="layers"></i>
+        <div class="stat-icon-wrapper green">
+          <i data-lucide="layers"></i>
+        </div>
         <div>
           <p>Total Stock Quantity</p>
           <h2 id="statTotalQty">0</h2>
         </div>
       </div>
 
-      <div class="stat-card">
-        <i data-lucide="alert-triangle"></i>
+      <div class="stat-card warning-state">
+        <div class="stat-icon-wrapper yellow">
+          <i data-lucide="alert-triangle"></i>
+        </div>
         <div>
           <p>Low Stock Items</p>
           <h2 id="statLowStock">0</h2>
         </div>
       </div>
 
-      <div class="stat-card">
-        <i data-lucide="x-circle"></i>
+      <div class="stat-card critical-state">
+        <div class="stat-icon-wrapper red">
+          <i data-lucide="x-circle"></i>
+        </div>
         <div>
           <p>Out of Stock</p>
           <h2 id="statOutOfStock">0</h2>
@@ -193,36 +218,38 @@
       </div>
     </section>
 
+    <!-- IMPROVED RECORDS CARD -->
     <section class="records-card">
       <div class="records-header">
         <div class="card-title">
-          <h2>Inventory Records</h2>
-          <p>Search, filter, update, and view inventory records.</p>
+          <h2>Inventory Database</h2>
+          <p>Search, filter, update stock quantities, track consumption, and edit recorded inventory details.</p>
         </div>
 
         <div class="header-actions">
-          <button class="report-btn" id="generateReportBtn">
+          <button class="report-btn" id="generateReportBtn" title="Prepare report selection for print">
             <i data-lucide="printer"></i>
             Generate Report
           </button>
-          <button class="encoding-btn" id="openEncodingBtn">
+          <button class="encoding-btn" id="openEncodingBtn" title="Encode new item entry">
             <i data-lucide="plus-circle"></i>
             Encode New Item
           </button>
         </div>
       </div>
 
-      <div class="tabs">
-        <button class="tab-btn active" onclick="setFilter('All', this)">All Items</button>
-        <button class="tab-btn" onclick="setFilter('In-Stock', this)">In Stock</button>
-        <button class="tab-btn" onclick="setFilter('Low-Stock', this)">Low Stock</button>
-        <button class="tab-btn" onclick="setFilter('Out-of-Stock', this)">Out of Stock</button>
+      <!-- TABS with Dynamic Counters -->
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" id="tabAll" onclick="setFilter('All', this)" role="tab">All Items <span class="tab-count" id="countAll">0</span></button>
+        <button class="tab-btn" id="tabInStock" onclick="setFilter('In-Stock', this)" role="tab">In Stock <span class="tab-count" id="countInStock">0</span></button>
+        <button class="tab-btn" id="tabLowStock" onclick="setFilter('Low-Stock', this)" role="tab">Low Stock <span class="tab-count" id="countLowStock">0</span></button>
+        <button class="tab-btn" id="tabOutOfStock" onclick="setFilter('Out-of-Stock', this)" role="tab">Out of Stock <span class="tab-count" id="countOutOfStock">0</span></button>
       </div>
 
       <div class="tools">
         <div class="search-field">
           <i data-lucide="search"></i>
-          <input type="text" id="searchInput" placeholder="Search item name, ID, desc..." oninput="displayRecords()">
+          <input type="text" id="searchInput" placeholder="Search item name, control ID, or description..." oninput="displayRecords()" aria-label="Search items">
         </div>
       </div>
 
@@ -230,13 +257,13 @@
         <table>
           <thead>
             <tr>
-              <th>Item ID</th>
-              <th>Item Details</th>
-              <th>Quantity</th>
-              <th>Used</th>
-              <th>Balance</th>
-              <th>Remarks</th>
-              <th>Actions</th>
+              <th style="width: 15%;">Item ID</th>
+              <th style="width: 30%;">Item Details</th>
+              <th style="width: 10%;">Initial Qty</th>
+              <th style="width: 10%;">Total Used</th>
+              <th style="width: 15%;">Remaining Balance</th>
+              <th style="width: 10%;">Remarks</th>
+              <th style="width: 10%;">Actions</th>
             </tr>
           </thead>
           <tbody id="recordsTable"></tbody>

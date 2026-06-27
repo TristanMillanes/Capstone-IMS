@@ -1,9 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>PGENRO IMS | Homepage</title>
 
   <!-- Google Font -->
@@ -22,18 +21,27 @@
 </head>
 
 <body>
+  <!-- Mobile Sidebar Overlay Backdrop -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
   <!-- NAVBAR -->
   <header class="navbar">
-    <a href="#home" class="logo-area">
-      <div class="logo-icon">
-      <img src="../logo/enro.png" class="logo-image">
-      </div>
+    <div class="nav-left">
+      <!-- Sidebar Toggle Control -->
+      <button class="sidebar-toggle-btn" id="sidebarToggle" type="button" aria-label="Toggle Sidebar">
+        <i data-lucide="menu"></i>
+      </button>
 
-      <div>
-        <h2>Provincial Government</h2>
-        <span>Environmental and Natural Resources office</span>
-      </div>
-    </a>
+      <a href="#home" class="logo-area">
+        <div class="logo-icon">
+          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'">
+        </div>
+        <div>
+          <h2>Provincial Government</h2>
+          <span>Environmental and Natural Resources Office</span>
+        </div>
+      </a>
+    </div>
 
     <nav class="nav-links" id="navLinks">
       <a href="#home" class="active">Home</a>
@@ -45,17 +53,22 @@
     </nav>
 
     <div class="right-nav">
+      <!-- Theme Switcher Button -->
+      <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle Theme">
+        <i data-lucide="moon" class="theme-icon-dark"></i>
+        <i data-lucide="sun" class="theme-icon-light" style="display: none;"></i>
+      </button>
+
+      <!-- Profile Dropdown Container -->
       <div class="profile-menu" id="profileMenu">
         <button class="profile-btn" id="profileBtn" type="button">
           <div class="profile-avatar">
             <i data-lucide="user"></i>
           </div>
-
           <div class="profile-text">
             <h4>Tristan Millanes</h4>
             <span>Authorized Account</span>
           </div>
-
           <i data-lucide="chevron-down" class="profile-chevron"></i>
         </button>
 
@@ -64,7 +77,6 @@
             <div class="profile-avatar big">
               <i data-lucide="user"></i>
             </div>
-
             <div>
               <h3>PGENRO User</h3>
               <p>Authorized Account</p>
@@ -88,87 +100,80 @@
         </div>
       </div>
 
-      <button class="menu-btn" id="menuBtn" type="button">
+      <button class="menu-btn" id="menuBtn" type="button" aria-label="Toggle Mobile Menu">
         <i data-lucide="menu"></i>
       </button>
     </div>
   </header>
 
-  <div class="app-layout">
+  <div class="app-container">
     <!-- SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="appSidebar">
       <div class="sidebar-header">
         <h3>IMS Modules</h3>
-        <p>Quick access menu</p>
+        <p class="sidebar-subtext">Quick access menu</p>
       </div>
 
       <ul class="modules-list">
         <li>
-          <a href="homepage.html">
+          <a href="homepage.html" data-tooltip="Dashboard">
             <i data-lucide="home"></i>
-            Dashboard
+            <span class="menu-label">Dashboard</span>
           </a>
         </li>
         <li>
-          <a href="Communication.html">
+          <a href="Communication.html" data-tooltip="Incoming/Outgoing">
             <i data-lucide="repeat"></i>
-            Incoming/Outgoing Communication
+            <span class="menu-label">Incoming/Outgoing</span>
           </a>
         </li>
-
         <li>
-          <a href="#travel">
+          <a href="#travel" data-tooltip="Travel Order">
             <i data-lucide="map-pin"></i>
-            Travel Order
+            <span class="menu-label">Travel Order</span>
           </a>
         </li>
-
         <li>
-          <a href="#memo">
+          <a href="#memo" data-tooltip="Office Memo">
             <i data-lucide="file-text"></i>
-            Office Memo
+            <span class="menu-label">Office Memo</span>
           </a>
         </li>
-
         <li>
-          <a href="employee.html">
+          <a href="employee.html" data-tooltip="Employee Records">
             <i data-lucide="users"></i>
-            Employee Records
+            <span class="menu-label">Employee Records</span>
           </a>
         </li>
-
         <li>
-          <a href="#inventory">
+          <a href="#inventory" data-tooltip="Inventory">
             <i data-lucide="box"></i>
-            Inventory
+            <span class="menu-label">Inventory</span>
           </a>
         </li>
-
         <li>
-          <a href="visitorsView.html">
+          <a href="visitorsView.html" data-tooltip="Visitor's Log">
             <i data-lucide="user-check"></i>
-            Visitor's Log
+            <span class="menu-label">Visitor's Log</span>
           </a>
         </li>
-
         <li>
-          <a href="#service">
+          <a href="#service" data-tooltip="Service Request">
             <i data-lucide="wrench"></i>
-            Service Request
+            <span class="menu-label">Service Request</span>
           </a>
         </li>
-
         <li>
-          <a href="#ics">
+          <a href="#ics" data-tooltip="ICS Inventory">
             <i data-lucide="clipboard-list"></i>
-            ICS
+            <span class="menu-label">ICS</span>
           </a>
         </li>
       </ul>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="main-content">
+    <main class="main-content" id="mainContent">
       <!-- HERO -->
       <section class="hero" id="home">
         <div class="hero-copy reveal">
@@ -193,7 +198,6 @@
               <i data-lucide="folder-open"></i>
               Open Modules
             </a>
-
             <a href="#analytics" class="secondary-btn">
               <i data-lucide="bar-chart-3"></i>
               View Charts
@@ -209,7 +213,6 @@
                 <span></span>
                 <span></span>
               </div>
-
               <div class="preview-title">
                 <h3>Dashboard Overview</h3>
                 <p>Recent activity summary and analytics preview.</p>
@@ -218,36 +221,51 @@
 
             <div class="stats-grid">
               <div class="stat-card">
-                <i data-lucide="inbox"></i>
-                <h4 class="counter" data-target="128">0</h4>
-                <p>Active Requests</p>
+                <div class="stat-icon-wrapper">
+                  <i data-lucide="inbox"></i>
+                </div>
+                <div>
+                  <h4 class="counter" data-target="128">0</h4>
+                  <p>Active Requests</p>
+                </div>
               </div>
 
               <div class="stat-card">
-                <i data-lucide="clock-3"></i>
-                <h4 class="counter" data-target="52">0</h4>
-                <p>Pending Approvals</p>
+                <div class="stat-icon-wrapper">
+                  <i data-lucide="clock-3"></i>
+                </div>
+                <div>
+                  <h4 class="counter" data-target="52">0</h4>
+                  <p>Pending Approvals</p>
+                </div>
               </div>
 
               <div class="stat-card">
-                <i data-lucide="archive"></i>
-                <h4 class="counter" data-target="421">0</h4>
-                <p>Archived Records</p>
+                <div class="stat-icon-wrapper">
+                  <i data-lucide="archive"></i>
+                </div>
+                <div>
+                  <h4 class="counter" data-target="421">0</h4>
+                  <p>Archived Records</p>
+                </div>
               </div>
 
               <div class="stat-card">
-                <i data-lucide="users-round"></i>
-                <h4 class="counter" data-target="36">0</h4>
-                <p>Visitors Today</p>
+                <div class="stat-icon-wrapper">
+                  <i data-lucide="users-round"></i>
+                </div>
+                <div>
+                  <h4 class="counter" data-target="36">0</h4>
+                  <p>Visitors Today</p>
+                </div>
               </div>
             </div>
 
             <div class="mini-chart-card">
-              <div>
+              <div class="mini-chart-desc">
                 <h4>Weekly Document Activity</h4>
                 <p>Incoming and outgoing movement</p>
               </div>
-
               <div class="mini-chart-wrapper">
                 <canvas id="miniChart"></canvas>
               </div>
@@ -266,75 +284,111 @@
           </p>
         </div>
 
-        <div class="search-box reveal">
-          <i data-lucide="search"></i>
-          <input type="text" id="moduleSearch" placeholder="Search module, record, or transaction..." />
+        <div class="search-box-container reveal">
+          <div class="search-box">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="moduleSearch" placeholder="Search modules... (Press '/' or 'Ctrl+K' to focus)" />
+            <button id="searchClearBtn" class="search-clear-btn" aria-label="Clear search" type="button">
+              <i data-lucide="x"></i>
+            </button>
+          </div>
         </div>
 
-        <div class="modules-grid">
-          <div class="module-card reveal" id="comm" data-name="Incoming Outgoing Communication">
-            <i data-lucide="repeat"></i>
+        <!-- Modules Search Fallback Container -->
+        <div id="noResultsContainer" class="no-results-state" style="display: none;">
+          <i data-lucide="search-code"></i>
+          <h4>No modules match your query</h4>
+          <p>Double check spelling or try terms like 'communication', 'inventory', or 'visitor'.</p>
+        </div>
+
+        <div class="modules-grid" id="modulesGrid">
+          <div class="module-card reveal" id="comm" data-name="Incoming Outgoing Communication" onclick="location.href='Communication.html'">
+            <div class="module-icon-box">
+              <i data-lucide="repeat"></i>
+            </div>
             <h3>Incoming/Outgoing Communication</h3>
             <p>
               Track request letters, endorsement letters, transmittal letters,
               response letters, notices, invitations, reports, and memoranda.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
 
-          <div class="module-card reveal" id="travel" data-name="Travel Order">
-            <i data-lucide="map-pin"></i>
+          <div class="module-card reveal" id="travel" data-name="Travel Order" onclick="location.href='#travel'">
+            <div class="module-icon-box">
+              <i data-lucide="map-pin"></i>
+            </div>
             <h3>Travel Order</h3>
             <p>
               Prepare, monitor, and approve travel order records for authorized office personnel.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
 
-          <div class="module-card reveal" id="memo" data-name="Office Memo">
-            <i data-lucide="file-text"></i>
+          <div class="module-card reveal" id="memo" data-name="Office Memo" onclick="location.href='#memo'">
+            <div class="module-icon-box">
+              <i data-lucide="file-text"></i>
+            </div>
             <h3>Office Memo</h3>
             <p>
               Create, store, and retrieve office memoranda and internal announcements.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
 
-          <div class="module-card reveal" id="employee" data-name="Employee Records">
-            <i data-lucide="users"></i>
+          <div class="module-card reveal" id="employee" data-name="Employee Records" onclick="location.href='employee.html'">
+            <div class="module-icon-box">
+              <i data-lucide="users"></i>
+            </div>
             <h3>Employee Records</h3>
             <p>
               Maintain employee profiles, assignments, positions, and personnel information.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
 
-          <div class="module-card reveal" id="inventory" data-name="Inventory">
-            <i data-lucide="box"></i>
+          <div class="module-card reveal" id="inventory" data-name="Inventory" onclick="location.href='#inventory'">
+            <div class="module-icon-box">
+              <i data-lucide="box"></i>
+            </div>
             <h3>Inventory</h3>
             <p>
               Monitor equipment, supplies, stocks, issued items, and inventory movement.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
 
-          <div class="module-card reveal" id="visitor" data-name="Visitor Log">
-            <i data-lucide="user-check"></i>
+          <div class="module-card reveal" id="visitor" data-name="Visitor Log" onclick="location.href='visitorsView.html'">
+            <div class="module-icon-box">
+              <i data-lucide="user-check"></i>
+            </div>
             <h3>Visitor's Log</h3>
             <p>
               Digitally record visitors, purpose of visit, time in, time out, and office destination.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
 
-          <div class="module-card reveal" id="service" data-name="Service Request">
-            <i data-lucide="wrench"></i>
+          <div class="module-card reveal" id="service" data-name="Service Request" onclick="location.href='#service'">
+            <div class="module-icon-box">
+              <i data-lucide="wrench"></i>
+            </div>
             <h3>Service Request</h3>
             <p>
               Submit, assign, monitor, and update facility or office service requests.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
 
-          <div class="module-card reveal" id="ics" data-name="Inventory Custodian Slip ICS">
-            <i data-lucide="clipboard-list"></i>
+          <div class="module-card reveal" id="ics" data-name="Inventory Custodian Slip ICS" onclick="location.href='#ics'">
+            <div class="module-icon-box">
+              <i data-lucide="clipboard-list"></i>
+            </div>
             <h3>ICS</h3>
             <p>
               Manage Inventory Custodian Slip records, issued items, and accountability details.
             </p>
+            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
           </div>
         </div>
       </section>
@@ -351,7 +405,9 @@
 
         <div class="features-grid">
           <div class="feature-box reveal">
-            <i data-lucide="shield-check"></i>
+            <div class="feature-icon-wrapper">
+              <i data-lucide="shield-check"></i>
+            </div>
             <h3>Secure Access</h3>
             <p>
               Supports authorized accounts, user profile access, and logout confirmation.
@@ -359,7 +415,9 @@
           </div>
 
           <div class="feature-box reveal">
-            <i data-lucide="database"></i>
+            <div class="feature-icon-wrapper">
+              <i data-lucide="database"></i>
+            </div>
             <h3>Centralized Repository</h3>
             <p>
               Provides one place for storing and managing office records and documents.
@@ -367,7 +425,9 @@
           </div>
 
           <div class="feature-box reveal">
-            <i data-lucide="search-check"></i>
+            <div class="feature-icon-wrapper">
+              <i data-lucide="search-check"></i>
+            </div>
             <h3>Fast Search</h3>
             <p>
               Allows users to search modules and quickly locate the record area they need.
@@ -375,7 +435,9 @@
           </div>
 
           <div class="feature-box reveal">
-            <i data-lucide="chart-no-axes-combined"></i>
+            <div class="feature-icon-wrapper">
+              <i data-lucide="chart-no-axes-combined"></i>
+            </div>
             <h3>Analytics Preview</h3>
             <p>
               Displays charts for document activity, record category, and transaction status.
@@ -401,10 +463,8 @@
                 <h3>Monthly Communication Activity</h3>
                 <p>Incoming and outgoing document records</p>
               </div>
-
               <span class="chart-badge">2026</span>
             </div>
-
             <div class="chart-wrapper line-chart">
               <canvas id="monthlyChart"></canvas>
             </div>
@@ -416,10 +476,8 @@
                 <h3>Record Category</h3>
                 <p>Distribution by module</p>
               </div>
-
               <span class="chart-badge">Live</span>
             </div>
-
             <div class="chart-wrapper">
               <canvas id="categoryChart"></canvas>
             </div>
@@ -431,45 +489,46 @@
                 <h3>Transaction Status</h3>
                 <p>Completed, pending, processing, and archived</p>
               </div>
-
               <span class="chart-badge">Summary</span>
             </div>
-
             <div class="chart-wrapper">
               <canvas id="statusChart"></canvas>
             </div>
           </div>
 
           <div class="activity-card reveal">
-            <h3>Recent Activity</h3>
-
-            <div class="activity-item">
-              <span class="activity-icon">
-                <i data-lucide="file-plus-2"></i>
-              </span>
-              <div>
-                <h4>New incoming document recorded</h4>
-                <p>Request letter added to communication records.</p>
-              </div>
+            <div class="activity-header">
+              <h3>Recent Activity</h3>
             </div>
-
-            <div class="activity-item">
-              <span class="activity-icon">
-                <i data-lucide="check-circle-2"></i>
-              </span>
-              <div>
-                <h4>Travel order approved</h4>
-                <p>Personnel travel order moved to completed status.</p>
+            <div class="activity-timeline">
+              <div class="activity-item">
+                <span class="activity-icon">
+                  <i data-lucide="file-plus-2"></i>
+                </span>
+                <div>
+                  <h4>New incoming document recorded</h4>
+                  <p>Request letter added to communication records.</p>
+                </div>
               </div>
-            </div>
 
-            <div class="activity-item">
-              <span class="activity-icon">
-                <i data-lucide="package-check"></i>
-              </span>
-              <div>
-                <h4>Inventory item updated</h4>
-                <p>Issued equipment record updated in inventory module.</p>
+              <div class="activity-item">
+                <span class="activity-icon">
+                  <i data-lucide="check-circle-2"></i>
+                </span>
+                <div>
+                  <h4>Travel order approved</h4>
+                  <p>Personnel travel order moved to completed status.</p>
+                </div>
+              </div>
+
+              <div class="activity-item">
+                <span class="activity-icon">
+                  <i data-lucide="package-check"></i>
+                </span>
+                <div>
+                  <h4>Inventory item updated</h4>
+                  <p>Issued equipment record updated in inventory module.</p>
+                </div>
               </div>
             </div>
           </div>
@@ -531,7 +590,7 @@
 
       <!-- FOOTER -->
       <footer class="footer" id="contact">
-        <div>
+        <div class="footer-brand">
           <h2>PGENRO IMS</h2>
           <p>
             Information Management System for centralized office records,
@@ -539,7 +598,7 @@
           </p>
         </div>
 
-        <div>
+        <div class="footer-links">
           <h4>Resources</h4>
           <a href="#modules">Modules</a>
           <a href="#features">Features</a>
@@ -547,14 +606,19 @@
           <a href="#process">Process</a>
         </div>
 
-        <div>
-          <h4>Contact</h4>
+        <div class="footer-contact">
+          <h4>Contact Information</h4>
           <p>Email: help@pgenro.gov.ph</p>
           <p>Office: PGENRO Quezon Province</p>
         </div>
       </footer>
     </main>
   </div>
+
+  <!-- Scroll-to-Top Floating Trigger Button -->
+  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll to top" type="button">
+    <i data-lucide="chevron-up"></i>
+  </button>
 
   <!-- JS -->
   <script src="homepage.js"></script>
