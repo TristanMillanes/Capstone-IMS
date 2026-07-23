@@ -1,15 +1,349 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Travel Order | IMS PGENRO</title>
-    <link rel="preconnect" href = "https://fonts.googleapis.com">
-    <link rel="preconnect" href = "https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Travel Order</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="employee.css" />
+  <link rel="stylesheet" href="travelOR.css" />
 </head>
 <body>
-    
-    
+
+  <header class="navbar">
+    <a href="homepage.html" class="logo-area">
+      <div class="logo-icon">
+        <img src="../logo/enro.png" class="logo-image" alt="PGENRO Logo" onerror="this.style.display='none'" />
+      </div>
+      <div>
+        <h2>Provincial Government</h2>
+        <span>Environmental and Natural Resources Office</span>
+      </div>
+    </a>
+
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>IMS Modules</h3>
+      <p>Quick access menu</p>
+    </div>
+
+    <ul class="modules-list">
+      <li><a href="homepage.html"><i data-lucide="home"></i><span>Dashboard</span></a></li>
+      <li><a href="Communication.html"><i data-lucide="repeat-2"></i><span>Incoming/Outgoing<br>Communication</span></a></li>
+      <li><a href="travelOR.html" class="active"><i data-lucide="map-pin"></i><span>Travel Order</span></a></li>
+      <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memo</span></a></li>
+      <li><a href="employee.html"><i data-lucide="users"></i><span>Employee Records</span></a></li>
+      <li><a href="inventory.html"><i data-lucide="box"></i><span>Inventory</span></a></li>
+      <li><a href="visitorsView.html"><i data-lucide="user-check"></i><span>Visitor's Log</span></a></li>
+      <li><a href="servicerequest.html"><i data-lucide="wrench"></i><span>Service Request</span></a></li>
+      <li><a href="ics.html"><i data-lucide="clipboard-list"></i><span>ICS</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <section class="page-header">
+      <div class="header-overlay-glow"></div>
+      <span class="page-badge">
+        <i data-lucide="map-pin"></i>
+        TRAVEL ORDER
+      </span>
+      <h1>Travel Order Command Center</h1>
+      <p>Monitor movement, approvals, and destination progress with a fresh dashboard layout built on the PGENRO IMS visual system.</p>
+    </section>
+
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-icon total-icon">
+          <i data-lucide="file-text"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Total Orders</span>
+          <h3 id="metricTotal">0</h3>
+          <span class="metric-sub">Requests Submitted</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon active-icon">
+          <i data-lucide="clock"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Pending</span>
+          <h3 id="metricPending">0</h3>
+          <span class="metric-sub">Awaiting Approval</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon leave-icon">
+          <i data-lucide="check-circle"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Approved</span>
+          <h3 id="metricApproved">0</h3>
+          <span class="metric-sub">Confirmed Trips</span>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-icon dept-icon">
+          <i data-lucide="map"></i>
+        </div>
+        <div class="metric-info">
+          <span class="metric-label">Destinations</span>
+          <h3 id="metricLocations">0</h3>
+          <span class="metric-sub">Target Locations</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="dashboard-grid">
+      <section class="dashboard-card">
+        <div class="dashboard-card-header">
+          <div>
+            <h3>Active Travel Orders</h3>
+            <p>Review the current travel queue, update approvals, and see which trips are due soon.</p>
+          </div>
+          <span class="small-badge">Live Queue</span>
+        </div>
+
+        <div class="order-list" id="activeOrderList">
+          <article class="order-card">
+            <div class="order-meta">
+              <strong>TO-2026-005</strong>
+              <span>Traveler: Maria Santos</span>
+              <span>Destination: Lucena City</span>
+              <span>Dates: 08 Jul 2026 - 10 Jul 2026</span>
+            </div>
+            <span class="status-pill status-pending">Pending</span>
+          </article>
+
+          <article class="order-card">
+            <div class="order-meta">
+              <strong>TO-2026-008</strong>
+              <span>Traveler: Jomar Reyes</span>
+              <span>Destination: Tayabas</span>
+              <span>Dates: 11 Jul 2026 - 12 Jul 2026</span>
+            </div>
+            <span class="status-pill status-approved">Approved</span>
+          </article>
+
+          <article class="order-card">
+            <div class="order-meta">
+              <strong>TO-2026-010</strong>
+              <span>Traveler: Aileen Dela Cruz</span>
+              <span>Destination: Sariaya</span>
+              <span>Dates: 14 Jul 2026 - 15 Jul 2026</span>
+            </div>
+            <span class="status-pill status-declined">Declined</span>
+          </article>
+        </div>
+      </section>
+
+      <aside class="summary-panel">
+        <div class="summary-panel-header">
+          <div>
+            <h3>Travel Snapshot</h3>
+            <p>Quick insights into the travel order pipeline and destination distribution.</p>
+          </div>
+          <button type="button" class="secondary-btn" onclick="openDrawer()">New Travel Order</button>
+        </div>
+
+        <div class="summary-panel-body">
+          <div class="summary-card">
+            <h4>Order Approval Pace</h4>
+            <strong>74%</strong>
+            <p>Approval pace is ahead of schedule for this quarter, with most provincial travel requests cleared.</p>
+            <div class="progress-row">
+              <div class="progress-track"><span class="progress-fill" style="width:74%"></span></div>
+              <div class="progress-track"><span class="progress-fill" style="width:42%; background: var(--accent)"></span></div>
+            </div>
+          </div>
+
+          <div class="summary-list">
+            <div class="summary-item">
+              <strong>Local Travel</strong>
+              <span>13 orders</span>
+            </div>
+            <div class="summary-item">
+              <strong>Provincial Travel</strong>
+              <span>9 orders</span>
+            </div>
+            <div class="summary-item">
+              <strong>National Travel</strong>
+              <span>4 orders</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="summary-panel-footer">
+          <div class="side-summary-list">
+            <div class="side-summary-card">
+              <h4>Priority Destination</h4>
+              <p>Lucena City remains the top destination for monitoring and site inspections this month.</p>
+            </div>
+            <div class="side-summary-card">
+              <h4>Next Approval Milestone</h4>
+              <p>10 travel orders are awaiting chief approval before dispatch on 17 July 2026.</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <section class="table-card records-card">
+      <div class="table-header-row">
+        <div>
+          <h3>Recent Travel Requests</h3>
+          <p class="table-subtitle">A more compact table for reviewing recent order submissions and approval status.</p>
+        </div>
+        <span class="row-counter" id="recordCounter">Showing 3 Records</span>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 120px;">TOR No.</th>
+              <th>Traveler</th>
+              <th>Destination</th>
+              <th>Type</th>
+              <th style="width: 110px;">Status</th>
+              <th class="text-center" style="width: 140px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="travelOrderTable">
+            <tr>
+              <td>TO-2026-005</td>
+              <td>Maria Santos</td>
+              <td>Lucena City</td>
+              <td>Provincial</td>
+              <td><span class="status-pill status-pending">Pending</span></td>
+              <td class="text-center"><button class="secondary-btn" type="button">View</button></td>
+            </tr>
+            <tr>
+              <td>TO-2026-008</td>
+              <td>Jomar Reyes</td>
+              <td>Tayabas</td>
+              <td>Local</td>
+              <td><span class="status-pill status-approved">Approved</span></td>
+              <td class="text-center"><button class="secondary-btn" type="button">View</button></td>
+            </tr>
+            <tr>
+              <td>TO-2026-010</td>
+              <td>Aileen Dela Cruz</td>
+              <td>Sariaya</td>
+              <td>Provincial</td>
+              <td><span class="status-pill status-declined">Declined</span></td>
+              <td class="text-center"><button class="secondary-btn" type="button">View</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="drawer-backdrop" id="drawerBackdrop"></div>
+    <section class="drawer-panel" id="formSection">
+      <div class="drawer-header">
+        <div>
+          <h2>Create Travel Order</h2>
+          <p>Fill in official travel details and submit for approval.</p>
+        </div>
+        <button type="button" id="cancelBtn" class="close-drawer-btn" title="Close Panel">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <form id="travelOrderForm" class="drawer-form">
+        <div class="drawer-form-body">
+          <div class="form-card-group">
+            <h4 class="form-group-header-label"><i data-lucide="file-text"></i> Travel Order Info</h4>
+            <div class="form-grid-3">
+              <div class="input-group">
+                <label for="toNumber">Travel Order No.</label>
+                <input type="text" id="toNumber" placeholder="TO-2026-001" required />
+              </div>
+              <div class="input-group">
+                <label for="travelerName">Traveler Name</label>
+                <input type="text" id="travelerName" placeholder="Juan dela Cruz" required />
+              </div>
+              <div class="input-group">
+                <label for="travelType">Travel Type</label>
+                <select id="travelType" required>
+                  <option value="">Choose Type</option>
+                  <option value="Local">Local</option>
+                  <option value="Provincial">Provincial</option>
+                  <option value="National">National</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label for="destination">Destination</label>
+                <input type="text" id="destination" placeholder="Lucena City, Quezon" required />
+              </div>
+              <div class="input-group">
+                <label for="startDate">Start Date</label>
+                <input type="date" id="startDate" required />
+              </div>
+              <div class="input-group">
+                <label for="endDate">End Date</label>
+                <input type="date" id="endDate" required />
+              </div>
+              <div class="input-group span-3">
+                <label for="purpose">Purpose of Travel</label>
+                <input type="text" id="purpose" placeholder="Inspect field site and submit report" required />
+              </div>
+              <div class="input-group">
+                <label for="vehicle">Vehicle / Transport</label>
+                <input type="text" id="vehicle" placeholder="Govt. vehicle / Bus" />
+              </div>
+              <div class="input-group">
+                <label for="status">Travel Order Status</label>
+                <select id="status" required>
+                  <option value="Pending">Pending</option>
+                  <option value="Approved">Approved</option>
+                  <option value="Declined">Declined</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-card-group">
+            <h4 class="form-group-header-label"><i data-lucide="user"></i> Official Requestor</h4>
+            <div class="form-grid-3">
+              <div class="input-group">
+                <label for="requestedBy">Requested By</label>
+                <input type="text" id="requestedBy" placeholder="Name of requestor" />
+              </div>
+              <div class="input-group">
+                <label for="requestedDept">Department</label>
+                <input type="text" id="requestedDept" placeholder="ENRO" />
+              </div>
+              <div class="input-group">
+                <label for="remarks">Remarks</label>
+                <input type="text" id="remarks" placeholder="Additional notes or approvals" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="drawer-actions">
+          <button type="button" class="tertiary-btn" onclick="closeDrawer()">Cancel</button>
+          <button type="submit" class="primary-btn flex-1-btn">Save Travel Order</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <script src="travelOR.js"></script>
 </body>
 </html>
