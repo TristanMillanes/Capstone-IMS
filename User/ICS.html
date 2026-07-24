@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | ICS Module</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="ICS.css" />
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <header class="navbar">
+    <a href="homepage.html" class="logo-area">
+      <div class="logo-icon">
+        <img src="../logo/enro.png" class="logo-image" alt="PGENRO Logo" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <h2>Provincial Government</h2>
+        <span>Environmental and Natural Resources Office</span>
+      </div>
+    </a>
+
+    <div class="hamburger-menu" id="hamburgerMenu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+  </header>
+
+  <div class="overlay" id="overlay"></div>
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h3>IMS Modules</h3>
+      <p>Quick access menu</p>
+    </div>
+
+    <ul class="modules-list">
+      <li><a href="homepage.html"><i data-lucide="home"></i><span>Dashboard</span></a></li>
+      <li><a href="communication.html"><i data-lucide="repeat-2"></i><span>Incoming/Outgoing<br>Communication</span></a></li>
+      <li><a href="travelorder.html"><i data-lucide="map-pin"></i><span>Travel Order</span></a></li>
+      <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memo</span></a></li>
+      <li><a href="employee.html"><i data-lucide="users"></i><span>Employee Records</span></a></li>
+      <li><a href="inventory.html"><i data-lucide="box"></i><span>Inventory</span></a></li>
+      <li><a href="visitorsView.html"><i data-lucide="user-check"></i><span>Visitor's Log</span></a></li>
+      <li><a href="ics.html" class="active"><i data-lucide="clipboard-list"></i><span>ICS</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="main-content">
+    <section class="page-header">
+      <div class="page-badge">
+        <i data-lucide="clipboard-list"></i>
+        Inventory Custodian Slip
+      </div>
+      <h1>Manage issued items, slips, and accountability records.</h1>
+      <p>Track what was issued, to whom, and whether each item has been returned or remains accountable.</p>
+    </section>
+
+    <section class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue">
+          <i data-lucide="clipboard-check"></i>
+        </div>
+        <div>
+          <p>Active Slips</p>
+          <h2 id="statTotalSlips">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-icon green">
+          <i data-lucide="package-open"></i>
+        </div>
+        <div>
+          <p>Issued Items</p>
+          <h2 id="statIssuedItems">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card caution">
+        <div class="stat-icon yellow">
+          <i data-lucide="rotate-ccw"></i>
+        </div>
+        <div>
+          <p>Pending Return</p>
+          <h2 id="statPendingReturn">0</h2>
+        </div>
+      </div>
+
+      <div class="stat-card danger">
+        <div class="stat-icon red">
+          <i data-lucide="alert-circle"></i>
+        </div>
+        <div>
+          <p>Overdue</p>
+          <h2 id="statOverdue">0</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="workspace-grid">
+      <div class="panel panel-form">
+        <div class="panel-header">
+          <div>
+            <h3>Encode Custodian Slip</h3>
+            <p>Register a new issued item and assign accountability.</p>
+          </div>
+          <span class="panel-pill">New Record</span>
+        </div>
+
+        <form id="icsForm" class="ics-form">
+          <div class="form-grid">
+            <label>
+              Slip No.
+              <input type="text" id="slipNo" placeholder="ICS-004" required>
+            </label>
+            <label>
+              Issue Date
+              <input type="date" id="issueDate" required>
+            </label>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              Custodian
+              <input type="text" id="custodian" placeholder="Juan Dela Cruz" required>
+            </label>
+            <label>
+              Office / Unit
+              <input type="text" id="officeUnit" placeholder="Planning Section" required>
+            </label>
+          </div>
+
+          <label>
+            Item Description
+            <textarea id="itemDesc" rows="3" placeholder="Laptop, projector, office supplies, etc."></textarea>
+          </label>
+
+          <div class="form-grid">
+            <label>
+              Quantity
+              <input type="number" id="quantity" min="1" value="1" required>
+            </label>
+            <label>
+              Status
+              <select id="status">
+                <option value="Issued">Issued</option>
+                <option value="Returned">Returned</option>
+                <option value="Pending">Pending</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Accountability Notes
+            <textarea id="notes" rows="3" placeholder="Condition, purpose, return deadline, remarks..."></textarea>
+          </label>
+
+          <div class="form-actions">
+            <button type="reset" class="secondary-btn">Clear</button>
+            <button type="submit" class="primary-btn">Save Slip</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="panel panel-records">
+        <div class="panel-header">
+          <div>
+            <h3>Recent Custodian Slips</h3>
+            <p>Issued items and accountable personnel.</p>
+          </div>
+          <span class="panel-pill soft">Live List</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Slip No.</th>
+                <th>Custodian</th>
+                <th>Item</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="slipTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="detail-grid">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Issued Items Summary</h3>
+            <p>Quick view of the current accountability load.</p>
+          </div>
+        </div>
+        <ul class="summary-list">
+          <li><span>Equipment & Devices</span><strong id="summaryEquipment">0</strong></li>
+          <li><span>Office Supplies</span><strong id="summarySupplies">0</strong></li>
+          <li><span>Field Use Items</span><strong id="summaryField">0</strong></li>
+        </ul>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h3>Accountability Notes</h3>
+            <p>Important reminders for each issued item.</p>
+          </div>
+        </div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <strong>Return Deadline</strong>
+            <p>All portable devices should be returned within 3 working days after use.</p>
+          </div>
+          <div class="timeline-item">
+            <strong>Custodian Sign-off</strong>
+            <p>Physical verification is required before the item is marked as returned.</p>
+          </div>
+          <div class="timeline-item">
+            <strong>Compliance Check</strong>
+            <p>Pending items are highlighted for follow-up by the inventory custodian.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="ICS.js"></script>
+</body>
+</html>
