@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Account Settings</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="Setting.css" />
+</head>
+
+<body>
+  <!-- Overlay Backdrop -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <!-- Left Section: Menu Toggle & Brand Logo -->
+    <div class="nav-left-container">
+      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle Navigation Menu" type="button">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <a href="homepage.html" class="logo-area">
+        <div class="logo-icon">
+          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'">
+        </div>
+        <div class="logo-text">
+          <h2>Provincial Government</h2>
+          <span>Environment & Natural Resources Office</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Center Section: Clean Anchor Navigation -->
+    <nav class="nav-links" id="navLinks">
+      <a href="homepage.html">Home</a>
+      <a href="#profile">Profile</a>
+      <a href="#security">Security</a>
+      <a href="#preferences">IMS Preferences</a>
+    </nav>
+
+    <!-- Right Section: Profile & System Status Indicator -->
+    <div class="right-nav">
+      <div class="profile-menu" id="profileMenu">
+        <button class="profile-btn" id="profileBtn" type="button">
+          <div class="profile-avatar">
+            <i data-lucide="user"></i>
+          </div>
+          <div class="profile-text">
+            <h4>PGENRO OFFICER</h4>
+            <span>Authorized Account</span>
+          </div>
+          <i data-lucide="chevron-down" class="profile-chevron"></i>
+        </button>
+
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-header">
+            <div class="profile-avatar big">
+              <i data-lucide="user"></i>
+            </div>
+            <div>
+              <h3>PGENRO User</h3>
+              <p>Authorized Admin</p>
+            </div>
+          </div>
+
+          <a href="homepage.html">
+            <i data-lucide="layout-dashboard"></i>
+            Dashboard Overview
+          </a>
+
+          <a href="Settings.html" class="active">
+            <i data-lucide="settings"></i>
+            Account Settings
+          </a>
+
+          <button class="logout-btn" id="logoutBtn" type="button">
+            <i data-lucide="log-out"></i>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <!-- FLOATING SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>IMS Modules</h3>
+        <p class="sidebar-subtext">Office Management Modules</p>
+      </div>
+
+      <ul class="modules-list">
+        <li>
+          <a href="homepage.html">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard Overview</span>
+          </a>
+        </li>
+        <li>
+          <a href="Communication.html">
+            <i data-lucide="mail"></i>
+            <span>Communications</span>
+          </a>
+        </li>
+        <li>
+          <a href="#travel">
+            <i data-lucide="navigation"></i>
+            <span>Travel Orders</span>
+          </a>
+        </li>
+        <li>
+          <a href="#memo">
+            <i data-lucide="file-text"></i>
+            <span>Office Memo Logs</span>
+          </a>
+        </li>
+        <li>
+          <a href="employee.html">
+            <i data-lucide="users-round"></i>
+            <span>Employee Records</span>
+          </a>
+        </li>
+        <li>
+          <a href="#inventory">
+            <i data-lucide="package"></i>
+            <span>Inventory Records</span>
+          </a>
+        </li>
+        <li>
+          <a href="visitorsView.html">
+            <i data-lucide="clipboard-signature"></i>
+            <span>Visitor's Logbook</span>
+          </a>
+        </li>
+        <li>
+          <a href="#service">
+            <i data-lucide="shield-alert"></i>
+            <span>Service Requests</span>
+          </a>
+        </li>
+        <li>
+          <a href="#ics">
+            <i data-lucide="layers"></i>
+            <span>ICS Records</span>
+          </a>
+        </li>
+        <li class="sidebar-divider"></li>
+        <li>
+          <a href="Settings.html" class="active">
+            <i data-lucide="settings"></i>
+            <span>Account Settings</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- Systems Status Widget -->
+      <div class="sidebar-footer">
+        <div class="system-status">
+          <span class="status-indicator online"></span>
+          <span class="status-text">IMS Server Connection Secure</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+      
+      <!-- PAGE TITLE HEADER -->
+      <section class="settings-header reveal">
+        <div class="header-title-area">
+          <span class="badge">
+            <i data-lucide="shield-check"></i>
+            Authorized Session Active
+          </span>
+          <h1>Account & <span>System Settings</span></h1>
+          <p class="header-subtitle">
+            Manage your PGENRO officer profile information, update secure access credentials, and customize office module preferences.
+          </p>
+        </div>
+      </section>
+
+      <!-- Toast / Floating Alert Message -->
+      <div id="settingsAlert"></div>
+
+      <!-- SETTINGS MAIN GRID -->
+      <div class="settings-grid">
+        
+        <!-- LEFT SIDE: PROFILE CARD & NAVIGATION -->
+        <div class="settings-sidebar-card reveal">
+          <div class="user-profile-summary">
+            <div class="avatar-upload-container">
+              <div class="big-avatar" id="avatarDisplay">
+                <i data-lucide="user"></i>
+              </div>
+              <button class="avatar-edit-btn" id="avatarEditBtn" title="Change Avatar">
+                <i data-lucide="camera"></i>
+              </button>
+            </div>
+
+            <h3 id="sidebarUserName">PGENRO Officer</h3>
+            <p id="sidebarUserRole">Authorized System Admin</p>
+            <span class="status-badge active"><i data-lucide="check-circle-2"></i> Account Verified</span>
+
+            <div class="user-meta-info">
+              <div class="meta-item">
+                <i data-lucide="building-2"></i>
+                <span>Quezon Provincial Capitol</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="mail"></i>
+                <span id="sidebarUserEmail">officer@pgenro.gov.ph</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="shield"></i>
+                <span>Level 4 Admin Clearance</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Tab Links -->
+          <div class="settings-nav-menu">
+            <button class="settings-nav-item active" data-tab="profile">
+              <i data-lucide="user"></i> Profile Information
+            </button>
+            <button class="settings-nav-item" data-tab="security">
+              <i data-lucide="lock"></i> Security & Credentials
+            </button>
+            <button class="settings-nav-item" data-tab="preferences">
+              <i data-lucide="sliders"></i> Module Preferences
+            </button>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE: SETTINGS FORM PANELS -->
+        <div class="settings-content-area reveal">
+          
+          <!-- TAB 1: PROFILE INFORMATION -->
+          <div class="settings-panel active" id="profile">
+            <div class="panel-header">
+              <div>
+                <h3>Personal & Office Details</h3>
+                <p>Update your personal identity details and internal provincial office designation.</p>
+              </div>
+              <span class="panel-tag">PGENRO Personnel</span>
+            </div>
+
+            <form id="profileSettingsForm">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label for="fullName">Full Name</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="user" class="input-icon"></i>
+                    <input type="text" id="fullName" class="form-control" value="PGENRO Officer" required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="email">Official Email Address</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="mail" class="input-icon"></i>
+                    <input type="email" id="email" class="form-control" value="officer@pgenro.gov.ph" required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="phone">Contact Number</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="phone" class="input-icon"></i>
+                    <input type="tel" id="phone" class="form-control" value="+63 917 123 4567" />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="employeeId">Employee ID / Item No.</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="badge-check" class="input-icon"></i>
+                    <input type="text" id="employeeId" class="form-control" value="PGENRO-2025-0892" readonly />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="division">Office Division</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="building" class="input-icon"></i>
+                    <select id="division" class="form-control">
+                      <option value="Environmental Management Division" selected>Environmental Management Division</option>
+                      <option value="Natural Resources Permitting Unit">Natural Resources Permitting Unit</option>
+                      <option value="Administrative & Support Services">Administrative & Support Services</option>
+                      <option value="Forestry & Conservation Section">Forestry & Conservation Section</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="designation">Position Designation</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="briefcase" class="input-icon"></i>
+                    <input type="text" id="designation" class="form-control" value="Environment & Management Specialist II" />
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i data-lucide="save"></i> Save Profile Changes
+                </button>
+                <button type="reset" class="btn btn-secondary">
+                  Reset Form
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 2: SECURITY & PASSWORD -->
+          <div class="tab-pane-content" id="security" style="display: none;">
+            <div class="panel-header">
+              <div>
+                <h3>Security Credentials</h3>
+                <p>Ensure account safety by changing your administrative password regularly.</p>
+              </div>
+              <span class="panel-tag warning">Security Protocol</span>
+            </div>
+
+            <form id="securitySettingsForm">
+              <div class="form-grid single-col">
+                <div class="form-group">
+                  <label for="currentPassword">Current System Password</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="key-round" class="input-icon"></i>
+                    <input type="password" id="currentPassword" class="form-control" placeholder="••••••••••••" required />
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="newPassword">New Password</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="lock" class="input-icon"></i>
+                    <input type="password" id="newPassword" class="form-control" placeholder="••••••••••••" required />
+                  </div>
+                  <span class="field-hint">Password must be at least 8 characters long with numbers and letters.</span>
+                </div>
+
+                <div class="form-group">
+                  <label for="confirmPassword">Confirm New Password</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="shield-alert" class="input-icon"></i>
+                    <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••••••" required />
+                  </div>
+                </div>
+              </div>
+
+              <!-- Extra Security Setting Toggles -->
+              <div class="security-toggles">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <h4>Two-Factor Authentication (2FA)</h4>
+                    <p>Require an email authorization code whenever signing into the PGENRO IMS portal.</p>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="twoFactorToggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <h4>Automatic Session Timeout</h4>
+                    <p>Log out automatically after 15 minutes of system inactivity to prevent unauthorized access.</p>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="timeoutToggle" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i data-lucide="shield-check"></i> Update Security Credentials
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- TAB 3: MODULE PREFERENCES -->
+          <div class="tab-pane-content" id="preferences" style="display: none;">
+            <div class="panel-header">
+              <div>
+                <h3>IMS System & Notification Preferences</h3>
+                <p>Customize default dashboard behavior and real-time document notification alerts.</p>
+              </div>
+              <span class="panel-tag">System Defaults</span>
+            </div>
+
+            <form id="preferencesSettingsForm">
+              <div class="form-grid mb-24">
+                <div class="form-group">
+                  <label for="defaultModule">Default Startup Module</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="layout" class="input-icon"></i>
+                    <select id="defaultModule" class="form-control">
+                      <option value="homepage.html">Dashboard Overview</option>
+                      <option value="Communication.html">Communications Module</option>
+                      <option value="visitorsView.html">Visitor's Logbook</option>
+                      <option value="employee.html">Employee Records</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label for="recordsPerPage">Default Table Display Records</label>
+                  <div class="input-wrapper">
+                    <i data-lucide="list-ordered" class="input-icon"></i>
+                    <select id="recordsPerPage" class="form-control">
+                      <option value="10">10 Rows per page</option>
+                      <option value="25" selected>25 Rows per page</option>
+                      <option value="50">50 Rows per page</option>
+                      <option value="100">100 Rows per page</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="security-toggles">
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <h4>Incoming Communication Alerts</h4>
+                    <p>Receive immediate alerts when new official documents arrive in the Communications module.</p>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="notifyComm" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <h4>Low Inventory Stock Warning</h4>
+                    <p>Notify office supply managers when critical office materials drop below reorder thresholds.</p>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="notifyStock" checked>
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-item">
+                  <div class="toggle-info">
+                    <h4>Visitor Check-In Log Activity</h4>
+                    <p>Display toast alerts on the dashboard when new visitors log into the lobby portal.</p>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="notifyVisitor">
+                    <span class="slider"></span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary">
+                  <i data-lucide="sliders"></i> Save System Preferences
+                </button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="footer" id="contact">
+        <div class="footer-container">
+          <div class="footer-brand">
+            <h2>PGENRO IMS</h2>
+            <p>
+              Provincial Government Environment and Natural Resources Office of Quezon Province. Managing resources through stable software architecture.
+            </p>
+          </div>
+
+          <div class="footer-group">
+            <h4>IMS Modules</h4>
+            <div class="footer-links-grid">
+              <a href="homepage.html">Home Monitor</a>
+              <a href="Communication.html">Communications</a>
+              <a href="visitorsView.html">Visitor Logs</a>
+              <a href="Settings.html">Account Settings</a>
+            </div>
+          </div>
+
+          <div class="footer-contact">
+            <h4>Contact Support</h4>
+            <p><strong>Email:</strong> systems@pgenro.gov.ph</p>
+            <p><strong>Location:</strong> PGENRO Building, Lucena City, Quezon Province</p>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2025 PGENRO. All Rights Reserved. Province of Quezon.</p>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- Scroll-to-Top Floating Trigger Button -->
+  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll back to top" type="button">
+    <i data-lucide="chevron-up"></i>
+  </button>
+
+  <!-- JS -->
+  <script src="Settings.js"></script>
+  <script type="module" src="settingsD.js"></script>
+  
+</body>
+</html>

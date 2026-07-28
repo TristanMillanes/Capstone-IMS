@@ -1,332 +1,228 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Helper to safely invoke Lucide icons
+    // Utility to execute Lucide Icons rendering safely
     const renderIconsSafely = () => {
         if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
             lucide.createIcons();
         }
     };
 
-    // Initialize Lucide Icons
     renderIconsSafely();
 
-    // Safe LocalStorage Helper to prevent sandboxed security crashes (e.g. in private windows)
+    // Isolated Storage Helper Wrapper
     const safeStorage = {
         getItem: (key) => {
-            try {
-                return localStorage.getItem(key);
-            } catch (e) {
-                return null;
-            }
+            try { return localStorage.getItem(key); } catch (e) { return null; }
         },
         setItem: (key, value) => {
-            try {
-                localStorage.setItem(key, value);
-            } catch (e) {}
+            try { localStorage.setItem(key, value); } catch (e) {}
         },
         removeItem: (key) => {
-            try {
-                localStorage.removeItem(key);
-            } catch (e) {}
+            try { localStorage.removeItem(key); } catch (e) {}
         }
     };
 
     // ==========================================
-    // 1. Interactive Fluid DoF Canvas Engine
+    // 1. Dynamic Interactive Spotlight Positioning
     // ==========================================
-    const leavesContainer = document.getElementById("leavesCanvasContainer");
+    const card = document.getElementById("interactiveCard");
+    const sunburstGlow = document.getElementById("sunburstGlow");
+
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    let currentX = mouseX;
+    let currentY = mouseY;
+
+    const updateCoordinates = (clientX, clientY) => {
+        mouseX = clientX;
+        mouseY = clientY;
+    };
+
+    window.addEventListener("mousemove", (e) => {
+        updateCoordinates(e.clientX, e.clientY);
+    }, { passive: true });
+
+    window.addEventListener("touchmove", (e) => {
+        if (e.touches.length > 0) {
+            updateCoordinates(e.touches[0].clientX, e.touches[0].clientY);
+        }
+    }, { passive: true });
+
+    if (card && sunburstGlow) {
+        card.addEventListener("mouseenter", () => card.classList.add("active-hover"));
+        card.addEventListener("mouseleave", () => card.classList.remove("active-hover"));
+
+        const interpolateGlowPosition = () => {
+            currentX += (mouseX - currentX) * 0.12;
+            currentY += (mouseY - currentY) * 0.12;
+
+            sunburstGlow.style.left = `${currentX}px`;
+            sunburstGlow.style.top = `${currentY}px`;
+
+            requestAnimationFrame(interpolateGlowPosition);
+        };
+
+        interpolateGlowPosition();
+    }
+
+    // ====================================================================
+    // 2. Ecology Vector Mesh Engine (Interactive Background Canvas)
+    // ====================================================================
+    const forestContainer = document.getElementById("forestCanvasContainer");
     
-    if (leavesContainer) {
+    if (forestContainer) {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-        leavesContainer.appendChild(canvas);
+        forestContainer.appendChild(canvas);
 
         let width = window.innerWidth;
         let height = window.innerHeight;
+        const nodes = [];
+        const maxNodes = 65;
 
-        // Trace pointer coordinates for dynamic physical deflection updates
-        let mouseX = -1000;
-        let mouseY = -1000;
-        let isPointerActive = false;
-
-        const setPointerCoords = (x, y) => {
-            mouseX = x;
-            mouseY = y;
-            isPointerActive = true;
-        };
-
-        const clearPointerCoords = () => {
-            mouseX = -1000;
-            mouseY = -1000;
-            isPointerActive = false;
-        };
-
-        // Mouse Listeners
-        window.addEventListener("mousemove", (event) => {
-            setPointerCoords(event.clientX, event.clientY);
-        });
-
-        window.addEventListener("mouseleave", () => {
-            clearPointerCoords();
-        });
-
-        // Touch Listeners for Mobile and Tablet Interactivity
-        window.addEventListener("touchstart", (event) => {
-            if (event.touches.length > 0) {
-                setPointerCoords(event.touches[0].clientX, event.touches[0].clientY);
-            }
-        }, { passive: true });
-
-        window.addEventListener("touchmove", (event) => {
-            if (event.touches.length > 0) {
-                setPointerCoords(event.touches[0].clientX, event.touches[0].clientY);
-            }
-        }, { passive: true });
-
-        window.addEventListener("touchend", () => {
-            clearPointerCoords();
-        });
-
-        // Optimized forest translucent spectrum
-        const leafColors = [
-            "rgba(16, 185, 129, 0.16)",  /* Emerald Midground */
-            "rgba(5, 150, 105, 0.14)",   /* Forest Core */
-            "rgba(52, 211, 153, 0.12)",  /* Pale Meadow */
-            "rgba(110, 231, 183, 0.08)",  /* Ambient Translucent */
-            "rgba(4, 120, 87, 0.15)"     /* Deep Pine */
-        ];
-
-        const calculateLeafDensity = () => {
-            const area = width * height;
-            return Math.min(45, Math.max(18, Math.floor(area / 48000)));
-        };
-
-        const leaves = [];
-
-        class FoliageParticle {
-            constructor() {
-                this.reset();
-                this.y = Math.random() * height;
-            }
-
-            reset() {
-                this.x = Math.random() * width;
-                this.y = -40;
-                
-                // Displacement offsets (for interactive repulsion effects)
-                this.dispX = 0;
-                this.dispY = 0;
-
-                // Focal depth distribution (0: Foreground, 1: Middleground, 2: Background)
-                this.depthPlane = Math.floor(Math.random() * 3);
-                
-                if (this.depthPlane === 0) { // Foreground (Larger, swift, soft opacity)
-                    this.size = Math.random() * 8 + 18;
-                    this.speedY = Math.random() * 0.5 + 0.7;
-                    this.alpha = Math.random() * 0.12 + 0.12;
-                } else if (this.depthPlane === 1) { // Middleground (Standard baseline)
-                    this.size = Math.random() * 6 + 11;
-                    this.speedY = Math.random() * 0.4 + 0.4;
-                    this.alpha = Math.random() * 0.15 + 0.12;
-                } else { // Background (Small, slow, deep opacity)
-                    this.size = Math.random() * 4 + 6;
-                    this.speedY = Math.random() * 0.2 + 0.2;
-                    this.alpha = Math.random() * 0.08 + 0.06;
-                }
-
-                this.speedX = Math.random() * 0.25 - 0.08;
-                this.oscillationIndex = Math.random() * 40;
-                this.oscillationStep = Math.random() * 0.008 + 0.003;
-                this.angle = Math.random() * Math.PI * 2;
-                this.rotationSpeed = Math.random() * 0.008 - 0.004;
-                
-                const colorBase = leafColors[Math.floor(Math.random() * leafColors.length)];
-                this.color = colorBase.replace(/[\d\.]+\)$/g, `${this.alpha})`);
-            }
-
-            update() {
-                // Determine distance to cursor
-                const dx = this.x - mouseX;
-                const dy = this.y - mouseY;
-                const distance = Math.hypot(dx, dy);
-                const repelThreshold = 160;
-
-                if (isPointerActive && distance < repelThreshold) {
-                    // Force coefficient based on distance proximity
-                    const force = (repelThreshold - distance) / repelThreshold;
-                    const repelAngle = Math.atan2(dy, dx);
-                    
-                    // Standard repulsion logic
-                    const pushForceX = Math.cos(repelAngle) * force * 2.0;
-                    const pushForceY = Math.sin(repelAngle) * force * 2.0;
-
-                    // Dynamic vortex drag (leaves swirl around the cursor dynamically)
-                    const swirlX = -Math.sin(repelAngle) * force * 0.8;
-                    const swirlY = Math.cos(repelAngle) * force * 0.8;
-
-                    this.dispX += pushForceX + swirlX;
-                    this.dispY += pushForceY + swirlY;
-                }
-
-                // Apply gradual decay of the deflection offset back to baseline gravity
-                this.dispX *= 0.90;
-                this.dispY *= 0.90;
-
-                this.y += this.speedY + this.dispY;
-                this.angle += this.rotationSpeed;
-                this.oscillationIndex += this.oscillationStep;
-                this.x += this.speedX + Math.sin(this.oscillationIndex) * 0.25 + this.dispX;
-
-                // Reset positions smoothly when leaving boundaries
-                if (this.y > height + 40 || this.x < -40 || this.x > width + 40) {
-                    this.reset();
-                }
-            }
-
-            draw() {
-                ctx.save();
-                ctx.translate(this.x, this.y);
-                ctx.rotate(this.angle);
-                ctx.fillStyle = this.color;
-
-                ctx.beginPath();
-                // Dual-arc organic leaf structure
-                ctx.moveTo(0, -this.size / 2);
-                ctx.quadraticCurveTo(this.size / 2.1, -this.size / 10, 0, this.size / 2);
-                ctx.quadraticCurveTo(-this.size / 2.1, -this.size / 10, 0, -this.size / 2);
-                ctx.fill();
-
-                ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha * 0.45})`;
-                ctx.lineWidth = 0.8;
-                ctx.beginPath();
-                ctx.moveTo(0, -this.size / 2);
-                ctx.lineTo(0, this.size / 2);
-                ctx.stroke();
-
-                ctx.restore();
-            }
-        }
-
-        const maxDensity = calculateLeafDensity();
-        for (let i = 0; i < maxDensity; i++) {
-            leaves.push(new FoliageParticle());
-        }
-
-        const updateBounds = () => {
+        const resizeCanvas = () => {
             width = window.innerWidth;
             height = window.innerHeight;
-            
             const dpr = window.devicePixelRatio || 1;
             canvas.width = width * dpr;
             canvas.height = height * dpr;
             canvas.style.width = `${width}px`;
             canvas.style.height = `${height}px`;
             ctx.scale(dpr, dpr);
+        };
 
-            // Re-evaluate target density dynamically during resize events
-            const targetDensity = calculateLeafDensity();
-            if (leaves.length < targetDensity) {
-                const diff = targetDensity - leaves.length;
-                for (let i = 0; i < diff; i++) {
-                    leaves.push(new FoliageParticle());
+        class EcologicalNode {
+            constructor() {
+                this.reset();
+            }
+
+            reset() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 0.45;
+                this.vy = (Math.random() - 0.5) * 0.45;
+                this.baseRadius = Math.random() * 2 + 1.5;
+                this.radius = this.baseRadius;
+                this.life = Math.random() * 0.5 + 0.5;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off boundaries slightly
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+
+                // Mouse interaction physics
+                const dx = this.x - mouseX;
+                const dy = this.y - mouseY;
+                const distance = Math.hypot(dx, dy);
+                const maxRange = 180;
+
+                if (distance < maxRange) {
+                    const force = (maxRange - distance) / maxRange;
+                    this.radius = this.baseRadius + (force * 2.5);
+                    this.x += (dx / distance) * force * 1.5;
+                    this.y += (dy / distance) * force * 1.5;
+                } else {
+                    this.radius += (this.baseRadius - this.radius) * 0.1;
                 }
-            } else if (leaves.length > targetDensity) {
-                leaves.length = targetDensity;
             }
-        };
 
-        let resizeTimer;
-        window.addEventListener("resize", () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(updateBounds, 150);
-        });
-        
-        updateBounds();
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = "rgba(16, 185, 129, 0.22)";
+                ctx.fill();
+            }
+        }
 
-        const renderLoop = () => {
+        window.addEventListener("resize", resizeCanvas, { passive: true });
+        resizeCanvas();
+
+        for (let i = 0; i < maxNodes; i++) {
+            nodes.push(new EcologicalNode());
+        }
+
+        const renderBackgroundLoop = () => {
             ctx.clearRect(0, 0, width, height);
-            for (let i = 0; i < leaves.length; i++) {
-                leaves[i].update();
-                leaves[i].draw();
+            
+            // Loop through nodes to update positions
+            nodes.forEach(node => {
+                node.update();
+                node.draw();
+            });
+
+            // Connect neighboring proximity vectors
+            ctx.lineWidth = 0.9;
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dist = Math.hypot(nodes[i].x - nodes[j].x, nodes[i].y - nodes[j].y);
+                    if (dist < 110) {
+                        const alphaMultiplier = (110 - dist) / 110;
+                        ctx.strokeStyle = `rgba(5, 150, 105, ${0.08 * alphaMultiplier})`;
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.stroke();
+                    }
+                }
             }
-            requestAnimationFrame(renderLoop);
+
+            requestAnimationFrame(renderBackgroundLoop);
         };
 
-        renderLoop();
+        requestAnimationFrame(renderBackgroundLoop);
     }
 
     // ==========================================
-    // 2. Real-time GMT+8 (PST) System Clock
-    // ==========================================
-    const clockTime = document.getElementById("clockTime");
-    
-    const updatePSTTime = () => {
-        if (!clockTime) return;
-        const now = new Date();
-        
-        // Convert local time to Philippines Standard Time (UTC+8)
-        const utc = now.getTime() + now.getTimezoneOffset() * 60000;
-        const pstOffset = 8; 
-        const pstDate = new Date(utc + 3600000 * pstOffset);
-
-        clockTime.textContent = pstDate.toLocaleTimeString("en-US", {
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit",
-            hour12: true
-        });
-    };
-
-    updatePSTTime();
-    setInterval(updatePSTTime, 1000);
-
-    // ==========================================
-    // 3. Dynamic Human Keystroke Typist Loop
+    // 3. Typist Subtitle Sequence
     // ==========================================
     const typingText = document.getElementById("typingText");
     const phrases = [
-        "INFORMATION MANAGEMENT SYSTEM",
-        "SECURE GATEWAY ACCESS NODE",
-        "REAL-TIME LOGISTICS OVERVIEW"
+        "SECURE GATEWAY TERMINAL",
+        "PGENRO WORKSPACE INSTANCE",
+        "CENTRAL ENVIRONMENTAL TELEMETRY"
     ];
 
     let currentPhraseIdx = 0;
     let currentCharIdx = 0;
-    let deletingState = false;
+    let isDeleting = false;
 
-    const performTypingCycle = () => {
+    const runTypingLoop = () => {
         if (!typingText) return;
-        const fullString = phrases[currentPhraseIdx];
+        const currentString = phrases[currentPhraseIdx];
 
-        if (deletingState) {
-            typingText.textContent = fullString.substring(0, currentCharIdx - 1);
+        if (isDeleting) {
+            typingText.textContent = currentString.substring(0, currentCharIdx - 1);
             currentCharIdx--;
         } else {
-            typingText.textContent = fullString.substring(0, currentCharIdx + 1);
+            typingText.textContent = currentString.substring(0, currentCharIdx + 1);
             currentCharIdx++;
         }
 
-        let animationDelay = deletingState ? 35 : (Math.random() * 40 + 55);
+        let speed = isDeleting ? 20 : (Math.random() * 25 + 30);
 
-        if (!deletingState && currentCharIdx === fullString.length) {
-            animationDelay = 2500; // Pause at the end of the text
-            deletingState = true;
+        if (!isDeleting && currentCharIdx === currentString.length) {
+            speed = 2400; // Delay before clearing phrase
+            isDeleting = true;
         }
 
-        if (deletingState && currentCharIdx === 0) {
-            deletingState = false;
+        if (isDeleting && currentCharIdx === 0) {
+            isDeleting = false;
             currentPhraseIdx = (currentPhraseIdx + 1) % phrases.length;
-            animationDelay = 450; // Dynamic transition delay
+            speed = 300; 
         }
 
-        setTimeout(performTypingCycle, animationDelay);
+        setTimeout(runTypingLoop, speed);
     };
 
     if (typingText) {
-        performTypingCycle();
+        runTypingLoop();
     }
 
     // ==========================================
-    // 4. Form Validation & Interactive Logic
+    // 4. Input Verification Panel
     // ==========================================
     const loginForm = document.getElementById("loginForm");
     const emailInput = document.getElementById("email");
@@ -343,175 +239,161 @@ document.addEventListener("DOMContentLoaded", () => {
     const strengthContainer = document.getElementById("strengthContainer");
     const strengthBarFill = document.getElementById("strengthBarFill");
     const strengthText = document.getElementById("strengthText");
+    const criteriaList = document.getElementById("criteriaList");
 
-    const loginCard = document.getElementById("loginCard");
     const loadingOverlay = document.getElementById("loadingOverlay");
     const loadingStatusHeading = document.getElementById("loadingStatusHeading");
     const loadingStatusText = document.getElementById("loadingStatusText");
 
-    // Tracking touched states prevents premature error validation display on typing
-    let emailTouched = false;
-    let passwordTouched = false;
+    let isEmailTouched = false;
+    let isPasswordTouched = false;
 
-    // Dynamic keyboard helper: Caps Lock Indicator
-    let capsLockIndicator = document.getElementById("capsLockIndicator");
-    if (!capsLockIndicator && passwordInput) {
-        capsLockIndicator = document.createElement("div");
-        capsLockIndicator.id = "capsLockIndicator";
-        capsLockIndicator.className = "caps-lock-indicator";
-        capsLockIndicator.innerHTML = '<i data-lucide="alert-triangle" class="caps-lock-icon" aria-hidden="true"></i> Warning: Caps Lock is Enabled';
-        
-        // Append cleanly to parent input-group instead of splitting horizontal flex-wrapper
-        const parentGroup = passwordInput.closest(".input-group");
-        if (parentGroup) {
-            parentGroup.appendChild(capsLockIndicator);
-        }
-    }
-
-    const toggleErrorCollapse = (container, show) => {
+    const setCollapseState = (container, visible) => {
         if (!container) return;
-        if (show) {
+        if (visible) {
             container.classList.add("active");
-            container.style.gridTemplateRows = "1fr";
         } else {
             container.classList.remove("active");
-            container.style.gridTemplateRows = "0fr";
         }
     };
 
-    const setInputFeedback = (inputNode, isInvalid, message = "") => {
-        const parentGroup = inputNode.closest(".input-group");
-        if (!parentGroup) return;
+    const updateVisualFeedback = (inputNode, isInvalid, message = "") => {
+        const parent = inputNode.closest(".input-group");
+        if (!parent) return;
 
-        parentGroup.classList.remove("valid", "invalid");
-        
+        parent.classList.remove("valid", "invalid");
+
         if (isInvalid) {
-            parentGroup.classList.add("invalid");
+            parent.classList.add("invalid");
         } else if (inputNode.value.trim() !== "") {
-            parentGroup.classList.add("valid");
+            parent.classList.add("valid");
         }
 
         if (inputNode === emailInput) {
             if (emailError) emailError.textContent = message;
-            toggleErrorCollapse(emailErrorContainer, isInvalid);
+            setCollapseState(emailErrorContainer, isInvalid);
         }
         if (inputNode === passwordInput) {
             if (passwordError) passwordError.textContent = message;
-            toggleErrorCollapse(passwordErrorContainer, isInvalid);
+            setCollapseState(passwordErrorContainer, isInvalid);
         }
     };
 
-    const runEmailValidation = (forceShowError = false) => {
+    const validateEmailFormat = (forceShow = false) => {
         if (!emailInput) return false;
-        const value = emailInput.value.trim();
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const val = emailInput.value.trim();
+        const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!value) {
-            if (forceShowError || emailTouched) {
-                setInputFeedback(emailInput, true, "Corporate email address is required.");
+        if (!val) {
+            if (forceShow || isEmailTouched) {
+                updateVisualFeedback(emailInput, true, "PGENRO IMS Account.");
             }
             return false;
         }
-        if (!emailRegex.test(value)) {
-            if (forceShowError || emailTouched) {
-                setInputFeedback(emailInput, true, "Please match secure format: username@domain.com");
+        if (!pattern.test(val)) {
+            if (forceShow || isEmailTouched) {
+                updateVisualFeedback(emailInput, true, "Enter correct address configuration (e.g. user@domain.gov.ph).");
             }
             return false;
         }
 
-        setInputFeedback(emailInput, false);
+        updateVisualFeedback(emailInput, false);
         return true;
     };
 
-    const runPasswordValidation = (forceShowError = false) => {
+    const validatePasswordFormat = (forceShow = false) => {
         if (!passwordInput) return false;
-        const value = passwordInput.value.trim();
+        const val = passwordInput.value.trim();
 
-        if (!value) {
-            if (forceShowError || passwordTouched) {
-                setInputFeedback(passwordInput, true, "Security password is required.");
-                if (strengthContainer) {
-                    strengthContainer.classList.remove("active");
-                    strengthContainer.style.gridTemplateRows = "0fr";
+        if (!val) {
+            if (forceShow || isPasswordTouched) {
+                updateVisualFeedback(passwordInput, true, "Access credentials security key required.");
+                if (strengthContainer) strengthContainer.classList.remove("active");
+            }
+            return false;
+        }
+        if (val.length < 6) {
+            if (forceShow || isPasswordTouched) {
+                updateVisualFeedback(passwordInput, true, "System access keys require at least 6 characters.");
+            }
+            return false;
+        }
+
+        updateVisualFeedback(passwordInput, false);
+        return true;
+    };
+
+    const updateCriteriaFeedback = (passwordString) => {
+        if (!criteriaList) return;
+
+        const validations = {
+            length: passwordString.length >= 6,
+            upper: /[A-Z]/.test(passwordString),
+            number: /[0-9]/.test(passwordString),
+            special: /[^A-Za-z0-9]/.test(passwordString)
+        };
+
+        let passedCount = 0;
+
+        Object.keys(validations).forEach(criterion => {
+            const el = criteriaList.querySelector(`[data-criterion="${criterion}"]`);
+            if (el) {
+                if (validations[criterion]) {
+                    el.classList.add("met");
+                    el.querySelector("i").setAttribute("data-lucide", "check-circle-2");
+                    passedCount++;
+                } else {
+                    el.classList.remove("met");
+                    el.querySelector("i").setAttribute("data-lucide", "circle-dot");
                 }
             }
-            return false;
-        }
-        if (value.length < 6) {
-            if (forceShowError || passwordTouched) {
-                setInputFeedback(passwordInput, true, "Password parameter must contain at least 6 characters.");
-            }
-            return false;
-        }
+        });
 
-        setInputFeedback(passwordInput, false);
-        return true;
+        renderIconsSafely();
+        return passedCount;
     };
 
-    const evaluatePasswordStrength = (passwordString) => {
+    const analyzePasswordEntropy = (passwordString) => {
         if (!strengthContainer) return 0;
-        
+
         if (!passwordString) {
             strengthContainer.classList.remove("active");
-            strengthContainer.style.gridTemplateRows = "0fr";
             return 0;
         }
 
         strengthContainer.classList.add("active");
-        strengthContainer.style.gridTemplateRows = "1fr";
-        let rating = 0;
+        const metCount = updateCriteriaFeedback(passwordString);
 
-        if (passwordString.length >= 6) rating++;
-        if (passwordString.length >= 10) rating++;
-        if (/[A-Z]/.test(passwordString)) rating++;
-        if (/[0-9]/.test(passwordString)) rating++;
-        if (/[^A-Za-z0-9]/.test(passwordString)) rating++;
+        let color = "var(--danger)";
+        let text = "Vulnerable Strength";
+        let width = "25%";
 
-        let fillColor = "var(--danger, #ef4444)";
-        let textStatus = "Weak Strength";
-        let completionPercent = "30%";
-
-        switch (rating) {
-            case 0:
-            case 1:
-            case 2:
-                fillColor = "var(--danger, #ef4444)";
-                textStatus = "Weak Strength";
-                completionPercent = "30%";
-                break;
-            case 3:
-                fillColor = "var(--warning, #f59e0b)";
-                textStatus = "Fair Strength";
-                completionPercent = "60%";
-                break;
-            case 4:
-                fillColor = "var(--primary, #3b82f6)";
-                textStatus = "Good Strength";
-                completionPercent = "80%";
-                break;
-            case 5:
-                fillColor = "var(--success, #10b981)";
-                textStatus = "Robust Security";
-                completionPercent = "100%";
-                break;
+        if (metCount === 3) {
+            color = "var(--warning)";
+            text = "Standard Protected Strength";
+            width = "60%";
+        } else if (metCount === 4) {
+            color = "var(--success)";
+            text = "High Complexity Key Matrix";
+            width = "100%";
         }
 
         if (strengthBarFill) {
-            strengthBarFill.style.width = completionPercent;
-            strengthBarFill.style.backgroundColor = fillColor;
+            strengthBarFill.style.width = width;
+            strengthBarFill.style.backgroundColor = color;
         }
         if (strengthText) {
-            strengthText.textContent = textStatus;
-            strengthText.style.color = fillColor;
+            strengthText.textContent = text;
+            strengthText.style.color = color;
         }
 
-        return rating;
+        return metCount;
     };
 
-    const displayBannerAlert = (statusType, contentText) => {
+    const displayBannerAlert = (status, text) => {
         if (!messageBox) return;
-        messageBox.className = `message-box ${statusType}`;
-        messageBox.textContent = contentText;
+        messageBox.className = `message-box ${status}`;
+        messageBox.textContent = text;
     };
 
     const clearBannerAlert = () => {
@@ -520,26 +402,20 @@ document.addEventListener("DOMContentLoaded", () => {
         messageBox.textContent = "";
     };
 
-    // Card vibration interaction if checks fail
-    const triggerCardVibration = () => {
-        if (!loginCard) return;
-        loginCard.classList.remove("shake-trigger");
-        // Force Reflow
-        void loginCard.offsetWidth;
-        loginCard.classList.add("shake-trigger");
-        
-        setTimeout(() => {
-            loginCard.classList.remove("shake-trigger");
-        }, 500);
+    const executeCardVibrate = () => {
+        if (!card) return;
+        card.classList.remove("shake-trigger");
+        void card.offsetWidth; 
+        card.classList.add("shake-trigger");
+        setTimeout(() => card.classList.remove("shake-trigger"), 450);
     };
 
-    // Password Visibility Switcher
     if (togglePassword && passwordInput) {
         togglePassword.addEventListener("click", () => {
-            const currentlyHidden = passwordInput.type === "password";
-            passwordInput.type = currentlyHidden ? "text" : "password";
+            const activeHidden = passwordInput.type === "password";
+            passwordInput.type = activeHidden ? "text" : "password";
 
-            togglePassword.innerHTML = currentlyHidden
+            togglePassword.innerHTML = activeHidden
                 ? '<i data-lucide="eye-off" aria-hidden="true"></i>'
                 : '<i data-lucide="eye" aria-hidden="true"></i>';
 
@@ -547,55 +423,36 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Dynamic Field Observers
     if (emailInput) {
         emailInput.addEventListener("input", () => {
-            // Only update active errors dynamically if field is already validated as touched/invalid
-            if (emailInput.closest(".input-group").classList.contains("invalid") || emailTouched) {
-                runEmailValidation();
+            if (emailInput.closest(".input-group").classList.contains("invalid") || isEmailTouched) {
+                validateEmailFormat();
             }
             clearBannerAlert();
         });
 
         emailInput.addEventListener("blur", () => {
-            emailTouched = true;
-            runEmailValidation(true);
+            isEmailTouched = true;
+            validateEmailFormat(true);
         });
     }
 
     if (passwordInput) {
-        passwordInput.addEventListener("input", (event) => {
-            const val = event.target.value;
-            evaluatePasswordStrength(val);
-            if (passwordInput.closest(".input-group").classList.contains("invalid") || passwordTouched) {
-                runPasswordValidation();
+        passwordInput.addEventListener("input", (e) => {
+            analyzePasswordEntropy(e.target.value);
+            if (passwordInput.closest(".input-group").classList.contains("invalid") || isPasswordTouched) {
+                validatePasswordFormat();
             }
             clearBannerAlert();
         });
 
         passwordInput.addEventListener("blur", () => {
-            passwordTouched = true;
-            runPasswordValidation(true);
+            isPasswordTouched = true;
+            validatePasswordFormat(true);
         });
-
-        // Track key state adjustments dynamically to discover active Caps Lock states
-        const checkCapsLock = (event) => {
-            if (capsLockIndicator && event.getModifierState) {
-                if (event.getModifierState("CapsLock")) {
-                    capsLockIndicator.style.display = "flex";
-                } else {
-                    capsLockIndicator.style.display = "none";
-                }
-            }
-        };
-
-        passwordInput.addEventListener("keydown", checkCapsLock);
-        passwordInput.addEventListener("keyup", checkCapsLock);
-        passwordInput.addEventListener("focus", checkCapsLock);
     }
 
-    // Remember Me retention logic using modular safeStorage wrapper
-    const handleCredentialRetention = () => {
+    const saveRetainedCredentials = () => {
         if (rememberMe && rememberMe.checked && emailInput) {
             safeStorage.setItem("pgenro_retained_email", emailInput.value.trim());
         } else {
@@ -603,66 +460,83 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    const processRetainedEmail = () => {
-        const retained = safeStorage.getItem("pgenro_retained_email");
-        if (retained && emailInput) {
-            emailInput.value = retained;
+    const prefillRetainedCredentials = () => {
+        const value = safeStorage.getItem("pgenro_retained_email");
+        if (value && emailInput) {
+            emailInput.value = value;
             if (rememberMe) rememberMe.checked = true;
-            setInputFeedback(emailInput, false);
+            updateVisualFeedback(emailInput, false);
         }
     };
 
-    // Form Submission Sequence
     if (loginForm) {
-        loginForm.addEventListener("submit", (submitEvent) => {
-            submitEvent.preventDefault();
+        loginForm.addEventListener("submit", (e) => {
+            e.preventDefault();
 
-            // Mark form components as touched to validate fields cleanly
-            emailTouched = true;
-            passwordTouched = true;
+            isEmailTouched = true;
+            isPasswordTouched = true;
 
-            const isEmailSecure = runEmailValidation(true);
-            const isPasswordSecure = runPasswordValidation(true);
+            const isEmailValid = validateEmailFormat(true);
+            const isPasswordValid = validatePasswordFormat(true);
 
-            if (!isEmailSecure || !isPasswordSecure) {
-                triggerCardVibration();
-                displayBannerAlert("error", "Verify credentials and correct validation messages.");
+            if (!isEmailValid || !isPasswordValid) {
+                executeCardVibrate();
+                displayBannerAlert("error", "Verify credentials and resolve invalid warning panels before entering gateway.");
                 return;
             }
 
-            handleCredentialRetention();
+            saveRetainedCredentials();
 
-            // Lock form layout while processing loading states
-            if (loginCard) loginCard.classList.add("processing");
+            const c1 = document.getElementById("telemetryCheck1");
+            const c2 = document.getElementById("telemetryCheck2");
+            const c3 = document.getElementById("telemetryCheck3");
+
+            // Reset Telemetry steps
+            [c1, c2, c3].forEach(el => {
+                if (el) el.className = "telemetry-item";
+            });
+
             if (loadingOverlay) {
                 loadingOverlay.classList.add("active");
                 loadingOverlay.setAttribute("aria-hidden", "false");
             }
             
-            if (loadingStatusHeading) loadingStatusHeading.textContent = "Verifying Credentials";
-            if (loadingStatusText) loadingStatusText.textContent = "Connecting with access validation server...";
+            if (loadingStatusHeading) loadingStatusHeading.textContent = "Negotiating Cryptographic Handshake";
+            if (loadingStatusText) loadingStatusText.textContent = "Establishing security tunneling with PGENRO node keys...";
 
-            // Handshake progression stages
+            // Telemetry item progressive step simulation
             setTimeout(() => {
-                if (loadingStatusHeading) loadingStatusHeading.textContent = "Securing Session Keys";
-                if (loadingStatusText) loadingStatusText.textContent = "Configuring temporary portal encryption keys...";
-            }, 1100);
+                if (c1) c1.classList.add("active");
+            }, 200);
 
             setTimeout(() => {
-                // Restore structural interactive control
-                if (loginCard) loginCard.classList.remove("processing");
+                if (c1) { c1.classList.remove("active"); c1.classList.add("done"); }
+                if (c2) c2.classList.add("active");
+                if (loadingStatusHeading) loadingStatusHeading.textContent = "Verifying Identity Signature";
+                if (loadingStatusText) loadingStatusText.textContent = "Validating administrative system profile authorization credentials...";
+            }, 900);
+
+            setTimeout(() => {
+                if (c2) { c2.classList.remove("active"); c2.classList.add("done"); }
+                if (c3) c3.classList.add("active");
+                if (loadingStatusHeading) loadingStatusHeading.textContent = "Routing Environment Module Session";
+                if (loadingStatusText) loadingStatusText.textContent = "Connecting transaction logging workspace portals...";
+            }, 1600);
+
+            setTimeout(() => {
+                if (c3) { c3.classList.remove("active"); c3.classList.add("done"); }
                 if (loadingOverlay) {
                     loadingOverlay.classList.remove("active");
                     loadingOverlay.setAttribute("aria-hidden", "true");
                 }
 
-                displayBannerAlert("success", "Handshake confirmed. Re-routing safely to administration portal dashboard...");
+                displayBannerAlert("success", "Access gateway cleared. Re-routing interface profile workspace...");
                 
-                // Secure Routing Transition Point
+                // Redirect hook transition point
                 // setTimeout(() => { window.location.href = "dashboard.html"; }, 1000);
             }, 2400);
         });
     }
 
-    processRetainedEmail();
+    prefillRetainedCredentials();
 });

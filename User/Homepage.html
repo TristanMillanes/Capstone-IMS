@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PGENRO IMS | Homepage</title>
 
-  <!-- Google Font -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -21,52 +21,47 @@
 </head>
 
 <body>
-  <!-- Mobile Sidebar Overlay Backdrop -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <!-- Overlay Backdrop -->
+  <div class="overlay" id="overlay"></div>
 
   <!-- NAVBAR -->
   <header class="navbar">
-    <div class="nav-left">
-      <!-- Sidebar Toggle Control -->
-      <button class="sidebar-toggle-btn" id="sidebarToggle" type="button" aria-label="Toggle Sidebar">
-        <i data-lucide="menu"></i>
+    <!-- Left Section: Menu Toggle & Brand Logo -->
+    <div class="nav-left-container">
+      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle Navigation Menu" type="button">
+        <span></span>
+        <span></span>
+        <span></span>
       </button>
 
       <a href="#home" class="logo-area">
         <div class="logo-icon">
-          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'">
+          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'">
         </div>
-        <div>
+        <div class="logo-text">
           <h2>Provincial Government</h2>
-          <span>Environmental and Natural Resources Office</span>
+          <span>Environment & Natural Resources Office</span>
         </div>
       </a>
     </div>
 
+    <!-- Center Section: Clean Anchor Navigation -->
     <nav class="nav-links" id="navLinks">
       <a href="#home" class="active">Home</a>
-      <a href="#modules">Modules</a>
-      <a href="#features">Features</a>
-      <a href="#analytics">Charts</a>
-      <a href="#process">Process</a>
+      <a href="#analytics">Telemetry Center</a>
+      <a href="#process">Strategy</a>
       <a href="#contact">Contact</a>
     </nav>
 
+    <!-- Right Section: Profile & System Status Indicator -->
     <div class="right-nav">
-      <!-- Theme Switcher Button -->
-      <button class="theme-toggle-btn" id="themeToggleBtn" type="button" aria-label="Toggle Theme">
-        <i data-lucide="moon" class="theme-icon-dark"></i>
-        <i data-lucide="sun" class="theme-icon-light" style="display: none;"></i>
-      </button>
-
-      <!-- Profile Dropdown Container -->
       <div class="profile-menu" id="profileMenu">
         <button class="profile-btn" id="profileBtn" type="button">
           <div class="profile-avatar">
             <i data-lucide="user"></i>
           </div>
           <div class="profile-text">
-            <h4>Tristan Millanes</h4>
+            <h4>PGENRO OFFICER</h4>
             <span>Authorized Account</span>
           </div>
           <i data-lucide="chevron-down" class="profile-chevron"></i>
@@ -79,7 +74,7 @@
             </div>
             <div>
               <h3>PGENRO User</h3>
-              <p>Authorized Account</p>
+              <p>Authorized Admin</p>
             </div>
           </div>
 
@@ -88,7 +83,7 @@
             Dashboard
           </a>
 
-          <a href="settings.html">
+          <a href="/Capstone-IMS/SettingIMS/Settings.html">
             <i data-lucide="settings"></i>
             Account Settings
           </a>
@@ -99,436 +94,195 @@
           </button>
         </div>
       </div>
-
-      <button class="menu-btn" id="menuBtn" type="button" aria-label="Toggle Mobile Menu">
-        <i data-lucide="menu"></i>
-      </button>
     </div>
   </header>
 
   <div class="app-container">
-    <!-- SIDEBAR -->
-    <aside class="sidebar" id="appSidebar">
+    <!-- FLOATING SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h3>IMS Modules</h3>
-        <p class="sidebar-subtext">Quick access menu</p>
+        <p class="sidebar-subtext">Office Management Modules</p>
       </div>
 
       <ul class="modules-list">
         <li>
-          <a href="homepage.html" data-tooltip="Dashboard">
-            <i data-lucide="home"></i>
-            <span class="menu-label">Dashboard</span>
+          <a href="homepage.html" class="active">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard Overview</span>
           </a>
         </li>
         <li>
-          <a href="Communication.html" data-tooltip="Incoming/Outgoing">
-            <i data-lucide="repeat"></i>
-            <span class="menu-label">Incoming/Outgoing</span>
+          <a href="Communication.html">
+            <i data-lucide="mail"></i>
+            <span>Communications</span>
           </a>
         </li>
         <li>
-          <a href="#travel" data-tooltip="Travel Order">
-            <i data-lucide="map-pin"></i>
-            <span class="menu-label">Travel Order</span>
+          <a href="#travel">
+            <i data-lucide="navigation"></i>
+            <span>Travel Orders</span>
           </a>
         </li>
         <li>
-          <a href="#memo" data-tooltip="Office Memo">
+          <a href="#memo">
             <i data-lucide="file-text"></i>
-            <span class="menu-label">Office Memo</span>
+            <span>Office Memo Logs</span>
           </a>
         </li>
         <li>
-          <a href="employee.html" data-tooltip="Employee Records">
-            <i data-lucide="users"></i>
-            <span class="menu-label">Employee Records</span>
+          <a href="employee.html">
+            <i data-lucide="users-round"></i>
+            <span>Employee Records</span>
           </a>
         </li>
         <li>
-          <a href="#inventory" data-tooltip="Inventory">
-            <i data-lucide="box"></i>
-            <span class="menu-label">Inventory</span>
+          <a href="#inventory">
+            <i data-lucide="package"></i>
+            <span>Inventory Records</span>
           </a>
         </li>
         <li>
-          <a href="visitorsView.html" data-tooltip="Visitor's Log">
-            <i data-lucide="user-check"></i>
-            <span class="menu-label">Visitor's Log</span>
+          <a href="visitorsView.html">
+            <i data-lucide="clipboard-signature"></i>
+            <span>Visitor's Logbook</span>
           </a>
         </li>
         <li>
-          <a href="#service" data-tooltip="Service Request">
-            <i data-lucide="wrench"></i>
-            <span class="menu-label">Service Request</span>
+          <a href="#service">
+            <i data-lucide="shield-alert"></i>
+            <span>Service Requests</span>
           </a>
         </li>
         <li>
-          <a href="#ics" data-tooltip="ICS Inventory">
-            <i data-lucide="clipboard-list"></i>
-            <span class="menu-label">ICS</span>
+          <a href="#ics">
+            <i data-lucide="layers"></i>
+            <span>ICS Records</span>
           </a>
         </li>
       </ul>
+
+      <!-- Systems Status Widget -->
+      <div class="sidebar-footer">
+        <div class="system-status">
+          <span class="status-indicator online"></span>
+          <span class="status-text">IMS Server Connection Secure</span>
+        </div>
+      </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main-content" id="mainContent">
       <!-- HERO -->
       <section class="hero" id="home">
-        <div class="hero-copy reveal">
+        <div class="hero-center-copy reveal">
           <span class="badge">
-            <i data-lucide="sparkles"></i>
-            Web-Based IMS
+            <i data-lucide="shield-check"></i>
+            Operational Monitor Active
           </span>
 
           <h1>
-            Welcome to <span>PGENRO IMS</span>
-            <small id="typingText">Information Management System</small>
+            Welcome to the <span>PGENRO IMS</span>
           </h1>
+          <p class="hero-subtitle">
+            Information Management System
+          </p>
 
-          <p>
-            Manage communications, travel orders, office memos, employee records,
-            inventory, visitor logs, service requests, and ICS records in one
-            centralized information management system.
+          <p class="hero-description">
+            An integrated database workspace designed to track document communications, handle structural office travel documents, archive internal announcements, register assets inventory, and manage client visitors rosters.
           </p>
 
           <div class="hero-actions">
-            <a href="#modules" class="primary-btn">
-              <i data-lucide="folder-open"></i>
-              Open Modules
+            <a href="#analytics" class="btn btn-primary">
+              <i data-lucide="line-chart"></i> View Metrics
             </a>
-            <a href="#analytics" class="secondary-btn">
-              <i data-lucide="bar-chart-3"></i>
-              View Charts
+            <a href="Communication.html" class="btn btn-secondary">
+              Open Communications <i data-lucide="arrow-right"></i>
             </a>
           </div>
         </div>
-
-        <div class="hero-card reveal">
-          <div class="dashboard-preview">
-            <div class="preview-header">
-              <div class="window-dots">
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-              <div class="preview-title">
-                <h3>Dashboard Overview</h3>
-                <p>Recent activity summary and analytics preview.</p>
-              </div>
-            </div>
-
-            <div class="stats-grid">
-              <div class="stat-card">
-                <div class="stat-icon-wrapper">
-                  <i data-lucide="inbox"></i>
-                </div>
-                <div>
-                  <h4 class="counter" data-target="128">0</h4>
-                  <p>Active Requests</p>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-icon-wrapper">
-                  <i data-lucide="clock-3"></i>
-                </div>
-                <div>
-                  <h4 class="counter" data-target="52">0</h4>
-                  <p>Pending Approvals</p>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-icon-wrapper">
-                  <i data-lucide="archive"></i>
-                </div>
-                <div>
-                  <h4 class="counter" data-target="421">0</h4>
-                  <p>Archived Records</p>
-                </div>
-              </div>
-
-              <div class="stat-card">
-                <div class="stat-icon-wrapper">
-                  <i data-lucide="users-round"></i>
-                </div>
-                <div>
-                  <h4 class="counter" data-target="36">0</h4>
-                  <p>Visitors Today</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="mini-chart-card">
-              <div class="mini-chart-desc">
-                <h4>Weekly Document Activity</h4>
-                <p>Incoming and outgoing movement</p>
-              </div>
-              <div class="mini-chart-wrapper">
-                <canvas id="miniChart"></canvas>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
-      <!-- MODULES -->
-      <section class="modules-section" id="modules">
-        <div class="section-title reveal">
-          <span>Core Modules</span>
-          <h2>IMS Modules</h2>
-          <p>
-            Use the search box to filter modules and select the record area you need.
-          </p>
-        </div>
-
-        <div class="search-box-container reveal">
-          <div class="search-box">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="moduleSearch" placeholder="Search modules... (Press '/' or 'Ctrl+K' to focus)" />
-            <button id="searchClearBtn" class="search-clear-btn" aria-label="Clear search" type="button">
-              <i data-lucide="x"></i>
-            </button>
-          </div>
-        </div>
-
-        <!-- Modules Search Fallback Container -->
-        <div id="noResultsContainer" class="no-results-state" style="display: none;">
-          <i data-lucide="search-code"></i>
-          <h4>No modules match your query</h4>
-          <p>Double check spelling or try terms like 'communication', 'inventory', or 'visitor'.</p>
-        </div>
-
-        <div class="modules-grid" id="modulesGrid">
-          <div class="module-card reveal" id="comm" data-name="Incoming Outgoing Communication" onclick="location.href='Communication.html'">
-            <div class="module-icon-box">
-              <i data-lucide="repeat"></i>
-            </div>
-            <h3>Incoming/Outgoing Communication</h3>
-            <p>
-              Track request letters, endorsement letters, transmittal letters,
-              response letters, notices, invitations, reports, and memoranda.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-
-          <div class="module-card reveal" id="travel" data-name="Travel Order" onclick="location.href='#travel'">
-            <div class="module-icon-box">
-              <i data-lucide="map-pin"></i>
-            </div>
-            <h3>Travel Order</h3>
-            <p>
-              Prepare, monitor, and approve travel order records for authorized office personnel.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-
-          <div class="module-card reveal" id="memo" data-name="Office Memo" onclick="location.href='#memo'">
-            <div class="module-icon-box">
-              <i data-lucide="file-text"></i>
-            </div>
-            <h3>Office Memo</h3>
-            <p>
-              Create, store, and retrieve office memoranda and internal announcements.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-
-          <div class="module-card reveal" id="employee" data-name="Employee Records" onclick="location.href='employee.html'">
-            <div class="module-icon-box">
-              <i data-lucide="users"></i>
-            </div>
-            <h3>Employee Records</h3>
-            <p>
-              Maintain employee profiles, assignments, positions, and personnel information.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-
-          <div class="module-card reveal" id="inventory" data-name="Inventory" onclick="location.href='#inventory'">
-            <div class="module-icon-box">
-              <i data-lucide="box"></i>
-            </div>
-            <h3>Inventory</h3>
-            <p>
-              Monitor equipment, supplies, stocks, issued items, and inventory movement.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-
-          <div class="module-card reveal" id="visitor" data-name="Visitor Log" onclick="location.href='visitorsView.html'">
-            <div class="module-icon-box">
-              <i data-lucide="user-check"></i>
-            </div>
-            <h3>Visitor's Log</h3>
-            <p>
-              Digitally record visitors, purpose of visit, time in, time out, and office destination.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-
-          <div class="module-card reveal" id="service" data-name="Service Request" onclick="location.href='#service'">
-            <div class="module-icon-box">
-              <i data-lucide="wrench"></i>
-            </div>
-            <h3>Service Request</h3>
-            <p>
-              Submit, assign, monitor, and update facility or office service requests.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-
-          <div class="module-card reveal" id="ics" data-name="Inventory Custodian Slip ICS" onclick="location.href='#ics'">
-            <div class="module-icon-box">
-              <i data-lucide="clipboard-list"></i>
-            </div>
-            <h3>ICS</h3>
-            <p>
-              Manage Inventory Custodian Slip records, issued items, and accountability details.
-            </p>
-            <span class="module-link-arrow">Open Module <i data-lucide="arrow-right"></i></span>
-          </div>
-        </div>
-      </section>
-
-      <!-- FEATURES -->
-      <section class="features-section" id="features">
-        <div class="section-title reveal">
-          <span>System Features</span>
-          <h2>Homepage Highlights</h2>
-          <p>
-            These features help users access records, monitor transactions, and view system activity.
-          </p>
-        </div>
-
-        <div class="features-grid">
-          <div class="feature-box reveal">
-            <div class="feature-icon-wrapper">
-              <i data-lucide="shield-check"></i>
-            </div>
-            <h3>Secure Access</h3>
-            <p>
-              Supports authorized accounts, user profile access, and logout confirmation.
-            </p>
-          </div>
-
-          <div class="feature-box reveal">
-            <div class="feature-icon-wrapper">
-              <i data-lucide="database"></i>
-            </div>
-            <h3>Centralized Repository</h3>
-            <p>
-              Provides one place for storing and managing office records and documents.
-            </p>
-          </div>
-
-          <div class="feature-box reveal">
-            <div class="feature-icon-wrapper">
-              <i data-lucide="search-check"></i>
-            </div>
-            <h3>Fast Search</h3>
-            <p>
-              Allows users to search modules and quickly locate the record area they need.
-            </p>
-          </div>
-
-          <div class="feature-box reveal">
-            <div class="feature-icon-wrapper">
-              <i data-lucide="chart-no-axes-combined"></i>
-            </div>
-            <h3>Analytics Preview</h3>
-            <p>
-              Displays charts for document activity, record category, and transaction status.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <!-- ANALYTICS -->
+      <!-- ANALYTICS SECTION -->
       <section class="analytics-section" id="analytics">
         <div class="section-title reveal">
-          <span>Dashboard Charts</span>
-          <h2>Records and Activity Analytics</h2>
+          <span>Telemetry Center</span>
+          <h2>Live Office Performance</h2>
           <p>
-            Visual overview of document flow, record categories, and current status.
+            Real-time visual monitoring of system data, daily record submissions, and overall workspace processing speeds.
           </p>
         </div>
 
         <div class="analytics-grid">
-          <div class="chart-card large reveal">
-            <div class="chart-header">
-              <div>
-                <h3>Monthly Communication Activity</h3>
-                <p>Incoming and outgoing document records</p>
-              </div>
-              <span class="chart-badge">2026</span>
-            </div>
-            <div class="chart-wrapper line-chart">
-              <canvas id="monthlyChart"></canvas>
-            </div>
-          </div>
-
+          <!-- Communication Chart (Incoming vs Outgoing) -->
           <div class="chart-card reveal">
             <div class="chart-header">
               <div>
-                <h3>Record Category</h3>
-                <p>Distribution by module</p>
+                <h3>Document Flow Trends</h3>
+                <p>Comparison metrics of incoming and outgoing document transmissions</p>
               </div>
-              <span class="chart-badge">Live</span>
+              <span class="chart-badge">Line Analytics</span>
             </div>
             <div class="chart-wrapper">
-              <canvas id="categoryChart"></canvas>
+              <canvas id="commCompareChart"></canvas>
             </div>
           </div>
 
-          <div class="chart-card reveal">
-            <div class="chart-header">
-              <div>
-                <h3>Transaction Status</h3>
-                <p>Completed, pending, processing, and archived</p>
-              </div>
-              <span class="chart-badge">Summary</span>
-            </div>
-            <div class="chart-wrapper">
-              <canvas id="statusChart"></canvas>
-            </div>
-          </div>
-
-          <div class="activity-card reveal">
-            <div class="activity-header">
-              <h3>Recent Activity</h3>
-            </div>
-            <div class="activity-timeline">
-              <div class="activity-item">
-                <span class="activity-icon">
-                  <i data-lucide="file-plus-2"></i>
-                </span>
+          <!-- Visitors Log Numbers & Statistics Board -->
+          <div class="visitor-telemetry-card reveal">
+            <div class="telemetry-header">
+              <div class="telemetry-header-title">
+                <div class="telemetry-icon-container">
+                  <i data-lucide="users" class="telemetry-icon"></i>
+                </div>
                 <div>
-                  <h4>New incoming document recorded</h4>
-                  <p>Request letter added to communication records.</p>
+                  <h3>Visitor Metrics</h3>
+                  <p>Daily tracking of registered visitors</p>
                 </div>
               </div>
+            </div>
 
-              <div class="activity-item">
-                <span class="activity-icon">
-                  <i data-lucide="check-circle-2"></i>
-                </span>
-                <div>
-                  <h4>Travel order approved</h4>
-                  <p>Personnel travel order moved to completed status.</p>
+            <!-- Numbers Display -->
+            <div class="visitor-numbers-grid">
+              <div class="number-stat-card">
+                <span class="stat-lbl">Active inside</span>
+                <div class="stat-num-container">
+                  <span class="num-indicator online"></span>
+                  <h4 class="counter" data-target="14">0</h4>
                 </div>
+                <p class="stat-desc">Currently checked-in</p>
               </div>
 
-              <div class="activity-item">
-                <span class="activity-icon">
-                  <i data-lucide="package-check"></i>
-                </span>
-                <div>
-                  <h4>Inventory item updated</h4>
-                  <p>Issued equipment record updated in inventory module.</p>
+              <div class="number-stat-card">
+                <span class="stat-lbl">Total today</span>
+                <h4 class="counter" data-target="36">0</h4>
+                <p class="stat-desc">Daily registrations</p>
+              </div>
+
+              <div class="number-stat-card">
+                <span class="stat-lbl">Avg Duration</span>
+                <div class="stat-num-container">
+                  <h4 class="counter" data-target="45">0</h4>
+                  <span class="num-unit">mins</span>
                 </div>
+                <p class="stat-desc">Est. transaction speed</p>
+              </div>
+
+              <div class="number-stat-card">
+                <span class="stat-lbl">Peak Traffic</span>
+                <h4 class="time-stat">11:30 AM</h4>
+                <p class="stat-desc">Most active hours</p>
+              </div>
+            </div>
+
+            <!-- Weekly Check-ins mini-bar representation -->
+            <div class="telemetry-sub-chart">
+              <div class="sub-chart-header">
+                <h4>Weekly Check-in Distribution</h4>
+                <span class="total-badge">216 Total Weekly Runs</span>
+              </div>
+              <div class="chart-wrapper mini-height">
+                <canvas id="visitorMiniBarChart"></canvas>
               </div>
             </div>
           </div>
@@ -538,51 +292,43 @@
       <!-- PROCESS -->
       <section class="process-section" id="process">
         <div class="section-title reveal">
-          <span>Basic Process</span>
-          <h2>How the Homepage Supports the IMS</h2>
+          <span>Basic Strategy</span>
+          <h2>Operational System Map</h2>
           <p>
-            The homepage provides an entry point for monitoring and accessing the main record modules.
+            A quick step-by-step approach to standard office tasks inside the management environment.
           </p>
         </div>
 
-        <div class="timeline">
-          <div class="timeline-item reveal">
-            <div class="timeline-icon">1</div>
-            <div>
-              <h3>Open IMS Homepage</h3>
-              <p>
-                The user opens the web-based IMS homepage and views system overview, modules, and analytics.
-              </p>
+        <div class="process-grid">
+          <div class="process-card reveal">
+            <div class="process-number">01</div>
+            <div class="process-content">
+              <h3>System Access</h3>
+              <p>Staff members authorize administrative privileges securely via secure database single sign-on mapping configurations.</p>
             </div>
           </div>
 
-          <div class="timeline-item reveal">
-            <div class="timeline-icon">2</div>
-            <div>
-              <h3>Select Module</h3>
-              <p>
-                The user selects a record module such as communication, travel order, memo, inventory, or visitor log.
-              </p>
+          <div class="process-card reveal">
+            <div class="process-number">02</div>
+            <div class="process-content">
+              <h3>Module Selection</h3>
+              <p>Access designated database units rapidly through the primary responsive collapsible menu sidebar.</p>
             </div>
           </div>
 
-          <div class="timeline-item reveal">
-            <div class="timeline-icon">3</div>
-            <div>
-              <h3>Monitor Records</h3>
-              <p>
-                The dashboard charts help users view document flow, pending transactions, and archived records.
-              </p>
+          <div class="process-card reveal">
+            <div class="process-number">03</div>
+            <div class="process-content">
+              <h3>Secure Entry</h3>
+              <p>Register, query, audit, or export core provincial resource tracking logs directly through optimized forms.</p>
             </div>
           </div>
 
-          <div class="timeline-item reveal">
-            <div class="timeline-icon">4</div>
-            <div>
-              <h3>Access Dashboard or Logout</h3>
-              <p>
-                The profile menu allows the user to proceed to the dashboard, account settings, or logout.
-              </p>
+          <div class="process-card reveal">
+            <div class="process-number">04</div>
+            <div class="process-content">
+              <h3>Analytics Reporting</h3>
+              <p>Database statistics update automatically on main control views providing immediate updates.</p>
             </div>
           </div>
         </div>
@@ -590,37 +336,45 @@
 
       <!-- FOOTER -->
       <footer class="footer" id="contact">
-        <div class="footer-brand">
-          <h2>PGENRO IMS</h2>
-          <p>
-            Information Management System for centralized office records,
-            communication tracking, and transaction monitoring.
-          </p>
+        <div class="footer-container">
+          <div class="footer-brand">
+            <h2>PGENRO IMS</h2>
+            <p>
+              Provincial Government Environment and Natural Resources Office of Quezon Province. Managing resources through stable software architecture.
+            </p>
+          </div>
+
+          <div class="footer-group">
+            <h4>IMS Modules</h4>
+            <div class="footer-links-grid">
+              <a href="#home">Home Monitor</a>
+              <a href="#analytics">Live Analytics</a>
+              <a href="Communication.html">Communications</a>
+              <a href="visitorsView.html">Visitor Logs</a>
+            </div>
+          </div>
+
+          <div class="footer-contact">
+            <h4>Contact Support</h4>
+            <p><strong>Email:</strong> systems@pgenro.gov.ph</p>
+            <p><strong>Location:</strong> PGENRO Building, Lucena City, Quezon Province</p>
+          </div>
         </div>
 
-        <div class="footer-links">
-          <h4>Resources</h4>
-          <a href="#modules">Modules</a>
-          <a href="#features">Features</a>
-          <a href="#analytics">Charts</a>
-          <a href="#process">Process</a>
-        </div>
-
-        <div class="footer-contact">
-          <h4>Contact Information</h4>
-          <p>Email: help@pgenro.gov.ph</p>
-          <p>Office: PGENRO Quezon Province</p>
+        <div class="footer-bottom">
+          <p>&copy; 2025 PGENRO. All Rights Reserved. Province of Quezon.</p>
         </div>
       </footer>
     </main>
   </div>
 
   <!-- Scroll-to-Top Floating Trigger Button -->
-  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll to top" type="button">
+  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll back to top" type="button">
     <i data-lucide="chevron-up"></i>
   </button>
 
   <!-- JS -->
   <script src="homepage.js"></script>
+  <script type="module" src="homapageD.JS"></script>
 </body>
 </html>
