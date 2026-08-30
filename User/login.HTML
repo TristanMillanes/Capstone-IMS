@@ -3,41 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PGENRO IMS | Secure Gateway</title>
+    <title>PGENRO IMS | Secure Enterprise Gateway</title>
 
-    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono for secure terminal states -->
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Premium Stylesheet Link -->
+    <!-- Stylesheet -->
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
 
-    <!-- Ambient Grid & Spatial Backdrops -->
+    <!-- Ambient Visual Depth Layers -->
     <div class="light-grid-overlay" aria-hidden="true"></div>
     <div class="botanical-noise" aria-hidden="true"></div>
+    <div class="ambient-glow-orb orb-primary" aria-hidden="true"></div>
+    <div class="ambient-glow-orb orb-secondary" aria-hidden="true"></div>
     <div class="ambient-sunburst" id="sunburstGlow" aria-hidden="true"></div>
     
-    <!-- Immersive Interactive Background Engine Canvas -->
-    <div id="forestCanvasContainer" aria-hidden="true"></div>
+    <!-- Interactive Spore/Constellation Background Canvas -->
+    <canvas id="forestCanvas" aria-hidden="true"></canvas>
 
-    <!-- Master Split-Screen Layout Wrap -->
+    <!-- Split-Screen Gateway Viewport -->
     <div class="gateway-viewport-wrapper">
         
-        <!-- Left Column: Branding Details & Logos -->
+        <!-- Left Column: Command & Branding Overview -->
         <section class="branding-panel">
             <div class="branding-content">
-                <!-- Dual Logo Container -->
+                
+                <!-- System Status Capsule -->
+                <div class="status-capsule">
+                    <span class="pulse-dot"></span>
+                    <span class="capsule-text">PGENRO SECURE NODE &bull; ONLINE</span>
+                </div>
+
+                <!-- Dual Authority Badges -->
                 <div class="brand-logo-cluster">
-                    <div class="brand-logo-wrapper logo-primary">
+                    <div class="brand-logo-wrapper logo-primary" title="Provincial Government of Quezon">
                         <img src="../logo/quezonLLOGO.png" alt="Provincial Government of Quezon Emblem" class="brand-logo-img" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
                         <i data-lucide="award" class="brand-fallback-icon"></i>
                     </div>
-                    <div class="brand-logo-connector"></div>
-                    <div class="brand-logo-wrapper logo-secondary">
+                    <div class="brand-logo-divider">
+                        <span></span>
+                    </div>
+                    <div class="brand-logo-wrapper logo-secondary" title="ENRO Office">
                         <img src="../logo/enro.png" alt="PGENRO Emblem" class="brand-logo-img" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
                         <i data-lucide="leaf" class="brand-fallback-icon"></i>
                     </div>
@@ -45,61 +58,91 @@
 
                 <div class="brand-text-block">
                     <span class="brand-eyebrow">Provincial Government of Quezon</span>
-                    <h1 class="brand-title">PGENRO IMS</h1>
-                    <span class="brand-subheading">Environment and Natural Resources Office</span>
+                    <h1 class="brand-title">PGENRO <span class="accent-title">IMS</span></h1>
+                    <p class="brand-subheading">Provincial Government Environment and Natural Resources Office</p>
+                    <p class="brand-description">
+                        Unified terminal for forestry compliance, quarry permitting, environmental monitoring, and provincial natural reserve intelligence.
+                    </p>
                 </div>
 
-                <!-- Live Interface Status Typist -->
-                <p class="typist-status">
+                <!-- Feature Metric Pills -->
+                <div class="system-highlights">
+                    <div class="highlight-item">
+                        <i data-lucide="shield-check" class="highlight-icon"></i>
+                        <div>
+                            <strong>AES-256</strong>
+                            <span>Clearance Protocol</span>
+                        </div>
+                    </div>
+                    <div class="highlight-item">
+                        <i data-lucide="cpu" class="highlight-icon"></i>
+                        <div>
+                            <strong>Real-Time</strong>
+                            <span>Audit Telemetry</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Interface Typist Feed -->
+                <div class="typist-status-pill">
+                    <span class="terminal-prefix">&gt;_</span>
                     <span class="typist-text" id="typingText">INITIALIZING SECURITY</span>
                     <span class="typist-cursor">|</span>
-                </p>
+                </div>
             </div>
         </section>
 
-        <!-- Right Column: Interactive Login Card -->
+        <!-- Right Column: Interactive Login Console -->
         <section class="form-panel">
             <main class="gateway-container">
                 <div class="interactive-light-card" id="interactiveCard">
                     
-                    <!-- Dynamic Telemetry Handshake Progress Overlay -->
+                    <!-- Dynamic Verification Telemetry Handshake Overlay -->
                     <div class="loading-overlay" id="loadingOverlay" aria-live="assertive" aria-hidden="true">
                         <div class="loading-content">
                             <div class="spinner-container">
-                                <i data-lucide="shield" class="spinner-icon-base"></i>
+                                <div class="spinner-core">
+                                    <i data-lucide="shield" class="spinner-icon-base"></i>
+                                </div>
                                 <div class="spinner-ring"></div>
+                                <div class="spinner-pulse"></div>
                             </div>
-                            <h3 id="loadingStatusHeading">Verifying Identity</h3>
-                            <p id="loadingStatusText">Establishing terminal connection...</p>
+                            <h3 id="loadingStatusHeading">Authenticating Node</h3>
+                            <p id="loadingStatusText">Establishing terminal handshake...</p>
                             
-                            <!-- Advanced Telemetry Verification Checklist -->
+                            <!-- Telemetry Checklist -->
                             <div class="telemetry-checklist">
                                 <div class="telemetry-item" id="telemetryCheck1">
                                     <span class="telemetry-dot"></span>
-                                    <span class="telemetry-label">Resolving network parameters</span>
+                                    <span class="telemetry-label">Establishing secure TLS channel</span>
                                 </div>
                                 <div class="telemetry-item" id="telemetryCheck2">
                                     <span class="telemetry-dot"></span>
-                                    <span class="telemetry-label">Verifying security credentials</span>
+                                    <span class="telemetry-label">Verifying clearance credentials</span>
                                 </div>
                                 <div class="telemetry-item" id="telemetryCheck3">
                                     <span class="telemetry-dot"></span>
-                                    <span class="telemetry-label">Authorizing secure workspace node</span>
+                                    <span class="telemetry-label">Mounting user workspace partition</span>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Simplified, Polished Card Header -->
+                    <!-- Card Header -->
                     <header class="gateway-header">
-                        <h2>System Authorization</h2>
-                        <p class="form-intro-text">Provide security credentials to unlock your node workspace.</p>
+                        <div class="header-icon-wrap">
+                            <i data-lucide="fingerprint"></i>
+                        </div>
+                        <div>
+                            <h2>Personnel Clearance</h2>
+                            <p class="form-intro-text">Authenticate your credentials to access the workspace.</p>
+                        </div>
                     </header>
 
-                    <!-- Banner Alerts -->
+                    <!-- Dynamic Notification Banner -->
                     <div id="messageBox" class="message-box" role="alert" aria-live="polite"></div>
 
-                    <!-- Credentials Module -->
+                    <!-- Authentication Form -->
                     <form id="loginForm" novalidate class="credentials-form">
                         
                         <!-- Floating Email Group -->
@@ -111,18 +154,10 @@
                                     type="email" 
                                     placeholder=" "
                                     autocomplete="email"
-                                    aria-describedby="emailError"
+                                    spellcheck="false"
                                     required
                                 >
-                                <label for="email" class="field-label">Government Email Address</label>
-                                <span class="field-status-indicator">
-                                    <i data-lucide="check" class="success-check-icon"></i>
-                                </span>
-                            </div>
-                            <div class="error-limiter" id="emailErrorContainer">
-                                <div class="error-panel">
-                                    <small class="error-msg" id="emailError"></small>
-                                </div>
+                                <label for="email" class="field-label">Official Email Address</label>
                             </div>
                         </div>
 
@@ -135,90 +170,82 @@
                                     type="password" 
                                     placeholder=" "
                                     autocomplete="current-password"
-                                    aria-describedby="passwordError"
                                     required
                                 >
                                 <label for="password" class="field-label">Security Password</label>
-                                <button type="button" class="password-toggle" id="togglePassword" aria-label="Toggle password text visibility">
+                                <button type="button" class="password-toggle" id="togglePassword" aria-label="Toggle password visibility" tabindex="-1">
                                     <i data-lucide="eye" aria-hidden="true"></i>
                                 </button>
                             </div>
                             
-                            <!-- Segmented Password Strength Grid -->
+                            <!-- Expandable Password Security Inspector -->
                             <div class="strength-limiter" id="strengthContainer" aria-live="polite">
                                 <div class="strength-panel">
                                     <div class="strength-indicators">
                                         <div class="bar-bg">
-                                            <div class="bar-segment"></div>
-                                            <div class="bar-segment"></div>
-                                            <div class="bar-segment"></div>
-                                            <div class="bar-segment"></div>
                                             <div class="bar-fill" id="strengthBarFill"></div>
                                         </div>
                                     </div>
                                     <div class="strength-header-row">
-                                        <span class="strength-feedback" id="strengthText">Analyzing complexity...</span>
+                                        <span class="strength-label">Entropy Metric:</span>
+                                        <span class="strength-feedback" id="strengthText">Analyzing...</span>
                                     </div>
                                     
-                                    <!-- Real-time Verification Criteria Checklist -->
+                                    <!-- Requirements Validation Checklist -->
                                     <ul class="criteria-list" id="criteriaList">
                                         <li data-criterion="length" class="criteria-item">
-                                            <i data-lucide="circle-dot"></i> <span>At least 6 characters</span>
+                                            <i data-lucide="circle" class="crit-icon"></i> <span>6+ characters</span>
                                         </li>
                                         <li data-criterion="upper" class="criteria-item">
-                                            <i data-lucide="circle-dot"></i> <span>One uppercase letter</span>
+                                            <i data-lucide="circle" class="crit-icon"></i> <span>Uppercase letter</span>
                                         </li>
                                         <li data-criterion="number" class="criteria-item">
-                                            <i data-lucide="circle-dot"></i> <span>One numeric digit</span>
+                                            <i data-lucide="circle" class="crit-icon"></i> <span>Number digit</span>
                                         </li>
                                         <li data-criterion="special" class="criteria-item">
-                                            <i data-lucide="circle-dot"></i> <span>One special character</span>
+                                            <i data-lucide="circle" class="crit-icon"></i> <span>Special symbol</span>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
-
-                            <div class="error-limiter" id="passwordErrorContainer">
-                                <div class="error-panel">
-                                    <small class="error-msg" id="passwordError"></small>
-                                </div>
-                            </div>
                         </div>
 
-                        <!-- Persistence and Session Configurations -->
+                        <!-- Persistence & Password Recovery -->
                         <div class="session-configs">
                             <label class="remember-label">
                                 <input type="checkbox" id="rememberMe">
                                 <span class="remember-box"></span>
-                                <span class="remember-txt">Retain credentials</span>
+                                <span class="remember-txt">Remember credentials</span>
                             </label>
-                            <a href="#" class="recovery-anchor">Recover Password</a>
+                            <a href="#" class="recovery-anchor">Forgot credentials?</a>
                         </div>
 
-                        <!-- Action Access Trigger -->
+                        <!-- Submit Action Button -->
                         <button type="submit" class="auth-btn" id="loginBtn">
-                            <span id="loginText">Access Terminal</span>
-                            <i data-lucide="shield-alert" id="loginIcon" aria-hidden="true"></i>
+                            <span class="btn-text">Authenticate Session</span>
+                            <i data-lucide="arrow-right" class="btn-icon" aria-hidden="true"></i>
                         </button>
 
                         <div class="divider">
-                            <span>Authorized Entry Points</span>
+                            <span>Alternate Access</span>
                         </div>
 
                         <a href="requestACC.html" class="portal-request-btn">
-                            Register Secure Profile
+                            <i data-lucide="user-plus" class="request-btn-icon"></i>
+                            <span>Register Clearance Request</span>
                         </a>
                     </form>
 
                     <footer class="gateway-footer">
-                        &copy; 2026 Quezon Province ENRO Information Management System.<br>All transactions are securely logged and audited.
+                        <p>&copy; 2026 Provincial Government of Quezon &bull; PGENRO IMS</p>
+                        <span class="footer-subtext">All login attempts are cryptographically stamped and audited.</span>
                     </footer>
                 </div>
             </main>
         </section>
 
     </div>
-<script type="module" src="loginD.js"></script>
-    <script src="login.js"></script>
+
+    <script type="module" src="../user-javascript/login.js"></script>
 </body>
 </html>

@@ -1,9 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Global Chart Reference Pool for strict memory control
-  const activeCharts = {
-    commCompare: null,
-    visitorMini: null
-  };
+  // Global Chart Reference
+  let commCompareChartInstance = null;
 
   // Initialize Lucide Icons
   if (window.lucide) {
@@ -39,7 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     hamburgerMenu.addEventListener("click", toggleMenu);
     overlay.addEventListener("click", closeMenu);
-    
+
     // Close sidebar on anchor selection inside the panel
     const sidebarAnchors = sidebar.querySelectorAll("a");
     sidebarAnchors.forEach((link) => {
@@ -74,7 +71,7 @@ document.addEventListener("DOMContentLoaded", () => {
     link.addEventListener("click", (e) => {
       const targetId = link.getAttribute("href");
       if (!targetId || targetId === "#") return;
-      
+
       const targetElement = document.querySelector(targetId);
       if (targetElement) {
         e.preventDefault();
@@ -106,31 +103,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Count animations for Visitor Log Numbers Panel
-  const counters = document.querySelectorAll(".counter");
-  let countersFired = false;
-
-  function runCounters() {
-    if (countersFired) return;
-    counters.forEach((counter) => {
-      const maxVal = Number(counter.getAttribute("data-target")) || 0;
-      let currentVal = 0;
-      const stepValue = Math.max(1, Math.ceil(maxVal / 60));
-
-      function countStep() {
-        currentVal += stepValue;
-        if (currentVal >= maxVal) {
-          counter.textContent = maxVal.toLocaleString();
-        } else {
-          counter.textContent = currentVal.toLocaleString();
-          requestAnimationFrame(countStep);
-        }
-      }
-      countStep();
-    });
-    countersFired = true;
-  }
-
   // Scroll reveal trigger
   const revealElements = document.querySelectorAll(".reveal");
   function runScrollReveal() {
@@ -141,15 +113,6 @@ document.addEventListener("DOMContentLoaded", () => {
         el.classList.add("show");
       }
     });
-
-    // Trigger counters once visitor stats panel comes into view
-    const statsGrid = document.querySelector(".visitor-numbers-grid");
-    if (statsGrid) {
-      const gridOffset = statsGrid.getBoundingClientRect().top;
-      if (gridOffset < window.innerHeight) {
-        runCounters();
-      }
-    }
   }
 
   window.addEventListener("scroll", runScrollReveal);
@@ -175,30 +138,24 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener("scroll", highlightActiveNavigation);
   highlightActiveNavigation();
 
-  // Setup Specific System Charts (Communications Flow & Visitor Volume Logs)
+  // Setup Specific System Chart (Document Flow Trends)
   function renderSystemCharts() {
     if (!window.Chart) return;
 
-    // Clean active chart objects before starting
-    Object.keys(activeCharts).forEach((key) => {
-      if (activeCharts[key]) {
-        activeCharts[key].destroy();
-      }
-    });
+    if (commCompareChartInstance) {
+      commCompareChartInstance.destroy();
+    }
 
     const gridColor = "rgba(15, 107, 61, 0.04)";
     const textColor = "#5e7264";
     const brandColorPrimary = "#0f6b3d";
     const brandColorSecondary = "#46b86b";
 
-    // Select Canvas Contexts
     const canvasCommCompare = document.getElementById("commCompareChart");
-    const canvasVisitorMini = document.getElementById("visitorMiniBarChart");
 
-    // CHART 1: Document Flow Trends Line Chart
     if (canvasCommCompare) {
       const ctx = canvasCommCompare.getContext("2d");
-      
+
       const gradientIncoming = ctx.createLinearGradient(0, 0, 0, 260);
       gradientIncoming.addColorStop(0, "rgba(15, 107, 61, 0.12)");
       gradientIncoming.addColorStop(1, "rgba(15, 107, 61, 0.0)");
@@ -207,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
       gradientOutgoing.addColorStop(0, "rgba(70, 184, 107, 0.08)");
       gradientOutgoing.addColorStop(1, "rgba(70, 184, 107, 0.0)");
 
-      activeCharts.commCompare = new Chart(canvasCommCompare, {
+      commCompareChartInstance = new Chart(canvasCommCompare, {
         type: "line",
         data: {
           labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct"],
@@ -265,45 +222,6 @@ document.addEventListener("DOMContentLoaded", () => {
               beginAtZero: true,
               ticks: { color: textColor, font: { family: "Plus Jakarta Sans", size: 10 } },
               grid: { color: gridColor }
-            }
-          }
-        }
-      });
-    }
-
-    // CHART 2: Weekly Visitor Distribution Mini Bar Chart
-    if (canvasVisitorMini) {
-      activeCharts.visitorMini = new Chart(canvasVisitorMini, {
-        type: "bar",
-        data: {
-          labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
-          datasets: [{
-            data: [28, 42, 35, 52, 48, 11],
-            backgroundColor: brandColorSecondary,
-            hoverBackgroundColor: brandColorPrimary,
-            borderRadius: 6,
-            borderSkipped: false
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              backgroundColor: "#09170f",
-              padding: 10
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: textColor, font: { weight: "700", family: "Plus Jakarta Sans", size: 9 } },
-              grid: { display: false }
-            },
-            y: {
-              beginAtZero: true,
-              display: false,
-              grid: { display: false }
             }
           }
         }

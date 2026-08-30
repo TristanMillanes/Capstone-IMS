@@ -49,6 +49,7 @@
     <nav class="nav-links" id="navLinks">
       <a href="#home" class="active">Home</a>
       <a href="#analytics">Telemetry Center</a>
+      <a href="#memo">Office Memos</a>
       <a href="#process">Strategy</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -125,7 +126,7 @@
           </a>
         </li>
         <li>
-          <a href="#memo">
+          <a href="officememo.html">
             <i data-lucide="file-text"></i>
             <span>Office Memo Logs</span>
           </a>
@@ -149,13 +150,13 @@
           </a>
         </li>
         <li>
-          <a href="#service">
+          <a href="service.html">
             <i data-lucide="shield-alert"></i>
             <span>Service Requests</span>
           </a>
         </li>
         <li>
-          <a href="#ics">
+          <a href="ICS.html">
             <i data-lucide="layers"></i>
             <span>ICS Records</span>
           </a>
@@ -228,62 +229,237 @@
             </div>
           </div>
 
-          <!-- Visitors Log Numbers & Statistics Board -->
+          <!-- Visitors Recent List Card -->
           <div class="visitor-telemetry-card reveal">
             <div class="telemetry-header">
               <div class="telemetry-header-title">
                 <div class="telemetry-icon-container">
-                  <i data-lucide="users" class="telemetry-icon"></i>
+                  <i data-lucide="clipboard-signature" class="telemetry-icon"></i>
                 </div>
                 <div>
-                  <h3>Visitor Metrics</h3>
-                  <p>Daily tracking of registered visitors</p>
+                  <h3>Recent Visitor Logs</h3>
+                  <p>Latest registered visitor check-ins & status</p>
+                </div>
+              </div>
+              <a href="visitorsView.html" class="view-all-link">
+                View All <i data-lucide="arrow-right"></i>
+              </a>
+            </div>
+
+            <!-- Recent Visitors Entry List -->
+            <div class="visitor-recent-list">
+              <div class="visitor-item">
+                <div class="visitor-avatar">JD</div>
+                <div class="visitor-info">
+                  <h4>Juan Dela Cruz</h4>
+                  <p>DENR Regional Office • Environmental Permit</p>
+                </div>
+                <div class="visitor-meta">
+                  <span class="visitor-time">10:42 AM</span>
+                  <span class="badge-status active"><span class="status-dot"></span> Checked In</span>
+                </div>
+              </div>
+
+              <div class="visitor-item">
+                <div class="visitor-avatar">MS</div>
+                <div class="visitor-info">
+                  <h4>Maria Santos</h4>
+                  <p>LGU Tayabas • Forest Management Inquiry</p>
+                </div>
+                <div class="visitor-meta">
+                  <span class="visitor-time">10:15 AM</span>
+                  <span class="badge-status active"><span class="status-dot"></span> Checked In</span>
+                </div>
+              </div>
+
+              <div class="visitor-item">
+                <div class="visitor-avatar">RR</div>
+                <div class="visitor-info">
+                  <h4>Robert Reyes</h4>
+                  <p>Quezon Eco-Tech • Compliance Audit</p>
+                </div>
+                <div class="visitor-meta">
+                  <span class="visitor-time">09:30 AM</span>
+                  <span class="badge-status completed">Checked Out</span>
+                </div>
+              </div>
+
+              <div class="visitor-item">
+                <div class="visitor-avatar">AG</div>
+                <div class="visitor-info">
+                  <h4>Ana Gomez</h4>
+                  <p>Provincial Legal • Document Submission</p>
+                </div>
+                <div class="visitor-meta">
+                  <span class="visitor-time">08:50 AM</span>
+                  <span class="badge-status completed">Checked Out</span>
+                </div>
+              </div>
+
+              <div class="visitor-item">
+                <div class="visitor-avatar">CL</div>
+                <div class="visitor-info">
+                  <h4>Carlos Lim</h4>
+                  <p>Private Citizen • Public Record Inquiry</p>
+                </div>
+                <div class="visitor-meta">
+                  <span class="visitor-time">08:15 AM</span>
+                  <span class="badge-status completed">Checked Out</span>
                 </div>
               </div>
             </div>
 
-            <!-- Numbers Display -->
-            <div class="visitor-numbers-grid">
-              <div class="number-stat-card">
-                <span class="stat-lbl">Active inside</span>
-                <div class="stat-num-container">
-                  <span class="num-indicator online"></span>
-                  <h4 class="counter" data-target="14">0</h4>
-                </div>
-                <p class="stat-desc">Currently checked-in</p>
-              </div>
-
-              <div class="number-stat-card">
-                <span class="stat-lbl">Total today</span>
-                <h4 class="counter" data-target="36">0</h4>
-                <p class="stat-desc">Daily registrations</p>
-              </div>
-
-              <div class="number-stat-card">
-                <span class="stat-lbl">Avg Duration</span>
-                <div class="stat-num-container">
-                  <h4 class="counter" data-target="45">0</h4>
-                  <span class="num-unit">mins</span>
-                </div>
-                <p class="stat-desc">Est. transaction speed</p>
-              </div>
-
-              <div class="number-stat-card">
-                <span class="stat-lbl">Peak Traffic</span>
-                <h4 class="time-stat">11:30 AM</h4>
-                <p class="stat-desc">Most active hours</p>
-              </div>
-            </div>
-
-            <!-- Weekly Check-ins mini-bar representation -->
+            <!-- Footer Activity Summary -->
             <div class="telemetry-sub-chart">
               <div class="sub-chart-header">
-                <h4>Weekly Check-in Distribution</h4>
-                <span class="total-badge">216 Total Weekly Runs</span>
+                <h4>Today's Log Summary</h4>
+                <span class="total-badge">36 Total Visitors Today</span>
               </div>
-              <div class="chart-wrapper mini-height">
-                <canvas id="visitorMiniBarChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- MEMORANDUM HOMEPAGE SECTION -->
+      <section class="memo-section" id="memo">
+        <div class="section-title reveal">
+          <span>Official Directives</span>
+          <h2>Pinned Office Memorandums</h2>
+          <p>
+            Important announcements, administrative circulars, and policy updates pinned for office compliance.
+          </p>
+        </div>
+
+        <div class="memo-grid">
+          <!-- Memo Card 1 (Urgent/Pinned) -->
+          <div class="memo-card pinned reveal">
+            <div class="memo-header">
+              <div class="memo-badge-group">
+                <span class="memo-pinned-tag">
+                  <i data-lucide="pin"></i> Pinned Memo
+                </span>
+                <span class="memo-code">MEMO-2025-042</span>
               </div>
+              <span class="priority-tag high">High Priority</span>
+            </div>
+
+            <div class="memo-body">
+              <h3>Implementation of Updated Environmental Permit Processing Workflow</h3>
+              <p>
+                All division chiefs and technical personnel are hereby instructed to adhere to the revised processing steps for ECC compliance and quarry permit clearances effective November 1, 2025.
+              </p>
+            </div>
+
+            <div class="memo-meta">
+              <div class="meta-item">
+                <i data-lucide="calendar"></i>
+                <span>Issued: Oct 24, 2025</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="user-check"></i>
+                <span>By: Office of the Department Head</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="users"></i>
+                <span>Target: All Divisions</span>
+              </div>
+            </div>
+
+            <div class="memo-footer">
+              <a href="#" class="btn-memo-link">
+                <i data-lucide="file-text"></i> Read Details
+              </a>
+              <button class="btn-icon-action" title="Download Document" type="button">
+                <i data-lucide="download"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Memo Card 2 (Pinned) -->
+          <div class="memo-card pinned reveal">
+            <div class="memo-header">
+              <div class="memo-badge-group">
+                <span class="memo-pinned-tag">
+                  <i data-lucide="pin"></i> Pinned Memo
+                </span>
+                <span class="memo-code">MEMO-2025-039</span>
+              </div>
+              <span class="priority-tag standard">Administrative</span>
+            </div>
+
+            <div class="memo-body">
+              <h3>Mandatory System Security & IMS Access Controls Protocol</h3>
+              <p>
+                In compliance with ICT security standards, all authorized IMS account users must update password credentials and verify two-factor authentication parameters before the end of the month.
+              </p>
+            </div>
+
+            <div class="memo-meta">
+              <div class="meta-item">
+                <i data-lucide="calendar"></i>
+                <span>Issued: Oct 18, 2025</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="user-check"></i>
+                <span>By: IT & Records Management</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="users"></i>
+                <span>Target: All IMS Operators</span>
+              </div>
+            </div>
+
+            <div class="memo-footer">
+              <a href="#" class="btn-memo-link">
+                <i data-lucide="file-text"></i> Read Details
+              </a>
+              <button class="btn-icon-action" title="Download Document" type="button">
+                <i data-lucide="download"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Memo Card 3 (Pinned) -->
+          <div class="memo-card pinned reveal">
+            <div class="memo-header">
+              <div class="memo-badge-group">
+                <span class="memo-pinned-tag">
+                  <i data-lucide="pin"></i> Pinned Memo
+                </span>
+                <span class="memo-code">MEMO-2025-036</span>
+              </div>
+              <span class="priority-tag Operations">Field Operations</span>
+            </div>
+
+            <div class="memo-body">
+              <h3>Schedule for Provincial Field Monitoring & Environmental Audit Q4</h3>
+              <p>
+                Field inspection teams are advised to review the deployed Travel Orders roster and technical monitoring toolkits for the upcoming joint DENR-PGENRO audit in Tayabas and Lucban sectors.
+              </p>
+            </div>
+
+            <div class="memo-meta">
+              <div class="meta-item">
+                <i data-lucide="calendar"></i>
+                <span>Issued: Oct 10, 2025</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="user-check"></i>
+                <span>By: Field Surveillance Chief</span>
+              </div>
+              <div class="meta-item">
+                <i data-lucide="users"></i>
+                <span>Target: Technical Field Team</span>
+              </div>
+            </div>
+
+            <div class="memo-footer">
+              <a href="#" class="btn-memo-link">
+                <i data-lucide="file-text"></i> Read Details
+              </a>
+              <button class="btn-icon-action" title="Download Document" type="button">
+                <i data-lucide="download"></i>
+              </button>
             </div>
           </div>
         </div>
@@ -349,6 +525,7 @@
             <div class="footer-links-grid">
               <a href="#home">Home Monitor</a>
               <a href="#analytics">Live Analytics</a>
+              <a href="#memo">Office Memos</a>
               <a href="Communication.html">Communications</a>
               <a href="visitorsView.html">Visitor Logs</a>
             </div>
@@ -374,7 +551,6 @@
   </button>
 
   <!-- JS -->
-  <script src="homepage.js"></script>
-  <script type="module" src="homapageD.JS"></script>
+  <script src="../user-javascript/homepage.js"></script>
 </body>
 </html>

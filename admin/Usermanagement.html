@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | User Management</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="Usermanagement.css" />
+</head>
+
+<body>
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="admin.html" class="logo-area">
+          <div class="logo-icon">
+            <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+            <i data-lucide="shield-check" style="display:none; color: var(--emerald-400);"></i>
+          </div>
+          <div class="logo-text">
+            <h2>PGENRO IMS</h2>
+            <span>Admin Control Center</span>
+          </div>
+        </a>
+        <button class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu">
+          <i data-lucide="panel-left-close"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-group">
+          <span class="nav-label">Main Panel</span>
+          <ul>
+            <li>
+              <a href="admin.html" class="nav-item">
+                <i data-lucide="layout-dashboard"></i>
+                <span>Executive Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="admin.html#modules" class="nav-item">
+                <i data-lucide="grid"></i>
+                <span>IMS Modules Hub</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="nav-group">
+          <span class="nav-label">Data & Records</span>
+          <ul>
+            <li>
+              <a href="user-management.html" class="nav-item active">
+                <i data-lucide="users"></i>
+                <span>User Management</span>
+                <span class="nav-badge emerald">Active</span>
+              </a>
+            </li>
+            <li>
+              <a href="../admin/requestACC.html" class="nav-item">
+                <i data-lucide="user-plus"></i>
+                <span>Account Requests</span>
+                <span class="nav-badge pulse">3 New</span>
+              </a>
+            </li>
+            <li>
+              <a href="../admin/Communication.html" class="nav-item">
+                <i data-lucide="arrow-left-right"></i>
+                <span>Communications Log</span>
+              </a>
+            </li>
+            <li>
+              <a href="../admin/employee.html" class="nav-item">
+                <i data-lucide="folder-git-2"></i>
+                <span>Employee Profiles</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="nav-group">
+          <span class="nav-label">System Control</span>
+          <ul>
+            <li>
+              <a href="admin.html#audit" class="nav-item">
+                <i data-lucide="shield-alert"></i>
+                <span>Security Audit Trail</span>
+              </a>
+            </li>
+            <li>
+              <a href="admin.html#backup" class="nav-item">
+                <i data-lucide="database"></i>
+                <span>System Backups</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-indicator">
+          <span class="status-dot online"></span>
+          <div class="status-info">
+            <span class="status-title">User Directory Sync</span>
+            <span class="status-sub">Updated Just Now</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <div class="main-wrapper">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+          
+          <div class="global-search">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="globalSearchInput" placeholder="Quick search personnel, roles, email..." />
+            <kbd class="search-shortcut">Ctrl K</kbd>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <button class="icon-btn" title="System Notifications">
+            <i data-lucide="bell"></i>
+            <span class="notification-ping"></span>
+          </button>
+
+          <div class="v-divider"></div>
+
+          <div class="profile-menu" id="profileMenu">
+            <button class="profile-btn" id="profileBtn" type="button">
+              <div class="profile-avatar">
+                <i data-lucide="user-check"></i>
+              </div>
+              <div class="profile-text">
+                <span class="user-name">Admin User</span>
+                <span class="user-role">System Administrator</span>
+              </div>
+              <i data-lucide="chevron-down" class="profile-chevron"></i>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- MAIN CONTENT -->
+      <main class="main-content">
+        <!-- PAGE HEADER -->
+        <section class="page-header">
+          <div class="header-title">
+            <div class="breadcrumb">
+              <a href="admin.html">Admin Console</a>
+              <i data-lucide="chevron-right"></i>
+              <span class="active">User Management</span>
+            </div>
+            <h1>User Accounts & Access Control</h1>
+            <p>Create, configure division access, manage security credentials, and monitor user statuses.</p>
+          </div>
+
+          <div class="header-actions">
+            <button class="btn btn-secondary" id="exportUsersBtn">
+              <i data-lucide="download"></i>
+              <span>Export CSV</span>
+            </button>
+            <button class="btn btn-primary" id="openAddUserModalBtn">
+              <i data-lucide="user-plus"></i>
+              <span>Add New User</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- KPI SUMMARY CARDS -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Total Accounts</span>
+              <div class="kpi-icon emerald"><i data-lucide="users"></i></div>
+            </div>
+            <div class="kpi-body">
+              <h3 id="statTotalUsers">6</h3>
+              <span class="kpi-sub">Across 4 Office Divisions</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Active Administrators</span>
+              <div class="kpi-icon blue"><i data-lucide="shield-check"></i></div>
+            </div>
+            <div class="kpi-body">
+              <h3 id="statTotalAdmins">2</h3>
+              <span class="kpi-sub">Super Admin Privileges</span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Pending Account Requests</span>
+              <div class="kpi-icon amber"><i data-lucide="clock"></i></div>
+            </div>
+            <div class="kpi-body">
+              <h3>3</h3>
+              <span class="kpi-sub"><a href="../admin/requestACC.html">Review Pending &rarr;</a></span>
+            </div>
+          </div>
+
+          <div class="kpi-card">
+            <div class="kpi-header">
+              <span class="kpi-label">Suspended / Inactive</span>
+              <div class="kpi-icon rose"><i data-lucide="user-x"></i></div>
+            </div>
+            <div class="kpi-body">
+              <h3 id="statSuspendedUsers">1</h3>
+              <span class="kpi-sub">Access Restricted</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- USER TABLE & FILTERS SECTION -->
+        <section class="dashboard-section">
+          <!-- Filter Controls Bar -->
+          <div class="table-controls-card">
+            <div class="controls-left">
+              <div class="filter-search-box">
+                <i data-lucide="search"></i>
+                <input type="text" id="userSearchInput" placeholder="Filter by name, username, email..." />
+              </div>
+
+              <select id="roleFilterSelect" class="filter-select">
+                <option value="ALL">All Roles</option>
+                <option value="Super Admin">Super Admin</option>
+                <option value="Division Head">Division Head</option>
+                <option value="System Staff">System Staff</option>
+              </select>
+
+              <select id="divisionFilterSelect" class="filter-select">
+                <option value="ALL">All Divisions</option>
+                <option value="Admin Office">Admin Office</option>
+                <option value="Environment Management">Environment Management</option>
+                <option value="Forestry Division">Forestry Division</option>
+                <option value="Mines & Quarry">Mines & Quarry</option>
+              </select>
+
+              <select id="statusFilterSelect" class="filter-select">
+                <option value="ALL">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+                <option value="Suspended">Suspended</option>
+              </select>
+            </div>
+
+            <div class="controls-right">
+              <button class="btn btn-secondary btn-sm" id="bulkDeleteBtn" disabled>
+                <i data-lucide="trash-2"></i> Delete Selected
+              </button>
+            </div>
+          </div>
+
+          <!-- USER DATA TABLE -->
+          <div class="card table-card">
+            <div class="table-responsive">
+              <table class="data-table" id="usersTable">
+                <thead>
+                  <tr>
+                    <th width="40"><input type="checkbox" id="selectAllCheckbox" /></th>
+                    <th>Personnel User</th>
+                    <th>Division / Office</th>
+                    <th>Role Badge</th>
+                    <th>Account Status</th>
+                    <th>Last Login</th>
+                    <th width="120" style="text-align: right;">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="userTableBody">
+                  <!-- Dynamic rows rendered via JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Table Pagination -->
+            <div class="table-footer">
+              <span class="text-muted" id="tableRangeText">Showing 1 to 6 of 6 Personnel Accounts</span>
+              <div class="pagination">
+                <button class="page-btn" disabled>&laquo;</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn" disabled>&raquo;</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT USER MODAL -->
+  <div class="modal-backdrop" id="userModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-icon emerald"><i data-lucide="user-cog"></i></div>
+          <div>
+            <h3 id="modalTitle">Add New User Account</h3>
+            <p id="modalSub">Configure personnel credentials and access permissions.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeUserModalBtn">&times;</button>
+      </div>
+
+      <form id="userForm">
+        <input type="hidden" id="userIdInput" />
+        
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="fullNameInput">Full Name <span class="required">*</span></label>
+              <input type="text" id="fullNameInput" class="form-control" placeholder="e.g. Gabriel Mendoza" required />
+            </div>
+            <div class="form-group">
+              <label for="usernameInput">Username <span class="required">*</span></label>
+              <input type="text" id="usernameInput" class="form-control" placeholder="e.g. gmendoza" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="emailInput">Email Address <span class="required">*</span></label>
+              <input type="email" id="emailInput" class="form-control" placeholder="gmendoza@pgenro.gov.ph" required />
+            </div>
+            <div class="form-group">
+              <label for="passwordInput">Password <span class="required" id="passRequiredStar">*</span></label>
+              <input type="password" id="passwordInput" class="form-control" placeholder="••••••••" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="divisionSelect">PGENRO Division <span class="required">*</span></label>
+              <select id="divisionSelect" class="form-control" required>
+                <option value="">Select Office Division</option>
+                <option value="Admin Office">Admin Office</option>
+                <option value="Environment Management">Environment Management Division</option>
+                <option value="Forestry Division">Forestry Division</option>
+                <option value="Mines & Quarry">Mines & Quarry Division</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="roleSelect">User Role <span class="required">*</span></label>
+              <select id="roleSelect" class="form-control" required>
+                <option value="System Staff">System Staff (Standard)</option>
+                <option value="Division Head">Division Head (Supervisor)</option>
+                <option value="Super Admin">Super Admin (Full Control)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="statusSelect">Account Status</label>
+            <select id="statusSelect" class="form-control">
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+              <option value="Suspended">Suspended</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="saveUserBtn">Save Account</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div class="toast-container" id="toast">
+    <i data-lucide="check-circle" class="toast-icon"></i>
+    <span id="toastMessage">User account saved successfully.</span>
+  </div>
+
+  <!-- JS -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script type="module" src="../admin-javascript/Usermanagement.js"></script>
+
+</body>
+</html>

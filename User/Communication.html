@@ -1,252 +1,362 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Communication Module</title>
+  <title>PGENRO IMS | Communication Logs</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="communication.css" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="Communication.css" />
 </head>
 
 <body>
-  <header class="navbar">
-    <a href="homepage.html" class="logo-area">
-      <div class="logo-icon">
-        <img src="../logo/enro.png" class="logo-image" alt="PGENRO Logo">
-      </div>
-      <div>
-        <h2>Provincial Government</h2>
-        <span>Environmental and Natural Resources Office</span>
-      </div>
-    </a>
+  <!-- Overlay Backdrop -->
+  <div class="overlay" id="overlay"></div>
 
-    <div class="hamburger-menu" id="hamburgerMenu">
-      <span></span>
-      <span></span>
-      <span></span>
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <!-- Left Section: Menu Toggle & Brand Logo -->
+    <div class="nav-left-container">
+      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle Navigation Menu" type="button">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <a href="Homepage.html" class="logo-area">
+        <div class="logo-icon">
+          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'">
+        </div>
+        <div class="logo-text">
+          <h2>Provincial Government</h2>
+          <span>Environment & Natural Resources Office</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Right Section: Profile Menu -->
+    <div class="right-nav">
+      <div class="profile-menu" id="profileMenu">
+        <button class="profile-btn" id="profileBtn" type="button">
+          <div class="profile-avatar">
+            <i data-lucide="user"></i>
+          </div>
+          <div class="profile-text">
+            <h4>PGENRO OFFICER</h4>
+            <span>Authorized Account</span>
+          </div>
+          <i data-lucide="chevron-down" class="profile-chevron"></i>
+        </button>
+
+        <div class="profile-dropdown" id="profileDropdown">
+          <div class="profile-dropdown-header">
+            <div class="profile-avatar big">
+              <i data-lucide="user"></i>
+            </div>
+            <div>
+              <h3>PGENRO User</h3>
+              <p>Authorized Viewer</p>
+            </div>
+          </div>
+
+          <a href="Homepage.html">
+            <i data-lucide="layout-dashboard"></i>
+            Dashboard Overview
+          </a>
+
+          <a href="/Capstone-IMS/SettingIMS/Settings.html">
+            <i data-lucide="settings"></i>
+            Account Settings
+          </a>
+
+          <button class="logout-btn" id="logoutBtn" type="button">
+            <i data-lucide="log-out"></i>
+            Logout
+          </button>
+        </div>
+      </div>
     </div>
   </header>
 
-  <div class="overlay" id="overlay"></div>
+  <div class="app-container">
+    <!-- FLOATING SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>IMS Modules</h3>
+        <p class="sidebar-subtext">Office Management Modules</p>
+      </div>
 
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h3>IMS Modules</h3>
-      <p>Quick access menu</p>
-    </div>
+      <ul class="modules-list">
+        <li>
+          <a href="Homepage.html">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard Overview</span>
+          </a>
+        </li>
+        <li>
+          <a href="Communication.html" class="active">
+            <i data-lucide="mail"></i>
+            <span>Communications</span>
+          </a>
+        </li>
+        <li>
+          <a href="travelorder.html">
+            <i data-lucide="navigation"></i>
+            <span>Travel Orders</span>
+          </a>
+        </li>
+        <li>
+          <a href="officememo.html">
+            <i data-lucide="file-text"></i>
+            <span>Office Memo Logs</span>
+          </a>
+        </li>
+        <li>
+          <a href="employee.html">
+            <i data-lucide="users-round"></i>
+            <span>Employee Records</span>
+          </a>
+        </li>
+        <li>
+          <a href="inventory.html">
+            <i data-lucide="package"></i>
+            <span>Inventory Records</span>
+          </a>
+        </li>
+        <li>
+          <a href="visitorsView.html">
+            <i data-lucide="clipboard-signature"></i>
+            <span>Visitor's Logbook</span>
+          </a>
+        </li>
+        <li>
+          <a href="servicerequest.html">
+            <i data-lucide="shield-alert"></i>
+            <span>Service Requests</span>
+          </a>
+        </li>
+        <li>
+          <a href="ics.html">
+            <i data-lucide="layers"></i>
+            <span>ICS Records</span>
+          </a>
+        </li>
+      </ul>
 
-    <ul class="modules-list">
-      <li><a href="homepage.html"><i data-lucide="home"></i><span>Dashboard</span></a></li> 
-      <li><a href="communication.html" class="active"><i data-lucide="repeat-2"></i><span>Incoming/Outgoing<br>Communication</span></a></li>
-      <li><a href="travelorder.html"><i data-lucide="map-pin"></i><span>Travel Order</span></a></li>
-      <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memo</span></a></li>
-      <li><a href="employee.html"><i data-lucide="users"></i><span>Employee Records</span></a></li>
-      <li><a href="inventory.html"><i data-lucide="box"></i><span>Inventory</span></a></li>
-      <li><a href="visitorsView.html"><i data-lucide="user-check"></i><span>Visitor's Log</span></a></li>
-      <li><a href="servicerequest.html"><i data-lucide="wrench"></i><span>Service Request</span></a></li>
-      <li><a href="ics.html"><i data-lucide="clipboard-list"></i><span>ICS</span></a></li>
-    </ul>
-  </aside>
+      <div class="sidebar-footer">
+        <div class="system-status">
+          <span class="status-indicator online"></span>
+          <span class="status-text">IMS Database Connected</span>
+        </div>
+      </div>
+    </aside>
 
-  <div class="form-modal" id="formModal">
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="mainContent">
+      <!-- HERO HEADER -->
+      <section class="page-header reveal">
+        <div class="header-content">
+          <span class="badge">
+            <i data-lucide="shield-check"></i>
+            Database Viewer Active
+          </span>
+          <h1>Incoming & Outgoing <span>Communications</span></h1>
+          <p>Real-time database records of official documents, transmittals, inquiries, and routing actions.</p>
+        </div>
+      </section>
+
+      <!-- METRICS CARDS -->
+      <section class="stats-grid reveal">
+        <div class="stat-card">
+          <div class="stat-icon-container">
+            <i data-lucide="database"></i>
+          </div>
+          <div class="stat-info">
+            <p>Total Records</p>
+            <h2 id="totalRecords">0</h2>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-container">
+            <i data-lucide="inbox"></i>
+          </div>
+          <div class="stat-info">
+            <p>Incoming Documents</p>
+            <h2 id="incomingCount">0</h2>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-container">
+            <i data-lucide="send"></i>
+          </div>
+          <div class="stat-info">
+            <p>Outgoing Releases</p>
+            <h2 id="outgoingCount">0</h2>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon-container">
+            <i data-lucide="clock-3"></i>
+          </div>
+          <div class="stat-info">
+            <p>Pending Action</p>
+            <h2 id="pendingCount">0</h2>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECORDS REGISTRY TABLE -->
+      <section class="records-card reveal">
+        <div class="records-header">
+          <div class="card-title">
+            <span>Official Records</span>
+            <h2>Communication Database</h2>
+            <p>Search, filter, and inspect registered communication entries.</p>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <div class="tabs">
+            <button class="tab-btn active" onclick="setFilter('All', this)">All Records</button>
+            <button class="tab-btn" onclick="setFilter('Incoming', this)">Incoming</button>
+            <button class="tab-btn" onclick="setFilter('Outgoing', this)">Outgoing</button>
+          </div>
+
+          <div class="tools">
+            <div class="search-field">
+              <i data-lucide="search"></i>
+              <input type="text" id="searchInput" placeholder="Search control no., subject, office..." oninput="displayRecords()">
+            </div>
+
+            <select id="statusFilter" onchange="displayRecords()">
+              <option value="All">All Statuses</option>
+              <option value="Pending">Pending</option>
+              <option value="Received">Received</option>
+              <option value="Forwarded">Forwarded</option>
+              <option value="Released">Released</option>
+              <option value="Archived">Archived</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Control No.</th>
+                <th>Date</th>
+                <th>Sender / Recipient Office</th>
+                <th>Subject / Particulars</th>
+                <th>Action Taken</th>
+                <th>Status</th>
+                <th style="text-align: center; width: 80px;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="recordsTable"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- FOOTER -->
+      <footer class="footer" id="contact">
+        <div class="footer-container">
+          <div class="footer-brand">
+            <h2>PGENRO IMS</h2>
+            <p>
+              Provincial Government Environment and Natural Resources Office of Quezon Province. Managing resources through stable software architecture.
+            </p>
+          </div>
+
+          <div class="footer-group">
+            <h4>IMS Modules</h4>
+            <div class="footer-links-grid">
+              <a href="Homepage.html">Home Overview</a>
+              <a href="Homepage.html#analytics">Telemetry</a>
+              <a href="officememo.html">Office Memos</a>
+              <a href="Communication.html">Communications</a>
+              <a href="visitorsView.html">Visitor Logs</a>
+            </div>
+          </div>
+
+          <div class="footer-contact">
+            <h4>Contact Support</h4>
+            <p><strong>Email:</strong> systems@pgenro.gov.ph</p>
+            <p><strong>Location:</strong> PGENRO Building, Lucena City, Quezon Province</p>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2025 PGENRO. All Rights Reserved. Province of Quezon.</p>
+        </div>
+      </footer>
+    </main>
+  </div>
+
+  <!-- READ-ONLY INSPECTION MODAL -->
+  <div class="form-modal" id="viewModal">
     <div class="modal-header">
-      <h2 id="formTitle">Encoding Communication Record</h2>
-      <button class="modal-close" id="formModalClose">
+      <div>
+        <h3>Document Information</h3>
+        <p>Complete communication metadata</p>
+      </div>
+      <button class="modal-close" id="viewModalClose" type="button">
         <i data-lucide="x"></i>
       </button>
     </div>
-
     <div class="modal-body">
-      <form id="communicationForm">
-        <input type="hidden" id="editIndex">
-
-        <div class="form-row">
-          <div>
-            <label>Communication Type</label>
-            <select id="type" required>
-              <option value="">Select Type</option>
-              <option value="Incoming">Incoming</option>
-              <option value="Outgoing">Outgoing</option>
-            </select>
-          </div>
-
-          <div>
-            <label>Control No.</label>
-            <input type="text" id="controlNo" readonly placeholder="Auto-generated">
-          </div>
+      <div class="form-row">
+        <div>
+          <label>Control No.</label>
+          <input type="text" id="viewControlNo" readonly>
         </div>
-
-        <label>Document Type</label>
-        <select id="documentType" required>
-          <option value="">Select Document Type</option>
-          <option>Request Letter</option>
-          <option>Endorsement Letter</option>
-          <option>Transmittal Letter</option>
-          <option>Response Letter</option>
-          <option>Notice of Meeting</option>
-          <option>Invitation</option>
-          <option>Report</option>
-          <option>Memorandum</option>
-          <option>Other Communication</option>
-        </select>
-
-        <div class="form-row">
-          <div>
-            <label>Date Received / Released</label>
-            <input type="date" id="date" required>
-          </div>
-
-          <div>
-            <label>Status</label>
-            <select id="status" required>
-              <option value="">Select Status</option>
-              <option>Pending</option>
-              <option>Received</option>
-              <option>Forwarded</option>
-              <option>Released</option>
-              <option>Archived</option>
-            </select>
-          </div>
+        <div>
+          <label>Type</label>
+          <input type="text" id="viewType" readonly>
         </div>
+      </div>
 
-        <label>Received From / Recipient Office</label>
-        <textarea id="office" required placeholder="Example: Governor's Office / PICTO"></textarea>
-
-        <label>Subject Matter / Particulars</label>
-        <textarea id="subject" required placeholder="Enter subject matter or particulars"></textarea>
-
-        <label>Date Forwarded / Action Taken</label>
-        <textarea id="dateForwarded" placeholder="Example: Forwarded to Admin Division"></textarea>
-
-        <label>Remarks</label>
-        <textarea id="remarks" placeholder="Enter remarks"></textarea>
-
-        <div class="upload-box">
-          <label>Upload Document Soft Copy</label>
-          <input type="file" id="documentFile" accept=".pdf,.png,.jpg,.jpeg">
-
-          <button type="button" class="ocr-btn" onclick="extractOCR()">
-            <i data-lucide="scan-text"></i>
-            Read Document Using OCR
-          </button>
+      <div class="form-row">
+        <div>
+          <label>Document Category</label>
+          <input type="text" id="viewDocType" readonly>
         </div>
-
-        <label>Extracted Document Text</label>
-        <textarea id="ocrText" placeholder="OCR result will appear here."></textarea>
-
-        <div id="pageViewer" class="page-viewer"></div>
-
-        <div class="form-actions">
-          <button type="button" class="clear-btn" onclick="clearForm()">Clear</button>
-          <button type="submit" class="save-btn" id="submitBtn">Save Record</button>
+        <div>
+          <label>Status</label>
+          <input type="text" id="viewStatus" readonly>
         </div>
-      </form>
+      </div>
+
+      <label>Office / Correspondent</label>
+      <textarea id="viewOffice" readonly></textarea>
+
+      <label>Subject / Particulars</label>
+      <textarea id="viewSubject" readonly></textarea>
+
+      <label>Action Taken / Date Forwarded</label>
+      <textarea id="viewDateForwarded" readonly></textarea>
+
+      <label>Extracted OCR Content</label>
+      <textarea id="viewOcrText" readonly style="min-height: 110px;"></textarea>
     </div>
   </div>
 
-  <main class="main-content">
-    <section class="page-header">
-      <span class="page-badge">
-        <i data-lucide="mail"></i>
-        Communication Module
-      </span>
-      <h1>Incoming and Outgoing Communication</h1>
-      <p>Manage communication records, control numbers, document status, action taken, remarks, and OCR-based document text extraction.</p>
-    </section>
+  <!-- Scroll-to-Top Floating Trigger Button -->
+  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll back to top" type="button">
+    <i data-lucide="chevron-up"></i>
+  </button>
 
-    <section class="stats-grid">
-      <div class="stat-card">
-        <i data-lucide="database"></i>
-        <div>
-          <p>Total Records</p>
-          <h2 id="totalRecords">0</h2>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <i data-lucide="inbox"></i>
-        <div>
-          <p>Incoming</p>
-          <h2 id="incomingCount">0</h2>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <i data-lucide="send"></i>
-        <div>
-          <p>Outgoing</p>
-          <h2 id="outgoingCount">0</h2>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <i data-lucide="clock-3"></i>
-        <div>
-          <p>Pending</p>
-          <h2 id="pendingCount">0</h2>
-        </div>
-      </div>
-    </section>
-
-    <section class="records-card">
-      <div class="records-header">
-        <div class="card-title">
-          <h2>Communication Records</h2>
-          <p>Search, filter, update, and view communication records.</p>
-        </div>
-
-        <button class="encoding-btn" id="openEncodingBtn">
-          <i data-lucide="plus-circle"></i>
-          Encoding Communication Record
-        </button>
-      </div>
-
-      <div class="tabs">
-        <button class="tab-btn active" onclick="setFilter('All', this)">All</button>
-        <button class="tab-btn" onclick="setFilter('Incoming', this)">Incoming</button>
-        <button class="tab-btn" onclick="setFilter('Outgoing', this)">Outgoing</button>
-      </div>
-
-      <div class="tools">
-        <div class="search-field">
-          <i data-lucide="search"></i>
-          <input type="text" id="searchInput" placeholder="Search control no., subject, office..." oninput="displayRecords()">
-        </div>
-
-        <select id="statusFilter" onchange="displayRecords()">
-          <option value="All">All Status</option>
-          <option>Pending</option>
-          <option>Received</option>
-          <option>Forwarded</option>
-          <option>Released</option>
-          <option>Archived</option>
-        </select>
-      </div>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Control No.</th>
-              <th>Date Received</th>
-              <th>Received From / Recipient</th>
-              <th>Subject Matter / Particulars</th>
-              <th>Date Forwarded / Action Taken</th>
-              <th>Remarks</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="recordsTable"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <script src="communication.js"></script>
+  <!-- JS -->
+  <script src="Communication.js"></script>
 </body>
 </html>

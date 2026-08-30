@@ -1,3 +1,26 @@
+// ==========================================
+// 1. FIREBASE INITIALIZATION
+// ==========================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
+  authDomain: "ims-capstone-bc65f.firebaseapp.com",
+  databaseURL: "https://ims-capstone-bc65f-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "ims-capstone-bc65f",
+  storageBucket: "ims-capstone-bc65f.firebasestorage.app",
+  messagingSenderId: "972207120140",
+  appId: "1:972207120140:web:6a94e2e1e9e8511e933329",
+  measurementId: "G-W4TPE7CHC8"
+};
+
+// Initialize Firebase if not already initialized
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+// ==========================================
+// 2. FORM & UI CONTROLLER
+// ==========================================
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("visitorForm");
   const inputs = document.querySelectorAll("#visitorForm input, #visitorForm textarea, #visitorForm select");
@@ -260,9 +283,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Handle Form Submissions
+  // Handle Form Submissions to Firebase Realtime Database
   if (form) {
-    form.addEventListener("submit", e => {
+    form.addEventListener("submit", async e => {
       e.preventDefault();
 
       let isValid = true;
@@ -279,6 +302,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const now = new Date();
       const visitorData = {
         fullName: document.getElementById("fullName")?.value.trim() || "",
         contact: document.getElementById("contact")?.value.trim() || "",
@@ -286,22 +310,17 @@ document.addEventListener("DOMContentLoaded", () => {
         personToVisit: document.getElementById("personToVisit")?.value.trim() || "",
         purposeCategory: document.getElementById("purposeCategory")?.value || "",
         otherPurposeSpecific: document.getElementById("otherPurposeSpecific")?.value.trim() || "",
-        date: new Date().toLocaleDateString(),
-        time: new Date().toLocaleTimeString(),
-        timestamp: new Date().toISOString()
+        date: now.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+        time: now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
+        timestamp: Date.now()
       };
 
+      // Push to Realtime Database with LocalStorage Fallback
       try {
-        if (window.firebaseDB) {
-          window.firebaseDB.ref('visitors').push(visitorData).catch(err => {
-            console.error('Firebase save failed, running localStorage fallback:', err);
-            saveToLocal(visitorData);
-          });
-        } else {
-          saveToLocal(visitorData);
-        }
+        await db.ref("visitors").push(visitorData);
       } catch (error) {
-        console.error("Local entry save execution failed:", error);
+        console.error("Firebase save failed, falling back to localStorage:", error);
+        saveToLocal(visitorData);
       }
 
       const visitorNameDisplay = document.getElementById("visitorNameDisplay");
@@ -360,5 +379,5 @@ document.addEventListener("DOMContentLoaded", () => {
   // Initial Boot sequence
   initClock();
   createLeaves();
-  updateProgress(); // Compute dynamic progress immediately for any prefilled values
+  updateProgress();
 });

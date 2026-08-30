@@ -2,8 +2,8 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Account Settings</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>PGENRO IMS | Account Settings & Profile</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -13,27 +13,29 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- CSS -->
+  <!-- External Stylesheet -->
   <link rel="stylesheet" href="Setting.css" />
 </head>
 
 <body>
-  <!-- Overlay Backdrop -->
-  <div class="overlay" id="overlay"></div>
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
 
-  <!-- NAVBAR -->
+  <!-- TOP NAVIGATION NAVBAR WITH BACK BUTTON -->
   <header class="navbar">
-    <!-- Left Section: Menu Toggle & Brand Logo -->
     <div class="nav-left-container">
-      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle Navigation Menu" type="button">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <!-- BACK TO DASHBOARD BUTTON -->
+      <a href="/Capstone-IMS/User/Homepage.html" class="btn-back" title="Return to Dashboard Overview">
+        <i data-lucide="arrow-left"></i>
+        <span class="btn-back-text">Dashboard</span>
+      </a>
+
+      <div class="nav-divider"></div>
 
       <a href="homepage.html" class="logo-area">
         <div class="logo-icon">
-          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'">
+          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'; this.nextElementSibling.style.display='block';">
+          <i data-lucide="trees" class="logo-fallback-icon" style="display:none;"></i>
         </div>
         <div class="logo-text">
           <h2>Provincial Government</h2>
@@ -42,487 +44,371 @@
       </a>
     </div>
 
-    <!-- Center Section: Clean Anchor Navigation -->
-    <nav class="nav-links" id="navLinks">
-      <a href="homepage.html">Home</a>
-      <a href="#profile">Profile</a>
-      <a href="#security">Security</a>
-      <a href="#preferences">IMS Preferences</a>
-    </nav>
-
-    <!-- Right Section: Profile & System Status Indicator -->
-    <div class="right-nav">
-      <div class="profile-menu" id="profileMenu">
-        <button class="profile-btn" id="profileBtn" type="button">
-          <div class="profile-avatar">
-            <i data-lucide="user"></i>
-          </div>
-          <div class="profile-text">
-            <h4>PGENRO OFFICER</h4>
-            <span>Authorized Account</span>
-          </div>
-          <i data-lucide="chevron-down" class="profile-chevron"></i>
-        </button>
-
-        <div class="profile-dropdown" id="profileDropdown">
-          <div class="profile-dropdown-header">
-            <div class="profile-avatar big">
-              <i data-lucide="user"></i>
-            </div>
-            <div>
-              <h3>PGENRO User</h3>
-              <p>Authorized Admin</p>
-            </div>
-          </div>
-
-          <a href="homepage.html">
-            <i data-lucide="layout-dashboard"></i>
-            Dashboard Overview
-          </a>
-
-          <a href="Settings.html" class="active">
-            <i data-lucide="settings"></i>
-            Account Settings
-          </a>
-
-          <button class="logout-btn" id="logoutBtn" type="button">
-            <i data-lucide="log-out"></i>
-            Logout
-          </button>
-        </div>
+    <div class="nav-right-container">
+      <div class="system-badge">
+        <span class="badge-pulse"></span>
+        <span class="badge-text">Settings Console</span>
       </div>
     </div>
   </header>
 
+  <!-- MAIN CONTENT CONTAINER -->
   <div class="app-container">
-    <!-- FLOATING SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <h3>IMS Modules</h3>
-        <p class="sidebar-subtext">Office Management Modules</p>
-      </div>
-
-      <ul class="modules-list">
-        <li>
-          <a href="homepage.html">
-            <i data-lucide="layout-dashboard"></i>
-            <span>Dashboard Overview</span>
-          </a>
-        </li>
-        <li>
-          <a href="Communication.html">
-            <i data-lucide="mail"></i>
-            <span>Communications</span>
-          </a>
-        </li>
-        <li>
-          <a href="#travel">
-            <i data-lucide="navigation"></i>
-            <span>Travel Orders</span>
-          </a>
-        </li>
-        <li>
-          <a href="#memo">
-            <i data-lucide="file-text"></i>
-            <span>Office Memo Logs</span>
-          </a>
-        </li>
-        <li>
-          <a href="employee.html">
-            <i data-lucide="users-round"></i>
-            <span>Employee Records</span>
-          </a>
-        </li>
-        <li>
-          <a href="#inventory">
-            <i data-lucide="package"></i>
-            <span>Inventory Records</span>
-          </a>
-        </li>
-        <li>
-          <a href="visitorsView.html">
-            <i data-lucide="clipboard-signature"></i>
-            <span>Visitor's Logbook</span>
-          </a>
-        </li>
-        <li>
-          <a href="#service">
-            <i data-lucide="shield-alert"></i>
-            <span>Service Requests</span>
-          </a>
-        </li>
-        <li>
-          <a href="#ics">
-            <i data-lucide="layers"></i>
-            <span>ICS Records</span>
-          </a>
-        </li>
-        <li class="sidebar-divider"></li>
-        <li>
-          <a href="Settings.html" class="active">
-            <i data-lucide="settings"></i>
-            <span>Account Settings</span>
-          </a>
-        </li>
-      </ul>
-
-      <!-- Systems Status Widget -->
-      <div class="sidebar-footer">
-        <div class="system-status">
-          <span class="status-indicator online"></span>
-          <span class="status-text">IMS Server Connection Secure</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content" id="mainContent">
+    <main class="main-content">
       
-      <!-- PAGE TITLE HEADER -->
-      <section class="settings-header reveal">
-        <div class="header-title-area">
-          <span class="badge">
-            <i data-lucide="shield-check"></i>
-            Authorized Session Active
-          </span>
-          <h1>Account & <span>System Settings</span></h1>
-          <p class="header-subtitle">
-            Manage your PGENRO officer profile information, update secure access credentials, and customize office module preferences.
-          </p>
+      <!-- HEADER BANNER -->
+      <section class="module-header">
+        <div class="module-title">
+          <div class="title-badge">
+            <i data-lucide="shield-check"></i> User Credentials & Control
+          </div>
+          <h1>Account Settings & Profile</h1>
+          <p>Manage your account credentials, security authentication, system notifications, and personal profile.</p>
         </div>
       </section>
 
-      <!-- Toast / Floating Alert Message -->
-      <div id="settingsAlert"></div>
-
-      <!-- SETTINGS MAIN GRID -->
+      <!-- SETTINGS LAYOUT GRID -->
       <div class="settings-grid">
         
-        <!-- LEFT SIDE: PROFILE CARD & NAVIGATION -->
-        <div class="settings-sidebar-card reveal">
-          <div class="user-profile-summary">
-            <div class="avatar-upload-container">
-              <div class="big-avatar" id="avatarDisplay">
-                <i data-lucide="user"></i>
-              </div>
-              <button class="avatar-edit-btn" id="avatarEditBtn" title="Change Avatar">
+        <!-- LEFT COLUMN: USER PROFILE CARD & TAB NAVIGATION -->
+        <div class="settings-sidebar-card">
+          <div class="profile-summary">
+            <div class="avatar-container">
+              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" alt="Profile Picture" id="avatarPreview" class="avatar-img" />
+              <button class="avatar-edit-btn" id="changeAvatarBtn" title="Change Avatar Image" type="button">
                 <i data-lucide="camera"></i>
               </button>
+              <input type="file" id="avatarFileInput" accept="image/*" hidden />
             </div>
 
-            <h3 id="sidebarUserName">PGENRO Officer</h3>
-            <p id="sidebarUserRole">Authorized System Admin</p>
-            <span class="status-badge active"><i data-lucide="check-circle-2"></i> Account Verified</span>
-
-            <div class="user-meta-info">
-              <div class="meta-item">
-                <i data-lucide="building-2"></i>
-                <span>Quezon Provincial Capitol</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="mail"></i>
-                <span id="sidebarUserEmail">officer@pgenro.gov.ph</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="shield"></i>
-                <span>Level 4 Admin Clearance</span>
-              </div>
-            </div>
+            <h2 class="profile-name" id="profileNameDisplay">EnP JOHN FRANCIS L. LUZANO, MPA</h2>
+            <p class="profile-role" id="profileRoleDisplay">Provincial Environment Head</p>
+            <span class="profile-badge"><i data-lucide="shield"></i> Administrator Account</span>
           </div>
 
-          <!-- Quick Tab Links -->
-          <div class="settings-nav-menu">
-            <button class="settings-nav-item active" data-tab="profile">
-              <i data-lucide="user"></i> Profile Information
-            </button>
-            <button class="settings-nav-item" data-tab="security">
-              <i data-lucide="lock"></i> Security & Credentials
-            </button>
-            <button class="settings-nav-item" data-tab="preferences">
-              <i data-lucide="sliders"></i> Module Preferences
-            </button>
-          </div>
+          <!-- TAB NAVIGATION LIST -->
+          <ul class="settings-tab-menu">
+            <li>
+              <button class="tab-btn active" data-tab="personal-tab" type="button">
+                <i data-lucide="user"></i>
+                <span>Personal Information</span>
+              </button>
+            </li>
+            <li>
+              <button class="tab-btn" data-tab="security-tab" type="button">
+                <i data-lucide="key-round"></i>
+                <span>Security & Password</span>
+              </button>
+            </li>
+            <li>
+              <button class="tab-btn" data-tab="preferences-tab" type="button">
+                <i data-lucide="sliders"></i>
+                <span>System Preferences</span>
+              </button>
+            </li>
+            <li>
+              <button class="tab-btn" data-tab="audit-tab" type="button">
+                <i data-lucide="history"></i>
+                <span>Activity & Audit Log</span>
+              </button>
+            </li>
+          </ul>
         </div>
 
-        <!-- RIGHT SIDE: SETTINGS FORM PANELS -->
-        <div class="settings-content-area reveal">
+        <!-- RIGHT COLUMN: SETTINGS TAB PANELS -->
+        <div class="settings-panel-container">
           
-          <!-- TAB 1: PROFILE INFORMATION -->
-          <div class="settings-panel active" id="profile">
-            <div class="panel-header">
-              <div>
-                <h3>Personal & Office Details</h3>
-                <p>Update your personal identity details and internal provincial office designation.</p>
+          <!-- TAB 1: PERSONAL INFORMATION -->
+          <div class="tab-panel active" id="personal-tab">
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3>Personal Information</h3>
+                  <p>Update your personal details, official title, and contact metadata.</p>
+                </div>
               </div>
-              <span class="panel-tag">PGENRO Personnel</span>
+
+              <form id="personalInfoForm">
+                <div class="form-grid">
+                  <div class="form-group full-width">
+                    <label for="fullNameInput">Full Name with Qualifications <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="user"></i>
+                      <input type="text" id="fullNameInput" class="form-control padded" value="EnP JOHN FRANCIS L. LUZANO, MPA" required />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="employeeIdInput">Employee / Control ID <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="badge-check"></i>
+                      <input type="text" id="employeeIdInput" class="form-control padded" value="PGENRO-2024-001" required readOnly />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="designationInput">Official Designation <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="briefcase"></i>
+                      <input type="text" id="designationInput" class="form-control padded" value="Provincial Environment Head" required />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="emailInput">Official Email Address <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="mail"></i>
+                      <input type="email" id="emailInput" class="form-control padded" value="j.luzano@quezon.gov.ph" required />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="phoneInput">Contact / Extension Phone</label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="phone"></i>
+                      <input type="text" id="phoneInput" class="form-control padded" value="+63 (042) 710-3456" />
+                    </div>
+                  </div>
+
+                  <div class="form-group full-width">
+                    <label for="divisionSelect">Assigned Office / Division <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="building-2"></i>
+                      <select id="divisionSelect" class="form-control padded" required>
+                        <option value="Executive Office">Executive Office (PG ENRO)</option>
+                        <option value="Administrative & Finance">Administrative & Finance</option>
+                        <option value="Technical Operations">Technical Operations</option>
+                        <option value="Mines & Geosciences">Mines & Geosciences</option>
+                        <option value="Forestry Division">Forestry Division</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="panel-footer">
+                  <button type="submit" class="btn-primary-modal">
+                    <i data-lucide="save"></i> Save Profile Changes
+                  </button>
+                </div>
+              </form>
             </div>
-
-            <form id="profileSettingsForm">
-              <div class="form-grid">
-                <div class="form-group">
-                  <label for="fullName">Full Name</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="user" class="input-icon"></i>
-                    <input type="text" id="fullName" class="form-control" value="PGENRO Officer" required />
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="email">Official Email Address</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="mail" class="input-icon"></i>
-                    <input type="email" id="email" class="form-control" value="officer@pgenro.gov.ph" required />
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="phone">Contact Number</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="phone" class="input-icon"></i>
-                    <input type="tel" id="phone" class="form-control" value="+63 917 123 4567" />
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="employeeId">Employee ID / Item No.</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="badge-check" class="input-icon"></i>
-                    <input type="text" id="employeeId" class="form-control" value="PGENRO-2025-0892" readonly />
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="division">Office Division</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="building" class="input-icon"></i>
-                    <select id="division" class="form-control">
-                      <option value="Environmental Management Division" selected>Environmental Management Division</option>
-                      <option value="Natural Resources Permitting Unit">Natural Resources Permitting Unit</option>
-                      <option value="Administrative & Support Services">Administrative & Support Services</option>
-                      <option value="Forestry & Conservation Section">Forestry & Conservation Section</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="designation">Position Designation</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="briefcase" class="input-icon"></i>
-                    <input type="text" id="designation" class="form-control" value="Environment & Management Specialist II" />
-                  </div>
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                  <i data-lucide="save"></i> Save Profile Changes
-                </button>
-                <button type="reset" class="btn btn-secondary">
-                  Reset Form
-                </button>
-              </div>
-            </form>
           </div>
 
           <!-- TAB 2: SECURITY & PASSWORD -->
-          <div class="tab-pane-content" id="security" style="display: none;">
-            <div class="panel-header">
-              <div>
-                <h3>Security Credentials</h3>
-                <p>Ensure account safety by changing your administrative password regularly.</p>
+          <div class="tab-panel" id="security-tab">
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3>Security & Authentication</h3>
+                  <p>Change your login password and manage two-factor account verification.</p>
+                </div>
               </div>
-              <span class="panel-tag warning">Security Protocol</span>
+
+              <form id="securityForm">
+                <div class="form-grid">
+                  <div class="form-group full-width">
+                    <label for="currentPasswordInput">Current Password <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="lock"></i>
+                      <input type="password" id="currentPasswordInput" class="form-control padded" placeholder="••••••••••••" required />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="newPasswordInput">New Password <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="key"></i>
+                      <input type="password" id="newPasswordInput" class="form-control padded" placeholder="At least 8 characters..." required />
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label for="confirmPasswordInput">Confirm New Password <span class="required">*</span></label>
+                    <div class="input-icon-wrapper">
+                      <i data-lucide="check-circle-2"></i>
+                      <input type="password" id="confirmPasswordInput" class="form-control padded" placeholder="Repeat new password..." required />
+                    </div>
+                  </div>
+                </div>
+
+                <div class="divider"><span>ENHANCED AUTHENTICATION</span></div>
+
+                <div class="toggle-card">
+                  <div class="toggle-info">
+                    <i data-lucide="smartphone"></i>
+                    <div>
+                      <strong>Two-Factor Authentication (2FA)</strong>
+                      <p>Require a 6-digit verification code sent via SMS/Email when logging in.</p>
+                    </div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="twoFactorToggle" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="panel-footer">
+                  <button type="submit" class="btn-primary-modal">
+                    <i data-lucide="shield-check"></i> Update Password & Security
+                  </button>
+                </div>
+              </form>
+
+              <div class="divider"><span>ACTIVE LOGIN SESSIONS</span></div>
+
+              <div class="session-list" id="sessionListContainer">
+                <div class="session-item">
+                  <div class="session-icon"><i data-lucide="laptop"></i></div>
+                  <div class="session-details">
+                    <strong>Windows Workstation - Chrome Browser</strong>
+                    <small>Lucena Office Subnet (192.168.1.15) • Current Active Session</small>
+                  </div>
+                  <span class="session-status active">Active Now</span>
+                </div>
+
+                <div class="session-item" id="mobileSessionItem">
+                  <div class="session-icon"><i data-lucide="smartphone"></i></div>
+                  <div class="session-details">
+                    <strong>PGENRO Mobile Field Portal</strong>
+                    <small>Android 14 App • Last sync 2 hours ago</small>
+                  </div>
+                  <button class="btn-secondary-modal sm" type="button" id="revokeMobileSessionBtn">Revoke</button>
+                </div>
+              </div>
             </div>
-
-            <form id="securitySettingsForm">
-              <div class="form-grid single-col">
-                <div class="form-group">
-                  <label for="currentPassword">Current System Password</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="key-round" class="input-icon"></i>
-                    <input type="password" id="currentPassword" class="form-control" placeholder="••••••••••••" required />
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="newPassword">New Password</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="lock" class="input-icon"></i>
-                    <input type="password" id="newPassword" class="form-control" placeholder="••••••••••••" required />
-                  </div>
-                  <span class="field-hint">Password must be at least 8 characters long with numbers and letters.</span>
-                </div>
-
-                <div class="form-group">
-                  <label for="confirmPassword">Confirm New Password</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="shield-alert" class="input-icon"></i>
-                    <input type="password" id="confirmPassword" class="form-control" placeholder="••••••••••••" required />
-                  </div>
-                </div>
-              </div>
-
-              <!-- Extra Security Setting Toggles -->
-              <div class="security-toggles">
-                <div class="toggle-item">
-                  <div class="toggle-info">
-                    <h4>Two-Factor Authentication (2FA)</h4>
-                    <p>Require an email authorization code whenever signing into the PGENRO IMS portal.</p>
-                  </div>
-                  <label class="switch">
-                    <input type="checkbox" id="twoFactorToggle" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-
-                <div class="toggle-item">
-                  <div class="toggle-info">
-                    <h4>Automatic Session Timeout</h4>
-                    <p>Log out automatically after 15 minutes of system inactivity to prevent unauthorized access.</p>
-                  </div>
-                  <label class="switch">
-                    <input type="checkbox" id="timeoutToggle" checked>
-                    <span class="slider"></span>
-                  </label>
-                </div>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                  <i data-lucide="shield-check"></i> Update Security Credentials
-                </button>
-              </div>
-            </form>
           </div>
 
-          <!-- TAB 3: MODULE PREFERENCES -->
-          <div class="tab-pane-content" id="preferences" style="display: none;">
-            <div class="panel-header">
-              <div>
-                <h3>IMS System & Notification Preferences</h3>
-                <p>Customize default dashboard behavior and real-time document notification alerts.</p>
+          <!-- TAB 3: SYSTEM PREFERENCES -->
+          <div class="tab-panel" id="preferences-tab">
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3>System Preferences & Automation</h3>
+                  <p>Configure interface themes, automated parsing triggers, and system alert preferences.</p>
+                </div>
               </div>
-              <span class="panel-tag">System Defaults</span>
+
+              <form id="preferencesForm">
+                <div class="preference-group">
+                  <h4>Appearance & Interface Theme</h4>
+                  <div class="theme-selector-grid">
+                    <label class="theme-card active" id="lightThemeCard">
+                      <input type="radio" name="themeMode" value="light" id="themeLightRadio" checked />
+                      <div class="theme-preview light"></div>
+                      <span>PG ENRO Light Theme</span>
+                    </label>
+
+                    <label class="theme-card" id="darkThemeCard">
+                      <input type="radio" name="themeMode" value="dark" id="themeDarkRadio" />
+                      <div class="theme-preview dark"></div>
+                      <span>Executive Dark Mode</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="divider"><span>AUTOMATION & NOTIFICATIONS</span></div>
+
+                <div class="toggle-card">
+                  <div class="toggle-info">
+                    <i data-lucide="sparkles"></i>
+                    <div>
+                      <strong>Auto-Parse PDF Executive Orders on Upload</strong>
+                      <p>Automatically process uploaded PDF text to pre-fill control number, target, and subject fields.</p>
+                    </div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="autoParseToggle" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="toggle-card">
+                  <div class="toggle-info">
+                    <i data-lucide="bell"></i>
+                    <div>
+                      <strong>Email Notifications for Directives & Orders</strong>
+                      <p>Receive immediate email copy when high-priority memos are issued to your division.</p>
+                    </div>
+                  </div>
+                  <label class="switch">
+                    <input type="checkbox" id="emailNotifToggle" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+
+                <div class="panel-footer">
+                  <button type="submit" class="btn-primary-modal">
+                    <i data-lucide="sliders"></i> Save System Preferences
+                  </button>
+                </div>
+              </form>
             </div>
+          </div>
 
-            <form id="preferencesSettingsForm">
-              <div class="form-grid mb-24">
-                <div class="form-group">
-                  <label for="defaultModule">Default Startup Module</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="layout" class="input-icon"></i>
-                    <select id="defaultModule" class="form-control">
-                      <option value="homepage.html">Dashboard Overview</option>
-                      <option value="Communication.html">Communications Module</option>
-                      <option value="visitorsView.html">Visitor's Logbook</option>
-                      <option value="employee.html">Employee Records</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label for="recordsPerPage">Default Table Display Records</label>
-                  <div class="input-wrapper">
-                    <i data-lucide="list-ordered" class="input-icon"></i>
-                    <select id="recordsPerPage" class="form-control">
-                      <option value="10">10 Rows per page</option>
-                      <option value="25" selected>25 Rows per page</option>
-                      <option value="50">50 Rows per page</option>
-                      <option value="100">100 Rows per page</option>
-                    </select>
-                  </div>
+          <!-- TAB 4: AUDIT & ACTIVITY LOG -->
+          <div class="tab-panel" id="audit-tab">
+            <div class="panel-card">
+              <div class="panel-header">
+                <div>
+                  <h3>Account Audit & Activity Log</h3>
+                  <p>Recent administrative actions, directive logs, and system modifications recorded under your ID.</p>
                 </div>
               </div>
 
-              <div class="security-toggles">
-                <div class="toggle-item">
-                  <div class="toggle-info">
-                    <h4>Incoming Communication Alerts</h4>
-                    <p>Receive immediate alerts when new official documents arrive in the Communications module.</p>
+              <div class="audit-timeline">
+                <div class="audit-item">
+                  <div class="audit-dot green"></div>
+                  <div class="audit-content">
+                    <div class="audit-title-bar">
+                      <strong>Issued Memorandum Control No. 26-234</strong>
+                      <span class="audit-time">May 11, 2026 - 10:38 AM</span>
+                    </div>
+                    <p>Issued directive to HON. SUNDAE E. ALVAREZ regarding Villanueva SWM Reorientation.</p>
                   </div>
-                  <label class="switch">
-                    <input type="checkbox" id="notifyComm" checked>
-                    <span class="slider"></span>
-                  </label>
                 </div>
 
-                <div class="toggle-item">
-                  <div class="toggle-info">
-                    <h4>Low Inventory Stock Warning</h4>
-                    <p>Notify office supply managers when critical office materials drop below reorder thresholds.</p>
+                <div class="audit-item">
+                  <div class="audit-dot blue"></div>
+                  <div class="audit-content">
+                    <div class="audit-title-bar">
+                      <strong>Updated Control No. 26-233 Particulars</strong>
+                      <span class="audit-time">May 07, 2026 - 02:15 PM</span>
+                    </div>
+                    <p>Updated PGSO inspection request details for office accessibility compliance.</p>
                   </div>
-                  <label class="switch">
-                    <input type="checkbox" id="notifyStock" checked>
-                    <span class="slider"></span>
-                  </label>
                 </div>
 
-                <div class="toggle-item">
-                  <div class="toggle-info">
-                    <h4>Visitor Check-In Log Activity</h4>
-                    <p>Display toast alerts on the dashboard when new visitors log into the lobby portal.</p>
+                <div class="audit-item">
+                  <div class="audit-dot gold"></div>
+                  <div class="audit-content">
+                    <div class="audit-title-bar">
+                      <strong>Pinned Priority Directive No. PG ENRO 25-002</strong>
+                      <span class="audit-time">May 06, 2026 - 08:30 AM</span>
+                    </div>
+                    <p>Featured Work Augmentation directive on overview dashboard banner.</p>
                   </div>
-                  <label class="switch">
-                    <input type="checkbox" id="notifyVisitor">
-                    <span class="slider"></span>
-                  </label>
+                </div>
+
+                <div class="audit-item">
+                  <div class="audit-dot green"></div>
+                  <div class="audit-content">
+                    <div class="audit-title-bar">
+                      <strong>System Authentication Success</strong>
+                      <span class="audit-time">May 05, 2026 - 07:45 AM</span>
+                    </div>
+                    <p>Logged in securely via Local Network Subnet 192.168.1.15.</p>
+                  </div>
                 </div>
               </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                  <i data-lucide="sliders"></i> Save System Preferences
-                </button>
-              </div>
-            </form>
+            </div>
           </div>
 
         </div>
-
       </div>
-
-      <!-- FOOTER -->
-      <footer class="footer" id="contact">
-        <div class="footer-container">
-          <div class="footer-brand">
-            <h2>PGENRO IMS</h2>
-            <p>
-              Provincial Government Environment and Natural Resources Office of Quezon Province. Managing resources through stable software architecture.
-            </p>
-          </div>
-
-          <div class="footer-group">
-            <h4>IMS Modules</h4>
-            <div class="footer-links-grid">
-              <a href="homepage.html">Home Monitor</a>
-              <a href="Communication.html">Communications</a>
-              <a href="visitorsView.html">Visitor Logs</a>
-              <a href="Settings.html">Account Settings</a>
-            </div>
-          </div>
-
-          <div class="footer-contact">
-            <h4>Contact Support</h4>
-            <p><strong>Email:</strong> systems@pgenro.gov.ph</p>
-            <p><strong>Location:</strong> PGENRO Building, Lucena City, Quezon Province</p>
-          </div>
-        </div>
-
-        <div class="footer-bottom">
-          <p>&copy; 2025 PGENRO. All Rights Reserved. Province of Quezon.</p>
-        </div>
-      </footer>
     </main>
   </div>
 
-  <!-- Scroll-to-Top Floating Trigger Button -->
-  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll back to top" type="button">
-    <i data-lucide="chevron-up"></i>
-  </button>
-
-  <!-- JS -->
+  <!-- External JavaScript Logic -->
   <script src="Settings.js"></script>
-  <script type="module" src="settingsD.js"></script>
-  
 </body>
 </html>

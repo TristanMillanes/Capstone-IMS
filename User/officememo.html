@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Office Memorandum (Viewer)</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="officememo.css" />
+</head>
+
+<body>
+  <div class="overlay" id="overlay"></div>
+
+  <header class="navbar">
+    <div class="nav-left-container">
+      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle Navigation Menu" type="button">
+        <span></span><span></span><span></span>
+      </button>
+
+      <a href="homepage.html" class="logo-area">
+        <div class="logo-icon">
+          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0';">
+        </div>
+        <div class="logo-text">
+          <h2>Provincial Government</h2>
+          <span>Environment & Natural Resources Office</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="nav-right-container">
+      <div class="system-badge">
+        <span class="badge-pulse"></span>
+        <span class="badge-text">Viewer Access</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <h3>IMS Modules</h3>
+        <p class="sidebar-subtext">Viewer Access</p>
+      </div>
+
+      <nav class="modules-nav">
+        <ul class="modules-list">
+          <li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard Overview</span></a></li>
+          <li><a href="Communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+          <li><a href="travelorder.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+          <li><a href="officememo.html" class="active"><i data-lucide="file-text"></i><span>Office Memo Logs</span></a></li>
+          <li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+          <li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory Records</span></a></li>
+          <li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitor's Logbook</span></a></li>
+          <li><a href="servicerequest.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+          <li><a href="ics.html"><i data-lucide="layers"></i><span>ICS Records</span></a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+      <section class="module-header">
+        <div class="module-title">
+          <div class="title-badge">
+            <i data-lucide="eye"></i> Directives Archive
+          </div>
+          <h1>Office Memorandum Logs</h1>
+          <p>Official repository of memorandums, circulars, and executive issuances.</p>
+        </div>
+        <div class="header-actions">
+          <button class="btn-secondary-modal" onclick="window.print()" type="button">
+            <i data-lucide="printer"></i> Print Registry Log
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI METRIC CARDS -->
+      <section class="memo-kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-icon green"><i data-lucide="files"></i></div>
+          <div class="kpi-info">
+            <h3 id="kpiTotal">0</h3>
+            <p>Total Memos</p>
+          </div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-icon warning"><i data-lucide="pin"></i></div>
+          <div class="kpi-info">
+            <h3 id="kpiPinned">0</h3>
+            <p>Pinned Directives</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SEARCH & FILTER -->
+      <section class="toolbar-card">
+        <div class="search-box">
+          <i data-lucide="search"></i>
+          <input type="text" id="searchInput" placeholder="Search control no., subject, or recipient..." />
+        </div>
+      </section>
+
+      <!-- DATA TABLE -->
+      <section class="table-card">
+        <div class="table-header-info">
+          <h3><i data-lucide="list-filter"></i> Memorandum Registry</h3>
+          <span class="table-subtext">Click the eye icon to preview attachments.</span>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="memo-table">
+            <thead>
+              <tr>
+                <th style="width: 130px;">Control No.</th>
+                <th style="width: 110px;">Date</th>
+                <th style="width: 220px;">Addressed To</th>
+                <th>Subject Matter</th>
+                <th style="width: 200px;">Remarks</th>
+                <th style="width: 90px; text-align: center;">View</th>
+              </tr>
+            </thead>
+            <tbody id="memoTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- PDF VIEWER MODAL -->
+  <div class="modal-backdrop" id="viewMemoModal">
+    <div class="modal-container large">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <div class="modal-header-icon blue"><i data-lucide="file-text"></i></div>
+          <div>
+            <h2 id="viewModalHeaderTitle">Document Viewer</h2>
+            <p>Digital Attachment</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeViewModalBtn" type="button">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div id="pdfViewerContainer" class="pdf-viewer-box">
+          <iframe id="pdfFrame" src="" class="pdf-iframe" title="Document PDF"></iframe>
+          <div id="noPdfMessage" class="no-pdf-placeholder hidden">
+            <div class="no-pdf-icon-wrap"><i data-lucide="file-x-2"></i></div>
+            <h3>No PDF Document Attached</h3>
+            <p>This memorandum record does not have a digital attachment.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary-modal" id="cancelViewModalBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../user-javascript/officememo.js"></script>
+</body>
+</html>
