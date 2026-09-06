@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <title>PGENRO IMS | Visitor'"'"'s Log</title>
+  <title>PGENRO IMS | Visitor Management</title>
 
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -14,31 +13,39 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- CSS -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="visitorsView.css" />
 </head>
 
 <body>
-  <!-- NAVBAR -->
+  <!-- TOP NAVBAR -->
   <header class="navbar">
+    <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle navigation menu">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
     <a href="homepage.html" class="logo-area">
       <div class="logo-icon">
-        <img src="../logo/enro.png" class="logo-image">
+        <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.src='https://via.placeholder.com/50?text=ENRO'">
       </div>
-
-      <div>
+      <div class="logo-text">
         <h2>Provincial Government</h2>
-        <span>Environmental and Natural Resources office</span>
+        <span>Environment and Natural Resources Office</span>
       </div>
     </a>
 
-    <div class="hamburger-menu" id="hamburgerMenu">
-      <span></span>
-      <span></span>
-      <span></span>
+    <div class="nav-right-actions">
+      <span class="system-time" id="liveClock">--:--:--</span>
+      <div class="admin-badge">
+        <i data-lucide="shield-check"></i>
+        <span>IMS Portal</span>
+      </div>
     </div>
   </header>
 
+  <!-- OVERLAY FOR SIDEBAR & DRAWER -->
   <div class="overlay" id="overlay"></div>
 
   <div class="app-layout">
@@ -46,62 +53,62 @@
     <aside class="sidebar" id="sidebar">
       <div class="sidebar-header">
         <h3>IMS Modules</h3>
-        <p>Quick access menu</p>
+        <p>Operational Directory</p>
       </div>
 
       <ul class="modules-list">
         <li>
           <a href="homepage.html">
-            <i data-lucide="home"></i>
-            Dashboard
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
           </a>
         </li>
         <li>
           <a href="Communication.html">
             <i data-lucide="repeat"></i>
-            Incoming/Outgoing Communication
+            <span>Communication Logs</span>
           </a>
         </li>
         <li>
-          <a href="#travel">
+          <a href="travel.html">
             <i data-lucide="map-pin"></i>
-            Travel Order
+            <span>Travel Orders</span>
           </a>
         </li>
         <li>
-          <a href="#memo">
+          <a href="officememo.html">
             <i data-lucide="file-text"></i>
-            Office Memo
+            <span>Office Memos</span>
           </a>
         </li>
         <li>
           <a href="employee.html">
             <i data-lucide="users"></i>
-            Employee Records
+            <span>Employee Records</span>
           </a>
         </li>
         <li>
-          <a href="#inventory">
+          <a href="inventory.html">
             <i data-lucide="box"></i>
-            Inventory
+            <span>Inventory</span>
           </a>
         </li>
         <li>
-          <a href="visitorslog.html" class="active">
+          <a href="visitorsView.html" class="active">
             <i data-lucide="user-check"></i>
-            Visitors Log
+            <span>Visitors Log</span>
           </a>
         </li>
         <li>
-          <a href="#service">
+          <a href="service.html">
             <i data-lucide="wrench"></i>
-            Service Request
+            <span>Service Requests</span>
           </a>
         </li>
         <li>
-          <a href="#ics">
+          <a href="ICS.html">
             <i data-lucide="clipboard-list"></i>
-            ICS
+            <span>Property & ICS</span>
           </a>
         </li>
       </ul>
@@ -109,127 +116,209 @@
 
     <!-- MAIN CONTENT -->
     <main class="main-content">
+      <!-- HEADER -->
       <section class="page-header">
-        <span class="page-badge">
-          <i data-lucide="user-check"></i>
-          Visitor Log Module
-        </span>
-        <h1>Visitor Records and Visit Details</h1>
-        <p>View today's visitors, filter by purpose, and inspect full visit details. Records are stored in Firebase Realtime Database (localStorage fallback).</p>
+        <div class="header-content">
+          <span class="page-badge">
+            <i data-lucide="user-check"></i> Public Relations & Security Desk
+          </span>
+          <h1>Visitor Logbook & Manifest</h1>
+          <p>Real-time audit log of public guests, visiting delegations, and service transactions in PGENRO.</p>
+        </div>
+
+        <div class="header-quick-actions">
+          <button class="btn btn-secondary" id="exportCsvBtn">
+            <i data-lucide="download"></i> Export CSV
+          </button>
+          <button class="btn btn-primary" id="refreshBtn">
+            <i data-lucide="refresh-cw"></i> Sync Data
+          </button>
+        </div>
       </section>
 
-      <section class="content-grid">
-        <div class="stats-section">
-          <div class="stat-card">
+      <!-- KPI METRICS -->
+      <section class="stats-section">
+        <div class="stat-card">
+          <div class="stat-icon icon-primary">
             <i data-lucide="users"></i>
-            <div>
-              <p>Total Visitors</p>
-              <h2 id="summaryTotal">0</h2>
-            </div>
           </div>
-
-          <div class="stat-card">
-            <i data-lucide="calendar"></i>
-            <div>
-              <p>Today'"'"'s Visits</p>
-              <h2 id="summaryToday">0</h2>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <i data-lucide="filter"></i>
-            <div>
-              <p>Current Filter</p>
-              <h2 id="summaryFilter">All</h2>
-            </div>
+          <div class="stat-info">
+            <p>Total Records</p>
+            <h2 id="summaryTotal">0</h2>
+            <span class="stat-meta">Accumulated visits</span>
           </div>
         </div>
 
-        <div class="visitors-section">
-          <div class="section-header">
-            <h2>Visitor Records</h2>
-            <p>Browse, search, and filter visitor entries.</p>
+        <div class="stat-card">
+          <div class="stat-icon icon-today">
+            <i data-lucide="calendar-clock"></i>
+          </div>
+          <div class="stat-info">
+            <p>Today's Arrivals</p>
+            <h2 id="summaryToday">0</h2>
+            <span class="stat-meta" id="todayDateStr">Current Date</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon icon-active">
+            <i data-lucide="activity"></i>
+          </div>
+          <div class="stat-info">
+            <p>Currently In-Building</p>
+            <h2 id="summaryInside">0</h2>
+            <span class="stat-meta text-emerald">Active passes</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- DATA SECTION -->
+      <section class="visitors-section">
+        <div class="section-toolbar">
+          <div class="date-filter-group">
+            <button class="date-chip active" data-range="all">All Dates</button>
+            <button class="date-chip" data-range="today">Today</button>
+            <button class="date-chip" data-range="week">This Week</button>
           </div>
 
-          <div class="search-filter">
+          <div class="search-filter-row">
             <div class="search-field">
               <i data-lucide="search"></i>
-              <input id="visitorSearch" type="search" placeholder="Search by name, contact, purpose..." aria-label="Search visitors" />
+              <input id="visitorSearch" type="search" placeholder="Search visitor name, purpose, office..." autocomplete="off" />
             </div>
 
-            <select id="visitorFilter" class="filter-select" aria-label="Filter visitors by purpose">
-              <option value="all">Filter by purpose</option>
+            <select id="purposeFilter" class="filter-select" aria-label="Filter by purpose">
+              <option value="all">All Purposes</option>
               <option value="Request for Speaker">Request for Speaker</option>
               <option value="I.E.C - Request for Information">I.E.C - Request for Information</option>
-              <option value="Environmental Concerns - Water Quality">Environmental Concerns - Water Quality</option>
-              <option value="Technical Assistance - WACS">Technical Assistance - WACS</option>
-              <option value="Other Service not listed">Other Service not listed</option>
+              <option value="Environmental Concerns - Water Quality">Water Quality Concerns</option>
+              <option value="Technical Assistance - WACS">Technical Assistance (WACS)</option>
+              <option value="Other Service not listed">Other Inquiries</option>
+            </select>
+
+            <select id="statusFilter" class="filter-select" aria-label="Filter by status">
+              <option value="all">All Statuses</option>
+              <option value="inside">Currently Inside</option>
+              <option value="completed">Completed / Signed Out</option>
             </select>
           </div>
+        </div>
 
-          <div class="table-wrapper">
-            <table class="visitor-table" aria-label="Visitor table">
-              <thead>
-                <tr>
-                  <th>Visitor</th>
-                  <th>When</th>
-                  <th>Purpose</th>
-                  <th>Visiting</th>
-                </tr>
-              </thead>
-              <tbody id="visitorTableBody"></tbody>
-            </table>
-          </div>
+        <!-- TABLE -->
+        <div class="table-wrapper">
+          <table class="visitor-table" id="visitorTable">
+            <thead>
+              <tr>
+                <th>Visitor Profile</th>
+                <th>Contact & Address</th>
+                <th>Person / Dept To Visit</th>
+                <th>Purpose Category</th>
+                <th>Time In / Date</th>
+                <th>Status</th>
+                <th style="text-align: right;">Action</th>
+              </tr>
+            </thead>
+            <tbody id="visitorTableBody">
+              <!-- Dynamically injected rows -->
+            </tbody>
+          </table>
 
           <div id="emptyState" class="empty-state hidden">
-            <p>No visitor records found.</p>
-            <small>Try clearing the filter or search.</small>
+            <div class="empty-icon"><i data-lucide="user-x"></i></div>
+            <p>No visitor logs match your search or filter criteria.</p>
+            <small>Reset filters or try searching for a different keyword.</small>
+          </div>
+        </div>
+
+        <!-- TABLE FOOTER -->
+        <div class="table-footer">
+          <span id="showingCountText">Showing 0 entries</span>
+          <div class="pagination-controls">
+            <button id="prevPageBtn" class="btn-page" disabled><i data-lucide="chevron-left"></i></button>
+            <span id="pageIndicator">1 / 1</span>
+            <button id="nextPageBtn" class="btn-page" disabled><i data-lucide="chevron-right"></i></button>
           </div>
         </div>
       </section>
-
-      <div id="detailPanel" class="detail-panel hidden" aria-live="polite">
-        <h3 id="detailTitle">Visitor Details</h3>
-        <div class="detail-grid">
-          <div class="detail-item">
-            <span>Full Name</span>
-            <strong id="detailName">—</strong>
-          </div>
-          <div class="detail-item">
-            <span>Contact</span>
-            <strong id="detailContact">—</strong>
-          </div>
-          <div class="detail-item">
-            <span>Address / Agency</span>
-            <strong id="detailAddress">—</strong>
-          </div>
-          <div class="detail-item">
-            <span>Person / Department</span>
-            <strong id="detailPerson">—</strong>
-          </div>
-          <div class="detail-item">
-            <span>Visit Purpose</span>
-            <strong id="detailPurpose">—</strong>
-          </div>
-          <div class="detail-item">
-            <span>Date & Time</span>
-            <strong id="detailWhen">—</strong>
-          </div>
-        </div>
-      </div>
     </main>
   </div>
 
+  <!-- SLIDE-OVER DETAIL DRAWER -->
+  <aside class="detail-drawer" id="detailDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title-group">
+        <span class="drawer-tag">Visitor Information</span>
+        <h3 id="drawerName">Guest Name</h3>
+      </div>
+      <button class="drawer-close-btn" id="closeDrawerBtn" aria-label="Close drawer">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="visitor-avatar-card">
+        <div class="visitor-lg-avatar" id="drawerAvatar">JD</div>
+        <div class="avatar-info">
+          <h4 id="drawerFullname">—</h4>
+          <span class="badge" id="drawerStatusBadge">Checked In</span>
+        </div>
+      </div>
+
+      <div class="drawer-info-grid">
+        <div class="info-group">
+          <label><i data-lucide="phone"></i> Contact Number</label>
+          <p id="drawerContact">—</p>
+        </div>
+
+        <div class="info-group">
+          <label><i data-lucide="map-pin"></i> Address / Agency</label>
+          <p id="drawerAddress">—</p>
+        </div>
+
+        <div class="info-group">
+          <label><i data-lucide="briefcase"></i> Person / Office Visiting</label>
+          <p id="drawerPerson">—</p>
+        </div>
+
+        <div class="info-group">
+          <label><i data-lucide="tag"></i> Purpose Category</label>
+          <p id="drawerPurpose">—</p>
+        </div>
+
+        <div class="info-group full-width">
+          <label><i data-lucide="clock"></i> Timeline Record</label>
+          <div class="timeline-box">
+            <div>
+              <span>Arrival Time:</span>
+              <strong id="drawerTimeIn">—</strong>
+            </div>
+            <div>
+              <span>Date:</span>
+              <strong id="drawerDate">—</strong>
+            </div>
+            <div>
+              <span>Checkout Time:</span>
+              <strong id="drawerTimeOut">Still Inside</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn btn-secondary" id="printPassBtn">
+        <i data-lucide="printer"></i> Print Pass
+      </button>
+      <button class="btn btn-success" id="toggleCheckoutBtn">
+        <i data-lucide="check-circle"></i> Mark Departure
+      </button>
+    </div>
+  </aside>
+
+  <!-- FIREBASE & APPLICATION LOGIC -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
   <script src="../VisitorsLog/visitorsData.js"></script>
-  <script>
-    // Small check to ensure Firebase DB is available for the visitor view
-    if (window.firebaseDB) {
-      console.log('Realtime DB available for visitors view');
-    }
-  </script>
-
   <script src="visitorsView.js"></script>
 </body>
 </html>
