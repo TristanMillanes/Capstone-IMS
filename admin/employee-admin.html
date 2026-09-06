@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Admin Personnel Records</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="employee-admin.css" />
+</head>
+<body>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="../admin/homepage.html" class="logo-area" aria-label="PGENRO IMS Dashboard">
+        <div class="logo-icon">
+          <img src="../logo/enro.png" alt="PGENRO Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+          <i data-lucide="shield-check" style="display:none"></i>
+        </div>
+        <div class="logo-text">
+          <h2>PGENRO IMS</h2>
+          <span>Admin Control Center</span>
+        </div>
+      </a>
+      <button class="icon-btn sidebar-toggle" id="sidebarCollapseBtn" type="button" title="Close Menu">
+        <i data-lucide="panel-left-close"></i>
+      </button>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Main administration">
+      <div class="nav-group">
+        <span class="nav-label">Main Panel</span>
+        <ul>
+          <li><a href="admin.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+          <li><a href="dmincommunication.html" class="nav-item"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+          <li><a href="../admin/travelorder.html" class="nav-item"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
+          <li><a href="../User/officememo.html" class="nav-item"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+          <li><a href="#" class="nav-item active" aria-current="page"><i data-lucide="users"></i><span>Employee Profiles</span></a></li>
+          <li><a href="../admin/invetoryadmin.html" class="nav-item"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
+          <li><a href="../User/visitorsView.html" class="nav-item"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+          <li><a href="../admin/serviceAdmin.html" class="nav-item"><i data-lucide="wrench"></i><span>Service Requests</span><span class="nav-badge emerald">0 Open</span></a></li>
+          <li><a href="../User/ics.html" class="nav-item"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+        </ul> 
+      </div>
+      <div class="nav-group">
+        <span class="nav-label">User &amp; System Control</span>
+        <ul>
+          <li><a href="Usermanagement.html" class="nav-item"><i data-lucide="users"></i><span>User Management</span></a></li>
+          <li><a href="../admin/requestACC.html" class="nav-item"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge emerald">0 New</span></a></li>
+          <li><a href="#" class="nav-item"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+          <li><a href="#" class="nav-item"><i data-lucide="database"></i><span>System Backups</span></a></li>
+          <li><a href="#" class="nav-item"><i data-lucide="settings"></i><span>Global Settings</span></a></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="system-status-indicator">
+        <span class="status-dot" id="statusDot"></span>
+        <div>
+          <span class="status-title">Supabase Database</span>
+          <span class="status-sub" id="statusText">Checking connection...</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN WRAPPER -->
+  <div class="main-wrapper">
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="mobile-menu-btn icon-btn" id="mobileMenuBtn" type="button" aria-label="Toggle Navigation">
+          <i data-lucide="menu"></i>
+        </button>
+        <div class="global-search">
+          <i data-lucide="search"></i>
+          <input id="globalSearch" type="search" placeholder="Search employee name, ID, position, or division... (Ctrl + K)" autocomplete="off">
+          <kbd>Ctrl K</kbd>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="icon-btn" id="refreshBtn" type="button" title="Refresh Directory">
+          <i data-lucide="refresh-cw"></i>
+        </button>
+        <div class="profile">
+          <div class="avatar"><i data-lucide="shield-check"></i></div>
+          <div class="profile-text">
+            <b id="adminName">Admin User</b>
+            <small>HR Administrator</small>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <!-- HERO HEADER -->
+      <section class="page-header">
+        <div>
+          <div class="breadcrumb">
+            <span>Admin Console</span>
+            <i data-lucide="chevron-right"></i>
+            <span>Human Resource &amp; Personnel</span>
+          </div>
+          <div class="eyebrow">
+            <i data-lucide="users"></i>
+            ADMIN PERSONNEL MANAGEMENT
+          </div>
+          <h1>Employee Records &amp; Directory</h1>
+          <p>Maintain plantilla positions, encode employment contracts, inspect complete 201 dossiers, and regulate duty statuses across divisions.</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="secondary-btn light" id="exportBtn" type="button">
+            <i data-lucide="download"></i>
+            Export CSV
+          </button>
+          <button class="primary-btn large" id="addEmployeeBtn" type="button">
+            <i data-lucide="user-plus"></i>
+            Add New Employee
+          </button>
+        </div>
+      </section>
+
+      <!-- KPI METRICS GRID -->
+      <section class="metrics-grid" aria-label="Workforce summary">
+        <div class="metric-card">
+          <div class="metric-icon total-icon"><i data-lucide="users"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">Total Strength</span>
+            <h3 id="metricTotal">0</h3>
+            <span class="metric-sub">Registered Staff</span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon active-icon"><i data-lucide="user-check"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">Active Duty</span>
+            <h3 id="metricActive">0</h3>
+            <span class="metric-sub" id="metricActivePct">0% of workforce</span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon leave-icon"><i data-lucide="plane"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">On Leave</span>
+            <h3 id="metricLeave">0</h3>
+            <span class="metric-sub">Official Leave / Travel</span>
+          </div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon dept-icon"><i data-lucide="building-2"></i></div>
+          <div class="metric-info">
+            <span class="metric-label">Operating Units</span>
+            <h3 id="metricDepts">0</h3>
+            <span class="metric-sub">Divisions &amp; Units</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- FILTER & TOOLBAR PANEL -->
+      <div class="toolbar-container">
+        <div class="toolbar-search-filters">
+          <div class="search-box">
+            <i data-lucide="search" class="search-icon"></i>
+            <input type="text" id="searchInput" placeholder="Search by name, ID, position, or item code..." autocomplete="off">
+          </div>
+          
+          <div class="filter-group">
+            <div class="select-wrapper">
+              <i data-lucide="briefcase" class="select-icon"></i>
+              <select id="filterEmploymentType" class="filter-select">
+                <option value="">All Employment Types</option>
+                <option value="PERMANENT">Permanent</option>
+                <option value="CASUAL">Casual</option>
+                <option value="JOB ORDER">Job Order</option>
+                <option value="CONTRACTUAL">Contractual</option>
+                <option value="CO-TERMINUS">Co-Terminus</option>
+              </select>
+            </div>
+            <div class="select-wrapper">
+              <i data-lucide="building" class="select-icon"></i>
+              <select id="filterDepartment" class="filter-select">
+                <option value="">All Divisions</option>
+              </select>
+            </div>
+            <div class="select-wrapper">
+              <i data-lucide="activity" class="select-icon"></i>
+              <select id="filterStatus" class="filter-select">
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="On Leave">On Leave</option>
+                <option value="Inactive">Inactive / Separated</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN TABLE SECTION -->
+      <section class="panel">
+        <div class="panel-header">
+          <div>
+            <h2>Personnel Directory</h2>
+            <p>Full staff records list. Click on any record to inspect dossiers or perform updates.</p>
+          </div>
+          <span class="row-counter" id="recordCounter">Showing 0 Staff</span>
+        </div>
+
+        <div class="table-wrap">
+          <table id="employeeDirectoryTable">
+            <thead>
+              <tr>
+                <th style="width: 120px;">Employee ID</th>
+                <th>Employee Name</th>
+                <th>Designation / Plantilla</th>
+                <th>Employment Type</th>
+                <th>Division / Unit</th>
+                <th>Contact &amp; Email</th>
+                <th>Duty Status</th>
+                <th style="text-align: right; width: 140px;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="employeeTable">
+              <tr><td colspan="8" class="empty">Loading personnel records...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <footer>
+        &copy; 2026 Provincial Government Environment and Natural Resources Office (PGENRO). HR Administration.
+      </footer>
+    </main>
+  </div>
+</div>
+
+<!-- ADD / EDIT EMPLOYEE MODAL -->
+<div class="modal-backdrop" id="employeeFormModal">
+  <div class="modal large-modal">
+    <div class="modal-head">
+      <div>
+        <span class="modal-kicker">HR MASTERFILE</span>
+        <h2 id="employeeModalTitle">Add New Employee</h2>
+      </div>
+      <button class="icon-btn close" data-close="employeeFormModal" type="button"><i data-lucide="x"></i></button>
+    </div>
+    <form id="employeeForm">
+      <input type="hidden" id="empDbId">
+
+      <div class="form-section-title">
+        <i data-lucide="user"></i> Personal Information
+      </div>
+      <div class="form-grid three">
+        <label>
+          Employee ID No. *
+          <input id="empId" placeholder="e.g. EMP-2026-001" required>
+        </label>
+        <label>
+          First Name *
+          <input id="empFirstName" placeholder="Juan" required>
+        </label>
+        <label>
+          Middle Name
+          <input id="empMiddleName" placeholder="Santos">
+        </label>
+        <label>
+          Last Name *
+          <input id="empLastName" placeholder="Dela Cruz" required>
+        </label>
+        <label>
+          Name Extension
+          <input id="empExtension" placeholder="Jr., III, etc.">
+        </label>
+        <label>
+          Gender *
+          <select id="empGender" required>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </label>
+        <label>
+          Birth Date
+          <input id="empDob" type="date">
+        </label>
+        <label>
+          Civil Status
+          <select id="empCivilStatus">
+            <option value="Single">Single</option>
+            <option value="Married">Married</option>
+            <option value="Widowed">Widowed</option>
+            <option value="Separated">Separated</option>
+          </select>
+        </label>
+        <label>
+          Blood Type
+          <input id="empBloodType" placeholder="e.g. O+, A+, B+">
+        </label>
+        <label class="full">
+          Birth Place
+          <input id="empPob" placeholder="Municipality / City, Province">
+        </label>
+      </div>
+
+      <div class="form-section-title" style="margin-top: 18px;">
+        <i data-lucide="briefcase"></i> Work &amp; Assignment Details
+      </div>
+      <div class="form-grid three">
+        <label>
+          Designation / Position *
+          <input id="empDesignation" placeholder="e.g. Environmental Management Specialist II" required>
+        </label>
+        <label>
+          Division / Unit *
+          <input id="empDepartment" list="deptDatalist" placeholder="Select or type unit" required>
+          <datalist id="deptDatalist">
+            <option value="Office of the Provincial ENR Officer">
+            <option value="Administrative & Support Services">
+            <option value="Forest Management Unit">
+            <option value="Coastal & Marine Resources Division">
+            <option value="Environmental Management & Pollution Control">
+            <option value="Mines & Geosciences Development">
+            <option value="Protected Areas & Biodiversity">
+          </datalist>
+        </label>
+        <label>
+          Employment Status *
+          <select id="empStatusType" required>
+            <option value="PERMANENT">Permanent</option>
+            <option value="CASUAL">Casual</option>
+            <option value="JOB ORDER">Job Order</option>
+            <option value="CONTRACTUAL">Contractual</option>
+            <option value="CO-TERMINUS">Co-Terminus</option>
+          </select>
+        </label>
+        <label>
+          Item Number
+          <input id="empItemCode" placeholder="e.g. EMS-2-004">
+        </label>
+        <label>
+          Date Employed
+          <input id="empDateEmployed" type="date">
+        </label>
+        <label>
+          Salary Grade &amp; Step
+          <input id="empSalaryGrade" placeholder="e.g. SG 15 - Step 1">
+        </label>
+        <label>
+          Duty Status *
+          <select id="empDutyStatus" required>
+            <option value="Active">Active</option>
+            <option value="On Leave">On Leave</option>
+            <option value="Inactive">Inactive / Separated</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="form-section-title" style="margin-top: 18px;">
+        <i data-lucide="phone"></i> Contact &amp; Residential Address
+      </div>
+      <div class="form-grid two">
+        <label>
+          Contact Mobile No.
+          <input id="empMobile" placeholder="e.g. 0917-000-0000">
+        </label>
+        <label>
+          Official / Active Email
+          <input id="empEmail" type="email" placeholder="e.g. juan.delacruz@pgenro.gov.ph">
+        </label>
+        <label class="full">
+          Residential Address
+          <textarea id="empAddress" placeholder="Barangay, Municipality / City, Province"></textarea>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="secondary-btn" data-close="employeeFormModal">Cancel</button>
+        <button class="primary-btn" id="saveEmployeeBtn" type="submit">
+          <i data-lucide="save"></i>Save Record
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- READ & PRINT PROFILE DOSSIER (201 FOLDER) MODAL -->
+<div class="modal-backdrop" id="profileModal">
+  <div class="modal large-modal">
+    <div class="modal-head">
+      <div class="profile-head-info">
+        <div class="profile-avatar large" id="viewAvatar">--</div>
+        <div>
+          <span class="modal-kicker">PERSONNEL 201 DOSSIER</span>
+          <h2 id="viewHeadingName">Employee Profile</h2>
+          <span class="badge" id="viewPillStatus">Active</span>
+        </div>
+      </div>
+      <div class="header-action-buttons">
+        <button type="button" class="secondary-btn" id="printDossierBtn" title="Print 201 Sheet">
+          <i data-lucide="printer"></i>Print 201 File
+        </button>
+        <button type="button" class="icon-btn close" data-close="profileModal">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-body-pad" id="printArea">
+      <div class="profile-dossier-grid">
+        
+        <!-- PERSONAL -->
+        <div class="dossier-card">
+          <div class="dossier-card-header"><i data-lucide="user"></i> Personal Profile</div>
+          <div class="dossier-grid-items">
+            <div class="d-item"><span class="d-lbl">ID Number</span><span class="d-val" id="v_id">—</span></div>
+            <div class="d-item"><span class="d-lbl">Full Name</span><span class="d-val" id="v_name">—</span></div>
+            <div class="d-item"><span class="d-lbl">Date of Birth</span><span class="d-val" id="v_dob">—</span></div>
+            <div class="d-item"><span class="d-lbl">Gender</span><span class="d-val" id="v_gender">—</span></div>
+            <div class="d-item"><span class="d-lbl">Civil Status</span><span class="d-val" id="v_civil">—</span></div>
+            <div class="d-item"><span class="d-lbl">Blood Type</span><span class="d-val" id="v_blood">—</span></div>
+            <div class="d-item span-d-2"><span class="d-lbl">Place of Birth</span><span class="d-val" id="v_pob">—</span></div>
+          </div>
+        </div>
+
+        <!-- WORK -->
+        <div class="dossier-card">
+          <div class="dossier-card-header"><i data-lucide="briefcase"></i> Plantilla &amp; Assignment</div>
+          <div class="dossier-grid-items">
+            <div class="d-item"><span class="d-lbl">Designation</span><span class="d-val" id="v_desig">—</span></div>
+            <div class="d-item"><span class="d-lbl">Employment Type</span><span class="d-val" id="v_emp_status">—</span></div>
+            <div class="d-item"><span class="d-lbl">Division / Unit</span><span class="d-val" id="v_dept">—</span></div>
+            <div class="d-item"><span class="d-lbl">Item Code</span><span class="d-val" id="v_item">—</span></div>
+            <div class="d-item"><span class="d-lbl">Date Employed</span><span class="d-val" id="v_date_employed">—</span></div>
+            <div class="d-item"><span class="d-lbl">Salary Grade</span><span class="d-val" id="v_salary_gradestep">—</span></div>
+          </div>
+        </div>
+
+        <!-- CONTACT -->
+        <div class="dossier-card">
+          <div class="dossier-card-header"><i data-lucide="phone-call"></i> Contact Channels</div>
+          <div class="dossier-grid-items">
+            <div class="d-item"><span class="d-lbl">Mobile Phone</span><span class="d-val" id="v_mobile">—</span></div>
+            <div class="d-item"><span class="d-lbl">Official Email</span><span class="d-val" id="v_email">—</span></div>
+          </div>
+        </div>
+
+        <!-- RESIDENCE -->
+        <div class="dossier-card">
+          <div class="dossier-card-header"><i data-lucide="map-pin"></i> Permanent Residence</div>
+          <div class="dossier-grid-items">
+            <div class="d-item span-d-2"><span class="d-lbl">Complete Address</span><span class="d-val" id="v_address">—</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-actions" style="margin-top: 20px;">
+        <button type="button" class="secondary-btn" id="dossierEditBtn">
+          <i data-lucide="pencil"></i>Edit This Profile
+        </button>
+        <button type="button" class="primary-btn" data-close="profileModal">
+          Close Dossier
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- MAIN SCRIPT -->
+<script type="module" src="../admin-javascript/employee-admin.js"></script>
+</body>
+</html>

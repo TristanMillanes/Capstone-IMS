@@ -1,7 +1,7 @@
 {
     "editor.tabSize": 1,
     "editor.formatOnSave": false,
-    "workbench.colorTheme": "Tomorrow Night Blue",
+    "workbench.colorTheme": "MacOS Modern Dark - Xcode Modern",
     "editor.mouseWheelZoom": true,
     "editor.formatOnPaste": false,
     "background.smoothImageRendering": true

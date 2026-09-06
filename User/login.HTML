@@ -3,248 +3,268 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PGENRO IMS | Secure Enterprise Gateway</title>
+    <meta name="theme-color" content="#031409">
+    <meta name="description" content="PGENRO IMS — Provincial Government Environment and Natural Resources Office of Quezon">
+    <title>PGENRO IMS — Secure Personnel Portal</title>
 
-    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    
-    <!-- Stylesheet -->
     <link rel="stylesheet" href="login.css">
 </head>
+
 <body>
+    <!-- ================================================================
+         ENVIRONMENTAL CANOPY BACKGROUND
+         ================================================================ -->
+    <div class="canopy-canvas" id="canopyCanvas" aria-hidden="true">
+        <div class="ambient-gradient"></div>
+        <div class="mist-layer mist-1"></div>
+        <div class="mist-layer mist-2"></div>
+        <div class="mist-layer mist-3"></div>
 
-    <!-- Ambient Visual Depth Layers -->
-    <div class="light-grid-overlay" aria-hidden="true"></div>
-    <div class="botanical-noise" aria-hidden="true"></div>
-    <div class="ambient-glow-orb orb-primary" aria-hidden="true"></div>
-    <div class="ambient-glow-orb orb-secondary" aria-hidden="true"></div>
-    <div class="ambient-sunburst" id="sunburstGlow" aria-hidden="true"></div>
-    
-    <!-- Interactive Spore/Constellation Background Canvas -->
-    <canvas id="forestCanvas" aria-hidden="true"></canvas>
+        <div class="canopy-sunbeam beam-left"></div>
+        <div class="canopy-sunbeam beam-right"></div>
 
-    <!-- Split-Screen Gateway Viewport -->
-    <div class="gateway-viewport-wrapper">
-        
-        <!-- Left Column: Command & Branding Overview -->
-        <section class="branding-panel">
-            <div class="branding-content">
-                
-                <!-- System Status Capsule -->
-                <div class="status-capsule">
-                    <span class="pulse-dot"></span>
-                    <span class="capsule-text">PGENRO SECURE NODE &bull; ONLINE</span>
-                </div>
+        <div class="glow-orb orb-foliage"></div>
+        <div class="glow-orb orb-emerald"></div>
+        <div class="glow-orb orb-gold"></div>
 
-                <!-- Dual Authority Badges -->
-                <div class="brand-logo-cluster">
-                    <div class="brand-logo-wrapper logo-primary" title="Provincial Government of Quezon">
-                        <img src="../logo/quezonLLOGO.png" alt="Provincial Government of Quezon Emblem" class="brand-logo-img" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
-                        <i data-lucide="award" class="brand-fallback-icon"></i>
+        <div class="leaf-field leaf-field-a"></div>
+        <div class="leaf-field leaf-field-b"></div>
+        <div class="falling-leaves" id="fallingLeaves"></div>
+        <div class="rain-layer"></div>
+        <div class="light-particles"></div>
+
+        <div class="canopy-grid"></div>
+        <div class="canopy-vignette"></div>
+        <div class="canopy-noise"></div>
+        <div class="cursor-glow"></div>
+    </div>
+
+    <!-- ================================================================
+         MAIN VIEWPORT
+         ================================================================ -->
+    <main class="portal-viewport">
+        <div class="portal-container">
+
+            <!-- ========================================================
+                 LEFT: PROVINCIAL IDENTITY & EDITORIAL
+                 ======================================================== -->
+            <section class="brand-showcase" aria-labelledby="portalTitle">
+                <!-- Dual Official Seals Container -->
+                <header class="brand-header">
+                    <div class="dual-seal-frame">
+                        <!-- PGENRO Logo -->
+                        <div class="seal-container" title="Provincial Environment and Natural Resources Office">
+                            <img
+                                src="../logo/enro.png"
+                                alt="PGENRO Official Seal"
+                                class="seal-img"
+                                onerror="this.style.display='none'; this.parentElement.classList.add('fallback-mode')"
+                            >
+                            <span class="seal-fallback">PGENRO</span>
+                        </div>
+
+                        <div class="seal-divider" aria-hidden="true"></div>
+
+                        <!-- Quezon Province Logo -->
+                        <div class="seal-container" title="Provincial Government of Quezon">
+                            <img
+                                src="../logo/Quezonlogo.png"
+                                alt="Provincial Government of Quezon Seal"
+                                class="seal-img"
+                                onerror="this.src='logo/quezonLLOGO.png'; this.onerror=function(){this.style.display='none'; this.parentElement.classList.add('fallback-mode')}"
+                            >
+                            <span class="seal-fallback">QUEZON</span>
+                        </div>
                     </div>
-                    <div class="brand-logo-divider">
-                        <span></span>
-                    </div>
-                    <div class="brand-logo-wrapper logo-secondary" title="ENRO Office">
-                        <img src="../logo/enro.png" alt="PGENRO Emblem" class="brand-logo-img" onload="this.nextElementSibling.style.display='none';" onerror="this.style.display='none';">
-                        <i data-lucide="leaf" class="brand-fallback-icon"></i>
-                    </div>
-                </div>
+                </header>
 
-                <div class="brand-text-block">
-                    <span class="brand-eyebrow">Provincial Government of Quezon</span>
-                    <h1 class="brand-title">PGENRO <span class="accent-title">IMS</span></h1>
-                    <p class="brand-subheading">Provincial Government Environment and Natural Resources Office</p>
-                    <p class="brand-description">
-                        Unified terminal for forestry compliance, quarry permitting, environmental monitoring, and provincial natural reserve intelligence.
+                <!-- Hero Section -->
+                <div class="brand-core">
+                    <div class="agency-tag">
+                        <span class="leaf-dot"></span>
+                        <span>PROVINCIAL GOVERNMENT OF QUEZON</span>
+                    </div>
+
+                    <h1 id="portalTitle" class="portal-title">
+                        PGENRO
+                        <span class="portal-title-sub">Information Management System</span>
+                    </h1>
+
+                    <p class="portal-description">
+                        The official unified digital platform of Quezon Province for environmental governance, natural resource records administration, regulatory clearances, and personnel operations.
                     </p>
-                </div>
 
-                <!-- Feature Metric Pills -->
-                <div class="system-highlights">
-                    <div class="highlight-item">
-                        <i data-lucide="shield-check" class="highlight-icon"></i>
-                        <div>
-                            <strong>AES-256</strong>
-                            <span>Clearance Protocol</span>
-                        </div>
-                    </div>
-                    <div class="highlight-item">
-                        <i data-lucide="cpu" class="highlight-icon"></i>
-                        <div>
-                            <strong>Real-Time</strong>
-                            <span>Audit Telemetry</span>
-                        </div>
+                    <div class="nature-quote">
+                        <i data-lucide="sprout" class="quote-icon"></i>
+                        <span>Dedicated to the conservation, protection, and sustainable management of Quezon’s natural heritage.</span>
                     </div>
                 </div>
 
-                <!-- Live Interface Typist Feed -->
-                <div class="typist-status-pill">
-                    <span class="terminal-prefix">&gt;_</span>
-                    <span class="typist-text" id="typingText">INITIALIZING SECURITY</span>
-                    <span class="typist-cursor">|</span>
-                </div>
-            </div>
-        </section>
+                <!-- Footer Time Display -->
+                <footer class="brand-footer">
+                    <div class="time-widget">
+                        <i data-lucide="clock" class="time-icon"></i>
+                        <div>
+                            <span class="time-label">Philippine Standard Time</span>
+                            <strong id="phTimeDisplay" class="time-text">PST (GMT+8) • Synchronizing...</strong>
+                        </div>
+                    </div>
+                    <span class="version-tag">Enterprise Portal v2.4</span>
+                </footer>
+            </section>
 
-        <!-- Right Column: Interactive Login Console -->
-        <section class="form-panel">
-            <main class="gateway-container">
-                <div class="interactive-light-card" id="interactiveCard">
-                    
-                    <!-- Dynamic Verification Telemetry Handshake Overlay -->
-                    <div class="loading-overlay" id="loadingOverlay" aria-live="assertive" aria-hidden="true">
-                        <div class="loading-content">
-                            <div class="spinner-container">
-                                <div class="spinner-core">
-                                    <i data-lucide="shield" class="spinner-icon-base"></i>
-                                </div>
-                                <div class="spinner-ring"></div>
-                                <div class="spinner-pulse"></div>
+            <!-- ========================================================
+                 RIGHT: FROSTED GLASS LOGIN CARD
+                 ======================================================== -->
+            <section class="auth-wrapper" aria-label="Personnel Sign-in Form">
+                <div class="glass-login-card" id="interactiveCard">
+
+                    <!-- Mobile Seal Branding (Shown on Smartphones) -->
+                    <div class="mobile-seal-header">
+                        <img src="logo/enro.png" alt="PGENRO Logo" class="mobile-logo">
+                        <div>
+                            <strong>PGENRO IMS</strong>
+                            <span>Provincial Government of Quezon</span>
+                        </div>
+                    </div>
+
+                    <!-- Header -->
+                    <div class="card-header">
+                        <div class="header-badge-icon">
+                            <i data-lucide="shield-check"></i>
+                        </div>
+                        <div>
+                            <h2>Personnel Login</h2>
+                            <p>Enter your authorized credentials to access your workspace.</p>
+                        </div>
+                    </div>
+
+                    <!-- Alerts & Messages -->
+                    <div id="messageBox" class="message-box" role="alert" aria-live="assertive"></div>
+
+                    <!-- Loading Screen -->
+                    <div class="loading-overlay" id="loadingOverlay" aria-live="polite" aria-hidden="true">
+                        <div class="loading-modal">
+                            <div class="loading-spinner-box">
+                                <div class="spinner-track"></div>
+                                <div class="spinner-center"><i data-lucide="leaf"></i></div>
                             </div>
-                            <h3 id="loadingStatusHeading">Authenticating Node</h3>
-                            <p id="loadingStatusText">Establishing terminal handshake...</p>
-                            
-                            <!-- Telemetry Checklist -->
-                            <div class="telemetry-checklist">
-                                <div class="telemetry-item" id="telemetryCheck1">
-                                    <span class="telemetry-dot"></span>
-                                    <span class="telemetry-label">Establishing secure TLS channel</span>
-                                </div>
-                                <div class="telemetry-item" id="telemetryCheck2">
-                                    <span class="telemetry-dot"></span>
-                                    <span class="telemetry-label">Verifying clearance credentials</span>
-                                </div>
-                                <div class="telemetry-item" id="telemetryCheck3">
-                                    <span class="telemetry-dot"></span>
-                                    <span class="telemetry-label">Mounting user workspace partition</span>
-                                </div>
-                            </div>
+                            <span class="loading-kicker">VERIFYING CLEARANCE</span>
+                            <h3 id="loadingStatusHeading">Authenticating</h3>
+                            <p id="loadingStatusText">Validating credentials against personnel directory...</p>
                         </div>
                     </div>
 
-                    <!-- Card Header -->
-                    <header class="gateway-header">
-                        <div class="header-icon-wrap">
-                            <i data-lucide="fingerprint"></i>
-                        </div>
-                        <div>
-                            <h2>Personnel Clearance</h2>
-                            <p class="form-intro-text">Authenticate your credentials to access the workspace.</p>
-                        </div>
-                    </header>
-
-                    <!-- Dynamic Notification Banner -->
-                    <div id="messageBox" class="message-box" role="alert" aria-live="polite"></div>
-
-                    <!-- Authentication Form -->
-                    <form id="loginForm" novalidate class="credentials-form">
-                        
-                        <!-- Floating Email Group -->
+                    <!-- Form -->
+                    <form id="loginForm" novalidate>
+                        <!-- Email Field -->
                         <div class="input-group">
-                            <div class="field-wrapper">
-                                <i data-lucide="mail" class="field-icon" aria-hidden="true"></i>
-                                <input 
-                                    id="email" 
-                                    type="email" 
-                                    placeholder=" "
+                            <label class="input-label" for="email">Official Email Address</label>
+                            <div class="input-box" id="emailFieldBox">
+                                <i data-lucide="mail" class="box-icon" aria-hidden="true"></i>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="name@quezon.gov.ph"
                                     autocomplete="email"
-                                    spellcheck="false"
+                                    inputmode="email"
                                     required
+                                    aria-describedby="emailHint"
                                 >
-                                <label for="email" class="field-label">Official Email Address</label>
+                            </div>
+                            <div class="input-hint" id="emailHint">
+                                <i data-lucide="info" aria-hidden="true"></i>
+                                <span>Use your registered government email address.</span>
                             </div>
                         </div>
 
-                        <!-- Floating Password Group -->
+                        <!-- Password Field -->
                         <div class="input-group">
-                            <div class="field-wrapper">
-                                <i data-lucide="lock" class="field-icon" aria-hidden="true"></i>
-                                <input 
-                                    id="password" 
-                                    type="password" 
-                                    placeholder=" "
+                            <div class="input-label-row">
+                                <label class="input-label" for="password">Password</label>
+                                <a href="requestACC.html" class="forgot-link">Need Help?</a>
+                            </div>
+                            <div class="input-box" id="passwordFieldBox">
+                                <i data-lucide="key-round" class="box-icon" aria-hidden="true"></i>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder="••••••••••••"
                                     autocomplete="current-password"
                                     required
                                 >
-                                <label for="password" class="field-label">Security Password</label>
-                                <button type="button" class="password-toggle" id="togglePassword" aria-label="Toggle password visibility" tabindex="-1">
-                                    <i data-lucide="eye" aria-hidden="true"></i>
+                                <button
+                                    type="button"
+                                    class="toggle-pass-btn"
+                                    id="togglePassword"
+                                    aria-label="Toggle password visibility"
+                                    title="Show/Hide Password"
+                                >
+                                    <i data-lucide="eye" id="toggleIcon"></i>
                                 </button>
                             </div>
-                            
-                            <!-- Expandable Password Security Inspector -->
-                            <div class="strength-limiter" id="strengthContainer" aria-live="polite">
-                                <div class="strength-panel">
-                                    <div class="strength-indicators">
-                                        <div class="bar-bg">
-                                            <div class="bar-fill" id="strengthBarFill"></div>
-                                        </div>
-                                    </div>
-                                    <div class="strength-header-row">
-                                        <span class="strength-label">Entropy Metric:</span>
-                                        <span class="strength-feedback" id="strengthText">Analyzing...</span>
-                                    </div>
-                                    
-                                    <!-- Requirements Validation Checklist -->
-                                    <ul class="criteria-list" id="criteriaList">
-                                        <li data-criterion="length" class="criteria-item">
-                                            <i data-lucide="circle" class="crit-icon"></i> <span>6+ characters</span>
-                                        </li>
-                                        <li data-criterion="upper" class="criteria-item">
-                                            <i data-lucide="circle" class="crit-icon"></i> <span>Uppercase letter</span>
-                                        </li>
-                                        <li data-criterion="number" class="criteria-item">
-                                            <i data-lucide="circle" class="crit-icon"></i> <span>Number digit</span>
-                                        </li>
-                                        <li data-criterion="special" class="criteria-item">
-                                            <i data-lucide="circle" class="crit-icon"></i> <span>Special symbol</span>
-                                        </li>
-                                    </ul>
-                                </div>
+                            <div class="caps-warning-box" id="capsLockWarning" aria-hidden="true">
+                                <i data-lucide="alert-triangle" aria-hidden="true"></i>
+                                <span>Caps Lock is currently <strong>ON</strong></span>
                             </div>
                         </div>
 
-                        <!-- Persistence & Password Recovery -->
-                        <div class="session-configs">
-                            <label class="remember-label">
+                        <!-- Options -->
+                        <div class="form-options-row">
+                            <label class="checkbox-label">
                                 <input type="checkbox" id="rememberMe">
-                                <span class="remember-box"></span>
-                                <span class="remember-txt">Remember credentials</span>
+                                <span class="custom-check"></span>
+                                <span class="check-caption">Remember email on this workstation</span>
                             </label>
-                            <a href="#" class="recovery-anchor">Forgot credentials?</a>
                         </div>
 
-                        <!-- Submit Action Button -->
-                        <button type="submit" class="auth-btn" id="loginBtn">
-                            <span class="btn-text">Authenticate Session</span>
-                            <i data-lucide="arrow-right" class="btn-icon" aria-hidden="true"></i>
+                        <!-- Sign In Button -->
+                        <button type="submit" class="primary-sign-btn" id="loginBtn">
+                            <span class="btn-caption">
+                                <strong>Sign In to Portal</strong>
+                                <small>Authorized Personnel Session</small>
+                            </span>
+                            <span class="btn-arrow-wrap" aria-hidden="true">
+                                <i data-lucide="arrow-right"></i>
+                            </span>
                         </button>
 
-                        <div class="divider">
-                            <span>Alternate Access</span>
+                        <div class="divider-line">
+                            <span>REGISTRATION & CLEARANCE</span>
                         </div>
 
-                        <a href="requestACC.html" class="portal-request-btn">
-                            <i data-lucide="user-plus" class="request-btn-icon"></i>
-                            <span>Register Clearance Request</span>
+                        <!-- Access Request CTA -->
+                        <a href="requestACC.html" class="request-access-btn">
+                            <div class="request-icon-box">
+                                <i data-lucide="user-plus"></i>
+                            </div>
+                            <div class="request-caption">
+                                <strong>Register Access Request</strong>
+                                <span>Submit new personnel credentials for approval</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="request-chevron"></i>
                         </a>
                     </form>
 
-                    <footer class="gateway-footer">
-                        <p>&copy; 2026 Provincial Government of Quezon &bull; PGENRO IMS</p>
-                        <span class="footer-subtext">All login attempts are cryptographically stamped and audited.</span>
+                    <footer class="card-footer">
+                        <span>© 2026 Provincial Government of Quezon</span>
+                        <span class="dot">•</span>
+                        <span>PGENRO IMS</span>
                     </footer>
                 </div>
-            </main>
-        </section>
+            </section>
 
-    </div>
+        </div>
+    </main>
 
     <script type="module" src="../user-javascript/login.js"></script>
 </body>

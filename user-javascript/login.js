@@ -1,22 +1,13 @@
 // ==========================================================================
-// PGENRO IMS - REALTIME DATABASE VERIFIED LOGIN CONTROLLER
+// PGENRO IMS — SECURE LOGIN CONTROLLER
+// Provincial Government of Quezon
 // ==========================================================================
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { 
-    getAuth, 
-    signInWithEmailAndPassword 
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import { 
-    getDatabase, 
-    ref, 
-    get, 
-    query, 
-    orderByChild, 
-    equalTo 
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
+import { getDatabase, ref, get, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
 
-// Firebase Configuration
+// FIREBASE CONFIGURATION
 const firebaseConfig = {
     apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
     authDomain: "ims-capstone-bc65f.firebaseapp.com",
@@ -33,19 +24,7 @@ const auth = getAuth(app);
 const db = getDatabase(app);
 
 document.addEventListener("DOMContentLoaded", () => {
-    // -------------------------------------------------------------
-    // Lucide Icon Safe Loader
-    // -------------------------------------------------------------
-    const renderIconsSafely = () => {
-        if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
-            lucide.createIcons();
-        }
-    };
-    renderIconsSafely();
-
-    // -------------------------------------------------------------
     // DOM Elements
-    // -------------------------------------------------------------
     const loginForm = document.getElementById("loginForm");
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
@@ -53,406 +32,341 @@ document.addEventListener("DOMContentLoaded", () => {
     const togglePassword = document.getElementById("togglePassword");
     const messageBox = document.getElementById("messageBox");
     const card = document.getElementById("interactiveCard");
-
+    const capsLockWarning = document.getElementById("capsLockWarning");
     const loadingOverlay = document.getElementById("loadingOverlay");
     const loadingStatusHeading = document.getElementById("loadingStatusHeading");
     const loadingStatusText = document.getElementById("loadingStatusText");
-    const c1 = document.getElementById("telemetryCheck1");
-    const c2 = document.getElementById("telemetryCheck2");
-    const c3 = document.getElementById("telemetryCheck3");
+    const loginButton = document.getElementById("loginBtn");
+    const phTimeDisplay = document.getElementById("phTimeDisplay");
+    const emailFieldBox = document.getElementById("emailFieldBox");
+    const passwordFieldBox = document.getElementById("passwordFieldBox");
 
-    const strengthContainer = document.getElementById("strengthContainer");
-    const strengthBarFill = document.getElementById("strengthBarFill");
-    const strengthText = document.getElementById("strengthText");
-    const sunburstGlow = document.getElementById("sunburstGlow");
-    const typingText = document.getElementById("typingText");
+    // Safe Lucide renderer
+    const renderIcons = () => {
+        if (typeof lucide !== "undefined" && typeof lucide.createIcons === "function") {
+            lucide.createIcons();
+        }
+    };
+    renderIcons();
 
-    // -------------------------------------------------------------
-    // Remember Me Auto-fill Handler
-    // -------------------------------------------------------------
-    const savedEmail = localStorage.getItem("pgenro_saved_email");
+    // Philippine Standard Time Clock
+    if (phTimeDisplay) {
+        const updatePST = () => {
+            const now = new Date();
+            const formatted = new Intl.DateTimeFormat("en-US", {
+                timeZone: "Asia/Manila",
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                hour12: true
+            }).format(now);
+            phTimeDisplay.textContent = `PST • ${formatted}`;
+        };
+        updatePST();
+        setInterval(updatePST, 1000);
+    }
+
+    // Local Storage Helper
+    const storage = {
+        get(key) { try { return localStorage.getItem(key); } catch (e) { return null; } },
+        set(key, val) { try { localStorage.setItem(key, val); } catch (e) {} },
+        remove(key) { try { localStorage.removeItem(key); } catch (e) {} }
+    };
+
+    // Load saved email
+    const savedEmail = storage.get("pgenro_saved_email");
     if (savedEmail && emailInput) {
         emailInput.value = savedEmail;
         if (rememberMe) rememberMe.checked = true;
     }
 
-    // -------------------------------------------------------------
-    // Typist Animation Loop
-    // -------------------------------------------------------------
-    if (typingText) {
-        const phrases = [
-            "INITIALIZING SECURITY NODE",
-            "FORESTRY DATA CLEARANCE",
-            "QUEZON PROVINCE ENRO IMS",
-            "ENCRYPTED ACCESS TERMINAL"
-        ];
-        let phraseIdx = 0;
-        let charIdx = 0;
-        let isDeleting = false;
-
-        const typeLoop = () => {
-            const current = phrases[phraseIdx];
-            if (isDeleting) {
-                typingText.textContent = current.substring(0, charIdx - 1);
-                charIdx--;
-            } else {
-                typingText.textContent = current.substring(0, charIdx + 1);
-                charIdx++;
+    // Caps Lock Detection
+    if (passwordInput && capsLockWarning) {
+        const checkCaps = (e) => {
+            if (e.getModifierState) {
+                const caps = e.getModifierState("CapsLock");
+                capsLockWarning.setAttribute("aria-hidden", String(!caps));
             }
-
-            let delayTime = isDeleting ? 35 : 75;
-
-            if (!isDeleting && charIdx === current.length) {
-                delayTime = 2200;
-                isDeleting = true;
-            } else if (isDeleting && charIdx === 0) {
-                isDeleting = false;
-                phraseIdx = (phraseIdx + 1) % phrases.length;
-                delayTime = 400;
-            }
-            setTimeout(typeLoop, delayTime);
         };
-        typeLoop();
+        passwordInput.addEventListener("keydown", checkCaps);
+        passwordInput.addEventListener("keyup", checkCaps);
+        passwordInput.addEventListener("blur", () => capsLockWarning.setAttribute("aria-hidden", "true"));
     }
 
-    // -------------------------------------------------------------
-    // Ambient Cursor Glow Follower
-    // -------------------------------------------------------------
-    window.addEventListener("pointermove", (e) => {
-        if (sunburstGlow) {
-            sunburstGlow.style.left = `${e.clientX}px`;
-            sunburstGlow.style.top = `${e.clientY}px`;
-        }
-    });
-
-    // -------------------------------------------------------------
-    // Interactive Constellation Spore Particles
-    // -------------------------------------------------------------
-    const canvas = document.getElementById("forestCanvas");
-    if (canvas) {
-        const ctx = canvas.getContext("2d");
-        let particles = [];
-
-        const resizeCanvas = () => {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        };
-        resizeCanvas();
-        window.addEventListener("resize", resizeCanvas);
-
-        const particleCount = Math.min(Math.floor(window.innerWidth / 30), 45);
-        for (let i = 0; i < particleCount; i++) {
-            particles.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                radius: Math.random() * 1.8 + 0.6,
-                dx: (Math.random() - 0.5) * 0.45,
-                dy: (Math.random() - 0.5) * 0.45,
-                alpha: Math.random() * 0.5 + 0.2
-            });
-        }
-
-        const animateCanvas = () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw connecting web
-            for (let a = 0; a < particles.length; a++) {
-                for (let b = a + 1; b < particles.length; b++) {
-                    const dist = Math.hypot(particles[a].x - particles[b].x, particles[a].y - particles[b].y);
-                    if (dist < 110) {
-                        ctx.beginPath();
-                        ctx.strokeStyle = `rgba(16, 185, 129, ${0.12 * (1 - dist / 110)})`;
-                        ctx.lineWidth = 0.8;
-                        ctx.moveTo(particles[a].x, particles[a].y);
-                        ctx.lineTo(particles[b].x, particles[b].y);
-                        ctx.stroke();
-                    }
-                }
-            }
-
-            // Draw spore points
-            particles.forEach((p) => {
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 245, 155, ${p.alpha})`;
-                ctx.shadowBlur = 8;
-                ctx.shadowColor = "rgba(0, 245, 155, 0.4)";
-                ctx.fill();
-
-                p.x += p.dx;
-                p.y += p.dy;
-
-                if (p.x < 0) p.x = canvas.width;
-                if (p.x > canvas.width) p.x = 0;
-                if (p.y < 0) p.y = canvas.height;
-                if (p.y > canvas.height) p.y = 0;
-            });
-
-            requestAnimationFrame(animateCanvas);
-        };
-        animateCanvas();
-    }
-
-    // -------------------------------------------------------------
-    // Password Strength & Criteria Checker
-    // -------------------------------------------------------------
-    const checkCriteria = (pwd) => {
-        const tests = {
-            length: pwd.length >= 6,
-            upper: /[A-Z]/.test(pwd),
-            number: /[0-9]/.test(pwd),
-            special: /[^A-Za-z0-9]/.test(pwd)
-        };
-
-        Object.keys(tests).forEach(key => {
-            const item = document.querySelector(`.criteria-item[data-criterion="${key}"]`);
-            if (item) {
-                if (tests[key]) {
-                    item.classList.add("met");
-                    item.innerHTML = `<i data-lucide="check-circle-2"></i> <span>${item.querySelector('span').textContent}</span>`;
-                } else {
-                    item.classList.remove("met");
-                    item.innerHTML = `<i data-lucide="circle"></i> <span>${item.querySelector('span').textContent}</span>`;
-                }
-            }
-        });
-        renderIconsSafely();
-
-        const score = Object.values(tests).filter(Boolean).length;
-        if (strengthBarFill && strengthText) {
-            if (pwd.length === 0) {
-                strengthBarFill.style.width = "0%";
-                strengthText.textContent = "Checking entropy...";
-                strengthText.style.color = "var(--text-muted)";
-            } else if (score <= 1) {
-                strengthBarFill.style.width = "25%";
-                strengthBarFill.style.backgroundColor = "var(--danger)";
-                strengthText.textContent = "Weak Entropy";
-                strengthText.style.color = "var(--danger)";
-            } else if (score <= 3) {
-                strengthBarFill.style.width = "65%";
-                strengthBarFill.style.backgroundColor = "var(--warning)";
-                strengthText.textContent = "Moderate Standard";
-                strengthText.style.color = "var(--warning)";
-            } else {
-                strengthBarFill.style.width = "100%";
-                strengthBarFill.style.backgroundColor = "var(--success)";
-                strengthText.textContent = "Optimal Complexity";
-                strengthText.style.color = "var(--success)";
-            }
-        }
-    };
-
-    if (passwordInput) {
-        passwordInput.addEventListener("focus", () => {
-            if (strengthContainer) strengthContainer.classList.add("active");
-        });
-        passwordInput.addEventListener("blur", () => {
-            if (passwordInput.value.length === 0 && strengthContainer) {
-                strengthContainer.classList.remove("active");
-            }
-        });
-        passwordInput.addEventListener("input", (e) => {
-            checkCriteria(e.target.value);
+    // Password Visibility Toggle
+    if (togglePassword && passwordInput) {
+        togglePassword.addEventListener("click", () => {
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            togglePassword.innerHTML = `<i data-lucide="${isPassword ? "eye-off" : "eye"}"></i>`;
+            renderIcons();
         });
     }
 
-    // -------------------------------------------------------------
-    // Alert & Telemetry Helpers
-    // -------------------------------------------------------------
-    const displayBannerAlert = (status, title, text) => {
+    // Banner Alert
+    const displayBanner = (status, title, text) => {
         if (!messageBox) return;
-        messageBox.className = `message-box ${status}`;
-        messageBox.innerHTML = `
-            <strong>${title}</strong>
-            <span>${text}</span>
-        `;
+        messageBox.className = `message-box show ${status}`;
+        messageBox.innerHTML = `<strong>${title}</strong><span>${text}</span>`;
+        renderIcons();
     };
 
-    const clearBannerAlert = () => {
+    const clearBanner = () => {
         if (!messageBox) return;
         messageBox.className = "message-box";
         messageBox.innerHTML = "";
     };
 
-    const executeCardVibrate = () => {
+    const triggerVibrate = () => {
         if (!card) return;
         card.classList.remove("shake-trigger");
-        void card.offsetWidth; // Trigger DOM reflow
+        void card.offsetWidth;
         card.classList.add("shake-trigger");
         setTimeout(() => card.classList.remove("shake-trigger"), 450);
     };
 
     const showLoading = (heading, text) => {
-        if (loadingOverlay) {
-            loadingOverlay.classList.add("active");
-            loadingOverlay.setAttribute("aria-hidden", "false");
-            if (loadingStatusHeading) loadingStatusHeading.textContent = heading;
-            if (loadingStatusText) loadingStatusText.textContent = text;
-        }
-        [c1, c2, c3].forEach(el => { if (el) el.className = "telemetry-item"; });
+        if (!loadingOverlay) return;
+        loadingOverlay.classList.add("active");
+        loadingOverlay.setAttribute("aria-hidden", "false");
+        if (loadingStatusHeading) loadingStatusHeading.textContent = heading;
+        if (loadingStatusText) loadingStatusText.textContent = text;
+        if (loginButton) loginButton.disabled = true;
     };
 
     const hideLoading = () => {
-        if (loadingOverlay) {
-            loadingOverlay.classList.remove("active");
-            loadingOverlay.setAttribute("aria-hidden", "true");
-        }
+        if (!loadingOverlay) return;
+        loadingOverlay.classList.remove("active");
+        loadingOverlay.setAttribute("aria-hidden", "true");
+        if (loginButton) loginButton.disabled = false;
     };
 
     const delay = (ms) => new Promise(res => setTimeout(res, ms));
 
-    // Password Toggle Visibility
-    if (togglePassword && passwordInput) {
-        togglePassword.addEventListener("click", () => {
-            const isPassword = passwordInput.type === "password";
-            passwordInput.type = isPassword ? "text" : "password";
-            togglePassword.innerHTML = isPassword 
-                ? '<i data-lucide="eye-off"></i>' 
-                : '<i data-lucide="eye"></i>';
-            renderIconsSafely();
-        });
-    }
+    // Clear alert when user interacts
+    emailInput?.addEventListener("input", clearBanner);
+    passwordInput?.addEventListener("input", clearBanner);
+    emailInput?.addEventListener("focus", () => emailFieldBox?.classList.remove("invalid"));
+    passwordInput?.addEventListener("focus", () => passwordFieldBox?.classList.remove("invalid"));
 
-    emailInput?.addEventListener("input", () => clearBannerAlert());
-    passwordInput?.addEventListener("input", () => clearBannerAlert());
-
-    // =========================================================================
-    // REALTIME DATABASE AUTHENTICATION & APPROVAL CHECK
-    // =========================================================================
+    // Form Submit Handler
     loginForm?.addEventListener("submit", async (e) => {
         e.preventDefault();
-        clearBannerAlert();
+        clearBanner();
 
-        const email = emailInput.value.trim().toLowerCase();
-        const password = passwordInput.value;
+        const email = emailInput?.value.trim().toLowerCase() || "";
+        const password = passwordInput?.value || "";
 
+        // Empty validation
         if (!email || !password) {
-            executeCardVibrate();
-            displayBannerAlert("error", "Missing Credentials", "Please enter both your official government email and security password.");
+            if (!email) emailFieldBox?.classList.add("invalid");
+            if (!password) passwordFieldBox?.classList.add("invalid");
+            triggerVibrate();
+            displayBanner("error", "Missing Information", "Please enter both your official email and password.");
             return;
         }
 
-        // Save email if remember me is ticked
-        if (rememberMe && rememberMe.checked) {
-            localStorage.setItem("pgenro_saved_email", email);
+        // Email format validation
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            emailFieldBox?.classList.add("invalid");
+            triggerVibrate();
+            displayBanner("error", "Invalid Email", "Please enter a valid email address (e.g., name@quezon.gov.ph).");
+            return;
+        }
+
+        // Remember Me
+        if (rememberMe?.checked) {
+            storage.set("pgenro_saved_email", email);
         } else {
-            localStorage.removeItem("pgenro_saved_email");
+            storage.remove("pgenro_saved_email");
         }
 
         try {
-            // STEP 1: Handshake
-            showLoading("Handshake Verification", "Establishing secure TLS socket...");
-            if (c1) c1.classList.add("active");
-            await delay(350);
-            if (c1) { c1.classList.remove("active"); c1.classList.add("done"); }
+            showLoading("Verifying Clearance", "Connecting to PGENRO secure directory...");
+            await delay(250);
 
-            // STEP 2: Query Realtime Database for Email
-            if (c2) c2.classList.add("active");
-            if (loadingStatusHeading) loadingStatusHeading.textContent = "Querying Records";
-            if (loadingStatusText) loadingStatusText.textContent = "Checking authorization clearance and profile status...";
-
-            // A. Super Admin Check
+            // 1. Check Super Admin Auth
             if (email.endsWith("@pgenro.admin") || email.includes("admin")) {
                 try {
                     await signInWithEmailAndPassword(auth, email, password);
-                    if (c2) { c2.classList.remove("active"); c2.classList.add("done"); }
-                    if (c3) c3.classList.add("done");
-                    if (loadingStatusHeading) loadingStatusHeading.textContent = "Administrator Authorized";
-                    await delay(400);
+                    if (loadingStatusHeading) loadingStatusHeading.textContent = "Clearance Granted";
+                    if (loadingStatusText) loadingStatusText.textContent = "Administrator verified. Opening Control Center...";
+                    await delay(350);
                     window.location.href = "../admin/admin.html";
                     return;
-                } catch (authErr) {
-                    // Fallthrough to standard employee flow
+                } catch (adminErr) {
+                    console.warn("Falling back to access_requests verification.");
                 }
             }
 
-            // B. Search access_requests in Realtime Database
+            // 2. Query Personnel DB
             const reqQuery = query(ref(db, "access_requests"), orderByChild("email"), equalTo(email));
             const reqSnap = await get(reqQuery);
 
-            if (c2) { c2.classList.remove("active"); c2.classList.add("done"); }
-            await delay(250);
-
             let userData = null;
             if (reqSnap.exists()) {
-                const requests = reqSnap.val();
-                const firstKey = Object.keys(requests)[0];
-                userData = requests[firstKey];
+                const data = reqSnap.val();
+                const keys = Object.keys(data);
+                if (keys.length > 0) userData = data[keys[0]];
             }
 
-            // CASE 1: No Account Found
             if (!userData) {
                 hideLoading();
-                executeCardVibrate();
-                displayBannerAlert(
-                    "error", 
-                    "No Account Found", 
-                    `Walang nakitang record para sa "${email}". Pindutin ang "Register Clearance Request" upang mag-apply.`
-                );
+                triggerVibrate();
+                emailFieldBox?.classList.add("invalid");
+                displayBanner("error", "Record Not Found", `No account record was found for "${email}". Please submit an Access Request.`);
                 return;
             }
 
-            // CASE 2: Account Pending
             if (userData.status === "Pending") {
                 hideLoading();
-                executeCardVibrate();
-                displayBannerAlert(
-                    "warning", 
-                    "Account Pending Approval", 
-                    `Ang iyong account (${userData.id || 'REQ'}) ay naghihintay pa ng Approval mula sa Administrator bago makapasok.`
-                );
+                triggerVibrate();
+                displayBanner("warning", "Account Pending Approval", `The account (${userData.id || "REQ"}) is currently under Administrator review.`);
                 return;
             }
 
-            // CASE 3: Account Declined
             if (userData.status === "Rejected") {
                 hideLoading();
-                executeCardVibrate();
-                const reason = userData.declineRemarks || "Verification failed.";
-                displayBannerAlert(
-                    "error", 
-                    "Access Request Declined", 
-                    `Ang iyong access request ay tinanggihan ng Administrator. Dahilan: "${reason}".`
-                );
+                triggerVibrate();
+                const reason = userData.declineRemarks || "Verification requirements were not met.";
+                displayBanner("error", "Access Request Declined", `Your access request was declined. Reason: "${reason}"`);
                 return;
             }
 
-            // CASE 4: Account Approved -> Verify Password
             if (userData.status === "Approved") {
-                if (c3) c3.classList.add("active");
-                if (loadingStatusHeading) loadingStatusHeading.textContent = "Verifying Credentials";
-                if (loadingStatusText) loadingStatusText.textContent = "Validating security hash against encrypted store...";
-
                 if (userData.password && userData.password !== password) {
                     hideLoading();
-                    executeCardVibrate();
-                    displayBannerAlert(
-                        "error", 
-                        "Authentication Failed", 
-                        "Approved ang iyong account, ngunit MALI ang inilagay mong password. Pakisubukan muli."
-                    );
+                    triggerVibrate();
+                    passwordFieldBox?.classList.add("invalid");
+                    displayBanner("error", "Authentication Failed", "The password you entered is incorrect. Please try again.");
+                    passwordInput?.focus();
                     return;
                 }
 
-                // Authentication Success
-                if (c3) { c3.classList.remove("active"); c3.classList.add("done"); }
-                if (loadingStatusHeading) loadingStatusHeading.textContent = "Clearance Granted";
-                if (loadingStatusText) loadingStatusText.textContent = `Welcome, ${userData.fullName || 'Personnel'}! Directing to workspace...`;
-                
-                // Save user session
-                localStorage.setItem("pgenro_current_user", JSON.stringify(userData));
-                
-                await delay(650);
+                if (loadingStatusHeading) loadingStatusHeading.textContent = "Access Granted";
+                if (loadingStatusText) loadingStatusText.textContent = `Welcome back, ${userData.fullName || "Personnel"}! Redirecting...`;
+
+                storage.set("pgenro_current_user", JSON.stringify(userData));
+                await delay(400);
                 window.location.href = "../User/homepage.html";
                 return;
             }
 
+            hideLoading();
+            triggerVibrate();
+            displayBanner("warning", "Unverified Status", "Your clearance status is unverified. Please coordinate with IT.");
+
         } catch (error) {
             hideLoading();
-            executeCardVibrate();
+            triggerVibrate();
             console.error("Login Error:", error);
-            displayBannerAlert("error", "System Error", error.message);
+            displayBanner("error", "System Notice", error.message || "Failed to authenticate with the server. Please try again.");
         }
     });
 });
+
+// ============================================================================
+// INTERACTIVE ENVIRONMENTAL BACKGROUND + CARD MICRO-INTERACTIONS
+// Firebase/Auth/Realtime Database logic above remains unchanged.
+// ============================================================================
+// ============================================================================
+// INTERACTIVE ENVIRONMENTAL BACKGROUND ONLY
+// The login panel/card is intentionally static. Form controls remain functional.
+// Firebase/Auth/Realtime Database logic above is unchanged.
+// ============================================================================
+const initEnvironmentalBackground = () => {
+    const root = document.documentElement;
+    const particleField = document.querySelector(".light-particles");
+    const fallingLeaves = document.getElementById("fallingLeaves");
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    // Natural falling leaves: varied shape, size, depth, wind drift and rotation.
+    if (fallingLeaves && !reduceMotion && !fallingLeaves.children.length) {
+        const fragment = document.createDocumentFragment();
+        const leafCount = window.innerWidth < 640 ? 9 : window.innerWidth < 1100 ? 16 : 24;
+        const leafTypes = ["leaf-round", "leaf-pointed", "leaf-long", "leaf-soft"];
+
+        for (let i = 0; i < leafCount; i++) {
+            const leaf = document.createElement("span");
+            const type = leafTypes[Math.floor(Math.random() * leafTypes.length)];
+            const depth = Math.random();
+            const size = 9 + depth * 17;
+
+            leaf.className = `falling-leaf ${type}`;
+            leaf.style.left = `${-5 + Math.random() * 110}%`;
+            leaf.style.setProperty("--leaf-size", `${size.toFixed(1)}px`);
+            leaf.style.setProperty("--leaf-opacity", `${0.20 + depth * 0.48}`);
+            leaf.style.setProperty("--leaf-rotate", `${Math.random() * 360}deg`);
+            leaf.style.setProperty("--leaf-drift", `${-150 + Math.random() * 300}px`);
+            leaf.style.animationDuration = `${13 + Math.random() * 15}s`;
+            leaf.style.animationDelay = `${Math.random() * -28}s`;
+            leaf.style.filter = `blur(${depth < .25 ? 1 : depth > .78 ? .1 : .35}px)`;
+            fragment.appendChild(leaf);
+        }
+        fallingLeaves.appendChild(fragment);
+    }
+
+    // Tiny floating pollen/dust for a humid forest atmosphere.
+    if (particleField && !reduceMotion && !particleField.children.length) {
+        const fragment = document.createDocumentFragment();
+        for (let i = 0; i < 26; i++) {
+            const particle = document.createElement("span");
+            const size = 1.5 + Math.random() * 3.5;
+            particle.className = "light-particle";
+            particle.style.left = `${Math.random() * 100}%`;
+            particle.style.top = `${18 + Math.random() * 72}%`;
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.animationDuration = `${8 + Math.random() * 12}s`;
+            particle.style.animationDelay = `${Math.random() * -16}s`;
+            particle.style.setProperty("--drift-x", `${-55 + Math.random() * 110}px`);
+            fragment.appendChild(particle);
+        }
+        particleField.appendChild(fragment);
+    }
+
+    if (reduceMotion) return;
+
+    // Pointer movement affects ONLY the environmental background.
+    let raf = null;
+    let targetX = 0;
+    let targetY = 0;
+    let currentX = 0;
+    let currentY = 0;
+
+    const animateBackground = () => {
+        raf = null;
+        currentX += (targetX - currentX) * 0.06;
+        currentY += (targetY - currentY) * 0.06;
+
+        root.style.setProperty("--bg-move-x", `${currentX * 22}px`);
+        root.style.setProperty("--bg-move-y", `${currentY * 17}px`);
+        root.style.setProperty("--cursor-x", `${50 + currentX * 50}%`);
+        root.style.setProperty("--cursor-y", `${50 + currentY * 50}%`);
+
+        if (Math.abs(targetX - currentX) > .001 || Math.abs(targetY - currentY) > .001) {
+            raf = requestAnimationFrame(animateBackground);
+        }
+    };
+
+    window.addEventListener("pointermove", (event) => {
+        targetX = Math.max(-1, Math.min(1, (event.clientX / window.innerWidth) * 2 - 1));
+        targetY = Math.max(-1, Math.min(1, (event.clientY / window.innerHeight) * 2 - 1));
+        if (!raf) raf = requestAnimationFrame(animateBackground);
+    }, { passive: true });
+
+    window.addEventListener("blur", () => {
+        targetX = 0;
+        targetY = 0;
+        if (!raf) raf = requestAnimationFrame(animateBackground);
+    });
+};
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initEnvironmentalBackground, { once: true });
+} else {
+    initEnvironmentalBackground();
+}

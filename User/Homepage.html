@@ -16,6 +16,10 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
+  <!-- Firebase Realtime Database -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
+
   <!-- CSS -->
   <link rel="stylesheet" href="homepage.css" />
 </head>
@@ -166,8 +170,8 @@
       <!-- Systems Status Widget -->
       <div class="sidebar-footer">
         <div class="system-status">
-          <span class="status-indicator online"></span>
-          <span class="status-text">IMS Server Connection Secure</span>
+          <span class="status-indicator online" id="firebaseStatusIndicator"></span>
+          <span class="status-text" id="firebaseStatusText">Connecting to Firebase...</span>
         </div>
       </div>
     </aside>
@@ -247,64 +251,11 @@
             </div>
 
             <!-- Recent Visitors Entry List -->
-            <div class="visitor-recent-list">
-              <div class="visitor-item">
-                <div class="visitor-avatar">JD</div>
+            <div class="visitor-recent-list" id="visitorRecentList">
+              <div class="visitor-item visitor-loading">
                 <div class="visitor-info">
-                  <h4>Juan Dela Cruz</h4>
-                  <p>DENR Regional Office • Environmental Permit</p>
-                </div>
-                <div class="visitor-meta">
-                  <span class="visitor-time">10:42 AM</span>
-                  <span class="badge-status active"><span class="status-dot"></span> Checked In</span>
-                </div>
-              </div>
-
-              <div class="visitor-item">
-                <div class="visitor-avatar">MS</div>
-                <div class="visitor-info">
-                  <h4>Maria Santos</h4>
-                  <p>LGU Tayabas • Forest Management Inquiry</p>
-                </div>
-                <div class="visitor-meta">
-                  <span class="visitor-time">10:15 AM</span>
-                  <span class="badge-status active"><span class="status-dot"></span> Checked In</span>
-                </div>
-              </div>
-
-              <div class="visitor-item">
-                <div class="visitor-avatar">RR</div>
-                <div class="visitor-info">
-                  <h4>Robert Reyes</h4>
-                  <p>Quezon Eco-Tech • Compliance Audit</p>
-                </div>
-                <div class="visitor-meta">
-                  <span class="visitor-time">09:30 AM</span>
-                  <span class="badge-status completed">Checked Out</span>
-                </div>
-              </div>
-
-              <div class="visitor-item">
-                <div class="visitor-avatar">AG</div>
-                <div class="visitor-info">
-                  <h4>Ana Gomez</h4>
-                  <p>Provincial Legal • Document Submission</p>
-                </div>
-                <div class="visitor-meta">
-                  <span class="visitor-time">08:50 AM</span>
-                  <span class="badge-status completed">Checked Out</span>
-                </div>
-              </div>
-
-              <div class="visitor-item">
-                <div class="visitor-avatar">CL</div>
-                <div class="visitor-info">
-                  <h4>Carlos Lim</h4>
-                  <p>Private Citizen • Public Record Inquiry</p>
-                </div>
-                <div class="visitor-meta">
-                  <span class="visitor-time">08:15 AM</span>
-                  <span class="badge-status completed">Checked Out</span>
+                  <h4>Loading visitor logs...</h4>
+                  <p>Connecting to Firebase Realtime Database</p>
                 </div>
               </div>
             </div>
@@ -313,7 +264,7 @@
             <div class="telemetry-sub-chart">
               <div class="sub-chart-header">
                 <h4>Today's Log Summary</h4>
-                <span class="total-badge">36 Total Visitors Today</span>
+                <span class="total-badge" id="todayVisitorsTotal">0 Total Visitors Today</span>
               </div>
             </div>
           </div>
@@ -330,136 +281,11 @@
           </p>
         </div>
 
-        <div class="memo-grid">
-          <!-- Memo Card 1 (Urgent/Pinned) -->
-          <div class="memo-card pinned reveal">
-            <div class="memo-header">
-              <div class="memo-badge-group">
-                <span class="memo-pinned-tag">
-                  <i data-lucide="pin"></i> Pinned Memo
-                </span>
-                <span class="memo-code">MEMO-2025-042</span>
-              </div>
-              <span class="priority-tag high">High Priority</span>
-            </div>
-
+        <div class="memo-grid" id="memoGrid">
+          <div class="memo-card reveal">
             <div class="memo-body">
-              <h3>Implementation of Updated Environmental Permit Processing Workflow</h3>
-              <p>
-                All division chiefs and technical personnel are hereby instructed to adhere to the revised processing steps for ECC compliance and quarry permit clearances effective November 1, 2025.
-              </p>
-            </div>
-
-            <div class="memo-meta">
-              <div class="meta-item">
-                <i data-lucide="calendar"></i>
-                <span>Issued: Oct 24, 2025</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="user-check"></i>
-                <span>By: Office of the Department Head</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="users"></i>
-                <span>Target: All Divisions</span>
-              </div>
-            </div>
-
-            <div class="memo-footer">
-              <a href="#" class="btn-memo-link">
-                <i data-lucide="file-text"></i> Read Details
-              </a>
-              <button class="btn-icon-action" title="Download Document" type="button">
-                <i data-lucide="download"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Memo Card 2 (Pinned) -->
-          <div class="memo-card pinned reveal">
-            <div class="memo-header">
-              <div class="memo-badge-group">
-                <span class="memo-pinned-tag">
-                  <i data-lucide="pin"></i> Pinned Memo
-                </span>
-                <span class="memo-code">MEMO-2025-039</span>
-              </div>
-              <span class="priority-tag standard">Administrative</span>
-            </div>
-
-            <div class="memo-body">
-              <h3>Mandatory System Security & IMS Access Controls Protocol</h3>
-              <p>
-                In compliance with ICT security standards, all authorized IMS account users must update password credentials and verify two-factor authentication parameters before the end of the month.
-              </p>
-            </div>
-
-            <div class="memo-meta">
-              <div class="meta-item">
-                <i data-lucide="calendar"></i>
-                <span>Issued: Oct 18, 2025</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="user-check"></i>
-                <span>By: IT & Records Management</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="users"></i>
-                <span>Target: All IMS Operators</span>
-              </div>
-            </div>
-
-            <div class="memo-footer">
-              <a href="#" class="btn-memo-link">
-                <i data-lucide="file-text"></i> Read Details
-              </a>
-              <button class="btn-icon-action" title="Download Document" type="button">
-                <i data-lucide="download"></i>
-              </button>
-            </div>
-          </div>
-
-          <!-- Memo Card 3 (Pinned) -->
-          <div class="memo-card pinned reveal">
-            <div class="memo-header">
-              <div class="memo-badge-group">
-                <span class="memo-pinned-tag">
-                  <i data-lucide="pin"></i> Pinned Memo
-                </span>
-                <span class="memo-code">MEMO-2025-036</span>
-              </div>
-              <span class="priority-tag Operations">Field Operations</span>
-            </div>
-
-            <div class="memo-body">
-              <h3>Schedule for Provincial Field Monitoring & Environmental Audit Q4</h3>
-              <p>
-                Field inspection teams are advised to review the deployed Travel Orders roster and technical monitoring toolkits for the upcoming joint DENR-PGENRO audit in Tayabas and Lucban sectors.
-              </p>
-            </div>
-
-            <div class="memo-meta">
-              <div class="meta-item">
-                <i data-lucide="calendar"></i>
-                <span>Issued: Oct 10, 2025</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="user-check"></i>
-                <span>By: Field Surveillance Chief</span>
-              </div>
-              <div class="meta-item">
-                <i data-lucide="users"></i>
-                <span>Target: Technical Field Team</span>
-              </div>
-            </div>
-
-            <div class="memo-footer">
-              <a href="#" class="btn-memo-link">
-                <i data-lucide="file-text"></i> Read Details
-              </a>
-              <button class="btn-icon-action" title="Download Document" type="button">
-                <i data-lucide="download"></i>
-              </button>
+              <h3>Loading office memorandums...</h3>
+              <p>Retrieving current pinned memos from Firebase Realtime Database.</p>
             </div>
           </div>
         </div>
@@ -549,6 +375,9 @@
   <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll back to top" type="button">
     <i data-lucide="chevron-up"></i>
   </button>
+
+  <!-- Firebase configuration must load before homepage logic -->
+  <script src="firebase-config.js"></script>
 
   <!-- JS -->
   <script src="../user-javascript/homepage.js"></script>
