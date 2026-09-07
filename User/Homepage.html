@@ -16,10 +16,6 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Firebase Realtime Database -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-
   <!-- CSS -->
   <link rel="stylesheet" href="homepage.css" />
 </head>
@@ -53,7 +49,6 @@
     <nav class="nav-links" id="navLinks">
       <a href="#home" class="active">Home</a>
       <a href="#analytics">Telemetry Center</a>
-      <a href="#memo">Office Memos</a>
       <a href="#process">Strategy</a>
       <a href="#contact">Contact</a>
     </nav>
@@ -130,7 +125,7 @@
           </a>
         </li>
         <li>
-          <a href="officememo.html">
+          <a href="#memo">
             <i data-lucide="file-text"></i>
             <span>Office Memo Logs</span>
           </a>
@@ -154,13 +149,13 @@
           </a>
         </li>
         <li>
-          <a href="service.html">
+          <a href="#service">
             <i data-lucide="shield-alert"></i>
             <span>Service Requests</span>
           </a>
         </li>
         <li>
-          <a href="ICS.html">
+          <a href="#ics">
             <i data-lucide="layers"></i>
             <span>ICS Records</span>
           </a>
@@ -170,8 +165,8 @@
       <!-- Systems Status Widget -->
       <div class="sidebar-footer">
         <div class="system-status">
-          <span class="status-indicator online" id="firebaseStatusIndicator"></span>
-          <span class="status-text" id="firebaseStatusText">Connecting to Firebase...</span>
+          <span class="status-indicator online"></span>
+          <span class="status-text">IMS Server Connection Secure</span>
         </div>
       </div>
     </aside>
@@ -233,59 +228,62 @@
             </div>
           </div>
 
-          <!-- Visitors Recent List Card -->
+          <!-- Visitors Log Numbers & Statistics Board -->
           <div class="visitor-telemetry-card reveal">
             <div class="telemetry-header">
               <div class="telemetry-header-title">
                 <div class="telemetry-icon-container">
-                  <i data-lucide="clipboard-signature" class="telemetry-icon"></i>
+                  <i data-lucide="users" class="telemetry-icon"></i>
                 </div>
                 <div>
-                  <h3>Recent Visitor Logs</h3>
-                  <p>Latest registered visitor check-ins & status</p>
-                </div>
-              </div>
-              <a href="visitorsView.html" class="view-all-link">
-                View All <i data-lucide="arrow-right"></i>
-              </a>
-            </div>
-
-            <!-- Recent Visitors Entry List -->
-            <div class="visitor-recent-list" id="visitorRecentList">
-              <div class="visitor-item visitor-loading">
-                <div class="visitor-info">
-                  <h4>Loading visitor logs...</h4>
-                  <p>Connecting to Firebase Realtime Database</p>
+                  <h3>Visitor Metrics</h3>
+                  <p>Daily tracking of registered visitors</p>
                 </div>
               </div>
             </div>
 
-            <!-- Footer Activity Summary -->
+            <!-- Numbers Display -->
+            <div class="visitor-numbers-grid">
+              <div class="number-stat-card">
+                <span class="stat-lbl">Active inside</span>
+                <div class="stat-num-container">
+                  <span class="num-indicator online"></span>
+                  <h4 class="counter" data-target="14">0</h4>
+                </div>
+                <p class="stat-desc">Currently checked-in</p>
+              </div>
+
+              <div class="number-stat-card">
+                <span class="stat-lbl">Total today</span>
+                <h4 class="counter" data-target="36">0</h4>
+                <p class="stat-desc">Daily registrations</p>
+              </div>
+
+              <div class="number-stat-card">
+                <span class="stat-lbl">Avg Duration</span>
+                <div class="stat-num-container">
+                  <h4 class="counter" data-target="45">0</h4>
+                  <span class="num-unit">mins</span>
+                </div>
+                <p class="stat-desc">Est. transaction speed</p>
+              </div>
+
+              <div class="number-stat-card">
+                <span class="stat-lbl">Peak Traffic</span>
+                <h4 class="time-stat">11:30 AM</h4>
+                <p class="stat-desc">Most active hours</p>
+              </div>
+            </div>
+
+            <!-- Weekly Check-ins mini-bar representation -->
             <div class="telemetry-sub-chart">
               <div class="sub-chart-header">
-                <h4>Today's Log Summary</h4>
-                <span class="total-badge" id="todayVisitorsTotal">0 Total Visitors Today</span>
+                <h4>Weekly Check-in Distribution</h4>
+                <span class="total-badge">216 Total Weekly Runs</span>
               </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- MEMORANDUM HOMEPAGE SECTION -->
-      <section class="memo-section" id="memo">
-        <div class="section-title reveal">
-          <span>Official Directives</span>
-          <h2>Pinned Office Memorandums</h2>
-          <p>
-            Important announcements, administrative circulars, and policy updates pinned for office compliance.
-          </p>
-        </div>
-
-        <div class="memo-grid" id="memoGrid">
-          <div class="memo-card reveal">
-            <div class="memo-body">
-              <h3>Loading office memorandums...</h3>
-              <p>Retrieving current pinned memos from Firebase Realtime Database.</p>
+              <div class="chart-wrapper mini-height">
+                <canvas id="visitorMiniBarChart"></canvas>
+              </div>
             </div>
           </div>
         </div>
@@ -351,7 +349,6 @@
             <div class="footer-links-grid">
               <a href="#home">Home Monitor</a>
               <a href="#analytics">Live Analytics</a>
-              <a href="#memo">Office Memos</a>
               <a href="Communication.html">Communications</a>
               <a href="visitorsView.html">Visitor Logs</a>
             </div>
@@ -376,10 +373,8 @@
     <i data-lucide="chevron-up"></i>
   </button>
 
-  <!-- Firebase configuration must load before homepage logic -->
-  <script src="firebase-config.js"></script>
-
   <!-- JS -->
-  <script src="../user-javascript/homepage.js"></script>
+  <script src="homepage.js"></script>
+  <script type="module" src="homapageD.JS"></script>
 </body>
 </html>

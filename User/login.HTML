@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
     <meta name="theme-color" content="#031409">
-    <meta name="description" content="PGENRO IMS — Provincial Government Environment and Natural Resources Office of Quezon">
+    <meta name="description" content="PGENRO IMS — Unified Digital Personnel Portal of the Provincial Government Environment and Natural Resources Office of Quezon.">
     <title>PGENRO IMS — Secure Personnel Portal</title>
 
     <!-- Google Fonts -->
@@ -19,32 +19,9 @@
 
 <body>
     <!-- ================================================================
-         ENVIRONMENTAL CANOPY BACKGROUND
+         HARDWARE-ACCELERATED ENVIRONMENTAL CANOPY CANVAS (60 FPS)
          ================================================================ -->
-    <div class="canopy-canvas" id="canopyCanvas" aria-hidden="true">
-        <div class="ambient-gradient"></div>
-        <div class="mist-layer mist-1"></div>
-        <div class="mist-layer mist-2"></div>
-        <div class="mist-layer mist-3"></div>
-
-        <div class="canopy-sunbeam beam-left"></div>
-        <div class="canopy-sunbeam beam-right"></div>
-
-        <div class="glow-orb orb-foliage"></div>
-        <div class="glow-orb orb-emerald"></div>
-        <div class="glow-orb orb-gold"></div>
-
-        <div class="leaf-field leaf-field-a"></div>
-        <div class="leaf-field leaf-field-b"></div>
-        <div class="falling-leaves" id="fallingLeaves"></div>
-        <div class="rain-layer"></div>
-        <div class="light-particles"></div>
-
-        <div class="canopy-grid"></div>
-        <div class="canopy-vignette"></div>
-        <div class="canopy-noise"></div>
-        <div class="cursor-glow"></div>
-    </div>
+    <canvas id="canopyCanvas" class="canopy-canvas" aria-hidden="true"></canvas>
 
     <!-- ================================================================
          MAIN VIEWPORT
@@ -65,7 +42,7 @@
                                 src="../logo/enro.png"
                                 alt="PGENRO Official Seal"
                                 class="seal-img"
-                                onerror="this.style.display='none'; this.parentElement.classList.add('fallback-mode')"
+                                onerror="this.onerror=null; this.style.display='none'; this.parentElement.classList.add('fallback-mode')"
                             >
                             <span class="seal-fallback">PGENRO</span>
                         </div>
@@ -78,7 +55,7 @@
                                 src="../logo/Quezonlogo.png"
                                 alt="Provincial Government of Quezon Seal"
                                 class="seal-img"
-                                onerror="this.src='logo/quezonLLOGO.png'; this.onerror=function(){this.style.display='none'; this.parentElement.classList.add('fallback-mode')}"
+                                onerror="this.onerror=null; this.src='logo/quezonLLOGO.png'; this.parentElement.classList.add('fallback-mode')"
                             >
                             <span class="seal-fallback">QUEZON</span>
                         </div>
@@ -88,7 +65,7 @@
                 <!-- Hero Section -->
                 <div class="brand-core">
                     <div class="agency-tag">
-                        <span class="leaf-dot"></span>
+                        <span class="leaf-dot" aria-hidden="true"></span>
                         <span>PROVINCIAL GOVERNMENT OF QUEZON</span>
                     </div>
 
@@ -101,8 +78,13 @@
                         The official unified digital platform of Quezon Province for environmental governance, natural resource records administration, regulatory clearances, and personnel operations.
                     </p>
 
+                    <div class="security-status-badge">
+                        <i data-lucide="shield-check" aria-hidden="true"></i>
+                        <span>256-Bit Encrypted Government Clearance Session</span>
+                    </div>
+
                     <div class="nature-quote">
-                        <i data-lucide="sprout" class="quote-icon"></i>
+                        <i data-lucide="sprout" class="quote-icon" aria-hidden="true"></i>
                         <span>Dedicated to the conservation, protection, and sustainable management of Quezon’s natural heritage.</span>
                     </div>
                 </div>
@@ -110,7 +92,7 @@
                 <!-- Footer Time Display -->
                 <footer class="brand-footer">
                     <div class="time-widget">
-                        <i data-lucide="clock" class="time-icon"></i>
+                        <i data-lucide="clock" class="time-icon" aria-hidden="true"></i>
                         <div>
                             <span class="time-label">Philippine Standard Time</span>
                             <strong id="phTimeDisplay" class="time-text">PST (GMT+8) • Synchronizing...</strong>
@@ -128,7 +110,12 @@
 
                     <!-- Mobile Seal Branding (Shown on Smartphones) -->
                     <div class="mobile-seal-header">
-                        <img src="logo/enro.png" alt="PGENRO Logo" class="mobile-logo">
+                        <img 
+                            src="../logo/enro.png" 
+                            onerror="this.onerror=null; this.src='logo/enro.png'" 
+                            alt="PGENRO Logo" 
+                            class="mobile-logo"
+                        >
                         <div>
                             <strong>PGENRO IMS</strong>
                             <span>Provincial Government of Quezon</span>
@@ -138,7 +125,7 @@
                     <!-- Header -->
                     <div class="card-header">
                         <div class="header-badge-icon">
-                            <i data-lucide="shield-check"></i>
+                            <i data-lucide="shield-check" aria-hidden="true"></i>
                         </div>
                         <div>
                             <h2>Personnel Login</h2>
@@ -146,15 +133,32 @@
                         </div>
                     </div>
 
-                    <!-- Alerts & Messages -->
-                    <div id="messageBox" class="message-box" role="alert" aria-live="assertive"></div>
+                    <!-- Network Status -->
+                    <div id="networkStatusBar" class="network-status-bar" role="status" aria-live="polite">
+                        <i data-lucide="wifi-off" aria-hidden="true"></i>
+                        <span>Workstation Offline: Reconnecting to network...</span>
+                    </div>
 
-                    <!-- Loading Screen -->
+                    <!-- Brute Force Lockout Countdown -->
+                    <div id="lockoutNotice" class="lockout-box" role="alert" aria-live="assertive">
+                        <i data-lucide="lock" aria-hidden="true"></i>
+                        <span>Security Lockout: Try again in <strong id="lockoutSeconds" class="lockout-timer">30</strong>s</span>
+                    </div>
+
+                    <!-- Alerts & Messages -->
+                    <div id="messageBox" class="message-box" role="alert" aria-live="assertive">
+                        <div id="messageContent"></div>
+                        <button type="button" class="alert-dismiss-btn" id="dismissAlert" aria-label="Dismiss message">
+                            <i data-lucide="x" aria-hidden="true"></i>
+                        </button>
+                    </div>
+
+                    <!-- Translucent Loading Overlay -->
                     <div class="loading-overlay" id="loadingOverlay" aria-live="polite" aria-hidden="true">
                         <div class="loading-modal">
                             <div class="loading-spinner-box">
                                 <div class="spinner-track"></div>
-                                <div class="spinner-center"><i data-lucide="leaf"></i></div>
+                                <div class="spinner-center"><i data-lucide="leaf" aria-hidden="true"></i></div>
                             </div>
                             <span class="loading-kicker">VERIFYING CLEARANCE</span>
                             <h3 id="loadingStatusHeading">Authenticating</h3>
@@ -162,9 +166,9 @@
                         </div>
                     </div>
 
-                    <!-- Form -->
-                    <form id="loginForm" novalidate>
-                        <!-- Email Field -->
+                    <!-- Login Form -->
+                    <form id="loginForm" novalidate autocomplete="on">
+                        <!-- Email -->
                         <div class="input-group">
                             <label class="input-label" for="email">Official Email Address</label>
                             <div class="input-box" id="emailFieldBox">
@@ -174,19 +178,37 @@
                                     id="email"
                                     name="email"
                                     placeholder="name@quezon.gov.ph"
-                                    autocomplete="email"
+                                    autocomplete="username"
                                     inputmode="email"
                                     required
                                     aria-describedby="emailHint"
+                                    spellcheck="false"
                                 >
+                                <button
+                                    type="button"
+                                    class="field-action-btn"
+                                    id="clearEmailBtn"
+                                    style="display: none;"
+                                    aria-label="Clear email input"
+                                    tabindex="-1"
+                                >
+                                    <i data-lucide="x" aria-hidden="true"></i>
+                                </button>
                             </div>
+
+                            <!-- Fast-fill domain suggestions -->
+                            <div class="domain-suggestions" id="domainSuggestions" aria-label="Suggested email domains">
+                                <button type="button" class="domain-pill" data-domain="@quezon.gov.ph">+ @quezon.gov.ph</button>
+                                <button type="button" class="domain-pill" data-domain="@pgenro.gov.ph">+ @pgenro.gov.ph</button>
+                            </div>
+
                             <div class="input-hint" id="emailHint">
                                 <i data-lucide="info" aria-hidden="true"></i>
                                 <span>Use your registered government email address.</span>
                             </div>
                         </div>
 
-                        <!-- Password Field -->
+                        <!-- Password -->
                         <div class="input-group">
                             <div class="input-label-row">
                                 <label class="input-label" for="password">Password</label>
@@ -204,12 +226,13 @@
                                 >
                                 <button
                                     type="button"
-                                    class="toggle-pass-btn"
+                                    class="field-action-btn"
                                     id="togglePassword"
-                                    aria-label="Toggle password visibility"
+                                    aria-label="Show password"
+                                    aria-pressed="false"
                                     title="Show/Hide Password"
                                 >
-                                    <i data-lucide="eye" id="toggleIcon"></i>
+                                    <i data-lucide="eye" id="toggleIcon" aria-hidden="true"></i>
                                 </button>
                             </div>
                             <div class="caps-warning-box" id="capsLockWarning" aria-hidden="true">
@@ -218,20 +241,20 @@
                             </div>
                         </div>
 
-                        <!-- Options -->
+                        <!-- Remember Me -->
                         <div class="form-options-row">
                             <label class="checkbox-label">
                                 <input type="checkbox" id="rememberMe">
-                                <span class="custom-check"></span>
+                                <span class="custom-check" aria-hidden="true"></span>
                                 <span class="check-caption">Remember email on this workstation</span>
                             </label>
                         </div>
 
-                        <!-- Sign In Button -->
+                        <!-- Action Button -->
                         <button type="submit" class="primary-sign-btn" id="loginBtn">
                             <span class="btn-caption">
-                                <strong>Sign In to Portal</strong>
-                                <small>Authorized Personnel Session</small>
+                                <strong id="btnLabel">Sign In to Portal</strong>
+                                <small id="btnSub">Authorized Personnel Session</small>
                             </span>
                             <span class="btn-arrow-wrap" aria-hidden="true">
                                 <i data-lucide="arrow-right"></i>
@@ -245,19 +268,19 @@
                         <!-- Access Request CTA -->
                         <a href="requestACC.html" class="request-access-btn">
                             <div class="request-icon-box">
-                                <i data-lucide="user-plus"></i>
+                                <i data-lucide="user-plus" aria-hidden="true"></i>
                             </div>
                             <div class="request-caption">
                                 <strong>Register Access Request</strong>
                                 <span>Submit new personnel credentials for approval</span>
                             </div>
-                            <i data-lucide="chevron-right" class="request-chevron"></i>
+                            <i data-lucide="chevron-right" class="request-chevron" aria-hidden="true"></i>
                         </a>
                     </form>
 
                     <footer class="card-footer">
                         <span>© 2026 Provincial Government of Quezon</span>
-                        <span class="dot">•</span>
+                        <span class="dot" aria-hidden="true">•</span>
                         <span>PGENRO IMS</span>
                     </footer>
                 </div>
@@ -266,6 +289,7 @@
         </div>
     </main>
 
+    <!-- App Script -->
     <script type="module" src="../user-javascript/login.js"></script>
 </body>
 </html>
