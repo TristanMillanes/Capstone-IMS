@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PGENRO IMS | ICS Administration</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Firebase SDKs (v10 Compatibility Mode) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+  <!-- Your existing admin theme + ICS module styles -->
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="ics-admin.css">
+</head>
+
+<body>
+  <div class="app-layout">
+    <!-- ====================== SIDEBAR ====================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <a href="#top" class="logo-area">
+          <div class="logo-icon">
+            <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
+            <i data-lucide="shield-check" style="display:none;"></i>
+          </div>
+          <div class="logo-text">
+            <h2>PGENRO IMS</h2>
+            <span>Admin Control Center</span>
+          </div>
+        </a>
+        <button class="sidebar-toggle" id="sidebarCollapseBtn" type="button" title="Collapse Menu">
+          <i data-lucide="panel-left-close"></i>
+        </button>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-group">
+          <span class="nav-label">Main Panel</span>
+          <ul>
+            <li><a href="admin.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+            <li><a href="admincommunication.html" class="nav-item"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+            <li><a href="travelorder.html" class="nav-item"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
+            <li><a href="officememo.html" class="nav-item"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+            <li><a href="employee-admin.html" class="nav-item"><i data-lucide="folder-git-2"></i><span>Employee Profiles</span></a></li>
+            <li><a href="invetoryadmin.html" class="nav-item"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
+            <li><a href="../User/visitorsView.html" class="nav-item"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+            <li><a href="serviceAdmin.html" class="nav-item"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
+            <li><a href="#" class="nav-item active"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+          </ul>
+        </div>
+
+        <div class="nav-group">
+          <span class="nav-label">User & System Control</span>
+          <ul>
+            <li><a href="Usermanagement.html" class="nav-item"><i data-lucide="users"></i><span>User Management</span></a></li>
+            <li><a href="requestACC.html" class="nav-item"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
+            <li><a href="#audit" class="nav-item"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+            <li><a href="#backup" class="nav-item"><i data-lucide="database"></i><span>System Backups</span></a></li>
+            <li><a href="#settings" class="nav-item"><i data-lucide="settings"></i><span>Global Settings</span></a></li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status-indicator">
+          <span class="status-dot online" id="dbStatusDot"></span>
+          <div class="status-info">
+            <span class="status-title">Database Sync</span>
+            <span class="status-sub" id="dbStatusText">Connecting Firebase...</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ====================== MAIN ====================== -->
+    <div class="main-wrapper" id="top">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
+            <i data-lucide="menu"></i>
+          </button>
+
+          <div class="global-search">
+            <i data-lucide="search" class="search-icon"></i>
+            <input id="globalSearchInput" type="text" placeholder="Search ICS no., control no., property, serial no., accountable person...">
+            <kbd class="search-shortcut">Ctrl K</kbd>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="system-status-pill">
+            <span class="status-dot online" id="topStatusDot"></span>
+            <span id="topStatusText">Database Online</span>
+          </div>
+
+          <div class="profile-menu" id="profileMenu">
+            <button class="profile-btn" id="profileBtn" type="button">
+              <div class="profile-avatar"><i data-lucide="shield-check"></i></div>
+              <div class="profile-text">
+                <span class="user-name">PGENRO Admin</span>
+                <span class="user-role">ICS Administrator</span>
+              </div>
+              <i data-lucide="chevron-down" class="profile-chevron"></i>
+            </button>
+            <div class="profile-dropdown" id="profileDropdown">
+              <div class="profile-dropdown-header">
+                <div class="profile-avatar big"><i data-lucide="user"></i></div>
+                <div>
+                  <h3>PGENRO Admin</h3>
+                  <p>ICS Property Administration</p>
+                  <span class="role-badge">Administrator</span>
+                </div>
+              </div>
+              <div class="dropdown-links">
+                <a href="../User/ics.html"><i data-lucide="eye"></i> Open User Viewer</a>
+                <a href="admin.html"><i data-lucide="layout-dashboard"></i> Admin Dashboard</a>
+              </div>
+              <div class="dropdown-footer">
+                <button class="logout-btn" id="logoutBtn" type="button">
+                  <i data-lucide="log-out"></i> Sign Out
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="main-content">
+        <!-- PAGE HEADER -->
+        <section class="ics-admin-header">
+          <div>
+            <div class="breadcrumb">
+              <span>Admin Console</span>
+              <i data-lucide="chevron-right"></i>
+              <span>Property Management</span>
+              <i data-lucide="chevron-right"></i>
+              <span class="active">ICS Administration</span>
+            </div>
+            <div class="header-title-row">
+              <div>
+                <span class="admin-module-badge"><i data-lucide="pencil-ruler"></i> ENCODING MODULE</span>
+                <h1>Inventory Custodian Slip <span>(ICS)</span> Administration</h1>
+                <p>Encode, update, archive, search and print official property accountability records. User-facing records remain read-only.</p>
+              </div>
+              <div class="header-actions">
+                <button class="btn btn-secondary" id="exportCsvBtn" type="button"><i data-lucide="download"></i> Export CSV</button>
+                <button class="btn btn-primary" id="addIcsBtn" type="button"><i data-lucide="plus"></i> New ICS Record</button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- KPI -->
+        <section class="ics-kpi-grid">
+          <div class="ics-kpi-card">
+            <div class="ics-kpi-icon primary"><i data-lucide="files"></i></div>
+            <div><span class="ics-kpi-label">Total Records</span><strong id="kpiTotal">0</strong><small>All encoded ICS records</small></div>
+          </div>
+          <div class="ics-kpi-card">
+            <div class="ics-kpi-icon success"><i data-lucide="badge-check"></i></div>
+            <div><span class="ics-kpi-label">Active Records</span><strong id="kpiActive">0</strong><small>Currently assigned property</small></div>
+          </div>
+          <div class="ics-kpi-card">
+            <div class="ics-kpi-icon warning"><i data-lucide="archive"></i></div>
+            <div><span class="ics-kpi-label">Archived</span><strong id="kpiArchived">0</strong><small>Historical records</small></div>
+          </div>
+          <div class="ics-kpi-card">
+            <div class="ics-kpi-icon info"><i data-lucide="coins"></i></div>
+            <div><span class="ics-kpi-label">Recorded Value</span><strong id="kpiValue">₱0.00</strong><small>Total encoded value</small></div>
+          </div>
+        </section>
+
+        <!-- RECORD PANEL -->
+        <section class="ics-panel">
+          <div class="ics-panel-header">
+            <div>
+              <h2><i data-lucide="database"></i> ICS Property Registry</h2>
+              <p>Administrative encoding workspace for the <span class="font-mono">ics_records</span> Firestore collection.</p>
+            </div>
+            <div class="view-switcher">
+              <button class="view-tab active" data-status-filter="ALL" type="button">All</button>
+              <button class="view-tab" data-status-filter="Active" type="button">Active</button>
+              <button class="view-tab" data-status-filter="Archived" type="button">Archived</button>
+            </div>
+          </div>
+
+          <div class="ics-toolbar">
+            <div class="search-field">
+              <i data-lucide="search"></i>
+              <input type="text" id="icsSearchInput" placeholder="Search control no., ICS no., article, description, serial or accountable person...">
+            </div>
+
+            <select class="filter-select" id="articleFilter">
+              <option value="ALL">All Articles</option>
+            </select>
+
+            <select class="filter-select" id="divisionFilter">
+              <option value="ALL">All Divisions</option>
+            </select>
+
+            <button class="icon-action-btn" id="clearFiltersBtn" type="button" title="Clear filters">
+              <i data-lucide="list-filter-x"></i>
+            </button>
+          </div>
+
+          <div class="table-meta-row">
+            <span id="recordCounter">Showing 0 records</span>
+            <span>Live synchronization enabled</span>
+          </div>
+
+          <div class="table-responsive">
+            <table class="ics-admin-table">
+              <thead>
+                <tr>
+                  <th>Control / ICS No.</th>
+                  <th>Article / Description</th>
+                  <th>Serial No.</th>
+                  <th>Qty</th>
+                  <th>Total Value</th>
+                  <th>Accountable Person</th>
+                  <th>Date Acquired</th>
+                  <th>Status</th>
+                  <th class="text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="icsTableBody">
+                <tr><td colspan="9" class="empty-row">Connecting to database records...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ====================== ADD / EDIT MODAL ====================== -->
+  <div class="modal-backdrop" id="editorModal">
+    <div class="ics-modal large">
+      <div class="ics-modal-header">
+        <div class="modal-heading">
+          <div class="modal-heading-icon"><i data-lucide="clipboard-pen-line"></i></div>
+          <div>
+            <span class="modal-overline">ADMINISTRATIVE ENCODING</span>
+            <h2 id="editorTitle">New Inventory Custodian Slip</h2>
+            <p>Enter the official property accountability information.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeEditorBtn" type="button"><i data-lucide="x"></i></button>
+      </div>
+
+      <form id="icsForm">
+        <div class="ics-modal-body">
+          <input type="hidden" id="recordId">
+
+          <div class="form-section-title"><i data-lucide="hash"></i> Control & Identification</div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="controlNo">Control No. <span>*</span></label>
+              <input id="controlNo" required maxlength="60" placeholder="e.g. ICS-2026-0001">
+            </div>
+            <div class="field">
+              <label for="icsNo">ICS No. <span>*</span></label>
+              <input id="icsNo" required maxlength="60" placeholder="Official ICS number">
+            </div>
+            <div class="field">
+              <label for="entryNo">Entry No.</label>
+              <input id="entryNo" maxlength="60" placeholder="Entry / registry number">
+            </div>
+            <div class="field">
+              <label for="accountCode">Account Code</label>
+              <input id="accountCode" maxlength="60" placeholder="e.g. 1-5-02-03-010">
+            </div>
+          </div>
+
+          <div class="form-section-title"><i data-lucide="package"></i> Property Information</div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="article">Article / Category <span>*</span></label>
+              <input id="article" required maxlength="120" placeholder="e.g. Office Equipment">
+            </div>
+            <div class="field span-2">
+              <label for="itemDescription">Item Description <span>*</span></label>
+              <input id="itemDescription" required maxlength="240" placeholder="Detailed property description">
+            </div>
+            <div class="field">
+              <label for="serialNo">Serial Number</label>
+              <input id="serialNo" maxlength="120" placeholder="Serial / service tag">
+            </div>
+            <div class="field">
+              <label for="itemNo">Item / Inventory No.</label>
+              <input id="itemNo" maxlength="120" placeholder="Property / inventory no.">
+            </div>
+            <div class="field">
+              <label for="unit">Unit of Measure</label>
+              <input id="unit" value="unit" maxlength="40">
+            </div>
+            <div class="field">
+              <label for="quantity">Quantity <span>*</span></label>
+              <input id="quantity" type="number" min="0" step="0.01" value="1" required>
+            </div>
+          </div>
+
+          <div class="form-section-title"><i data-lucide="coins"></i> Financial & Procurement</div>
+          <div class="form-grid">
+            <div class="field">
+              <label for="unitCost">Unit Cost (₱) <span>*</span></label>
+              <input id="unitCost" type="number" min="0" step="0.01" value="0" required>
+            </div>
+            <div class="field">
+              <label>Total Value</label>
+              <div class="calculated-field" id="totalValuePreview">₱0.00</div>
+            </div>
+            <div class="field">
+              <label for="dateAcquired">Date Acquired</label>
+              <input id="dateAcquired" type="date">
+            </div>
+            <div class="field">
+              <label for="prNo">Purchase Request (P.R.) No.</label>
+              <input id="prNo" maxlength="80" placeholder="P.R. number">
+            </div>
+            <div class="field">
+              <label for="prDate">P.R. Date</label>
+              <input id="prDate" type="date">
+            </div>
+            <div class="field">
+              <label for="fundCluster">Fund Cluster</label>
+              <input id="fundCluster" value="General Fund (01)" maxlength="80">
+            </div>
+          </div>
+
+          <div class="form-section-title"><i data-lucide="user-check"></i> Accountability</div>
+          <div class="form-grid">
+            <div class="field span-2">
+              <label for="accountablePerson">Person Accountable <span>*</span></label>
+              <input id="accountablePerson" required maxlength="180" placeholder="Complete name of accountable employee">
+            </div>
+            <div class="field">
+              <label for="division">Division / Unit</label>
+              <input id="division" maxlength="120" placeholder="Office / division">
+            </div>
+            <div class="field">
+              <label for="status">Record Status</label>
+              <select id="status">
+                <option value="Active">Active</option>
+                <option value="Archived">Archived</option>
+              </select>
+            </div>
+            <div class="field span-3">
+              <label for="remarks">Historical / Remarks</label>
+              <textarea id="remarks" rows="4" maxlength="1000" placeholder="Additional notes, transfers, condition, historical remarks, etc."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="ics-modal-footer">
+          <button class="btn btn-secondary" type="button" id="cancelEditorBtn">Cancel</button>
+          <button class="btn btn-primary" type="submit" id="saveIcsBtn">
+            <i data-lucide="save"></i> Save ICS Record
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====================== VIEW MODAL ====================== -->
+  <div class="modal-backdrop" id="viewModal">
+    <div class="ics-modal view-modal">
+      <div class="ics-modal-header">
+        <div class="modal-heading">
+          <div class="modal-heading-icon"><i data-lucide="file-badge"></i></div>
+          <div>
+            <span class="modal-overline">RECORD REVIEW</span>
+            <h2 id="viewTitle">ICS Record Details</h2>
+            <p>Administrative view of the selected property slip.</p>
+          </div>
+        </div>
+        <button class="modal-close-btn" id="closeViewBtn" type="button"><i data-lucide="x"></i></button>
+      </div>
+
+      <div class="ics-modal-body">
+        <div class="view-summary">
+          <div>
+            <span class="detail-label">Article</span>
+            <strong id="viewArticle">---</strong>
+            <p id="viewDescription">---</p>
+          </div>
+          <span id="viewStatus" class="status-badge active">Active</span>
+        </div>
+
+        <div class="view-grid">
+          <div class="view-card"><span>Control No.</span><strong id="viewControlNo">---</strong></div>
+          <div class="view-card"><span>ICS No.</span><strong id="viewIcsNo">---</strong></div>
+          <div class="view-card"><span>Account Code</span><strong id="viewAccountCode">---</strong></div>
+          <div class="view-card"><span>Entry No.</span><strong id="viewEntryNo">---</strong></div>
+          <div class="view-card"><span>Serial No.</span><strong id="viewSerialNo">---</strong></div>
+          <div class="view-card"><span>Item / Inventory No.</span><strong id="viewItemNo">---</strong></div>
+          <div class="view-card"><span>Quantity</span><strong id="viewQty">0</strong></div>
+          <div class="view-card"><span>Unit</span><strong id="viewUnit">unit</strong></div>
+          <div class="view-card"><span>Unit Cost</span><strong id="viewUnitCost">₱0.00</strong></div>
+          <div class="view-card"><span>Total Value</span><strong id="viewTotalValue">₱0.00</strong></div>
+          <div class="view-card"><span>Date Acquired</span><strong id="viewDateAcquired">---</strong></div>
+          <div class="view-card"><span>P.R. No.</span><strong id="viewPrNo">---</strong></div>
+          <div class="view-card"><span>P.R. Date</span><strong id="viewPrDate">---</strong></div>
+          <div class="view-card"><span>Fund Cluster</span><strong id="viewFundCluster">---</strong></div>
+          <div class="view-card span-2"><span>Person Accountable</span><strong id="viewAccountable">---</strong></div>
+          <div class="view-card span-2"><span>Division / Unit</span><strong id="viewDivision">---</strong></div>
+          <div class="view-card span-4"><span>Historical / Remarks</span><p id="viewRemarks">No remarks.</p></div>
+        </div>
+      </div>
+
+      <div class="ics-modal-footer">
+        <button class="btn btn-danger-outline" id="deleteViewBtn" type="button"><i data-lucide="trash-2"></i> Delete</button>
+        <div class="footer-actions-right">
+          <button class="btn btn-secondary" id="printViewBtn" type="button"><i data-lucide="printer"></i> Print</button>
+          <button class="btn btn-primary" id="editViewBtn" type="button"><i data-lucide="square-pen"></i> Edit Record</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../admin-javascript/AdminICS.js"></script>
+</body>
+</html>

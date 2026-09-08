@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Homepage</title>
+  <title>PGENRO IMS | Dashboard Overview</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,10 +16,6 @@
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Firebase Realtime Database -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-
   <!-- CSS -->
   <link rel="stylesheet" href="homepage.css" />
 </head>
@@ -30,7 +26,6 @@
 
   <!-- NAVBAR -->
   <header class="navbar">
-    <!-- Left Section: Menu Toggle & Brand Logo -->
     <div class="nav-left-container">
       <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle Navigation Menu" type="button">
         <span></span>
@@ -40,7 +35,7 @@
 
       <a href="#home" class="logo-area">
         <div class="logo-icon">
-          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'">
+          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'" />
         </div>
         <div class="logo-text">
           <h2>Provincial Government</h2>
@@ -49,19 +44,20 @@
       </a>
     </div>
 
-    <!-- Center Section: Clean Anchor Navigation -->
+    <!-- Center Section: Anchor Navigation -->
     <nav class="nav-links" id="navLinks">
-      <a href="#home" class="active">Home</a>
-      <a href="#analytics">Telemetry Center</a>
-      <a href="#memo">Office Memos</a>
+      <a href="#home" class="active">Overview</a>
+      <a href="#kpiOverview">Metrics</a>
+      <a href="#analytics">Telemetry</a>
+      <a href="#memo">Memos</a>
       <a href="#process">Strategy</a>
       <a href="#contact">Contact</a>
     </nav>
 
-    <!-- Right Section: Profile & System Status Indicator -->
+    <!-- Right Section: Profile & Systems Status -->
     <div class="right-nav">
       <div class="profile-menu" id="profileMenu">
-        <button class="profile-btn" id="profileBtn" type="button">
+        <button class="profile-btn" id="profileBtn" type="button" aria-haspopup="true" aria-expanded="false">
           <div class="profile-avatar">
             <i data-lucide="user"></i>
           </div>
@@ -72,7 +68,7 @@
           <i data-lucide="chevron-down" class="profile-chevron"></i>
         </button>
 
-        <div class="profile-dropdown" id="profileDropdown">
+        <div class="profile-dropdown" id="profileDropdown" role="menu">
           <div class="profile-dropdown-header">
             <div class="profile-avatar big">
               <i data-lucide="user"></i>
@@ -83,17 +79,17 @@
             </div>
           </div>
 
-          <a href="dashboard.html">
+          <a href="dashboard.html" role="menuitem">
             <i data-lucide="layout-dashboard"></i>
             Dashboard
           </a>
 
-          <a href="/Capstone-IMS/SettingIMS/Settings.html">
+          <a href="/Capstone-IMS/SettingIMS/Settings.html" role="menuitem">
             <i data-lucide="settings"></i>
             Account Settings
           </a>
 
-          <button class="logout-btn" id="logoutBtn" type="button">
+          <button class="logout-btn" id="logoutBtn" type="button" role="menuitem">
             <i data-lucide="log-out"></i>
             Logout
           </button>
@@ -170,40 +166,118 @@
       <!-- Systems Status Widget -->
       <div class="sidebar-footer">
         <div class="system-status">
-          <span class="status-indicator online" id="firebaseStatusIndicator"></span>
-          <span class="status-text" id="firebaseStatusText">Connecting to Firebase...</span>
+          <span class="status-indicator standby" id="dbStatusIndicator"></span>
+          <span class="status-text" id="dbStatusText">Standby • Ready for Supabase Sync</span>
         </div>
       </div>
     </aside>
 
     <!-- MAIN CONTENT -->
     <main class="main-content" id="mainContent">
-      <!-- HERO -->
-      <section class="hero" id="home">
+      <!-- DASHBOARD HERO / COMMAND HEADER -->
+      <section class="hero dashboard-header-banner" id="home">
         <div class="hero-center-copy reveal">
-          <span class="badge">
-            <i data-lucide="shield-check"></i>
-            Operational Monitor Active
-          </span>
+          <div class="badge-row">
+            <span class="badge live-time-badge">
+              <i data-lucide="clock"></i>
+              <span id="currentDateText">Loading time...</span>
+            </span>
+            <span class="badge status-pill">
+              <i data-lucide="database"></i>
+              Database-Driven (Zero-Baseline)
+            </span>
+          </div>
 
           <h1>
             Welcome to the <span>PGENRO IMS</span>
           </h1>
           <p class="hero-subtitle">
-            Information Management System
+            Integrated Workspace &amp; Real-Time Operations Command Dashboard
           </p>
 
           <p class="hero-description">
-            An integrated database workspace designed to track document communications, handle structural office travel documents, archive internal announcements, register assets inventory, and manage client visitors rosters.
+            Live central monitor aggregating official communications, employee profiles, service requests, asset inventory, travel orders, and visitor registry.
           </p>
 
+          <div class="hero-stats-strip">
+            <div class="stat-pill">
+              <i data-lucide="server"></i>
+              <span>Total Database Records: <strong id="heroTotalRecords">0</strong></span>
+            </div>
+          </div>
+
           <div class="hero-actions">
-            <a href="#analytics" class="btn btn-primary">
-              <i data-lucide="line-chart"></i> View Metrics
+            <a href="#kpiOverview" class="btn btn-primary">
+              <i data-lucide="line-chart"></i> View Metrics Summary
             </a>
             <a href="Communication.html" class="btn btn-secondary">
-              Open Communications <i data-lucide="arrow-right"></i>
+              Official Communications <i data-lucide="arrow-right"></i>
             </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- OVERALL DATABASE KPI OVERVIEW -->
+      <section class="kpi-section" id="kpiOverview">
+        <div class="kpi-grid">
+          <!-- KPI 1: Communications -->
+          <div class="kpi-card reveal">
+            <div class="kpi-icon"><i data-lucide="mail"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-label">Communications</span>
+              <h3 id="kpiTotalComms">0</h3>
+              <p class="kpi-sub"><span id="kpiIncomingCount">0</span> In • <span id="kpiOutgoingCount">0</span> Out</p>
+            </div>
+          </div>
+
+          <!-- KPI 2: Service Requests -->
+          <div class="kpi-card reveal">
+            <div class="kpi-icon warning"><i data-lucide="shield-alert"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-label">Service Requests</span>
+              <h3 id="kpiTotalServices">0</h3>
+              <p class="kpi-sub"><span id="kpiPendingServices">0</span> Pending Action</p>
+            </div>
+          </div>
+
+          <!-- KPI 3: Employees -->
+          <div class="kpi-card reveal">
+            <div class="kpi-icon"><i data-lucide="users-round"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-label">Personnel</span>
+              <h3 id="kpiTotalEmployees">0</h3>
+              <p class="kpi-sub">Active Staff Records</p>
+            </div>
+          </div>
+
+          <!-- KPI 4: Travel Orders -->
+          <div class="kpi-card reveal">
+            <div class="kpi-icon"><i data-lucide="navigation"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-label">Travel Orders</span>
+              <h3 id="kpiTotalTravel">0</h3>
+              <p class="kpi-sub"><span id="kpiActiveTravel">0</span> Active Field Trips</p>
+            </div>
+          </div>
+
+          <!-- KPI 5: Inventory & ICS -->
+          <div class="kpi-card reveal">
+            <div class="kpi-icon"><i data-lucide="package"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-label">Tracked Assets</span>
+              <h3 id="kpiTotalAssets">0</h3>
+              <p class="kpi-sub"><span id="kpiTotalIcs">0</span> ICS Issued</p>
+            </div>
+          </div>
+
+          <!-- KPI 6: Office Visitors -->
+          <div class="kpi-card reveal">
+            <div class="kpi-icon"><i data-lucide="clipboard-signature"></i></div>
+            <div class="kpi-details">
+              <span class="kpi-label">Today's Visitors</span>
+              <h3 id="kpiVisitorsToday">0</h3>
+              <p class="kpi-sub"><span id="kpiVisitorsInside">0</span> Currently Inside</p>
+            </div>
           </div>
         </div>
       </section>
@@ -218,8 +292,9 @@
           </p>
         </div>
 
+        <!-- Primary Row: Line Flow & Visitor Telemetry -->
         <div class="analytics-grid">
-          <!-- Communication Chart (Incoming vs Outgoing) -->
+          <!-- Communication Chart -->
           <div class="chart-card reveal">
             <div class="chart-header">
               <div>
@@ -242,7 +317,7 @@
                 </div>
                 <div>
                   <h3>Recent Visitor Logs</h3>
-                  <p>Latest registered visitor check-ins & status</p>
+                  <p>Latest registered visitor check-ins &amp; status</p>
                 </div>
               </div>
               <a href="visitorsView.html" class="view-all-link">
@@ -250,21 +325,68 @@
               </a>
             </div>
 
-            <!-- Recent Visitors Entry List -->
             <div class="visitor-recent-list" id="visitorRecentList">
-              <div class="visitor-item visitor-loading">
-                <div class="visitor-info">
-                  <h4>Loading visitor logs...</h4>
-                  <p>Connecting to Firebase Realtime Database</p>
-                </div>
+              <div class="empty-state-box">
+                <div class="empty-icon"><i data-lucide="clipboard-list"></i></div>
+                <h4>No Visitor Records</h4>
+                <p>Logged office visitors from the database will display here automatically.</p>
               </div>
             </div>
 
-            <!-- Footer Activity Summary -->
             <div class="telemetry-sub-chart">
               <div class="sub-chart-header">
                 <h4>Today's Log Summary</h4>
                 <span class="total-badge" id="todayVisitorsTotal">0 Total Visitors Today</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Secondary Row: Database Ratio & Recent Service Requests -->
+        <div class="analytics-grid" style="margin-top: 24px;">
+          <!-- Operations Doughnut Chart -->
+          <div class="chart-card reveal">
+            <div class="chart-header">
+              <div>
+                <h3>Database Activity Ratio</h3>
+                <p>Proportional balance of recorded entities across system tables</p>
+              </div>
+              <span class="chart-badge">Volume Share</span>
+            </div>
+            <div class="chart-wrapper">
+              <canvas id="operationsDistChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Service Requests Log Card -->
+          <div class="visitor-telemetry-card reveal">
+            <div class="telemetry-header">
+              <div class="telemetry-header-title">
+                <div class="telemetry-icon-container">
+                  <i data-lucide="shield-alert" class="telemetry-icon"></i>
+                </div>
+                <div>
+                  <h3>Recent Service Requests</h3>
+                  <p>Latest registered tickets and office maintenance tasks</p>
+                </div>
+              </div>
+              <a href="service.html" class="view-all-link">
+                Manage <i data-lucide="arrow-right"></i>
+              </a>
+            </div>
+
+            <div class="visitor-recent-list" id="serviceRecentList">
+              <div class="empty-state-box">
+                <div class="empty-icon"><i data-lucide="shield-alert"></i></div>
+                <h4>No Active Service Requests</h4>
+                <p>Maintenance, IT, and administrative requests will appear here once registered.</p>
+              </div>
+            </div>
+
+            <div class="telemetry-sub-chart">
+              <div class="sub-chart-header">
+                <h4>Queue Summary</h4>
+                <span class="total-badge" id="servicePendingSummary">0 Pending / In Queue</span>
               </div>
             </div>
           </div>
@@ -282,16 +404,17 @@
         </div>
 
         <div class="memo-grid" id="memoGrid">
-          <div class="memo-card reveal">
-            <div class="memo-body">
-              <h3>Loading office memorandums...</h3>
-              <p>Retrieving current pinned memos from Firebase Realtime Database.</p>
+          <div class="memo-empty-card reveal show">
+            <div class="empty-state-box">
+              <div class="empty-icon"><i data-lucide="file-text"></i></div>
+              <h4>No Pinned Office Memorandums</h4>
+              <p>Directives, notices, and official executive orders from the database will display here.</p>
             </div>
           </div>
         </div>
       </section>
 
-      <!-- PROCESS -->
+      <!-- PROCESS / SYSTEM MAP -->
       <section class="process-section" id="process">
         <div class="section-title reveal">
           <span>Basic Strategy</span>
@@ -306,7 +429,7 @@
             <div class="process-number">01</div>
             <div class="process-content">
               <h3>System Access</h3>
-              <p>Staff members authorize administrative privileges securely via secure database single sign-on mapping configurations.</p>
+              <p>Staff members authorize administrative privileges securely via database single sign-on mapping configurations.</p>
             </div>
           </div>
 
@@ -376,10 +499,7 @@
     <i data-lucide="chevron-up"></i>
   </button>
 
-  <!-- Firebase configuration must load before homepage logic -->
-  <script src="firebase-config.js"></script>
-
   <!-- JS -->
-  <script src="../user-javascript/homepage.js"></script>
+  <script src="../user-javascript/homepage.js</scirpt>
 </body>
 </html>

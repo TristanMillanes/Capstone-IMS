@@ -1,25 +1,52 @@
 /* ============================================================================
-   PGENRO IMS HOMEPAGE
-   Firebase Realtime Database Edition
+   PGENRO IMS HOMEPAGE - EXECUTIVE DASHBOARD ENGINE
+   Configured for Supabase Integration (Strict 0-Baseline & Decoupled DB Architecture)
    ============================================================================ */
 
 document.addEventListener("DOMContentLoaded", () => {
+  // --- Chart Instances ---
   let commCompareChartInstance = null;
-  let latestFlowData = null;
-  let visitorCache = [];
+  let operationsDistChartInstance = null;
 
-  // Firebase paths. Change these constants only if your existing database
-  // uses different top-level node names.
-  const DB_PATHS = {
-    visitors: "visitors",
-    memos: "memos",
-    documentFlow: "documentFlow"
+  // --- Strict 0-Baseline Dashboard State ---
+  const dashboardState = {
+    // Aggregated Metrics
+    kpis: {
+      totalComms: 0,
+      incomingComms: 0,
+      outgoingComms: 0,
+      totalServices: 0,
+      pendingServices: 0,
+      totalEmployees: 0,
+      totalTravel: 0,
+      activeTravel: 0,
+      totalAssets: 0,
+      totalIcs: 0,
+      visitorsToday: 0,
+      visitorsInside: 0
+    },
+    // Operations Volume Tracking
+    operations: {
+      comms: 0,
+      services: 0,
+      employees: 0,
+      travel: 0,
+      inventory: 0,
+      visitors: 0
+    },
+    // Document Flow Line Chart Data (Defaults to 0 baseline)
+    documentFlow: {
+      labels: ["Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6"],
+      incoming: [0, 0, 0, 0, 0, 0],
+      outgoing: [0, 0, 0, 0, 0, 0]
+    },
+    // Dynamic Record Collections
+    visitors: [],
+    serviceRequests: [],
+    memos: []
   };
 
-  if (window.lucide) {
-    lucide.createIcons();
-  }
-
+  // --- DOM Selectors ---
   const $ = (selector) => document.querySelector(selector);
   const hamburgerMenu = $("#hamburgerMenu");
   const sidebar = $("#sidebar");
@@ -29,44 +56,68 @@ document.addEventListener("DOMContentLoaded", () => {
   const profileBtn = $("#profileBtn");
   const logoutBtn = $("#logoutBtn");
   const scrollToTopBtn = $("#scrollToTopBtn");
+
+  // Telemetry & Status Nodes
+  const dbStatusIndicator = $("#dbStatusIndicator") || $("#firebaseStatusIndicator");
+  const dbStatusText = $("#dbStatusText") || $("#firebaseStatusText");
   const visitorRecentList = $("#visitorRecentList");
   const todayVisitorsTotal = $("#todayVisitorsTotal");
+  const serviceRecentList = $("#serviceRecentList");
+  const servicePendingSummary = $("#servicePendingSummary");
   const memoGrid = $("#memoGrid");
-  const firebaseStatusIndicator = $("#firebaseStatusIndicator");
-  const firebaseStatusText = $("#firebaseStatusText");
+  const heroTotalRecords = $("#heroTotalRecords");
+  const currentDateText = $("#currentDateText");
 
-  // --------------------------------------------------------------------------
-  // Generic helpers
-  // --------------------------------------------------------------------------
+  // KPI Counter Nodes
+  const kpiNodes = {
+    totalComms: $("#kpiTotalComms"),
+    incomingComms: $("#kpiIncomingCount"),
+    outgoingComms: $("#kpiOutgoingCount"),
+    totalServices: $("#kpiTotalServices"),
+    pendingServices: $("#kpiPendingServices"),
+    totalEmployees: $("#kpiTotalEmployees"),
+    totalTravel: $("#kpiTotalTravel"),
+    activeTravel: $("#kpiActiveTravel"),
+    totalAssets: $("#kpiTotalAssets"),
+    totalIcs: $("#kpiTotalIcs"),
+    visitorsToday: $("#kpiVisitorsToday"),
+    visitorsInside: $("#kpiVisitorsInside")
+  };
+
+  // --- Utility Functions ---
+  const refreshIcons = () => {
+    if (window.lucide && typeof window.lucide.createIcons === "function") {
+      window.lucide.createIcons();
+    }
+  };
+
   const escapeHtml = (value) => {
     const div = document.createElement("div");
     div.textContent = value == null ? "" : String(value);
     return div.innerHTML;
   };
 
-  const normalizeRecords = (snapshotValue) => {
-    if (!snapshotValue) return [];
-
-    if (Array.isArray(snapshotValue)) {
-      return snapshotValue.map((value, index) => ({
-        id: String(index),
-        ...(value && typeof value === "object" ? value : { value })
+  const normalizeRecords = (records) => {
+    if (!records) return [];
+    if (Array.isArray(records)) {
+      return records.map((val, idx) => ({
+        id: val?.id !== undefined ? String(val.id) : String(idx),
+        ...(val && typeof val === "object" ? val : { value: val })
       }));
     }
-
-    if (typeof snapshotValue === "object") {
-      return Object.entries(snapshotValue).map(([id, value]) => ({
+    if (typeof records === "object") {
+      return Object.entries(records).map(([id, val]) => ({
         id,
-        ...(value && typeof value === "object" ? value : { value })
+        ...(val && typeof val === "object" ? val : { value: val })
       }));
     }
-
     return [];
   };
 
   const getFirstValue = (record, keys, fallback = "") => {
+    if (!record) return fallback;
     for (const key of keys) {
-      if (record && record[key] !== undefined && record[key] !== null && record[key] !== "") {
+      if (record[key] !== undefined && record[key] !== null && record[key] !== "") {
         return record[key];
       }
     }
@@ -75,49 +126,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const parseDate = (value) => {
     if (value == null || value === "") return null;
-
     if (typeof value === "number") {
-      const milliseconds = value < 100000000000 ? value * 1000 : value;
-      const date = new Date(milliseconds);
-      return Number.isNaN(date.getTime()) ? null : date;
+      const ms = value < 100000000000 ? value * 1000 : value;
+      const d = new Date(ms);
+      return Number.isNaN(d.getTime()) ? null : d;
     }
-
-    const date = new Date(value);
-    return Number.isNaN(date.getTime()) ? null : date;
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
   };
 
   const formatTime = (record) => {
     const raw = getFirstValue(record, [
-      "timestamp",
-      "time",
-      "checkInTime",
-      "checkedInAt",
-      "createdAt",
-      "dateTime"
+      "created_at", "timestamp", "time", "checkInTime", "checkedInAt", "createdAt", "dateTime"
     ]);
-
     const date = parseDate(raw);
     if (!date) return getFirstValue(record, ["displayTime", "timeLabel"], "—");
-
-    return new Intl.DateTimeFormat("en-PH", {
-      hour: "numeric",
-      minute: "2-digit"
-    }).format(date);
+    return new Intl.DateTimeFormat("en-PH", { hour: "numeric", minute: "2-digit" }).format(date);
   };
 
   const isToday = (record) => {
     const raw = getFirstValue(record, [
-      "timestamp",
-      "time",
-      "checkInTime",
-      "checkedInAt",
-      "createdAt",
-      "dateTime",
-      "date"
+      "created_at", "timestamp", "time", "checkInTime", "checkedInAt", "createdAt", "date"
     ]);
     const date = parseDate(raw);
     if (!date) return false;
-
     const now = new Date();
     return (
       date.getFullYear() === now.getFullYear() &&
@@ -128,10 +160,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const sortNewest = (records) => {
     return [...records].sort((a, b) => {
-      const aRaw = getFirstValue(a, ["timestamp", "createdAt", "dateTime", "time", "date"], 0);
-      const bRaw = getFirstValue(b, ["timestamp", "createdAt", "dateTime", "time", "date"], 0);
-      const aDate = parseDate(aRaw);
-      const bDate = parseDate(bRaw);
+      const aDate = parseDate(getFirstValue(a, ["created_at", "timestamp", "createdAt", "dateTime", "time", "date"], 0));
+      const bDate = parseDate(getFirstValue(b, ["created_at", "timestamp", "createdAt", "dateTime", "time", "date"], 0));
       if (aDate && bDate) return bDate - aDate;
       if (aDate) return -1;
       if (bDate) return 1;
@@ -146,9 +176,420 @@ document.addEventListener("DOMContentLoaded", () => {
     return (words[0][0] + words[words.length - 1][0]).toUpperCase();
   };
 
-  // --------------------------------------------------------------------------
-  // Sidebar / Hamburger
-  // --------------------------------------------------------------------------
+  // --- Live Date & Time Display ---
+  const updateLiveDateTime = () => {
+    if (!currentDateText) return;
+    const now = new Date();
+    const formatted = new Intl.DateTimeFormat("en-PH", {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit"
+    }).format(now);
+    currentDateText.textContent = formatted;
+  };
+  updateLiveDateTime();
+  setInterval(updateLiveDateTime, 60000);
+
+  // --- System / Database Status Badge ---
+  const setDatabaseStatus = (statusType = "ready", message = "Ready for Supabase Connection") => {
+    if (!dbStatusIndicator || !dbStatusText) return;
+    dbStatusIndicator.className = `status-indicator ${statusType}`;
+    dbStatusText.textContent = message;
+  };
+
+  // --- Render KPI Cards & Aggregated Counters ---
+  const renderKPIs = () => {
+    const { kpis } = dashboardState;
+
+    if (kpiNodes.totalComms) kpiNodes.totalComms.textContent = kpis.totalComms;
+    if (kpiNodes.incomingComms) kpiNodes.incomingComms.textContent = kpis.incomingComms;
+    if (kpiNodes.outgoingComms) kpiNodes.outgoingComms.textContent = kpis.outgoingComms;
+
+    if (kpiNodes.totalServices) kpiNodes.totalServices.textContent = kpis.totalServices;
+    if (kpiNodes.pendingServices) kpiNodes.pendingServices.textContent = kpis.pendingServices;
+
+    if (kpiNodes.totalEmployees) kpiNodes.totalEmployees.textContent = kpis.totalEmployees;
+
+    if (kpiNodes.totalTravel) kpiNodes.totalTravel.textContent = kpis.totalTravel;
+    if (kpiNodes.activeTravel) kpiNodes.activeTravel.textContent = kpis.activeTravel;
+
+    if (kpiNodes.totalAssets) kpiNodes.totalAssets.textContent = kpis.totalAssets;
+    if (kpiNodes.totalIcs) kpiNodes.totalIcs.textContent = kpis.totalIcs;
+
+    if (kpiNodes.visitorsToday) kpiNodes.visitorsToday.textContent = kpis.visitorsToday;
+    if (kpiNodes.visitorsInside) kpiNodes.visitorsInside.textContent = kpis.visitorsInside;
+
+    // Total records counter on Hero
+    if (heroTotalRecords) {
+      const grandTotal = kpis.totalComms + kpis.totalServices + kpis.totalEmployees +
+                         kpis.totalTravel + kpis.totalAssets + kpis.totalIcs;
+      heroTotalRecords.textContent = grandTotal.toLocaleString();
+    }
+  };
+
+  // --- Render Visitor Logs List ---
+  const renderVisitors = (records = dashboardState.visitors) => {
+    const normalized = normalizeRecords(records);
+    dashboardState.visitors = normalized;
+    dashboardState.operations.visitors = normalized.length;
+
+    const todayCount = normalized.filter(isToday).length;
+    const insideCount = normalized.filter(r => {
+      const st = String(getFirstValue(r, ["status", "visit_status", "visitStatus"], "Checked In"));
+      return /checked.?in|active|inside/i.test(st);
+    }).length;
+
+    dashboardState.kpis.visitorsToday = todayCount;
+    dashboardState.kpis.visitorsInside = insideCount;
+    renderKPIs();
+
+    if (todayVisitorsTotal) {
+      todayVisitorsTotal.textContent = `${todayCount} Total Visitors Today`;
+    }
+
+    if (!visitorRecentList) return;
+
+    if (!normalized.length) {
+      visitorRecentList.innerHTML = `
+        <div class="empty-state-box">
+          <div class="empty-icon"><i data-lucide="clipboard-list"></i></div>
+          <h4>No Visitor Records</h4>
+          <p>Logged office visitors from the database will display here automatically.</p>
+        </div>`;
+      refreshIcons();
+      updateOperationsChart();
+      return;
+    }
+
+    const sorted = sortNewest(normalized).slice(0, 5);
+    visitorRecentList.innerHTML = sorted.map(visitor => {
+      const name = getFirstValue(visitor, ["full_name", "name", "fullName", "visitorName"], "Visitor");
+      const office = getFirstValue(visitor, ["office", "organization", "agency", "company"], "Office / Guest");
+      const purpose = getFirstValue(visitor, ["purpose", "reason", "visitPurpose"], "General Transaction");
+      const status = String(getFirstValue(visitor, ["status", "visit_status", "visitStatus"], "Checked In"));
+      const isInside = /checked.?in|active|inside/i.test(status);
+
+      return `
+        <div class="visitor-item">
+          <div class="visitor-avatar">${escapeHtml(initials(name))}</div>
+          <div class="visitor-info">
+            <h4>${escapeHtml(name)}</h4>
+            <p>${escapeHtml(office)} • ${escapeHtml(purpose)}</p>
+          </div>
+          <div class="visitor-meta">
+            <span class="visitor-time">${escapeHtml(formatTime(visitor))}</span>
+            <span class="badge-status ${isInside ? "active" : "completed"}">
+              ${isInside ? '<span class="status-dot"></span>' : ''}
+              ${escapeHtml(status)}
+            </span>
+          </div>
+        </div>`;
+    }).join("");
+
+    refreshIcons();
+    updateOperationsChart();
+  };
+
+  // --- Render Service Requests List ---
+  const renderServiceRequests = (records = dashboardState.serviceRequests) => {
+    const normalized = normalizeRecords(records);
+    dashboardState.serviceRequests = normalized;
+    dashboardState.operations.services = normalized.length;
+
+    const pendingCount = normalized.filter(r => {
+      const st = String(getFirstValue(r, ["status", "request_status", "serviceStatus"], "pending"));
+      return /pending|open|queue|review|in.?progress/i.test(st);
+    }).length;
+
+    dashboardState.kpis.totalServices = normalized.length;
+    dashboardState.kpis.pendingServices = pendingCount;
+    renderKPIs();
+
+    if (servicePendingSummary) {
+      servicePendingSummary.textContent = `${pendingCount} Pending / In Queue`;
+    }
+
+    if (!serviceRecentList) return;
+
+    if (!normalized.length) {
+      serviceRecentList.innerHTML = `
+        <div class="empty-state-box">
+          <div class="empty-icon"><i data-lucide="shield-alert"></i></div>
+          <h4>No Active Service Requests</h4>
+          <p>Maintenance, IT, and administrative requests will appear here once registered.</p>
+        </div>`;
+      refreshIcons();
+      updateOperationsChart();
+      return;
+    }
+
+    const sorted = sortNewest(normalized).slice(0, 5);
+    serviceRecentList.innerHTML = sorted.map(ticket => {
+      const title = getFirstValue(ticket, ["title", "subject", "service_type", "serviceType"], "Service Request");
+      const requester = getFirstValue(ticket, ["requested_by", "requester", "employee_name", "staff"], "Office Staff");
+      const status = String(getFirstValue(ticket, ["status", "request_status", "serviceStatus"], "Pending"));
+      const isPending = /pending|open|queue/i.test(status);
+
+      return `
+        <div class="visitor-item">
+          <div class="visitor-avatar" style="background: ${isPending ? 'rgba(235, 87, 87, 0.12)' : 'var(--primary-glow)'}; color: ${isPending ? '#eb5757' : 'var(--primary-dark)'};">
+            <i data-lucide="${isPending ? 'alert-circle' : 'check-circle'}" style="width:16px;height:16px;"></i>
+          </div>
+          <div class="visitor-info">
+            <h4>${escapeHtml(title)}</h4>
+            <p>Requester: ${escapeHtml(requester)}</p>
+          </div>
+          <div class="visitor-meta">
+            <span class="badge-status ${isPending ? 'completed' : 'active'}">
+              ${escapeHtml(status)}
+            </span>
+          </div>
+        </div>`;
+    }).join("");
+
+    refreshIcons();
+    updateOperationsChart();
+  };
+
+  // --- Render Pinned Memorandums ---
+  const renderMemos = (records = dashboardState.memos) => {
+    const normalized = normalizeRecords(records);
+    dashboardState.memos = normalized;
+
+    if (!memoGrid) return;
+
+    const pinned = normalized
+      .filter(memo => String(getFirstValue(memo, ["pinned", "is_pinned", "isPinned"], true)).toLowerCase() !== "false")
+      .slice(0, 6);
+
+    if (!pinned.length) {
+      memoGrid.innerHTML = `
+        <div class="memo-empty-card reveal show">
+          <div class="empty-state-box">
+            <div class="empty-icon"><i data-lucide="file-text"></i></div>
+            <h4>No Pinned Office Memorandums</h4>
+            <p>Directives, notices, and official executive orders from the database will display here.</p>
+          </div>
+        </div>`;
+      refreshIcons();
+      return;
+    }
+
+    memoGrid.innerHTML = pinned.map(memo => {
+      const title = getFirstValue(memo, ["title", "subject", "memo_title", "memoTitle"], "Official Notice");
+      const description = getFirstValue(memo, ["description", "content", "summary", "body"], "No synopsis available.");
+      const code = getFirstValue(memo, ["code", "memo_code", "reference_no", "referenceNo"], "MEMO");
+      const priority = getFirstValue(memo, ["priority", "priority_level", "category"], "Standard");
+      const issuedDate = getFirstValue(memo, ["issued_date", "date_issued", "created_at", "date"], "—");
+      const issuedBy = getFirstValue(memo, ["issued_by", "author", "department"], "PGENRO Admin");
+      const target = getFirstValue(memo, ["target", "audience"], "All Units");
+      const detailsUrl = getFirstValue(memo, ["details_url", "url", "link"], "officememo.html");
+      const downloadUrl = getFirstValue(memo, ["download_url", "file_url", "fileUrl"], "");
+      const isHigh = String(priority).toLowerCase() === "high";
+
+      return `
+        <div class="memo-card pinned reveal show">
+          <div class="memo-header">
+            <div class="memo-badge-group">
+              <span class="memo-pinned-tag"><i data-lucide="pin"></i> Pinned</span>
+              <span class="memo-code">${escapeHtml(code)}</span>
+            </div>
+            <span class="priority-tag ${isHigh ? 'high' : 'standard'}">${escapeHtml(priority)}</span>
+          </div>
+
+          <div class="memo-body">
+            <h3>${escapeHtml(title)}</h3>
+            <p>${escapeHtml(description)}</p>
+          </div>
+
+          <div class="memo-meta">
+            <div class="meta-item"><i data-lucide="calendar"></i><span>Issued: ${escapeHtml(issuedDate)}</span></div>
+            <div class="meta-item"><i data-lucide="user-check"></i><span>By: ${escapeHtml(issuedBy)}</span></div>
+            <div class="meta-item"><i data-lucide="users"></i><span>Target: ${escapeHtml(target)}</span></div>
+          </div>
+
+          <div class="memo-footer">
+            <a href="${escapeHtml(detailsUrl)}" class="btn-memo-link">
+              <i data-lucide="file-text"></i> Read Details
+            </a>
+            ${downloadUrl ? `
+              <a class="btn-icon-action" title="Download Attachment" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener">
+                <i data-lucide="download"></i>
+              </a>` : `
+              <button class="btn-icon-action" title="No attached file" type="button" disabled>
+                <i data-lucide="download"></i>
+              </button>`}
+          </div>
+        </div>`;
+    }).join("");
+
+    refreshIcons();
+  };
+
+  // --- Document Flow Line Chart (With Graceful 0-Baseline) ---
+  const renderDocumentFlowChart = (flowData = dashboardState.documentFlow) => {
+    if (!window.Chart) return;
+    const canvas = $("#commCompareChart");
+    if (!canvas) return;
+
+    if (commCompareChartInstance) {
+      commCompareChartInstance.destroy();
+      commCompareChartInstance = null;
+    }
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const brandPrimary = "#0f6b3d";
+    const brandLight = "#46b86b";
+
+    const gradIn = ctx.createLinearGradient(0, 0, 0, 260);
+    gradIn.addColorStop(0, "rgba(15, 107, 61, 0.18)");
+    gradIn.addColorStop(1, "rgba(15, 107, 61, 0.0)");
+
+    const gradOut = ctx.createLinearGradient(0, 0, 0, 260);
+    gradOut.addColorStop(0, "rgba(70, 184, 107, 0.15)");
+    gradOut.addColorStop(1, "rgba(70, 184, 107, 0.0)");
+
+    const datasets = [
+      {
+        label: "Incoming Transmissions",
+        data: flowData.incoming || [0, 0, 0, 0, 0, 0],
+        borderColor: brandPrimary,
+        backgroundColor: gradIn,
+        fill: true,
+        tension: 0.35,
+        borderWidth: 2.5,
+        pointBackgroundColor: brandPrimary,
+        pointRadius: 3.5,
+        pointHoverRadius: 6
+      },
+      {
+        label: "Outgoing Releases",
+        data: flowData.outgoing || [0, 0, 0, 0, 0, 0],
+        borderColor: brandLight,
+        backgroundColor: gradOut,
+        fill: true,
+        tension: 0.35,
+        borderWidth: 2,
+        pointBackgroundColor: brandLight,
+        pointRadius: 3.5,
+        pointHoverRadius: 6
+      }
+    ];
+
+    commCompareChartInstance = new Chart(canvas, {
+      type: "line",
+      data: {
+        labels: flowData.labels || ["Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6"],
+        datasets
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: {
+            position: "top",
+            labels: {
+              color: "#5e7264",
+              usePointStyle: true,
+              boxWidth: 8,
+              font: { weight: "600", family: "Plus Jakarta Sans", size: 11 }
+            }
+          }
+        },
+        scales: {
+          x: {
+            ticks: { color: "#5e7264", font: { family: "Plus Jakarta Sans", size: 10 } },
+            grid: { display: false }
+          },
+          y: {
+            beginAtZero: true,
+            suggestedMax: 5,
+            ticks: {
+              color: "#5e7264",
+              font: { family: "Plus Jakarta Sans", size: 10 },
+              precision: 0,
+              stepSize: 1
+            },
+            grid: { color: "rgba(15, 107, 61, 0.05)" }
+          }
+        }
+      }
+    });
+  };
+
+  // --- Operations Distribution Doughnut Chart (With 0-Safe Handling) ---
+  const updateOperationsChart = () => {
+    if (!window.Chart) return;
+    const canvas = $("#operationsDistChart");
+    if (!canvas) return;
+
+    if (operationsDistChartInstance) {
+      operationsDistChartInstance.destroy();
+      operationsDistChartInstance = null;
+    }
+
+    const { operations } = dashboardState;
+    const dataValues = [
+      operations.comms,
+      operations.services,
+      operations.employees,
+      operations.travel,
+      operations.inventory,
+      operations.visitors
+    ];
+
+    const hasData = dataValues.some(val => val > 0);
+
+    const labels = hasData
+      ? ["Comms", "Service Requests", "Staff", "Travel Orders", "Assets/ICS", "Visitors"]
+      : ["No Database Records Recorded"];
+
+    const chartData = hasData ? dataValues : [1];
+
+    const backgroundColors = hasData
+      ? ["#0f6b3d", "#eb5757", "#46b86b", "#2d9cdb", "#f2c94c", "#9b51e0"]
+      : ["rgba(15, 107, 61, 0.08)"];
+
+    operationsDistChartInstance = new Chart(canvas, {
+      type: "doughnut",
+      data: {
+        labels,
+        datasets: [{
+          data: chartData,
+          backgroundColor: backgroundColors,
+          borderWidth: 2,
+          borderColor: "#ffffff"
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            enabled: hasData
+          },
+          legend: {
+            position: "right",
+            labels: {
+              boxWidth: 10,
+              usePointStyle: true,
+              color: "#5e7264",
+              font: { family: "Plus Jakarta Sans", size: 11, weight: "600" }
+            }
+          }
+        },
+        cutout: "70%"
+      }
+    });
+  };
+
+  // --- Sidebar & Mobile Navigation Handlers ---
   if (hamburgerMenu && sidebar && overlay && mainContent) {
     const toggleMenu = () => {
       const isOpen = sidebar.classList.toggle("open");
@@ -171,13 +612,10 @@ document.addEventListener("DOMContentLoaded", () => {
     hamburgerMenu.setAttribute("aria-expanded", "false");
     hamburgerMenu.addEventListener("click", toggleMenu);
     overlay.addEventListener("click", closeMenu);
+    sidebar.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
 
-    sidebar.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", closeMenu);
-    });
-
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape") closeMenu();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeMenu();
     });
 
     window.addEventListener("resize", () => {
@@ -185,19 +623,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --------------------------------------------------------------------------
-  // Profile dropdown
-  // --------------------------------------------------------------------------
+  // --- Profile Menu Dropdown ---
   if (profileBtn && profileMenu) {
     profileBtn.setAttribute("aria-expanded", "false");
-
-    profileBtn.addEventListener("click", (event) => {
-      event.stopPropagation();
+    profileBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
       const isOpen = profileMenu.classList.toggle("open");
       profileBtn.setAttribute("aria-expanded", String(isOpen));
     });
 
-    profileMenu.addEventListener("click", (event) => event.stopPropagation());
+    profileMenu.addEventListener("click", (e) => e.stopPropagation());
 
     document.addEventListener("click", () => {
       profileMenu.classList.remove("open");
@@ -205,455 +640,209 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --------------------------------------------------------------------------
-  // Logout
-  // --------------------------------------------------------------------------
+  // --- Logout Trigger ---
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", async () => {
-      const confirmed = window.confirm("Are you sure you want to end your current session?");
-      if (!confirmed) return;
-
-      try {
-        if (window.firebase?.auth) {
-          await firebase.auth().signOut();
-        }
-      } catch (error) {
-        console.warn("Firebase sign-out was not completed:", error);
-      } finally {
+    logoutBtn.addEventListener("click", () => {
+      if (window.confirm("Are you sure you want to end your current session?")) {
         window.location.href = "login.html";
       }
     });
   }
 
-  // --------------------------------------------------------------------------
-  // Smooth anchor scrolling
-  // --------------------------------------------------------------------------
-  document.querySelectorAll('a[href^="#"]').forEach((link) => {
-    link.addEventListener("click", (event) => {
-      const targetId = link.getAttribute("href");
-      if (!targetId || targetId === "#") return;
-
-      const targetElement = document.querySelector(targetId);
-      if (!targetElement) return;
-
-      event.preventDefault();
-      targetElement.scrollIntoView({ behavior: "smooth", block: "start" });
-
-      if (history.replaceState) {
-        history.replaceState(null, "", targetId);
-      }
-    });
-  });
-
-  // --------------------------------------------------------------------------
-  // Scroll-to-top
-  // --------------------------------------------------------------------------
+  // --- Scroll to Top Button ---
   const updateScrollToTopButton = () => {
     if (!scrollToTopBtn) return;
     scrollToTopBtn.classList.toggle("visible", window.scrollY > 300);
   };
-
   window.addEventListener("scroll", updateScrollToTopButton, { passive: true });
-
   if (scrollToTopBtn) {
-    scrollToTopBtn.addEventListener("click", () => {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
+    scrollToTopBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
-
   updateScrollToTopButton();
 
-  // --------------------------------------------------------------------------
-  // Reveal animations
-  // --------------------------------------------------------------------------
-  const runScrollReveal = () => {
-    const triggerHeight = window.innerHeight - 50;
-    document.querySelectorAll(".reveal").forEach((element) => {
-      if (element.getBoundingClientRect().top < triggerHeight) {
-        element.classList.add("show");
+  // --- Scroll Spy Nav Highlighting ---
+  const highlightActiveNavigation = () => {
+    const anchors = document.querySelectorAll(".nav-links a");
+    const sections = document.querySelectorAll("section[id], footer[id]");
+    const scrollPosition = window.scrollY + 180;
+    let activeId = "";
+
+    sections.forEach(sec => {
+      if (sec.offsetTop <= scrollPosition) {
+        activeId = sec.id;
       }
     });
-  };
 
+    if (!activeId && sections.length) {
+      activeId = sections[0].id;
+    }
+
+    anchors.forEach(a => {
+      const href = a.getAttribute("href");
+      const isActive = href === `#${activeId}`;
+      a.classList.toggle("active", isActive);
+    });
+  };
+  window.addEventListener("scroll", highlightActiveNavigation, { passive: true });
+  highlightActiveNavigation();
+
+  // --- Intersection Observer (Scroll Reveal) ---
   if ("IntersectionObserver" in window) {
     const revealObserver = new IntersectionObserver((entries, observer) => {
-      entries.forEach((entry) => {
+      entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add("show");
           observer.unobserve(entry.target);
         }
       });
-    }, { rootMargin: "0px 0px -50px 0px", threshold: 0.05 });
+    }, { rootMargin: "0px 0px -40px 0px", threshold: 0.05 });
 
-    document.querySelectorAll(".reveal").forEach((element) => revealObserver.observe(element));
+    document.querySelectorAll(".reveal").forEach(el => revealObserver.observe(el));
   } else {
-    window.addEventListener("scroll", runScrollReveal, { passive: true });
-    runScrollReveal();
+    document.querySelectorAll(".reveal").forEach(el => el.classList.add("show"));
   }
 
-  // --------------------------------------------------------------------------
-  // Active navigation
-  // --------------------------------------------------------------------------
-  const highlightActiveNavigation = () => {
-    const anchors = document.querySelectorAll(".nav-links a");
-    const sections = document.querySelectorAll("section[id], footer[id]");
-    const scrollPosition = window.scrollY + 160;
-    let activeId = "";
-
-    sections.forEach((section) => {
-      if (section.offsetTop <= scrollPosition) activeId = section.id;
-    });
-
-    anchors.forEach((anchor) => {
-      const isActive = anchor.getAttribute("href") === `#${activeId}`;
-      anchor.classList.toggle("active", isActive);
-      anchor.setAttribute("aria-current", isActive ? "page" : "false");
-    });
-  };
-
-  window.addEventListener("scroll", highlightActiveNavigation, { passive: true });
-  highlightActiveNavigation();
-
-  // --------------------------------------------------------------------------
-  // Firebase connection status
-  // --------------------------------------------------------------------------
-  const setFirebaseStatus = (online) => {
-    if (!firebaseStatusIndicator || !firebaseStatusText) return;
-
-    firebaseStatusIndicator.classList.toggle("online", online);
-    firebaseStatusIndicator.classList.toggle("offline", !online);
-    firebaseStatusText.textContent = online
-      ? "Firebase Realtime Database Connected"
-      : "Firebase Realtime Database Offline";
-  };
-
-  // --------------------------------------------------------------------------
-  // Visitors
-  // --------------------------------------------------------------------------
-  const renderVisitors = (records) => {
-    if (!visitorRecentList) return;
-
-    const newest = sortNewest(records).slice(0, 5);
-    visitorCache = records;
-
-    if (!newest.length) {
-      visitorRecentList.innerHTML = `
-        <div class="visitor-item">\n          <div class="visitor-info">\n            <h4>No visitor records yet</h4>\n            <p>Visitor activity from Firebase will appear here automatically.</p>\n          </div>\n        </div>`;
-    } else {
-      visitorRecentList.innerHTML = newest.map((visitor) => {
-        const name = getFirstValue(visitor, ["name", "fullName", "visitorName"], "Unknown Visitor");
-        const office = getFirstValue(visitor, ["office", "organization", "company", "agency"], "Office/Organization");
-        const purpose = getFirstValue(visitor, ["purpose", "reason", "visitPurpose"], "General Inquiry");
-        const status = String(getFirstValue(visitor, ["status", "visitStatus"], "Checked In"));
-        const checkedIn = /checked.?in|active|inside/i.test(status);
-        const statusClass = checkedIn ? "active" : "completed";
-        const statusLabel = escapeHtml(status || (checkedIn ? "Checked In" : "Checked Out"));
-
-        return `
-          <div class="visitor-item">
-            <div class="visitor-avatar">${escapeHtml(initials(name))}</div>
-            <div class="visitor-info">
-              <h4>${escapeHtml(name)}</h4>
-              <p>${escapeHtml(office)} • ${escapeHtml(purpose)}</p>
-            </div>
-            <div class="visitor-meta">
-              <span class="visitor-time">${escapeHtml(formatTime(visitor))}</span>
-              <span class="badge-status ${statusClass}">
-                ${checkedIn ? '<span class="status-dot"></span>' : ''}
-                ${statusLabel}
-              </span>
-            </div>
-          </div>`;
-      }).join("");
-    }
-
-    const totalToday = records.filter(isToday).length;
-    if (todayVisitorsTotal) {
-      todayVisitorsTotal.textContent = `${totalToday} Total Visitors Today`;
-    }
-
-    if (window.lucide) lucide.createIcons();
-  };
-
-  // --------------------------------------------------------------------------
-  // Memos
-  // --------------------------------------------------------------------------
-  const renderMemos = (records) => {
-    if (!memoGrid) return;
-
-    const pinned = records
-      .filter((memo) => String(getFirstValue(memo, ["pinned", "isPinned"], true)).toLowerCase() !== "false")
-      .sort((a, b) => {
-        const ap = String(getFirstValue(a, ["priority", "priorityLevel"], "standard")).toLowerCase();
-        const bp = String(getFirstValue(b, ["priority", "priorityLevel"], "standard")).toLowerCase();
-        return (ap === "high" ? -1 : 1) - (bp === "high" ? -1 : 1);
-      })
-      .slice(0, 6);
-
-    if (!pinned.length) {
-      memoGrid.innerHTML = `
-        <div class="memo-card reveal show">
-          <div class="memo-body">
-            <h3>No pinned memorandums</h3>
-            <p>Add memo records under the Firebase <strong>${escapeHtml(DB_PATHS.memos)}</strong> node to display them here.</p>
-          </div>
-        </div>`;
-      return;
-    }
-
-    memoGrid.innerHTML = pinned.map((memo) => {
-      const title = getFirstValue(memo, ["title", "subject", "memoTitle"], "Untitled Memorandum");
-      const description = getFirstValue(memo, ["description", "content", "summary", "body"], "No memo description provided.");
-      const code = getFirstValue(memo, ["code", "memoCode", "referenceNo", "reference"], "MEMO");
-      const priority = getFirstValue(memo, ["priority", "priorityLevel", "category"], "Administrative");
-      const issuedDate = getFirstValue(memo, ["issuedDate", "dateIssued", "date"], "—");
-      const issuedBy = getFirstValue(memo, ["issuedBy", "author", "department", "from"], "Office Administration");
-      const target = getFirstValue(memo, ["target", "audience", "targetAudience"], "All Personnel");
-      const detailsUrl = getFirstValue(memo, ["detailsUrl", "url", "link"], "#");
-      const downloadUrl = getFirstValue(memo, ["downloadUrl", "fileUrl", "documentUrl"], "");
-      const isHigh = String(priority).toLowerCase() === "high";
-      const priorityClass = isHigh ? "high" : String(priority).toLowerCase().replace(/\s+/g, "-");
-
-      return `
-        <div class="memo-card pinned reveal show">
-          <div class="memo-header">
-            <div class="memo-badge-group">
-              <span class="memo-pinned-tag"><i data-lucide="pin"></i> Pinned Memo</span>
-              <span class="memo-code">${escapeHtml(code)}</span>
-            </div>
-            <span class="priority-tag ${escapeHtml(priorityClass)}">${escapeHtml(priority)}</span>
-          </div>
-
-          <div class="memo-body">
-            <h3>${escapeHtml(title)}</h3>
-            <p>${escapeHtml(description)}</p>
-          </div>
-
-          <div class="memo-meta">
-            <div class="meta-item"><i data-lucide="calendar"></i><span>Issued: ${escapeHtml(issuedDate)}</span></div>
-            <div class="meta-item"><i data-lucide="user-check"></i><span>By: ${escapeHtml(issuedBy)}</span></div>
-            <div class="meta-item"><i data-lucide="users"></i><span>Target: ${escapeHtml(target)}</span></div>
-          </div>
-
-          <div class="memo-footer">
-            <a href="${escapeHtml(detailsUrl)}" class="btn-memo-link">
-              <i data-lucide="file-text"></i> Read Details
-            </a>
-            ${downloadUrl ? `
-              <a class="btn-icon-action" title="Download Document" href="${escapeHtml(downloadUrl)}" target="_blank" rel="noopener">
-                <i data-lucide="download"></i>
-              </a>` : `
-              <button class="btn-icon-action" title="No document attached" type="button" disabled>
-                <i data-lucide="download"></i>
-              </button>`}
-          </div>
-        </div>`;
-    }).join("");
-
-    if (window.lucide) lucide.createIcons();
-  };
-
-  // --------------------------------------------------------------------------
-  // Document flow chart
-  // --------------------------------------------------------------------------
-  const normalizeFlow = (value) => {
-    if (!value || typeof value !== "object") return null;
-
-    // Supports:
-    // /documentFlow/{May:{incoming:54,outgoing:38}, ...}
-    // /documentFlow/{labels:[...], incoming:[...], outgoing:[...]}
-    const labels = Array.isArray(value.labels)
-      ? value.labels
-      : Array.isArray(value.months)
-      ? value.months
-      : null;
-
-    if (labels) {
-      return {
-        labels,
-        incoming: Array.isArray(value.incoming)
-          ? value.incoming
-          : Array.isArray(value.incomingDocuments)
-          ? value.incomingDocuments
-          : [],
-        outgoing: Array.isArray(value.outgoing)
-          ? value.outgoing
-          : Array.isArray(value.outgoingReleases)
-          ? value.outgoingReleases
-          : []
-      };
-    }
-
-    const entries = Object.entries(value)
-      .filter(([, item]) => item && typeof item === "object" && !Array.isArray(item))
-      .map(([label, item]) => ({
-        label,
-        incoming: Number(getFirstValue(item, ["incoming", "incomingDocuments", "inbound"], 0)) || 0,
-        outgoing: Number(getFirstValue(item, ["outgoing", "outgoingReleases", "outbound"], 0)) || 0
-      }));
-
-    if (!entries.length) return null;
-
-    return {
-      labels: entries.map((entry) => entry.label),
-      incoming: entries.map((entry) => entry.incoming),
-      outgoing: entries.map((entry) => entry.outgoing)
-    };
-  };
-
-  const renderSystemChart = (flow = null) => {
-    if (!window.Chart) return;
-
-    const canvas = $("#commCompareChart");
-    if (!canvas) return;
-
-    if (commCompareChartInstance) {
-      commCompareChartInstance.destroy();
-      commCompareChartInstance = null;
-    }
-
-    const dataset = flow || latestFlowData || {
-      labels: ["May", "Jun", "Jul", "Aug", "Sep", "Oct"],
-      incoming: [0, 0, 0, 0, 0, 0],
-      outgoing: [0, 0, 0, 0, 0, 0]
-    };
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const gridColor = "rgba(15, 107, 61, 0.04)";
-    const textColor = "#5e7264";
-    const brandColorPrimary = "#0f6b3d";
-    const brandColorSecondary = "#46b86b";
-
-    const gradientIncoming = ctx.createLinearGradient(0, 0, 0, 260);
-    gradientIncoming.addColorStop(0, "rgba(15, 107, 61, 0.12)");
-    gradientIncoming.addColorStop(1, "rgba(15, 107, 61, 0.0)");
-
-    const gradientOutgoing = ctx.createLinearGradient(0, 0, 0, 260);
-    gradientOutgoing.addColorStop(0, "rgba(70, 184, 107, 0.08)");
-    gradientOutgoing.addColorStop(1, "rgba(70, 184, 107, 0.0)");
-
-    commCompareChartInstance = new Chart(canvas, {
-      type: "line",
-      data: {
-        labels: dataset.labels,
-        datasets: [
-          {
-            label: "Incoming Documents",
-            data: dataset.incoming,
-            borderColor: brandColorPrimary,
-            backgroundColor: gradientIncoming,
-            fill: true,
-            tension: 0.35,
-            borderWidth: 3,
-            pointBackgroundColor: brandColorPrimary,
-            pointHoverRadius: 6
-          },
-          {
-            label: "Outgoing Releases",
-            data: dataset.outgoing,
-            borderColor: brandColorSecondary,
-            backgroundColor: gradientOutgoing,
-            fill: true,
-            tension: 0.35,
-            borderWidth: 2,
-            pointBackgroundColor: brandColorSecondary,
-            pointHoverRadius: 4
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: "index", intersect: false },
-        plugins: {
-          legend: {
-            position: "top",
-            labels: {
-              color: textColor,
-              usePointStyle: true,
-              boxWidth: 8,
-              font: { weight: "600", family: "Plus Jakarta Sans", size: 11 }
-            }
-          },
-          tooltip: {
-            backgroundColor: "#09170f",
-            padding: 12,
-            titleColor: "#ffffff",
-            bodyColor: "#ffffff"
-          }
-        },
-        scales: {
-          x: {
-            ticks: { color: textColor, font: { family: "Plus Jakarta Sans", size: 10 } },
-            grid: { display: false }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: {
-              color: textColor,
-              font: { family: "Plus Jakarta Sans", size: 10 },
-              precision: 0
-            },
-            grid: { color: gridColor }
-          }
-        }
-      }
-    });
-  };
-
-  // --------------------------------------------------------------------------
-  // Firebase listeners
-  // --------------------------------------------------------------------------
-  const startFirebase = () => {
-    if (!window.PGENRO_FIREBASE?.db) {
-      setFirebaseStatus(false);
-      console.error("PGENRO Firebase database is unavailable.");
-      return;
-    }
-
-    const db = window.PGENRO_FIREBASE.db;
-
-    db.ref(".info/connected").on("value", (snapshot) => {
-      setFirebaseStatus(snapshot.val() === true);
-    });
-
-    db.ref(DB_PATHS.visitors).on("value", (snapshot) => {
-      renderVisitors(normalizeRecords(snapshot.val()));
-    }, (error) => {
-      console.error("Visitor listener failed:", error);
-      renderVisitors([]);
-    });
-
-    db.ref(DB_PATHS.memos).on("value", (snapshot) => {
-      renderMemos(normalizeRecords(snapshot.val()));
-    }, (error) => {
-      console.error("Memo listener failed:", error);
-      renderMemos([]);
-    });
-
-    db.ref(DB_PATHS.documentFlow).on("value", (snapshot) => {
-      const flow = normalizeFlow(snapshot.val());
-      if (flow) {
-        latestFlowData = flow;
-        renderSystemChart(flow);
-      } else {
-        renderSystemChart();
-      }
-    }, (error) => {
-      console.error("Document flow listener failed:", error);
-      renderSystemChart();
-    });
-  };
-
-  // Initial chart plus live Firebase listeners.
-  renderSystemChart();
-  startFirebase();
-
+  // --- Responsive Chart Auto-Redraw ---
   let resizeTimer = null;
   window.addEventListener("resize", () => {
     window.clearTimeout(resizeTimer);
-    resizeTimer = window.setTimeout(() => renderSystemChart(), 150);
+    resizeTimer = window.setTimeout(() => {
+      renderDocumentFlowChart();
+      updateOperationsChart();
+    }, 150);
   });
+
+  // ==========================================================================
+  // PUBLIC DASHBOARD API (Easily connect Supabase or custom queries here)
+  // ==========================================================================
+  window.PGENRO_DASHBOARD = {
+    // 1. Update Communications
+    setCommunications: (records = []) => {
+      const list = normalizeRecords(records);
+      dashboardState.operations.comms = list.length;
+      let inCount = 0;
+      let outCount = 0;
+
+      list.forEach(doc => {
+        const type = String(getFirstValue(doc, ["type", "direction", "category", "document_type"], "incoming")).toLowerCase();
+        if (type.includes("out")) outCount++;
+        else inCount++;
+      });
+
+      dashboardState.kpis.totalComms = list.length;
+      dashboardState.kpis.incomingComms = inCount;
+      dashboardState.kpis.outgoingComms = outCount;
+      renderKPIs();
+      updateOperationsChart();
+    },
+
+    // 2. Update Visitors
+    setVisitors: (records = []) => {
+      renderVisitors(records);
+    },
+
+    // 3. Update Service Requests
+    setServiceRequests: (records = []) => {
+      renderServiceRequests(records);
+    },
+
+    // 4. Update Employees
+    setEmployees: (records = []) => {
+      const list = normalizeRecords(records);
+      dashboardState.operations.employees = list.length;
+      dashboardState.kpis.totalEmployees = list.length;
+      renderKPIs();
+      updateOperationsChart();
+    },
+
+    // 5. Update Travel Orders
+    setTravelOrders: (records = []) => {
+      const list = normalizeRecords(records);
+      dashboardState.operations.travel = list.length;
+      const active = list.filter(to => {
+        const st = String(getFirstValue(to, ["status", "travel_status", "travelStatus"], "active"));
+        return /active|ongoing|approved|field/i.test(st);
+      }).length;
+
+      dashboardState.kpis.totalTravel = list.length;
+      dashboardState.kpis.activeTravel = active;
+      renderKPIs();
+      updateOperationsChart();
+    },
+
+    // 6. Update Assets & ICS
+    setInventory: (inventoryRecords = [], icsRecords = []) => {
+      const invList = normalizeRecords(inventoryRecords);
+      const icsList = normalizeRecords(icsRecords);
+
+      dashboardState.operations.inventory = invList.length + icsList.length;
+      dashboardState.kpis.totalAssets = invList.length;
+      dashboardState.kpis.totalIcs = icsList.length;
+      renderKPIs();
+      updateOperationsChart();
+    },
+
+    // 7. Update Memos
+    setMemos: (records = []) => {
+      renderMemos(records);
+    },
+
+    // 8. Update Flow Line Chart
+    setDocumentFlow: (flowData) => {
+      if (flowData && typeof flowData === "object") {
+        dashboardState.documentFlow = flowData;
+        renderDocumentFlowChart(flowData);
+      }
+    },
+
+    // 9. Update Database Status Badge
+    setDatabaseStatus: (type = "online", message = "Database Live & Connected") => {
+      setDatabaseStatus(type, message);
+    },
+
+    // 10. Bulk Payload Loader (Useful when fetching from Supabase all-in-one)
+    loadDatabasePayload: (payload = {}) => {
+      if (payload.communications) window.PGENRO_DASHBOARD.setCommunications(payload.communications);
+      if (payload.visitors) window.PGENRO_DASHBOARD.setVisitors(payload.visitors);
+      if (payload.serviceRequests) window.PGENRO_DASHBOARD.setServiceRequests(payload.serviceRequests);
+      if (payload.employees) window.PGENRO_DASHBOARD.setEmployees(payload.employees);
+      if (payload.travelOrders) window.PGENRO_DASHBOARD.setTravelOrders(payload.travelOrders);
+      if (payload.inventory || payload.ics) window.PGENRO_DASHBOARD.setInventory(payload.inventory || [], payload.ics || []);
+      if (payload.memos) window.PGENRO_DASHBOARD.setMemos(payload.memos);
+      if (payload.documentFlow) window.PGENRO_DASHBOARD.setDocumentFlow(payload.documentFlow);
+      if (payload.status) setDatabaseStatus(payload.status.type, payload.status.message);
+    },
+
+    // 11. Reset Everything to Strict 0
+    resetToZero: () => {
+      Object.keys(dashboardState.kpis).forEach(k => { dashboardState.kpis[k] = 0; });
+      Object.keys(dashboardState.operations).forEach(k => { dashboardState.operations[k] = 0; });
+      dashboardState.visitors = [];
+      dashboardState.serviceRequests = [];
+      dashboardState.memos = [];
+      dashboardState.documentFlow = {
+        labels: ["Month 1", "Month 2", "Month 3", "Month 4", "Month 5", "Month 6"],
+        incoming: [0, 0, 0, 0, 0, 0],
+        outgoing: [0, 0, 0, 0, 0, 0]
+      };
+      renderKPIs();
+      renderVisitors([]);
+      renderServiceRequests([]);
+      renderMemos([]);
+      renderDocumentFlowChart();
+      updateOperationsChart();
+    },
+
+    getState: () => ({ ...dashboardState })
+  };
+
+  // --- Initial Clean Boot ---
+  renderKPIs();
+  renderVisitors([]);
+  renderServiceRequests([]);
+  renderMemos([]);
+  renderDocumentFlowChart();
+  updateOperationsChart();
+  setDatabaseStatus("standby", "Standby • Ready for Supabase Sync");
+  refreshIcons();
 });

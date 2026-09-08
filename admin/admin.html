@@ -1,442 +1,442 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Government Control Center</title>
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PGENRO IMS | Government Control Center</title>
 
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Chart.js -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-  <!-- Firebase SDKs (v10 Compatibility Mode) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase SDKs (v10 Compatibility Mode) -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="admin.css" />
-</head>
+    <!-- CSS -->
+    <link rel="stylesheet" href="admin.css" />
+  </head>
 
-<body>
-  <div class="app-layout">
-    <!-- SIDEBAR NAVIGATION -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <a href="#dashboard" class="logo-area">
-          <div class="logo-icon">
-            <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-            <i data-lucide="shield-check" style="display:none; color: var(--emerald-400);"></i>
-          </div>
-          <div class="logo-text">
-            <h2>PGENRO IMS</h2>
-            <span>Admin Control Center</span>
-          </div>
-        </a>
-        <button class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu">
-          <i data-lucide="panel-left-close"></i>
-        </button>
-      </div>
-
-      <nav class="sidebar-nav">
-        <!-- MAIN PANEL MODULES -->
-        <div class="nav-group">
-          <span class="nav-label">Main Panel</span>
-          <ul>
-            <li>
-              <a href="#dashboard" class="nav-item active">
-                <i data-lucide="layout-dashboard"></i>
-                <span>Executive Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="../admin/admincommunication.html" class="nav-item">
-                <i data-lucide="arrow-left-right"></i>
-                <span>Communications Log</span>
-              </a>
-            </li>
-            <li>
-              <a href="../admin/travelorder.html" class="nav-item">
-                <i data-lucide="briefcase"></i>
-                <span>Travel Orders</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/officememo.html" class="nav-item">
-                <i data-lucide="file-text"></i>
-                <span>Office Memos</span>
-              </a>
-            </li>
-            <li>
-              <a href="employee-admin.html" class="nav-item">
-                <i data-lucide="folder-git-2"></i>
-                <span>Employee Profiles</span>
-              </a>
-            </li>
-            <li>
-              <a href="invetoryadmin.html" class="nav-item">
-                <i data-lucide="boxes"></i>
-                <span>Supplies Inventory</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/visitorsView.html" class="nav-item">
-                <i data-lucide="clipboard-check"></i>
-                <span>Visitors Log</span>
-              </a>
-            </li>
-            <li>
-              <a href="../admin/serviceAdmin.html" class="nav-item">
-                <i data-lucide="wrench"></i>
-                <span>Service Requests</span>
-                <span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/ics.html" class="nav-item">
-                <i data-lucide="file-check-2"></i>
-                <span>ICS Property Slips</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <!-- USER & SYSTEM CONTROL -->
-        <div class="nav-group">
-          <span class="nav-label">User & System Control</span>
-          <ul>
-            <li>
-              <a href="Usermanagement.html" class="nav-item">
-                <i data-lucide="users"></i>
-                <span>User Management</span>
-              </a>
-            </li>
-            <li>
-              <a href="../admin/requestACC.html" class="nav-item">
-                <i data-lucide="user-plus"></i>
-                <span>Account Requests</span>
-                <span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span>
-              </a>
-            </li>
-            <li>
-              <a href="#audit" class="nav-item">
-                <i data-lucide="shield-alert"></i>
-                <span>Security Audit Trail</span>
-              </a>
-            </li>
-            <li>
-              <a href="#backup" class="nav-item">
-                <i data-lucide="database"></i>
-                <span>System Backups</span>
-              </a>
-            </li>
-            <li>
-              <a href="#settings" class="nav-item">
-                <i data-lucide="settings"></i>
-                <span>Global Settings</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="system-status-indicator">
-          <span class="status-dot online" id="dbStatusDot"></span>
-          <div class="status-info">
-            <span class="status-title">Database Sync</span>
-            <span class="status-sub" id="dbStatusText">Connecting Firebase...</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN WRAPPER -->
-    <div class="main-wrapper">
-      <!-- TOPBAR -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
-            <i data-lucide="menu"></i>
+  <body>
+    <div class="app-layout">
+      <!-- SIDEBAR NAVIGATION -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <a href="#dashboard" class="logo-area">
+            <div class="logo-icon">
+              <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
+              <i data-lucide="shield-check" style="display:none; color: var(--emerald-400);"></i>
+            </div>
+            <div class="logo-text">
+              <h2>PGENRO IMS</h2>
+              <span>Admin Control Center</span>
+            </div>
+          </a>
+          <button class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu">
+            <i data-lucide="panel-left-close"></i>
           </button>
-          
-          <div class="global-search">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="globalSearchInput" placeholder="Search memos, inventory, travel orders, personnel, records..." />
-            <kbd class="search-shortcut">Ctrl K</kbd>
-          </div>
         </div>
 
-        <div class="topbar-right">
-          <!-- Notification Button & Drawer -->
-          <div class="notification-wrapper">
-            <button class="icon-btn" id="notificationsBtn" title="System Notifications">
-              <i data-lucide="bell"></i>
-              <span class="notification-ping" id="notifPing" style="display: none;"></span>
-            </button>
-
-            <div class="notification-dropdown" id="notificationDropdown">
-              <div class="notification-header">
-                <h3>Notifications</h3>
-                <span class="badge-count" id="notifBadgeCount">0 Unread</span>
-              </div>
-              <div class="notification-list" id="notificationList">
-                <div class="empty-notif-state">No new notifications</div>
-              </div>
-            </div>
+        <nav class="sidebar-nav">
+          <!-- MAIN PANEL MODULES -->
+          <div class="nav-group">
+            <span class="nav-label">Main Panel</span>
+            <ul>
+              <li>
+                <a href="#dashboard" class="nav-item active">
+                  <i data-lucide="layout-dashboard"></i>
+                  <span>Executive Dashboard</span>
+                </a>
+              </li>
+              <li>
+                <a href="../admin/admincommunication.html" class="nav-item">
+                  <i data-lucide="arrow-left-right"></i>
+                  <span>Communications Log</span>
+                </a>
+              </li>
+              <li>
+                <a href="../admin/travelorder.html" class="nav-item">
+                  <i data-lucide="briefcase"></i>
+                  <span>Travel Orders</span>
+                </a>
+              </li>
+              <li>
+                <a href="officememo-admin.html" class="nav-item">
+                  <i data-lucide="file-text"></i>
+                  <span>Office Memos</span>
+                </a>
+              </li>
+              <li>
+                <a href="employee-admin.html" class="nav-item">
+                  <i data-lucide="folder-git-2"></i>
+                  <span>Employee Profiles</span>
+                </a>
+              </li>
+              <li>
+                <a href="invetoryadmin.html" class="nav-item">
+                  <i data-lucide="boxes"></i>
+                  <span>Supplies Inventory</span>
+                </a>
+              </li>
+              <li>
+                <a href="../User/visitorsView.html" class="nav-item">
+                  <i data-lucide="clipboard-check"></i>
+                  <span>Visitors Log</span>
+                </a>
+              </li>
+              <li>
+                <a href="../admin/serviceAdmin.html" class="nav-item">
+                  <i data-lucide="wrench"></i>
+                  <span>Service Requests</span>
+                  <span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span>
+                </a>
+              </li>
+              <li>
+                <a href="ics-admin.html" class="nav-item">
+                  <i data-lucide="file-check-2"></i>
+                  <span>ICS Property Slips</span>
+                </a>
+              </li>
+            </ul>
           </div>
 
-          <div class="v-divider"></div>
+          <!-- USER & SYSTEM CONTROL -->
+          <div class="nav-group">
+            <span class="nav-label">User & System Control</span>
+            <ul>
+              <li>
+                <a href="Usermanagement.html" class="nav-item">
+                  <i data-lucide="users"></i>
+                  <span>User Management</span>
+                </a>
+              </li>
+              <li>
+                <a href="../admin/requestACC.html" class="nav-item">
+                  <i data-lucide="user-plus"></i>
+                  <span>Account Requests</span>
+                  <span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span>
+                </a>
+              </li>
+              <li>
+                <a href="#audit" class="nav-item">
+                  <i data-lucide="shield-alert"></i>
+                  <span>Security Audit Trail</span>
+                </a>
+              </li>
+              <li>
+                <a href="#backup" class="nav-item">
+                  <i data-lucide="database"></i>
+                  <span>System Backups</span>
+                </a>
+              </li>
+              <li>
+                <a href="#settings" class="nav-item">
+                  <i data-lucide="settings"></i>
+                  <span>Global Settings</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </nav>
 
-          <!-- Profile Menu -->
-          <div class="profile-menu" id="profileMenu">
-            <button class="profile-btn" id="profileBtn" type="button">
-              <div class="profile-avatar">
-                <i data-lucide="shield-check"></i>
-              </div>
-              <div class="profile-text">
-                <span class="user-name" id="currentUserName">Admin User</span>
-                <span class="user-role" id="currentUserRole">System Administrator</span>
-              </div>
-              <i data-lucide="chevron-down" class="profile-chevron"></i>
-            </button>
-
-            <div class="profile-dropdown" id="profileDropdown">
-              <div class="profile-dropdown-header">
-                <div class="profile-avatar big">
-                  <i data-lucide="user"></i>
-                </div>
-                <div>
-                  <h3 id="dropdownUserName">PGENRO Admin</h3>
-                  <p id="dropdownUserEmail">admin@pgenro.gov.ph</p>
-                  <span class="role-badge">Super Admin</span>
-                </div>
-              </div>
-
-              <div class="dropdown-links">
-                <a href="#settings"><i data-lucide="sliders"></i> Preferences</a>
-                <a href="../User/requestACC.html"><i data-lucide="user-check"></i> Pending Approvals</a>
-                <a href="#audit"><i data-lucide="file-text"></i> Security Audit</a>
-              </div>
-
-              <div class="dropdown-footer">
-                <button class="logout-btn" id="logoutBtn" type="button">
-                  <i data-lucide="log-out"></i>
-                  Sign Out
-                </button>
-              </div>
+        <div class="sidebar-footer">
+          <div class="system-status-indicator">
+            <span class="status-dot online" id="dbStatusDot"></span>
+            <div class="status-info">
+              <span class="status-title">Database Sync</span>
+              <span class="status-sub" id="dbStatusText">Connecting Firebase...</span>
             </div>
           </div>
         </div>
-      </header>
+      </aside>
 
-      <!-- MAIN CONTENT -->
-      <main class="main-content">
-        <!-- PAGE HEADER -->
-        <section class="page-header" id="dashboard">
-          <div class="header-title">
-            <div class="breadcrumb">
-              <span>Admin Console</span>
-              <i data-lucide="chevron-right"></i>
-              <span class="active">Overview</span>
-            </div>
-            <h1>Executive Control Center</h1>
-            <p>Real-time oversight for PGENRO personnel, travel orders, assets, documents, and technical services.</p>
-          </div>
-        </section>
-
-        <!-- KPI METRICS GRID -->
-        <section class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-label">Registered Personnel</span>
-              <div class="kpi-icon emerald"><i data-lucide="users"></i></div>
-            </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiPersonnel" data-target="0">0</h3>
-              <span class="kpi-trend positive"><i data-lucide="trending-up"></i> Active Service Records</span>
-            </div>
-            <div class="kpi-footer">
-              <a href="../User/employee.html">View Employee Profiles &rarr;</a>
+      <!-- MAIN WRAPPER -->
+      <div class="main-wrapper">
+        <!-- TOPBAR -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
+              <i data-lucide="menu"></i>
+            </button>
+            
+            <div class="global-search">
+              <i data-lucide="search" class="search-icon"></i>
+              <input type="text" id="globalSearchInput" placeholder="Search memos, inventory, travel orders, personnel, records..." />
+              <kbd class="search-shortcut">Ctrl K</kbd>
             </div>
           </div>
 
-          <div class="kpi-card urgent-border">
-            <div class="kpi-header">
-              <span class="kpi-label">Pending Account Requests</span>
-              <div class="kpi-icon amber"><i data-lucide="user-plus"></i></div>
+          <div class="topbar-right">
+            <!-- Notification Button & Drawer -->
+            <div class="notification-wrapper">
+              <button class="icon-btn" id="notificationsBtn" title="System Notifications">
+                <i data-lucide="bell"></i>
+                <span class="notification-ping" id="notifPing" style="display: none;"></span>
+              </button>
+
+              <div class="notification-dropdown" id="notificationDropdown">
+                <div class="notification-header">
+                  <h3>Notifications</h3>
+                  <span class="badge-count" id="notifBadgeCount">0 Unread</span>
+                </div>
+                <div class="notification-list" id="notificationList">
+                  <div class="empty-notif-state">No new notifications</div>
+                </div>
+              </div>
             </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiPendingAcc" data-target="0">0</h3>
-              <span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Action Required</span>
-            </div>
-            <div class="kpi-footer">
-              <a href="../User/requestACC.html">Approve credentials &rarr;</a>
+
+            <div class="v-divider"></div>
+
+            <!-- Profile Menu -->
+            <div class="profile-menu" id="profileMenu">
+              <button class="profile-btn" id="profileBtn" type="button">
+                <div class="profile-avatar">
+                  <i data-lucide="shield-check"></i>
+                </div>
+                <div class="profile-text">
+                  <span class="user-name" id="currentUserName">Admin User</span>
+                  <span class="user-role" id="currentUserRole">System Administrator</span>
+                </div>
+                <i data-lucide="chevron-down" class="profile-chevron"></i>
+              </button>
+
+              <div class="profile-dropdown" id="profileDropdown">
+                <div class="profile-dropdown-header">
+                  <div class="profile-avatar big">
+                    <i data-lucide="user"></i>
+                  </div>
+                  <div>
+                    <h3 id="dropdownUserName">PGENRO Admin</h3>
+                    <p id="dropdownUserEmail">admin@pgenro.gov.ph</p>
+                    <span class="role-badge">Super Admin</span>
+                  </div>
+                </div>
+
+                <div class="dropdown-links">
+                  <a href="#settings"><i data-lucide="sliders"></i> Preferences</a>
+                  <a href="../User/requestACC.html"><i data-lucide="user-check"></i> Pending Approvals</a>
+                  <a href="#audit"><i data-lucide="file-text"></i> Security Audit</a>
+                </div>
+
+                <div class="dropdown-footer">
+                  <button class="logout-btn" id="logoutBtn" type="button">
+                    <i data-lucide="log-out"></i>
+                    Sign Out
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
+        </header>
 
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-label">Active ICS Slips Issued</span>
-              <div class="kpi-icon blue"><i data-lucide="file-check-2"></i></div>
+        <!-- MAIN CONTENT -->
+        <main class="main-content">
+          <!-- PAGE HEADER -->
+          <section class="page-header" id="dashboard">
+            <div class="header-title">
+              <div class="breadcrumb">
+                <span>Admin Console</span>
+                <i data-lucide="chevron-right"></i>
+                <span class="active">Overview</span>
+              </div>
+              <h1>Executive Control Center</h1>
+              <p>Real-time oversight for PGENRO personnel, travel orders, assets, documents, and technical services.</p>
             </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiActiveICS" data-target="0">0</h3>
-              <span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> Tangible Assets Assigned</span>
-            </div>
-            <div class="kpi-footer">
-              <a href="../User/ics.html">Manage ICS Property &rarr;</a>
-            </div>
-          </div>
+          </section>
 
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-label">Low Supply Items</span>
-              <div class="kpi-icon purple"><i data-lucide="boxes"></i></div>
+          <!-- KPI METRICS GRID -->
+          <section class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Registered Personnel</span>
+                <div class="kpi-icon emerald"><i data-lucide="users"></i></div>
+              </div>
+              <div class="kpi-body">
+                <h3 class="counter" id="kpiPersonnel" data-target="0">0</h3>
+                <span class="kpi-trend positive"><i data-lucide="trending-up"></i> Active Service Records</span>
+              </div>
+              <div class="kpi-footer">
+                <a href="../User/employee.html">View Employee Profiles &rarr;</a>
+              </div>
             </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiLowStock" data-target="0">0</h3>
-              <span class="kpi-trend urgent"><i data-lucide="alert-triangle"></i> Restock Advised</span>
-            </div>
-            <div class="kpi-footer">
-              <a href="../User/inventory.html">Check Inventory &rarr;</a>
-            </div>
-          </div>
-        </section>
 
-        <!-- ANALYTICS & MEMOS VIEW SECTION -->
-        <section class="dashboard-section" id="analytics">
-          <div class="section-header">
+            <div class="kpi-card urgent-border">
+              <div class="kpi-header">
+                <span class="kpi-label">Pending Account Requests</span>
+                <div class="kpi-icon amber"><i data-lucide="user-plus"></i></div>
+              </div>
+              <div class="kpi-body">
+                <h3 class="counter" id="kpiPendingAcc" data-target="0">0</h3>
+                <span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Action Required</span>
+              </div>
+              <div class="kpi-footer">
+                <a href="../User/requestACC.html">Approve credentials &rarr;</a>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Active ICS Slips Issued</span>
+                <div class="kpi-icon blue"><i data-lucide="file-check-2"></i></div>
+              </div>
+              <div class="kpi-body">
+                <h3 class="counter" id="kpiActiveICS" data-target="0">0</h3>
+                <span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> Tangible Assets Assigned</span>
+              </div>
+              <div class="kpi-footer">
+                <a href="../User/ics.html">Manage ICS Property &rarr;</a>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-header">
+                <span class="kpi-label">Low Supply Items</span>
+                <div class="kpi-icon purple"><i data-lucide="boxes"></i></div>
+              </div>
+              <div class="kpi-body">
+                <h3 class="counter" id="kpiLowStock" data-target="0">0</h3>
+                <span class="kpi-trend urgent"><i data-lucide="alert-triangle"></i> Restock Advised</span>
+              </div>
+              <div class="kpi-footer">
+                <a href="../User/inventory.html">Check Inventory &rarr;</a>
+              </div>
+            </div>
+          </section>
+
+          <!-- ANALYTICS & MEMOS VIEW SECTION -->
+          <section class="dashboard-section" id="analytics">
+            <div class="section-header">
+              <div>
+                <h2>System Activity & Document Overview</h2>
+                <p>Live analysis of document routing, categories, service requests, and official memos.</p>
+              </div>
+            </div>
+
+            <div class="analytics-grid">
+              <div class="chart-card large">
+                <div class="chart-card-header">
+                  <div>
+                    <h3>Monthly Document & Routing Volume</h3>
+                    <p>Comparison between Memos, Communications, and ICS Slips</p>
+                  </div>
+                  <span class="chart-pill emerald">Live Sync</span>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="monthlyChart"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <div>
+                    <h3>Record Category Distribution</h3>
+                    <p>Data volume across active IMS modules</p>
+                  </div>
+                </div>
+                <div class="chart-wrapper doughnut-container">
+                  <canvas id="categoryChart"></canvas>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="chart-card-header">
+                  <div>
+                    <h3>Service Request & Action Status</h3>
+                    <p>Resolution status for service tickets and tasks</p>
+                  </div>
+                </div>
+                <div class="chart-wrapper">
+                  <canvas id="statusChart"></canvas>
+                </div>
+              </div>
+
+              <!-- RECENT OFFICE MEMOS LIVE VIEW WIDGET -->
+              <div class="card system-health-card">
+                <div class="chart-card-header">
+                  <div>
+                    <h3>Office Memos Stream</h3>
+                    <p id="memosTotalCountLabel">0 Memos Recorded</p>
+                  </div>
+                  <a href="../User/officememo.html" class="chart-pill emerald">View All</a>
+                </div>
+                <div class="memo-stream-list" id="memoStreamList">
+                  <div class="empty-table-cell">No memos recorded in database.</div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- USER ACTIVITY AUDIT TRAIL DATA TABLE -->
+          <section class="dashboard-section" id="audit">
+            <div class="section-header">
+              <div>
+                <h2>User Login & Logout Audit Trail</h2>
+                <p>Real-time authentication records tracking user logins, logouts, session states, and client IPs.</p>
+              </div>
+              <div class="table-actions">
+                <input type="text" id="tableSearchInput" class="input-sm" placeholder="Search user activity..." />
+                <button class="btn btn-secondary btn-sm" id="exportCsvBtn"><i data-lucide="download"></i> Export CSV</button>
+              </div>
+            </div>
+
+            <div class="card table-card">
+              <div class="table-responsive">
+                <table class="data-table" id="auditTable">
+                  <thead>
+                    <tr>
+                      <th width="40"><input type="checkbox" id="selectAllRows" /></th>
+                      <th>Timestamp</th>
+                      <th>User Account</th>
+                      <th>Activity / Event</th>
+                      <th>Role / Division</th>
+                      <th>IP Address</th>
+                      <th>Session Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="auditTableBody">
+                    <tr>
+                      <td colspan="7" class="empty-table-cell">No login/logout activity recorded in database.</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Table Pagination Bar -->
+              <div class="table-footer">
+                <span class="text-muted" id="tablePaginationInfo">Showing 0 to 0 of 0 log entries</span>
+                <div class="pagination">
+                  <button class="page-btn" disabled>&laquo;</button>
+                  <button class="page-btn active">1</button>
+                  <button class="page-btn" disabled>&raquo;</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- FOOTER -->
+          <footer class="admin-footer">
             <div>
-              <h2>System Activity & Document Overview</h2>
-              <p>Live analysis of document routing, categories, service requests, and official memos.</p>
+              <p>&copy; 2026 Provincial Government Environment and Natural Resources Office (PGENRO). All rights reserved.</p>
             </div>
-          </div>
-
-          <div class="analytics-grid">
-            <div class="chart-card large">
-              <div class="chart-card-header">
-                <div>
-                  <h3>Monthly Document & Routing Volume</h3>
-                  <p>Comparison between Memos, Communications, and ICS Slips</p>
-                </div>
-                <span class="chart-pill emerald">Live Sync</span>
-              </div>
-              <div class="chart-wrapper">
-                <canvas id="monthlyChart"></canvas>
-              </div>
+            <div class="footer-links">
+              <a href="#privacy">Privacy Security</a>
+              <a href="#terms">Terms of Service</a>
+              <a href="#support">Admin Support</a>
             </div>
-
-            <div class="chart-card">
-              <div class="chart-card-header">
-                <div>
-                  <h3>Record Category Distribution</h3>
-                  <p>Data volume across active IMS modules</p>
-                </div>
-              </div>
-              <div class="chart-wrapper doughnut-container">
-                <canvas id="categoryChart"></canvas>
-              </div>
-            </div>
-
-            <div class="chart-card">
-              <div class="chart-card-header">
-                <div>
-                  <h3>Service Request & Action Status</h3>
-                  <p>Resolution status for service tickets and tasks</p>
-                </div>
-              </div>
-              <div class="chart-wrapper">
-                <canvas id="statusChart"></canvas>
-              </div>
-            </div>
-
-            <!-- RECENT OFFICE MEMOS LIVE VIEW WIDGET -->
-            <div class="card system-health-card">
-              <div class="chart-card-header">
-                <div>
-                  <h3>Office Memos Stream</h3>
-                  <p id="memosTotalCountLabel">0 Memos Recorded</p>
-                </div>
-                <a href="../User/officememo.html" class="chart-pill emerald">View All</a>
-              </div>
-              <div class="memo-stream-list" id="memoStreamList">
-                <div class="empty-table-cell">No memos recorded in database.</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- USER ACTIVITY AUDIT TRAIL DATA TABLE -->
-        <section class="dashboard-section" id="audit">
-          <div class="section-header">
-            <div>
-              <h2>User Login & Logout Audit Trail</h2>
-              <p>Real-time authentication records tracking user logins, logouts, session states, and client IPs.</p>
-            </div>
-            <div class="table-actions">
-              <input type="text" id="tableSearchInput" class="input-sm" placeholder="Search user activity..." />
-              <button class="btn btn-secondary btn-sm" id="exportCsvBtn"><i data-lucide="download"></i> Export CSV</button>
-            </div>
-          </div>
-
-          <div class="card table-card">
-            <div class="table-responsive">
-              <table class="data-table" id="auditTable">
-                <thead>
-                  <tr>
-                    <th width="40"><input type="checkbox" id="selectAllRows" /></th>
-                    <th>Timestamp</th>
-                    <th>User Account</th>
-                    <th>Activity / Event</th>
-                    <th>Role / Division</th>
-                    <th>IP Address</th>
-                    <th>Session Status</th>
-                  </tr>
-                </thead>
-                <tbody id="auditTableBody">
-                  <tr>
-                    <td colspan="7" class="empty-table-cell">No login/logout activity recorded in database.</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <!-- Table Pagination Bar -->
-            <div class="table-footer">
-              <span class="text-muted" id="tablePaginationInfo">Showing 0 to 0 of 0 log entries</span>
-              <div class="pagination">
-                <button class="page-btn" disabled>&laquo;</button>
-                <button class="page-btn active">1</button>
-                <button class="page-btn" disabled>&raquo;</button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="admin-footer">
-          <div>
-            <p>&copy; 2026 Provincial Government Environment and Natural Resources Office (PGENRO). All rights reserved.</p>
-          </div>
-          <div class="footer-links">
-            <a href="#privacy">Privacy Security</a>
-            <a href="#terms">Terms of Service</a>
-            <a href="#support">Admin Support</a>
-          </div>
-        </footer>
-      </main>
+          </footer>
+        </main>
+      </div>
     </div>
-  </div>
 
-  <!-- JS -->
-  <script src="../admin-javascript/admin.js"></script>
-  <script type="module" src="../admin-javascript/RequestACC.js"></script>
-</body>
-</html>
+    <!-- JS -->
+    <script src="../admin-javascript/admin.js"></script>
+    <script type="module" src="../admin-javascript/RequestACC.js"></script>
+  </body>
+  </html>

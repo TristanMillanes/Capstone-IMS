@@ -3,355 +3,596 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IMS Access Portal | PGENRO</title>
-    <meta name="description" content="Official Personnel Access Authorization Gateway for PGENRO IMS.">
+    <meta name="theme-color" content="#031e15">
+    <meta name="description" content="Official Provincial Government Environment and Natural Resources Office (PGENRO) IMS personnel clearance and access portal.">
+    <title>Personnel Access Gateway | PGENRO IMS</title>
 
-    <!-- Fonts -->
+    <!-- Typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="requestACC.css">
 </head>
 <body>
+    <a class="skip-link" href="#accessForm">Skip to access form</a>
 
-    <!-- ATMOSPHERIC BACKGROUND WITH PARTICLES -->
-    <div class="modern-bg" id="parallaxWrapper" aria-hidden="true">
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
-        <div class="glow-orb orb-3"></div>
-        <div class="mountain-bg"></div> 
-        <canvas id="leafCanvas"></canvas>
-        <div class="glass-overlay"></div>
+    <!-- Environmental Atmospheric Background -->
+    <div class="page-background" aria-hidden="true">
+        <!-- SVG Topographic GIS Contour Elevation Overlay -->
+        <svg class="bg-topo" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+            <path d="M-100,200 C300,120 450,380 800,240 C1150,100 1300,320 1600,180" fill="none" stroke="rgba(73, 207, 153, 0.08)" stroke-width="1.8"/>
+            <path d="M-100,280 C260,200 480,440 860,310 C1200,190 1360,400 1600,260" fill="none" stroke="rgba(73, 207, 153, 0.07)" stroke-width="1.6"/>
+            <path d="M-100,360 C220,280 510,500 920,380 C1250,280 1420,480 1600,340" fill="none" stroke="rgba(73, 207, 153, 0.06)" stroke-width="1.5"/>
+            <path d="M-100,440 C180,360 540,560 980,450 C1300,370 1480,560 1600,420" fill="none" stroke="rgba(73, 207, 153, 0.05)" stroke-width="1.4"/>
+            <path d="M-100,520 C140,440 570,620 1040,520 C1350,460 1540,640 1600,500" fill="none" stroke="rgba(73, 207, 153, 0.04)" stroke-width="1.2"/>
+            <path d="M-100,600 C100,520 600,680 1100,590 C1400,550 1600,720 1600,580" fill="none" stroke="rgba(73, 207, 153, 0.035)" stroke-width="1.2"/>
+            <ellipse cx="980" cy="450" rx="140" ry="60" fill="none" stroke="rgba(73, 207, 153, 0.06)" stroke-width="1"/>
+            <ellipse cx="980" cy="450" rx="80" ry="32" fill="none" stroke="rgba(73, 207, 153, 0.08)" stroke-width="1.2"/>
+        </svg>
+
+        <!-- Dynamic Ambient Light Orbs -->
+        <div class="bg-glow glow-canopy"></div>
+        <div class="bg-glow glow-deepforest"></div>
+        <div class="bg-glow glow-biolum"></div>
+        
+        <!-- Subtle Natural Leaf Veins -->
+        <div class="eco-leaf leaf-left"></div>
+        <div class="eco-leaf leaf-right"></div>
+        <div class="bg-vignette"></div>
     </div>
 
-    <main class="split-layout">
-        <!-- LEFT HERO PANEL -->
-        <section class="hero-showcase">
-            <div class="hero-content">
-                <div class="brand-header">
-                    <img src="../logo/enro.png" alt="PGENRO Logo" class="brand-logo" onerror="this.src='https://via.placeholder.com/72?text=PGENRO'">
-                    <div class="brand-text-group">
-                        <span class="brand-main">PROVINCIAL GOVERNMENT ENVIRONMENT<br>AND NATURAL RESOURCES OFFICE</span>
-                        <span class="brand-sub">Information Management System</span>
+    <!-- Main Container -->
+    <main class="app-shell">
+        
+        <!-- Left Hero Environmental Panel -->
+        <aside class="hero-panel">
+            <div class="hero-texture"></div>
+
+            <div class="hero-top">
+                <a href="#" class="brand-lockup" aria-label="PGENRO IMS Official Portal">
+                    <div class="brand-logo-wrap">
+                        <img src="../logo/enro.png" alt="PGENRO Official Seal" class="brand-logo"
+                             onerror="this.style.display='none'; this.parentElement.classList.add('logo-fallback')">
+                        <span class="logo-fallback-mark" aria-hidden="true"><i data-lucide="trees"></i></span>
                     </div>
+                    <div class="brand-copy">
+                        <span class="brand-title">PGENRO <span class="brand-subbadge">IMS</span></span>
+                        <span class="brand-office">Provincial Government Environment<br>&amp; Natural Resources Office</span>
+                    </div>
+                </a>
+                <div class="security-pill" title="Protected Public Sector Gateway">
+                    <span class="pulse-ring"></span>
+                    <i data-lucide="shield-check"></i>
+                    <span>Authorized Entry</span>
                 </div>
-                
-                <h1 class="hero-title">REQUEST<br>ACCOUNT</h1>
-                <p class="hero-desc">Personnel credential gateway. Submit your official division assignment and endorsement for system privilege authorization.</p>
             </div>
 
-            <div class="hero-footer">
-                <div class="status-badge" role="status">
-                    <div class="pulse-ring"></div>
-                    Admin Endorsement Verification Active
+            <div class="hero-main">
+                <div class="eyebrow">
+                    <span class="eyebrow-icon"><i data-lucide="sprout"></i></span>
+                    <span>Personnel Access Clearance</span>
                 </div>
-                <div class="system-time" id="currentDate" aria-label="Current Date">Initializing...</div>
-            </div>
-        </section>
-
-        <!-- RIGHT FORM PANEL -->
-        <section class="right-panel">
-            <div class="panel-inner">
                 
-                <header class="top-nav">
-                    <span class="help-text">Already registered?</span>
-                    <a href="login.html" class="btn-ghost" id="signInBtn">
-                        Sign In <i data-lucide="arrow-right"></i>
-                    </a>
-                </header>
+                <h1>Protecting Nature through <span>Verified Governance.</span></h1>
+                
+                <p class="hero-lede">
+                    Submit your credentials to request authorized access to forestry concessions, watershed mapping, quarry monitoring, and environmental management modules.
+                </p>
 
-                <!-- STEP PROGRESS BAR -->
-                <nav class="stepper-horizontal" aria-label="Form Progress">
-                    <div class="stepper-line" aria-hidden="true">
-                        <div class="stepper-progress" id="stepperProgress"></div>
+                <!-- Environmental Pillars -->
+                <div class="hero-points">
+                    <div class="hero-point">
+                        <div class="hero-point-icon forest-tier"><i data-lucide="tree-pine"></i></div>
+                        <div>
+                            <strong>Natural Resources Registry</strong>
+                            <span>Secure access segregated by division and field assignments.</span>
+                        </div>
                     </div>
-                    
-                    <div class="step active" data-step="1" aria-current="step">
-                        <div class="step-marker"><i data-lucide="user"></i></div>
-                        <span>Identity</span>
+                    <div class="hero-point">
+                        <div class="hero-point-icon admin-tier"><i data-lucide="fingerprint"></i></div>
+                        <div>
+                            <strong>Role-Based Administrative Clearance</strong>
+                            <span>Every request undergoes validation by your designated division head.</span>
+                        </div>
                     </div>
+                    <div class="hero-point">
+                        <div class="hero-point-icon audit-tier"><i data-lucide="database"></i></div>
+                        <div>
+                            <strong>Audited Conservation Records</strong>
+                            <span>Compliant with RA 10173 and provincial environmental transparency codes.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="step" data-step="2">
-                        <div class="step-marker"><i data-lucide="briefcase"></i></div>
-                        <span>Assignment</span>
+            <div class="hero-bottom">
+                <div class="system-metric">
+                    <span class="tiny-label">IMS GATEWAY STATUS</span>
+                    <div class="online-state">
+                        <span class="status-dot"></span> 
+                        <span>Operational &bull; Main Grid</span>
                     </div>
+                </div>
+                <div class="hero-date-wrapper">
+                    <span class="tiny-label">PROVINCIAL CALENDAR</span>
+                    <div class="hero-date" id="currentDate">Loading calendar…</div>
+                </div>
+            </div>
+        </aside>
 
-                    <div class="step" data-step="3">
-                        <div class="step-marker"><i data-lucide="shield-check"></i></div>
-                        <span>Endorsement</span>
+        <!-- Right Form Panel -->
+        <section class="form-panel" aria-label="Account clearance application">
+            
+            <!-- Panel Header -->
+            <div class="form-panel-header">
+                <div>
+                    <span class="section-kicker">
+                        <i data-lucide="compass"></i> Official Onboarding
+                    </span>
+                    <h2>Access Request Form</h2>
+                    <p>Complete the 3 verification steps. Your entries are cached locally as you proceed.</p>
+                </div>
+                <a href="login.html" class="sign-in-link" title="Already have an active IMS profile?">
+                    <div class="sign-in-text">
+                        <span>Have credentials?</span>
+                        <strong>Sign in to IMS</strong>
                     </div>
+                    <div class="sign-in-icon">
+                        <i data-lucide="arrow-right"></i>
+                    </div>
+                </a>
+            </div>
+
+            <!-- Modern Stepper Navigation -->
+            <div class="progress-area">
+                <div class="progress-meta">
+                    <span class="meta-step" id="progressLabel">Step 1 of 3</span>
+                    <span class="meta-hint" id="progressHint">Personal Identification &amp; Security</span>
+                </div>
+                
+                <div class="progress-track" aria-hidden="true">
+                    <div class="progress-bar" id="stepperProgress"></div>
+                </div>
+
+                <nav class="stepper" aria-label="Registration stages">
+                    <button class="step active" type="button" data-step="1" aria-current="step">
+                        <span class="step-indicator">
+                            <span class="step-number">1</span>
+                            <i data-lucide="user-check" class="step-done-icon"></i>
+                        </span>
+                        <span class="step-copy">
+                            <strong>Identity</strong>
+                            <small>Legal records</small>
+                        </span>
+                    </button>
+
+                    <button class="step" type="button" data-step="2">
+                        <span class="step-indicator">
+                            <span class="step-number">2</span>
+                            <i data-lucide="briefcase" class="step-done-icon"></i>
+                        </span>
+                        <span class="step-copy">
+                            <strong>Assignment</strong>
+                            <small>Division &amp; role</small>
+                        </span>
+                    </button>
+
+                    <button class="step" type="button" data-step="3">
+                        <span class="step-indicator">
+                            <span class="step-number">3</span>
+                            <i data-lucide="badge-check" class="step-done-icon"></i>
+                        </span>
+                        <span class="step-copy">
+                            <strong>Endorsement</strong>
+                            <small>Review &amp; certify</small>
+                        </span>
+                    </button>
                 </nav>
+            </div>
 
-                <!-- DRAFT NOTIFICATION BANNER -->
-                <div class="draft-banner" id="draftBanner" role="status" style="display: none;">
-                    <span class="draft-text"><i data-lucide="history" class="small-icon"></i> Incomplete application recovered</span>
-                    <div class="draft-actions">
-                        <button type="button" class="btn-text-action" id="restoreDraftBtn">Keep Data</button>
-                        <button type="button" class="btn-text-action danger" id="discardDraftBtn">Clear</button>
+            <!-- Draft Restoral Notice Banner -->
+            <div class="draft-banner" id="draftBanner" role="status" style="display:none;">
+                <div class="draft-message">
+                    <div class="draft-icon"><i data-lucide="archive-restore"></i></div>
+                    <div>
+                        <strong>Unsubmitted Application Draft Found</strong>
+                        <span>We restored your previous progress from this browser session.</span>
                     </div>
                 </div>
+                <div class="draft-actions">
+                    <button type="button" class="btn-inline" id="restoreDraftBtn">
+                        <i data-lucide="rotate-ccw"></i> Restore Draft
+                    </button>
+                    <button type="button" class="btn-inline danger" id="discardDraftBtn">
+                        <i data-lucide="trash-2"></i> Discard
+                    </button>
+                </div>
+            </div>
 
-                <form id="accessForm" class="form-content" novalidate autocomplete="off">
+            <!-- Live Status Bar -->
+            <div class="save-status-row">
+                <div class="save-status" id="saveStatus" aria-live="polite">
+                    <i data-lucide="cloud"></i>
+                    <span>Draft autosave active</span>
+                </div>
+            </div>
 
-                    <!-- ==========================================
-                         PAGE 1: IDENTITY & CREDENTIALS WITH PASSWORDS
-                    =========================================== -->
-                    <div class="form-page active" id="page1" role="tabpanel" aria-label="Identity Verification">
-                        <div class="page-header stagger-1">
-                            <h2>Personnel Identification & Security</h2>
-                            <p>Enter your official identity and create your security password.</p>
-                        </div>
-                        
-                        <div class="form-grid stagger-2">
-                            <div class="input-container full-width">
-                                <label for="fullName">Full Legal Name (with Title if applicable)</label>
-                                <div class="input-wrapper">
-                                    <i data-lucide="user-check" class="icon-left"></i>
-                                    <input type="text" id="fullName" required placeholder="e.g. Engr. Aris Thorne or Juan Dela Cruz">
-                                </div>
-                                <span class="error-msg" id="fullNameError"></span>
-                            </div>
-                            
-                            <div class="input-container">
-                                <label for="email">Gov / Official Email Address</label>
-                                <div class="input-wrapper">
-                                    <i data-lucide="mail" class="icon-left"></i>
-                                    <input type="email" id="email" required placeholder="name@pgenro.gov.ph">
-                                </div>
-                                <span class="error-msg" id="emailError"></span>
-                            </div>
-                            
-                            <div class="input-container">
-                                <label for="contact">Mobile Contact Number</label>
-                                <div class="input-wrapper">
-                                    <i data-lucide="phone" class="icon-left"></i>
-                                    <input type="tel" id="contact" required pattern="^(09)\d{9}$" placeholder="09123456789">
-                                </div>
-                                <span class="error-msg" id="contactError"></span>
-                            </div>
-
-                            <div class="input-container full-width">
-                                <label for="govId">Government Employee ID / PRC License No.</label>
-                                <div class="input-wrapper">
-                                    <i data-lucide="id-card" class="icon-left"></i>
-                                    <input type="text" id="govId" required placeholder="e.g. PGQ-EMP-2024-089">
-                                </div>
-                                <span class="error-msg" id="govIdError"></span>
-                            </div>
-
-                            <!-- PASSWORD FIELD -->
-                            <div class="input-container">
-                                <label for="password">Create Security Password</label>
-                                <div class="input-wrapper">
-                                    <i data-lucide="lock" class="icon-left"></i>
-                                    <input type="password" id="password" required minlength="6" placeholder="Min. 6 characters">
-                                    <button type="button" class="password-toggle" id="togglePasswordBtn" aria-label="Toggle password visibility">
-                                        <i data-lucide="eye"></i>
-                                    </button>
-                                </div>
-                                <span class="error-msg" id="passwordError"></span>
-                            </div>
-
-                            <!-- CONFIRM PASSWORD FIELD -->
-                            <div class="input-container">
-                                <label for="confirmPassword">Confirm Security Password</label>
-                                <div class="input-wrapper">
-                                    <i data-lucide="shield-check" class="icon-left"></i>
-                                    <input type="password" id="confirmPassword" required minlength="6" placeholder="Re-enter password">
-                                    <button type="button" class="password-toggle" id="toggleConfirmPasswordBtn" aria-label="Toggle confirm password visibility">
-                                        <i data-lucide="eye"></i>
-                                    </button>
-                                </div>
-                                <span class="error-msg" id="confirmPasswordError"></span>
-                            </div>
+            <!-- The Multi-Step Form -->
+            <form id="accessForm" class="form-content" novalidate autocomplete="off">
+                
+                <!-- =================== STEP 1: IDENTITY =================== -->
+                <section class="form-page active" id="page1" role="tabpanel" aria-label="Identity and security">
+                    <div class="page-header">
+                        <div class="section-badge">01</div>
+                        <div>
+                            <span class="form-kicker">Section I &bull; Personnel Records</span>
+                            <h3>Official Identification &amp; Credentials</h3>
+                            <p>Enter your full legal name and government identifiers as registered with PGENRO Human Resources.</p>
                         </div>
                     </div>
 
-                    <!-- ==========================================
-                         PAGE 2: DIVISION ASSIGNMENT & ROLES
-                    =========================================== -->
-                    <div class="form-page" id="page2" role="tabpanel" aria-label="Division Assignment" style="display: none;">
-                        <div class="page-header stagger-1">
-                            <h2>Division & Access Privileges</h2>
-                            <p>Specify your exact office division and requested system role privileges.</p>
+                    <div class="form-grid">
+                        <div class="input-container full-width">
+                            <label for="fullName">Full Legal Name <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="user" class="icon-left"></i>
+                                <input type="text" id="fullName" required placeholder="e.g. Engr. Maria Santos Dela Cruz" autocomplete="name">
+                            </div>
+                            <span class="field-help">Include any official title, professional prefix, or suffix (e.g. For., Engr., Jr.).</span>
+                            <span class="error-msg" id="fullNameError"></span>
                         </div>
-                        
-                        <div class="form-grid stagger-2">
-                            <!-- Job Designation -->
-                            <div class="input-container full-width">
-                                <label for="position">Official Job Designation</label>
-                                <div class="input-wrapper select-wrapper">
-                                    <i data-lucide="award" class="icon-left"></i>
-                                    <select id="position" required>
-                                        <option value="" disabled selected hidden>Select your official job title</option>
-                                        <optgroup label="Technical & Environmental">
-                                            <option value="Environmental Management Specialist">Environmental Mgt. Specialist</option>
-                                            <option value="Mining Engineer / Geologist">Mining Engineer / Geologist</option>
-                                            <option value="Forestry Technician / Officer">Forestry Technician / Officer</option>
-                                            <option value="GIS Specialist / Cartographer">GIS Specialist / Cartographer</option>
-                                        </optgroup>
-                                        <optgroup label="Administrative & Supervisory">
-                                            <option value="Administrative Officer">Administrative Officer</option>
-                                            <option value="Records / Clearance Officer">Records / Clearance Officer</option>
-                                            <option value="Division Chief / Provincial Officer">Division Chief / Provincial Officer</option>
-                                        </optgroup>
-                                        <option value="Other Personnel">Other Technical Staff</option>
-                                    </select>
-                                    <i data-lucide="chevron-down" class="icon-right"></i>
-                                </div>
-                                <span class="error-msg" id="positionError"></span>
-                            </div>
 
-                            <!-- Office Division -->
-                            <div class="input-container">
-                                <label for="division">Assigned Office Division</label>
-                                <div class="input-wrapper select-wrapper">
-                                    <i data-lucide="building-2" class="icon-left"></i>
-                                    <select id="division" required>
-                                        <option value="" disabled selected hidden>Choose Division</option>
-                                        <option value="Admin Office">Admin Office</option>
-                                        <option value="Environment Management">Environment Management</option>
-                                        <option value="Forestry Division">Forestry Division</option>
-                                        <option value="Mines & Quarry">Mines & Quarry</option>
-                                    </select>
-                                    <i data-lucide="chevron-down" class="icon-right"></i>
-                                </div>
-                                <span class="error-msg" id="divisionError"></span>
+                        <div class="input-container">
+                            <label for="email">Official Government / PGENRO Email <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="mail" class="icon-left"></i>
+                                <input type="email" id="email" required placeholder="name@pgenro.gov.ph" autocomplete="email">
                             </div>
+                            <span class="field-help">Official division inbox or approved institutional email.</span>
+                            <span class="error-msg" id="emailError"></span>
+                        </div>
 
-                            <!-- Requested Access Role -->
-                            <div class="input-container">
-                                <label for="role">Requested IMS Access Level</label>
-                                <div class="input-wrapper select-wrapper">
-                                    <i data-lucide="shield" class="icon-left"></i>
-                                    <select id="role" required>
-                                        <option value="" disabled selected hidden>Choose Access Level</option>
-                                        <option value="System Staff">System Staff (Standard IMS Entry)</option>
-                                        <option value="Division Head">Division Head (Division Supervision)</option>
-                                        <option value="Super Admin">Super Admin (Full Control)</option>
-                                    </select>
-                                    <i data-lucide="chevron-down" class="icon-right"></i>
-                                </div>
-                                <span class="error-msg" id="roleError"></span>
+                        <div class="input-container">
+                            <label for="contact">Active Mobile Contact <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="phone" class="icon-left"></i>
+                                <input type="tel" id="contact" required pattern="^(09)\d{9}$" maxlength="11" inputmode="numeric" placeholder="09123456789" autocomplete="tel">
                             </div>
+                            <span class="field-help">11-digit Philippine mobile contact (09XXXXXXXXX).</span>
+                            <span class="error-msg" id="contactError"></span>
+                        </div>
 
-                            <!-- Division Head Endorser Name -->
-                            <div class="input-container full-width">
-                                <label for="endorser">Division Head / Endorsing Officer</label>
-                                <div class="input-wrapper">
-                                    <i data-lucide="user-check" class="icon-left"></i>
-                                    <input type="text" id="endorser" required placeholder="e.g. Engr. Gabriel Mendoza (Provincial Officer)">
-                                </div>
-                                <span class="error-msg" id="endorserError"></span>
+                        <div class="input-container full-width">
+                            <label for="govId">Government Employee ID or PRC License No. <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="award" class="icon-left"></i>
+                                <input type="text" id="govId" required placeholder="e.g. PGQ-ENV-2024-041 or PRC-0089124" autocomplete="off">
                             </div>
+                            <span class="field-help">Used for cross-verifying active government appointment.</span>
+                            <span class="error-msg" id="govIdError"></span>
+                        </div>
+
+                        <div class="input-container">
+                            <label for="password">Create Secure Password <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="lock" class="icon-left"></i>
+                                <input type="password" id="password" required minlength="6" placeholder="At least 6 characters" autocomplete="new-password">
+                                <button type="button" class="password-toggle" id="togglePasswordBtn" aria-label="Show password">
+                                    <i data-lucide="eye"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Forest-Themed Organic Password Meter -->
+                            <div class="password-meter-wrap" aria-hidden="true">
+                                <div class="password-meter-segments">
+                                    <span class="segment" id="pwSeg1"></span>
+                                    <span class="segment" id="pwSeg2"></span>
+                                    <span class="segment" id="pwSeg3"></span>
+                                    <span class="segment" id="pwSeg4"></span>
+                                </div>
+                                <div class="password-meter-info">
+                                    <i data-lucide="shield" class="meter-icon"></i>
+                                    <span id="passwordStrengthText">Security strength indicator</span>
+                                </div>
+                            </div>
+                            <span class="error-msg" id="passwordError"></span>
+                        </div>
+
+                        <div class="input-container">
+                            <label for="confirmPassword">Confirm Secure Password <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="shield-check" class="icon-left"></i>
+                                <input type="password" id="confirmPassword" required minlength="6" placeholder="Re-enter security password" autocomplete="new-password">
+                                <button type="button" class="password-toggle" id="toggleConfirmPasswordBtn" aria-label="Show password">
+                                    <i data-lucide="eye"></i>
+                                </button>
+                            </div>
+                            <span class="field-help">Must match the password entered above.</span>
+                            <span class="error-msg" id="confirmPasswordError"></span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =================== STEP 2: ASSIGNMENT =================== -->
+                <section class="form-page" id="page2" role="tabpanel" aria-label="Division assignment" style="display:none;">
+                    <div class="page-header">
+                        <div class="section-badge">02</div>
+                        <div>
+                            <span class="form-kicker">Section II &bull; Office Jurisdiction</span>
+                            <h3>Division Placement &amp; Access Tier</h3>
+                            <p>Specify your environmental branch assignment and the operational clearance tier needed.</p>
                         </div>
                     </div>
 
-                    <!-- ==========================================
-                         PAGE 3: VALIDATION & ENDORSEMENT
-                    =========================================== -->
-                    <div class="form-page" id="page3" role="tabpanel" aria-label="Endorsement Validation" style="display: none;">
-                        <div class="page-header stagger-1">
-                            <h2>Clearance Validation</h2>
-                            <p>State your operational intent and certify division endorsement.</p>
-                        </div>
-                        
-                        <div class="validation-layout stagger-2">
-                            <div class="input-container full-width">
-                                <div class="label-row">
-                                    <label for="reason">Operational Intent / Purpose</label>
-                                    <span class="char-counter" id="charCount">0 / 250</span>
-                                </div>
-                                <div class="input-wrapper textarea-wrapper">
-                                    <i data-lucide="file-text" class="icon-left text-icon"></i>
-                                    <textarea id="reason" maxlength="250" required placeholder="State exact operational duties requiring portal credentials (e.g., Encoding quarterly mining concession permits, monitoring tree seedling distributions)..."></textarea>
-                                </div>
-                                <span class="error-msg" id="reasonError"></span>
+                    <div class="form-grid">
+                        <div class="input-container full-width">
+                            <label for="position">Official Job Title / Designation <span>*</span></label>
+                            <div class="input-wrapper select-wrapper">
+                                <i data-lucide="briefcase" class="icon-left"></i>
+                                <select id="position" required>
+                                    <option value="" disabled selected>Select your official job title</option>
+                                    <optgroup label="Technical &amp; Natural Resource Personnel">
+                                        <option value="Environmental Management Specialist">Environmental Management Specialist (EMS)</option>
+                                        <option value="Mining Engineer / Geologist">Mining Engineer / Geologist</option>
+                                        <option value="Forestry Technician / Officer">Forestry Technician / Forest Officer</option>
+                                        <option value="GIS Specialist / Cartographer">GIS Specialist / Geomatics Cartographer</option>
+                                    </optgroup>
+                                    <optgroup label="Administrative &amp; Enforcement Personnel">
+                                        <option value="Administrative Officer">Administrative Officer</option>
+                                        <option value="Records / Clearance Officer">Records / Clearance Officer</option>
+                                        <option value="Environmental Inspection Officer">Environmental Inspection / Enforcement Officer</option>
+                                        <option value="Division Chief / Provincial Officer">Division Chief / Provincial Officer</option>
+                                    </optgroup>
+                                    <option value="Other Personnel">Other Accredited Staff</option>
+                                </select>
+                                <i data-lucide="chevron-down" class="icon-right"></i>
                             </div>
+                            <span class="error-msg" id="positionError"></span>
+                        </div>
 
-                            <!-- Endorsement Checkbox -->
+                        <div class="input-container full-width">
+                            <label for="division">Assigned Environmental Division <span>*</span></label>
+                            <div class="input-wrapper select-wrapper">
+                                <i data-lucide="building" class="icon-left"></i>
+                                <select id="division" required>
+                                    <option value="" disabled selected>Choose assigned division branch</option>
+                                    <option value="Admin Office">Admin Office (Executive &amp; General Services)</option>
+                                    <option value="Environment Management">Environment Management Division (Pollution, Waste, Compliance)</option>
+                                    <option value="Forestry Division">Forestry Division (Watershed, Reforestation, Agroforestry)</option>
+                                    <option value="Mines & Quarry">Mines &amp; Geosciences / Quarry Permitting Division</option>
+                                </select>
+                                <i data-lucide="chevron-down" class="icon-right"></i>
+                            </div>
+                            <span class="error-msg" id="divisionError"></span>
+                        </div>
+
+                        <!-- Role Tier Choice -->
+                        <fieldset class="input-container role-field full-width">
+                            <legend>Requested Clearance Level <span>*</span></legend>
+                            <select id="role" class="sr-only" required aria-label="Requested IMS access role">
+                                <option value="" disabled selected>Choose an access role</option>
+                                <option value="User">User</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+
+                            <div class="role-choice-grid" role="group" aria-label="Select access role tier">
+                                <button type="button" class="role-choice" data-role="User" aria-pressed="false">
+                                    <div class="role-badge-tag">Standard Staff</div>
+                                    <div class="role-choice-head">
+                                        <span class="role-choice-icon user-icon">
+                                            <i data-lucide="user-check"></i>
+                                        </span>
+                                        <div class="role-title-block">
+                                            <strong>Division User</strong>
+                                            <span>Operational Staff Tier</span>
+                                        </div>
+                                        <span class="role-choice-check"><i data-lucide="check"></i></span>
+                                    </div>
+                                    <p class="role-desc">
+                                        Field encoding, viewing GIS spatial layers, submitting quarry/forestry reports, and monitoring municipal permits.
+                                    </p>
+                                </button>
+
+                                <button type="button" class="role-choice" data-role="Admin" aria-pressed="false">
+                                    <div class="role-badge-tag admin-tag">Privileged</div>
+                                    <div class="role-choice-head">
+                                        <span class="role-choice-icon admin-icon">
+                                            <i data-lucide="shield-alert"></i>
+                                        </span>
+                                        <div class="role-title-block">
+                                            <strong>Division Admin</strong>
+                                            <span>Supervisory &amp; Clearance Tier</span>
+                                        </div>
+                                        <span class="role-choice-check"><i data-lucide="check"></i></span>
+                                    </div>
+                                    <p class="role-desc">
+                                        Approve staff clearance requests, manage division user roles, audit data logs, and export provincial executive summaries.
+                                    </p>
+                                </button>
+                            </div>
+                            <span class="field-help">Choose <strong>Division User</strong> unless you have been officially designated with executive system clearance.</span>
+                            <span class="error-msg" id="roleError"></span>
+                        </fieldset>
+
+                        <div class="input-container full-width">
+                            <label for="endorser">Division Head / Endorsing Authority <span>*</span></label>
+                            <div class="input-wrapper">
+                                <i data-lucide="user-check" class="icon-left"></i>
+                                <input type="text" id="endorser" required placeholder="e.g. Engr. Roberto Tan (Chief, Mines & Quarry Division)" autocomplete="off">
+                            </div>
+                            <span class="field-help">Full name and designation of your immediate division chief or provincial officer.</span>
+                            <span class="error-msg" id="endorserError"></span>
+                        </div>
+                    </div>
+
+                    <div class="info-callout">
+                        <div class="info-icon"><i data-lucide="info"></i></div>
+                        <div>
+                            <strong>Need Cross-Division Spatial Access?</strong>
+                            <p>Users assigned to specialized GIS roles can view regional base-maps across Forestry, Environment, and Mining upon administrator approval.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- =================== STEP 3: ENDORSEMENT =================== -->
+                <section class="form-page" id="page3" role="tabpanel" aria-label="Endorsement validation" style="display:none;">
+                    <div class="page-header">
+                        <div class="section-badge">03</div>
+                        <div>
+                            <span class="form-kicker">Section III &bull; Verification &amp; Clearance</span>
+                            <h3>Operational Intent &amp; Dossier Review</h3>
+                            <p>Verify your entered credentials and endorse compliance with provincial data protection protocols.</p>
+                        </div>
+                    </div>
+
+                    <div class="validation-layout">
+                        <!-- Live Summary Dossier -->
+                        <div class="dossier-card" id="dossierPreview">
+                            <div class="dossier-header">
+                                <div class="dossier-title">
+                                    <i data-lucide="file-check"></i>
+                                    <span>Application Verification Summary</span>
+                                </div>
+                                <span class="dossier-badge" id="summaryRoleBadge">Role: --</span>
+                            </div>
+                            <div class="dossier-grid">
+                                <div class="dossier-item">
+                                    <small>Applicant Name</small>
+                                    <strong id="sumName">--</strong>
+                                </div>
+                                <div class="dossier-item">
+                                    <small>Official ID / License</small>
+                                    <strong id="sumId">--</strong>
+                                </div>
+                                <div class="dossier-item">
+                                    <small>Assigned Division</small>
+                                    <strong id="sumDivision">--</strong>
+                                </div>
+                                <div class="dossier-item">
+                                    <small>Designation</small>
+                                    <strong id="sumPosition">--</strong>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Operational Intent Textarea -->
+                        <div class="input-container full-width">
+                            <div class="label-row">
+                                <label for="reason">Operational Intent / Justification <span>*</span></label>
+                                <span class="char-counter" id="charCount">0 / 250</span>
+                            </div>
+                            <div class="input-wrapper textarea-wrapper">
+                                <i data-lucide="pen-tool" class="icon-left text-icon"></i>
+                                <textarea id="reason" maxlength="250" required placeholder="Specify your primary duties (e.g., Encode quarterly mining concession permits, audit air quality telemetry, or maintain seedling dispersal logs)."></textarea>
+                            </div>
+                            <span class="field-help">Provide specific, audit-ready operational justification for the PGENRO Administrator.</span>
+                            <span class="error-msg" id="reasonError"></span>
+                        </div>
+
+                        <!-- Endorsement Compliance Checkboxes -->
+                        <div class="compliance-group">
                             <div class="compliance-wrapper">
                                 <label class="compliance-box" for="endorsementCheck">
                                     <input type="checkbox" id="endorsementCheck" required>
-                                    <div class="checkbox-visual"><i data-lucide="check"></i></div>
-                                    <p>
-                                        I certify that my <strong>Division Head Endorsement Letter</strong> is signed, valid, and available for administrative verification.
-                                    </p>
+                                    <span class="checkbox-visual"><i data-lucide="check"></i></span>
+                                    <span class="compliance-copy">
+                                        <strong>Endorsement Document Verification</strong>
+                                        <span>I certify that I hold a signed endorsement memo from my Division Head and am prepared to present it upon physical or digital audit.</span>
+                                    </span>
                                 </label>
                                 <span class="error-msg" id="endorsementCheckError"></span>
                             </div>
 
-                            <!-- Privacy Checkbox -->
                             <div class="compliance-wrapper">
                                 <label class="compliance-box" for="agree">
                                     <input type="checkbox" id="agree" required>
-                                    <div class="checkbox-visual"><i data-lucide="check"></i></div>
-                                    <p>
-                                        I certify that all information is accurate and agree to the 
-                                        <button type="button" class="btn-link" id="openPrivacyBtn">Data Privacy Protocols</button>.
-                                    </p>
+                                    <span class="checkbox-visual"><i data-lucide="check"></i></span>
+                                    <span class="compliance-copy">
+                                        <strong>Accuracy &amp; Environmental Data Privacy</strong>
+                                        <span>I confirm all data provided is true and binding. I agree to abide by the PGENRO <button type="button" class="btn-link" id="openPrivacyBtn">Data Privacy Protocols &amp; RA 10173</button>.</span>
+                                    </span>
                                 </label>
                                 <span class="error-msg" id="agreeError"></span>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- FORM CONTROLS -->
-                    <div class="form-controls">
-                        <button type="button" id="backBtn" class="btn-outline" style="visibility: hidden;">
-                            <i data-lucide="chevron-left"></i> Back
-                        </button>
-                        <div class="action-group">
-                            <button type="button" id="nextBtn" class="btn-solid">
-                                Continue <i data-lucide="chevron-right"></i>
-                            </button>
-                            <button type="submit" id="submitBtn" class="btn-solid btn-success" style="display:none;">
-                                Submit for Clearance <i data-lucide="shield-check"></i>
-                            </button>
+                        <div class="secure-submit-note">
+                            <i data-lucide="lock"></i>
+                            <span>Endorsement packets are cryptographically stamped and transmitted directly to the System Administrator.</span>
                         </div>
                     </div>
+                </section>
 
-                </form>
-            </div>
+                <!-- Navigation Controls -->
+                <div class="form-controls">
+                    <button type="button" id="backBtn" class="btn-outline" style="visibility:hidden;">
+                        <i data-lucide="arrow-left"></i>
+                        <span>Previous</span>
+                    </button>
+                    
+                    <div class="control-status" id="controlStatus">
+                        <i data-lucide="check-circle-2"></i> Progress automatically saved
+                    </div>
+
+                    <div class="action-group">
+                        <button type="button" id="nextBtn" class="btn-solid">
+                            <span>Proceed</span>
+                            <i data-lucide="arrow-right"></i>
+                        </button>
+                        
+                        <button type="submit" id="submitBtn" class="btn-solid btn-success" style="display:none;">
+                            <span>Submit Clearance</span>
+                            <i data-lucide="send"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
         </section>
     </main>
 
-    <!-- DATA PRIVACY MODAL -->
+    <!-- Data Privacy Modal -->
     <dialog class="modal-dialog" id="privacyModal">
         <div class="modal-wrapper">
             <header class="modal-header">
-                <div class="modal-icon-bg"><i data-lucide="shield-alert"></i></div>
-                <h2>Data Privacy & Security Governance</h2>
-                <button type="button" class="modal-close-btn" id="closePrivacyBtn">
+                <div class="modal-icon-bg"><i data-lucide="shield-check"></i></div>
+                <div>
+                    <span class="form-kicker">REPUBLIC ACT NO. 10173</span>
+                    <h2>Environmental Data Privacy Governance</h2>
+                </div>
+                <button type="button" class="modal-close-btn" id="closePrivacyBtn" aria-label="Close dialog">
                     <i data-lucide="x"></i>
                 </button>
             </header>
+            
             <div class="modal-body">
-                <p>By submitting an access request to the Provincial Government Environment and Natural Resources Office (PGENRO) IMS, you agree to comply with <strong>Republic Act No. 10173 (Data Privacy Act of 2012)</strong>.</p>
+                <p>As a verified operator of the Provincial Government Environment and Natural Resources Office (PGENRO) Information Management System, you are entrusted with confidential spatial, ecological, and industrial concession data.</p>
                 
-                <h3>Clearance & Security Provisions:</h3>
+                <h3>Mandatory Operator Obligations</h3>
                 <ul>
-                    <li><strong>Credential Protection:</strong> Assigned credentials are exclusively for the authorized individual. Account sharing is strictly prohibited.</li>
-                    <li><strong>Division Boundaries:</strong> Access is limited to your endorsed Division (Admin, Environment, Forestry, or Mines & Quarry).</li>
-                    <li><strong>System Audit Trails:</strong> All database submissions, exports, and document views are permanently logged and monitored by the System Administrator.</li>
+                    <li><strong>Non-Disclosure of Concession Maps:</strong> Geospatial coordinates of pending mineral quarry applications, active watershed reserves, and endangered flora sanctuaries must not be exported without explicit written clearance.</li>
+                    <li><strong>Account Non-Transferability:</strong> Credentials assigned are personal to your civil service appointment. Sharing passwords or permitting unauthorized operators to access your terminal constitutes an offense under civil service regulations.</li>
+                    <li><strong>Audit Trail Integrity:</strong> All queries, record alterations, export timestamps, and IP addresses are recorded permanently in the PGENRO central security audit repository.</li>
                 </ul>
-                <p class="terms-footer-text">Unauthorized access or falsification of endorsement letters is subject to administrative sanctions under Civil Service rules.</p>
+
+                <p class="terms-footer-text">
+                    By confirming this declaration, you accept liability under Republic Act No. 10173 (Data Privacy Act) and the Environmental Protection Code of the Province.
+                </p>
             </div>
+            
             <footer class="modal-footer">
-                <button type="button" class="btn-solid btn-success" id="acceptPrivacyBtn">I Accept and Understand</button>
+                <button type="button" class="btn-solid btn-success" id="acceptPrivacyBtn">
+                    <i data-lucide="check"></i> I Accept &amp; Comply
+                </button>
             </footer>
         </div>
     </dialog>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
+    <!-- Toast Notification Anchor -->
     <div id="toastContainer" class="toast-container" aria-live="assertive"></div>
 
-    <!-- JS Scripts -->
     <script type="module" src="../user-javascript/requestACC.js"></script>
 </body>
 </html>
