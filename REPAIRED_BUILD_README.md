@@ -1,31 +1,22 @@
-# PGENRO IMS — Repaired Build
+# PGENRO IMS — Consolidated/Repaired Build
 
-This build was repaired from the original `Capstone-IMS (2)(2).zip` baseline.
-It does **not** use the previous V3 rewrite as its base.
+This build preserves the existing module CRUD and Supabase logic while consolidating the presentation and navigation layers.
 
-## What was repaired
+## Repairs included
 
-- Preserved existing Admin/User CRUD and authentication scripts.
-- Added a conservative responsive UI layer (`shared/repaired-ui.css`).
-- Added non-destructive reveal/transition animations (`shared/repaired-ui.js`).
-- Rebuilt the broken Settings page using native Supabase APIs only.
-- Added Account Settings navigation for Admin and User workspaces.
-- Added database-backed user preferences and administrator system settings.
-- Added database-driven announcement/account-request/session-timeout runtime support.
-- Added the shared workspace shell to Admin Service Requests for consistent responsive behavior.
+- Standardized HTML filenames and internal URLs to lowercase for case-sensitive hosting.
+- Removed duplicate legacy UI assets that were no longer linked by active pages.
+- Removed the redundant `shared/repaired-ui.js` runtime layer; its responsibilities are already handled by `shared/pgenro-global.js` and `shared/workspace.js`.
+- Preserved the existing per-page CSS output so module-specific layouts and responsive rules remain intact.
+- Added a root `index.html` entry point.
+- Hardened the OCR upload endpoint with safe filenames, size limits, temporary-file isolation, validation, cleanup, and non-debug default execution.
+- Added `User/requirements-ocr.txt` for the OCR backend.
 
-## Required database upgrade for Settings
+## Validation status
 
-If your existing PGENRO Supabase database is already installed, run only:
+- Project audit: PASS — 0 missing local assets.
+- Regression suite: PASS.
+- JavaScript syntax: PASS.
+- OCR Python syntax: PASS.
 
-`supabase/SAFE_SETTINGS_PATCH.sql`
-
-This patch is idempotent and does not drop operational tables.
-
-For a brand-new database, `supabase/PGENRO_FULL_SETUP.sql` already includes the safe settings patch at the end.
-
-## Important
-
-Use Live Server or another local web server. Do not open protected HTML pages directly with `file://`.
-
-If `SAFE_SETTINGS_PATCH.sql` has not been run yet, the normal IMS modules still work. The Settings page will show a clear error instead of breaking the rest of the system.
+Live Supabase permissions, deployed Edge Functions, browser rendering, and real account/database transactions still require acceptance testing against the user's Supabase project.

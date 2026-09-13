@@ -22,6 +22,7 @@
 
 
 
+<link rel="stylesheet" href="../shared/admin.css?v=20260913-clean2">
 </head>
 <body class="pgenro-admin" data-admin-page="admin.html" data-requires-auth="admin">
 <div class="app-layout">
@@ -66,7 +67,7 @@
 <span class="nav-label">User &amp; Access</span>
 <ul>
 <li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-<li><a class="nav-item" href="requestACC.html"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span></a></li>
+<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
@@ -140,7 +141,7 @@
 <div class="dropdown-links">
 <a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
 <a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
-<a href="requestACC.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
+<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
 <a href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account Settings</span></a>
 </div>
 <div class="dropdown-footer">
@@ -188,7 +189,7 @@
 <span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Action Required</span>
 </div>
 <div class="kpi-footer">
-<a href="requestACC.html">Approve credentials →</a>
+<a href="requestacc.html">Approve credentials →</a>
 </div>
 </div>
 <div class="kpi-card">
@@ -236,7 +237,7 @@
 <a class="module-control-card" href="serviceAdmin.html"><div class="module-control-icon"><i data-lucide="wrench"></i></div><div><strong>Service Requests</strong><span>Requests &amp; course of action</span></div><b id="modServiceCount">0</b></a>
 <a class="module-control-card" href="ics-admin.html"><div class="module-control-icon"><i data-lucide="file-check-2"></i></div><div><strong>ICS Property</strong><span>Custodian slips &amp; assets</span></div><b id="modIcsCount">0</b></a>
 <a class="module-control-card" href="Usermanagement.html"><div class="module-control-icon"><i data-lucide="user-cog"></i></div><div><strong>User Management</strong><span>Accounts, roles &amp; status</span></div><b id="modUserCount">0</b></a>
-<a class="module-control-card attention" href="requestACC.html"><div class="module-control-icon"><i data-lucide="user-plus"></i></div><div><strong>Account Requests</strong><span>Review access applications</span></div><b id="modRequestCount">0</b></a>
+<a class="module-control-card attention" href="requestacc.html"><div class="module-control-icon"><i data-lucide="user-plus"></i></div><div><strong>Account Requests</strong><span>Review access applications</span></div><b id="modRequestCount">0</b></a>
 </div>
 </section>
 <!-- ANALYTICS & MEMOS VIEW SECTION -->
@@ -382,6 +383,6 @@
 <script src="../admin-javascript/admin-ui.js"></script>
 <script src="../shared/pgenro-global.js?v=20260912"></script>
 <script src="../shared/workspace.js?v=20260913"></script>
-<script src="../shared/repaired-ui.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
 </body>
 </html>

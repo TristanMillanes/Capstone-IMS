@@ -152,7 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if ($("notifBadgeCount")) $("notifBadgeCount").textContent=`${pending.length} Unread`;
     if ($("notifPing")) $("notifPing").style.display=pending.length?"block":"none";
     const list=$("notificationList"); if(!list)return;
-    list.innerHTML=pending.length?pending.slice(0,5).map(r=>`<a href="requestACC.html" class="notification-item"><strong>${escapeHTML(r.fullName||r.name||"New applicant")}</strong><span>${escapeHTML(r.email||r.role||"Access request")}</span></a>`).join(""):'<div class="empty-notif-state">No new notifications</div>';
+    list.innerHTML=pending.length?pending.slice(0,5).map(r=>`<a href="requestacc.html" class="notification-item"><strong>${escapeHTML(r.fullName||r.name||"New applicant")}</strong><span>${escapeHTML(r.email||r.role||"Access request")}</span></a>`).join(""):'<div class="empty-notif-state">No new notifications</div>';
   }
 
   function renderMemoStream(rows) {

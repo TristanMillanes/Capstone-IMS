@@ -37,7 +37,6 @@ This build keeps the existing Supabase/database logic and adds a shared presenta
 
 ## New shared files
 
-- `shared/pgenro-global.css`
 - `shared/pgenro-global.js`
 
 These files are intentionally presentation-only. They do not contain Supabase credentials, CRUD logic, authentication decisions, or database permissions.

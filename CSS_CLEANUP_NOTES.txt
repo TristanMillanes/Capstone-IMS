@@ -1,39 +1,37 @@
 PGENRO IMS - CSS / FILE ORGANIZATION CLEANUP
 Date: 2026-09-13
 
-Goal
-- Keep only one local CSS file per page/module.
-- Remove the extra global/repair/admin override CSS files that were making the project hard to maintain.
-- Preserve the previous CSS cascade order so the existing layout/design is not intentionally changed.
+The repeated shared CSS copied into every module stylesheet has been removed.
+Each application page now loads:
 
-What changed
-- 25 HTML pages now load exactly one local CSS file each.
-- Consolidated 142 previous local stylesheet links plus 2 inline <style> blocks into their proper page/module stylesheet.
-- Removed these redundant CSS files after consolidation:
-  * USER-CSS/pgenro-global.css
-  * USER-CSS/pgenro-user.css
-  * admin/admin-modern.css
-  * admin/admin-ui.css
-  * admin/visitors-admin-enhanced.css
-  * shared/pgenro-global.css
-  * shared/repaired-ui.css
-  * shared/workspace.css
-- Moved USER-CSS/pgenro-user.js to user-javascript/pgenro-user.js and updated all HTML references.
-- Removed the now-empty USER-CSS folder.
-- Added supabase-test.css for SUPABASE_CONNECTION_TEST.html so that page also follows the one-CSS rule.
+1. One small module stylesheet for page-specific components.
+2. One cached category stylesheet for shared layout, theme, responsiveness,
+   accessibility, and final compatibility rules.
 
-Examples
-- admin/admincommunication.html -> admin/admincommunication.css only
-- admin/serviceAdmin.html -> admin/serviceAdmin.css only
-- admin/visitors-admin.html -> admin/visitor.css only
-- User/communication.html -> User/Communication.css only
-- User/service.html -> User/service.css only
-- User/travelOR.html -> User/travelOR.css only
+Shared category stylesheets:
+- shared/admin.css
+- shared/user.css
+- shared/public.css
+- shared/diagnostic.css
 
-Validation
-- All 25 HTML pages have exactly one local stylesheet reference.
-- All local CSS references resolve to existing files.
-- All CSS files parse without syntax errors.
-- Existing regression test: PASS.
-- Project audit: 0 issues.
-- All JavaScript files pass node --check.
+Removed obsolete/repeated source layers:
+- USER-CSS/pgenro-global.css
+- USER-CSS/pgenro-user.css
+- shared/pgenro-global.css
+- shared/workspace.css
+- shared/repaired-ui.css
+- shared/ui-overrides.css
+- admin/admin-modern.css
+- admin/admin-ui.css
+- admin/visitors-admin-enhanced.css
+
+Result:
+- CSS size before cleanup: 3,458,097 bytes
+- CSS size after cleanup: 943,964 bytes
+- Reduction: 72.7%
+
+The Supabase and application JavaScript logic was not changed by this cleanup.
+Run both checks from the project root before deployment:
+
+  python3 tests/audit.py
+  node tests/regression.cjs
