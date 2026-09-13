@@ -1,0 +1,149 @@
+/* PGENRO IMS — conservative UI repair layer (2026-09-13)
+   Loaded last. Focuses on responsiveness and polish without changing module logic. */
+:root{
+  --repair-green:#176b52;
+  --repair-green-dark:#0f4d3b;
+  --repair-ink:#172923;
+  --repair-muted:#61736d;
+  --repair-line:#dce6e1;
+  --repair-bg:#f4f7f5;
+  --repair-card:#fff;
+  --repair-shadow:0 10px 28px rgba(18,63,50,.08);
+  --repair-radius:16px;
+}
+html{scroll-behavior:smooth}
+body.pgenro-admin,body.pgenro-user{background:var(--repair-bg)!important;color:var(--repair-ink)}
+body.pgenro-admin .main-wrapper,body.pgenro-user .main-content{min-width:0}
+
+/* Admin shell: make the change visible but keep the existing DOM and controllers. */
+body.pgenro-admin .sidebar{
+  background:linear-gradient(180deg,#123f32 0%,#0d3328 100%)!important;
+  border-right:1px solid rgba(255,255,255,.06)!important;
+  box-shadow:8px 0 28px rgba(14,51,40,.08)!important;
+}
+body.pgenro-admin .sidebar-header{border-bottom:1px solid rgba(255,255,255,.08)!important}
+body.pgenro-admin .sidebar .nav-item{
+  border:1px solid transparent!important;
+  transition:background-color .2s ease,border-color .2s ease,transform .2s ease!important;
+}
+body.pgenro-admin .sidebar .nav-item:hover{background:rgba(255,255,255,.09)!important;transform:translateX(2px)}
+body.pgenro-admin .sidebar .nav-item.active{
+  background:linear-gradient(90deg,rgba(255,255,255,.16),rgba(255,255,255,.08))!important;
+  border-color:rgba(255,255,255,.1)!important;
+  box-shadow:inset 3px 0 #9fd4ad!important;
+}
+body.pgenro-admin .topbar{
+  background:rgba(255,255,255,.96)!important;
+  border-bottom:1px solid var(--repair-line)!important;
+  box-shadow:0 6px 20px rgba(18,63,50,.035)!important;
+  backdrop-filter:blur(12px);
+}
+body.pgenro-admin .main-content{max-width:1800px;width:100%;margin-inline:auto}
+body.pgenro-admin :is(.page-header,.ics-admin-header,.module-header){
+  background:linear-gradient(135deg,#fff 0%,#f8fbf9 100%)!important;
+  border:1px solid var(--repair-line)!important;
+  border-radius:var(--repair-radius)!important;
+  box-shadow:0 8px 24px rgba(18,63,50,.045)!important;
+}
+body.pgenro-admin :is(.kpi-card,.metric-card,.stat-card,.module-control-card,.panel-card,.chart-card,.system-tool-card,.settings-panel-card){
+  border:1px solid var(--repair-line)!important;
+  border-radius:var(--repair-radius)!important;
+  box-shadow:0 5px 18px rgba(18,63,50,.045)!important;
+}
+body.pgenro-admin :is(.kpi-card,.metric-card,.stat-card,.module-control-card){transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease!important}
+body.pgenro-admin :is(.kpi-card,.metric-card,.stat-card,.module-control-card):hover{transform:translateY(-3px);box-shadow:var(--repair-shadow)!important;border-color:#c9ddd3!important}
+body.pgenro-admin .global-search{border:1px solid #e1e9e5!important;border-radius:12px!important;background:#f6f8f7!important}
+
+/* User shell */
+body.pgenro-user .navbar{
+  background:rgba(255,255,255,.97)!important;
+  border-bottom:1px solid var(--repair-line)!important;
+  backdrop-filter:blur(12px);
+}
+body.pgenro-user .sidebar{
+  background:linear-gradient(180deg,#123f32 0%,#0e372b 100%)!important;
+  border:1px solid rgba(255,255,255,.05)!important;
+  box-shadow:0 12px 30px rgba(18,63,50,.11)!important;
+}
+body.pgenro-user .modules-list a{transition:background-color .2s ease,transform .2s ease!important}
+body.pgenro-user .modules-list a:hover{transform:translateX(2px);background:rgba(255,255,255,.09)!important}
+body.pgenro-user :is(.page-header,.module-header,.hero.dashboard-header-banner,.panel-card,.chart-card,.kpi-card,.metric-card,.stat-card,.table-card,.records-card){
+  border-color:var(--repair-line)!important;
+}
+
+/* Shared content polish */
+body:is(.pgenro-admin,.pgenro-user) :is(.data-table,.records-table,table){border-collapse:separate;border-spacing:0}
+body:is(.pgenro-admin,.pgenro-user) :is(.table-responsive,.table-wrapper,.records-table-wrapper,.ics-table-wrapper,.ws-table-scroll,.table-container){
+  max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:thin;
+}
+body:is(.pgenro-admin,.pgenro-user) :is(.data-table,.records-table,table) th{white-space:nowrap}
+body:is(.pgenro-admin,.pgenro-user) :is(input,select,textarea){max-width:100%}
+body:is(.pgenro-admin,.pgenro-user) :is(input,select,textarea):focus{border-color:#5d9d84!important;box-shadow:0 0 0 3px rgba(23,107,82,.11)!important}
+body:is(.pgenro-admin,.pgenro-user) :is(.btn,.btn-primary,.btn-secondary,.action-btn,button){-webkit-tap-highlight-color:transparent}
+body:is(.pgenro-admin,.pgenro-user) :is(.btn,.btn-primary,.btn-secondary){transition:transform .18s ease,box-shadow .18s ease,background-color .18s ease!important}
+body:is(.pgenro-admin,.pgenro-user) :is(.btn,.btn-primary,.btn-secondary):active{transform:translateY(1px) scale(.99)}
+body:is(.pgenro-admin,.pgenro-user) :is(.modal-content,.modal-window,.drawer,.detail-drawer){max-width:calc(100vw - 24px);max-height:calc(100dvh - 24px)}
+body:is(.pgenro-admin,.pgenro-user) .repair-ui-enter{opacity:0;transform:translateY(12px)}
+body:is(.pgenro-admin,.pgenro-user) .repair-ui-enter.is-visible{opacity:1;transform:none;transition:opacity .42s ease,transform .42s cubic-bezier(.2,.75,.25,1)}
+
+/* System announcement from database settings */
+.pgenro-system-announcement{position:relative;z-index:25;margin:0;border-bottom:1px solid #cce3d7;background:#edf8f2;color:#184b39;padding:10px 18px;font-size:13px;font-weight:600;text-align:center}
+.pgenro-system-announcement[hidden]{display:none!important}
+
+/* Settings/preferences applied globally */
+html[data-pgenro-theme="dark"] body.pgenro-admin,html[data-pgenro-theme="dark"] body.pgenro-user{--repair-bg:#101915;--repair-card:#17231e;--repair-ink:#edf7f2;--repair-muted:#a9bdb4;--repair-line:#2a3b34;background:#101915!important;color:#edf7f2!important}
+html[data-pgenro-theme="dark"] body:is(.pgenro-admin,.pgenro-user) :is(.topbar,.navbar,.page-header,.module-header,.ics-admin-header,.panel-card,.chart-card,.kpi-card,.metric-card,.stat-card,.table-card,.records-card,.module-control-card,.settings-panel-card){background:#17231e!important;color:#edf7f2!important;border-color:#2a3b34!important}
+html[data-pgenro-theme="dark"] body:is(.pgenro-admin,.pgenro-user) :is(input,select,textarea,.global-search){background:#111b17!important;color:#edf7f2!important;border-color:#31463c!important}
+body.pgenro-compact :is(th,td){padding-top:9px!important;padding-bottom:9px!important}
+body.pgenro-compact :is(.kpi-card,.metric-card,.stat-card,.panel-card){padding-top:14px!important;padding-bottom:14px!important}
+body.pgenro-reduced-motion *,body.pgenro-reduced-motion *::before,body.pgenro-reduced-motion *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+
+/* Tablet */
+@media(max-width:1100px){
+  body.pgenro-admin .topbar{padding-inline:16px!important}
+  body.pgenro-admin .main-content{padding:20px 16px!important}
+  body.pgenro-admin :is(.kpi-grid,.metrics-grid,.stats-grid,.module-control-grid,.dashboard-grid){grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  body.pgenro-admin :is(.header-actions,.page-actions,.toolbar,.toolbar-actions,.filters-row){flex-wrap:wrap!important}
+  body.pgenro-user .main-content{margin-right:16px!important}
+}
+
+/* Mobile */
+@media(max-width:900px){
+  body.pgenro-admin .sidebar{position:fixed!important;left:0!important;top:0!important;bottom:0!important;height:100dvh!important;z-index:1200!important;transform:translateX(-105%)!important;transition:transform .24s ease!important}
+  body.pgenro-admin .sidebar.mobile-open,body.pgenro-admin .sidebar.open{transform:translateX(0)!important}
+  body.pgenro-admin .main-wrapper,body.pgenro-admin .main-wrapper.sidebar-collapsed{margin-left:0!important;width:100%!important}
+  body.pgenro-admin .topbar{left:0!important;width:100%!important}
+  body.pgenro-admin #mobileMenuBtn{display:inline-flex!important}
+  body.pgenro-admin .global-search{max-width:min(520px,55vw)!important}
+  body.pgenro-admin .search-shortcut{display:none!important}
+  body.pgenro-user .main-content{margin:0 14px!important;padding-top:94px!important}
+}
+
+@media(max-width:680px){
+  body.pgenro-admin .main-content{padding:14px 10px!important;gap:16px!important}
+  body.pgenro-admin :is(.page-header,.module-header,.ics-admin-header){padding:18px!important}
+  body.pgenro-admin :is(.kpi-grid,.metrics-grid,.stats-grid,.module-control-grid,.dashboard-grid){grid-template-columns:1fr!important}
+  body.pgenro-admin .topbar{min-height:64px!important;padding:8px 10px!important}
+  body.pgenro-admin .global-search{display:none!important}
+  body.pgenro-admin .topbar-right{gap:6px!important}
+  body.pgenro-admin :is(.profile-dropdown,.notification-dropdown){position:fixed!important;top:68px!important;right:10px!important;left:10px!important;width:auto!important;max-width:none!important}
+  body.pgenro-user .logo-text span{display:none!important}
+  body.pgenro-user .navbar{padding:9px 10px!important}
+  body:is(.pgenro-admin,.pgenro-user) :is(.form-grid,.details-grid,.filter-grid,.info-grid){grid-template-columns:1fr!important}
+  body:is(.pgenro-admin,.pgenro-user) :is(.header-actions,.page-actions,.toolbar-actions,.modal-window-footer){width:100%;flex-wrap:wrap!important}
+  body:is(.pgenro-admin,.pgenro-user) :is(.header-actions,.page-actions,.toolbar-actions,.modal-window-footer)>.btn{flex:1 1 150px;justify-content:center}
+  body:is(.pgenro-admin,.pgenro-user) :is(.modal-content,.modal-window){width:calc(100vw - 16px)!important;max-width:calc(100vw - 16px)!important;margin:8px!important;border-radius:14px!important}
+  body:is(.pgenro-admin,.pgenro-user) :is(input,select,textarea){font-size:16px!important}
+}
+
+@media(max-width:420px){
+  body.pgenro-user .main-content{margin-inline:10px!important}
+  body:is(.pgenro-admin,.pgenro-user) :is(.kpi-grid,.metrics-grid,.stats-grid,.ics-kpi-grid){grid-template-columns:1fr!important}
+  .pgenro-system-announcement{padding:9px 12px;font-size:12px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto!important}
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  .repair-ui-enter{opacity:1!important;transform:none!important}
+}

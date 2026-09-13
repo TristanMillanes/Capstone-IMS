@@ -3,40 +3,12 @@
 // Provincial Government of Quezon | Enterprise Edition
 // ==========================================================================
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import {
-    getAuth,
-    signInWithEmailAndPassword
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import {
-    getDatabase,
-    ref,
-    get,
-    push,
-    set,
-    query,
-    orderByChild,
-    equalTo,
-    serverTimestamp
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
-
 // ==========================================================================
-// 1. FIREBASE INITIALIZATION & SECURITY POLICY
+// SUPABASE AUTH + AUTHORIZATION
+// Shared client is initialized by ../shared/supabase.js
 // ==========================================================================
-const firebaseConfig = {
-    apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
-    authDomain: "ims-capstone-bc65f.firebaseapp.com",
-    databaseURL: "https://ims-capstone-bc65f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ims-capstone-bc65f",
-    storageBucket: "ims-capstone-bc65f.firebasestorage.app",
-    messagingSenderId: "972207120140",
-    appId: "1:972207120140:web:6a94e2e1e9e8511e933329",
-    measurementId: "G-W4TPE7CHC8"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
+const supabase = window.pgenroSupabase;
+const PGENRO_API = window.PGENRO_API;
 
 // Security Policy Constants
 const SECURITY_CONFIG = {
@@ -65,19 +37,21 @@ const maskEmail = (email) => {
 
 // Asynchronous non-blocking security audit logger
 const recordAuditLog = async (action, email, status, details = "") => {
+    if (!supabase) return;
     try {
-        const logRef = ref(db, "audit_logs/login_events");
-        const newEntry = push(logRef);
-        await set(newEntry, {
-            action,
-            emailMasked: maskEmail(email),
-            status,
-            details,
-            timestamp: serverTimestamp(),
-            userAgent: navigator.userAgent.substring(0, 120)
+        await supabase.from("audit_logs").insert({
+            id: crypto.randomUUID(),
+            data: {
+                action,
+                emailMasked: maskEmail(email),
+                status,
+                details,
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent.substring(0, 120)
+            }
         });
     } catch {
-        // Silent catch: audit failure never blocks personnel login
+        // Audit failure must never block sign-in.
     }
 };
 
@@ -990,113 +964,117 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            showLoading("Verifying Clearance", "Connecting to PGENRO secure directory...");
-            await delay(180);
-
-            // Step A: Admin Authentication
-            const isAuthorizedAdminDomain = email.endsWith("@pgenro.admin") || email.endsWith("@admin.quezon.gov.ph");
-
-            if (isAuthorizedAdminDomain) {
-                try {
-                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                    if (loadingStatusHeading) loadingStatusHeading.textContent = "Clearance Granted";
-                    if (loadingStatusText) loadingStatusText.textContent = "Administrator verified. Opening Control Center...";
-
-                    resetFailedAttempts();
-                    await recordAuditLog("ADMIN_LOGIN_SUCCESS", email, "Success", "Firebase Auth Authorized");
-
-                    storage.setSession("pgenro_session_token", userCredential.user.uid);
-                    await delay(300);
-                    window.location.href = "../admin/admin.html";
-                    return;
-                } catch (adminErr) {
-                    console.warn("Primary admin auth rejected, checking database...", adminErr.code);
-                }
+            if (!supabase || !window.PGENRO_SUPABASE?.configured) {
+                throw new Error("Supabase is not configured yet. Add the Publishable/Anon key in shared/supabase.js.");
             }
 
-            // Step B: Personnel Registry Verification
-            if (loadingStatusText) loadingStatusText.textContent = "Querying personnel registry...";
+            showLoading("Verifying Clearance", "Authenticating with Supabase...");
+            await delay(140);
 
-            const reqQuery = query(ref(db, "access_requests"), orderByChild("email"), equalTo(email));
-            const reqSnap = await get(reqQuery);
+            const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+                email,
+                password
+            });
 
-            let userData = null;
-            if (reqSnap.exists()) {
-                const data = reqSnap.val();
-                const keys = Object.keys(data);
-                if (keys.length > 0) userData = data[keys[0]];
-            }
-
-            if (!userData) {
+            if (authError) {
                 hideLoading();
                 recordFailedAttempt();
                 triggerVibrate();
-                emailFieldBox?.classList.add("invalid");
-                await recordAuditLog("LOGIN_FAILED_NOT_FOUND", email, "Failed", "No registry entry");
-                displayBanner("error", "Record Not Found", `No personnel record was found for "${email}". Please submit an Access Request.`);
+                passwordFieldBox?.classList.add("invalid");
+                await recordAuditLog("LOGIN_FAILED_AUTH", email, "Failed", authError.message);
+                displayBanner("error", "Authentication Failed", "The email or password you entered is incorrect.");
                 return;
             }
 
-            if (userData.status === "Pending") {
+            const user = authData.user;
+            if (!user) throw new Error("Supabase did not return an authenticated user.");
+
+            if (loadingStatusText) loadingStatusText.textContent = "Checking administrator-controlled access status...";
+
+            const { data: profile, error: profileError } = await supabase
+                .from("profiles")
+                .select("*")
+                .eq("user_id", user.id)
+                .maybeSingle();
+
+            if (profileError) throw profileError;
+
+            if (!profile) {
+                await supabase.auth.signOut();
                 hideLoading();
                 triggerVibrate();
-                await recordAuditLog("LOGIN_BLOCKED_PENDING", email, "Blocked", "Status is Pending");
-                displayBanner("warning", "Account Pending Clearance", `Your request (${userData.id || "ID-REQ"}) is undergoing Administrator review.`);
+                displayBanner("error", "Personnel Profile Missing", "Your login exists but no PGENRO personnel profile is linked to it.");
                 return;
             }
 
-            if (userData.status === "Rejected") {
+            const normalizedStatus = String(profile.status || "").trim().toLowerCase();
+            const approved = profile.is_active === true && ["active", "approved"].includes(normalizedStatus);
+
+            if (!approved) {
+                await supabase.auth.signOut();
                 hideLoading();
                 triggerVibrate();
-                const reason = userData.declineRemarks || "Verification requirements were not met.";
-                await recordAuditLog("LOGIN_BLOCKED_REJECTED", email, "Blocked", `Reason: ${reason}`);
-                displayBanner("error", "Access Request Declined", `Your clearance was declined: "${reason}"`);
-                return;
-            }
 
-            if (userData.status === "Approved") {
-                if (userData.password && userData.password !== password) {
-                    hideLoading();
-                    recordFailedAttempt();
-                    triggerVibrate();
-                    passwordFieldBox?.classList.add("invalid");
-                    await recordAuditLog("LOGIN_FAILED_PASSWORD", email, "Failed", "Incorrect password");
-                    displayBanner("error", "Authentication Failed", "The password you entered is incorrect. Please verify credentials.");
-                    passwordInput?.focus();
-                    return;
-                }
-
-                // Authentication confirmed
-                resetFailedAttempts();
-                if (loadingStatusHeading) loadingStatusHeading.textContent = "Clearance Granted";
-                if (loadingStatusText) loadingStatusText.textContent = `Welcome back, ${userData.fullName || "Personnel"}! Redirecting...`;
-
-                // Scrub plaintext password before saving
-                const cleanProfile = sanitizeUserData(userData);
-                storage.set("pgenro_current_user", JSON.stringify(cleanProfile));
-                storage.setSession("pgenro_session_active", "true");
-
-                await recordAuditLog("PERSONNEL_LOGIN_SUCCESS", email, "Success", `Role: ${userData.role || "Staff"}`);
-                await delay(350);
-
-                if (userData.role === "admin" || userData.role === "superadmin") {
-                    window.location.href = "../admin/admin.html";
+                const statusLabel = profile.status || "Pending";
+                if (normalizedStatus === "pending") {
+                    await recordAuditLog("LOGIN_BLOCKED_PENDING", email, "Blocked", "Pending administrator approval");
+                    displayBanner("warning", "Account Pending Clearance", "Your account request is still waiting for administrator approval.");
+                } else if (normalizedStatus === "rejected") {
+                    await recordAuditLog("LOGIN_BLOCKED_REJECTED", email, "Blocked", "Rejected by administrator");
+                    displayBanner("error", "Access Request Declined", "Your account request was declined by the PGENRO administrator.");
+                } else if (normalizedStatus === "suspended") {
+                    await recordAuditLog("LOGIN_BLOCKED_SUSPENDED", email, "Blocked", "Suspended by administrator");
+                    displayBanner("error", "Account Suspended", "Your account access has been suspended by the administrator.");
                 } else {
-                    window.location.href = "../User/homepage.html";
+                    await recordAuditLog("LOGIN_BLOCKED_INACTIVE", email, "Blocked", `Status: ${statusLabel}`);
+                    displayBanner("error", "Account Inactive", `Your account is currently ${statusLabel}.`);
                 }
                 return;
             }
 
-            hideLoading();
-            triggerVibrate();
-            displayBanner("warning", "Unverified Clearance", "Your clearance status could not be verified. Please coordinate with IT.");
+            resetFailedAttempts();
 
+            const cleanProfile = sanitizeUserData({
+                uid: user.id,
+                id: user.id,
+                fullName: profile.full_name || user.user_metadata?.full_name || email.split("@")[0],
+                username: profile.username || email.split("@")[0],
+                email: profile.email || email,
+                contact: profile.contact || "",
+                position: profile.position || "",
+                division: profile.division || "",
+                role: profile.role || "System Staff",
+                accountType: profile.account_type || "Standard User",
+                status: profile.status || "Active",
+                lastLogin: new Date().toISOString()
+            });
+
+            storage.set("pgenro_current_user", JSON.stringify(cleanProfile));
+            storage.setSession("pgenro_session_active", "true");
+            storage.setSession("pgenro_session_token", user.id);
+
+            // Safe last-login heartbeat; the SQL function can update only auth.uid().
+            await supabase.rpc("touch_last_login").then(() => {}).catch(() => {});
+
+            await recordAuditLog("LOGIN_SUCCESS", email, "Success", `Role: ${cleanProfile.role}`);
+
+            if (loadingStatusHeading) loadingStatusHeading.textContent = "Clearance Granted";
+            if (loadingStatusText) loadingStatusText.textContent = `Welcome back, ${cleanProfile.fullName}! Redirecting...`;
+            await delay(280);
+
+            if (PGENRO_API?.isAdminRole(cleanProfile.role)) {
+                window.location.href = "../admin/admin.html";
+            } else {
+                window.location.href = "../User/homepage.html";
+            }
+            return;
         } catch (error) {
+            try { await supabase?.auth?.signOut(); } catch {}
             hideLoading();
             triggerVibrate();
-            console.error("Login Error:", error);
+            console.error("Supabase Login Error:", error);
             await recordAuditLog("LOGIN_SYSTEM_ERROR", email, "Error", error.message);
-            displayBanner("error", "System Notice", error.message || "Failed to authenticate with the server. Please try again.");
+            displayBanner("error", "System Notice", error.message || "Failed to authenticate with Supabase.");
         }
     });
 });

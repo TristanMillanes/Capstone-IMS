@@ -14,9 +14,33 @@
     
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="requestACC.css">
+    <link rel="stylesheet" href="requestACC.css?v=20260913-clean">
+  
+
+
 </head>
-<body>
+<body class="is-loading pgenro-auth pgenro-request">
+
+    <!-- Premium Secure Gateway Loading Screen -->
+    <div class="app-loader" id="appLoader" role="status" aria-live="polite" aria-label="Loading PGENRO IMS portal">
+        <div class="loader-ambient" aria-hidden="true"></div>
+        <div class="loader-content">
+            <div class="loader-mark" aria-hidden="true">
+                <span class="loader-orbit orbit-one"></span>
+                <span class="loader-orbit orbit-two"></span>
+                <span class="loader-core"><i data-lucide="leaf"></i></span>
+            </div>
+            <div class="loader-copy">
+                <span class="loader-kicker">PGENRO IMS</span>
+                <strong>Preparing secure gateway</strong>
+                <span class="loader-status" id="loaderStatus">Initializing personnel access services…</span>
+            </div>
+            <div class="loader-progress" aria-hidden="true">
+                <span></span>
+            </div>
+        </div>
+    </div>
+
     <a class="skip-link" href="#accessForm">Skip to access form</a>
 
     <!-- Environmental Atmospheric Background -->
@@ -45,7 +69,7 @@
     </div>
 
     <!-- Main Container -->
-    <main class="app-shell">
+    <main class="app-shell" id="appShell">
         
         <!-- Left Hero Environmental Panel -->
         <aside class="hero-panel">
@@ -125,6 +149,24 @@
 
         <!-- Right Form Panel -->
         <section class="form-panel" aria-label="Account clearance application">
+
+            <!-- Submission Processing Overlay -->
+            <div class="form-processing-overlay" id="formProcessingOverlay" aria-hidden="true">
+                <div class="processing-card" role="status" aria-live="polite">
+                    <div class="processing-visual">
+                        <span class="processing-ring"></span>
+                        <span class="processing-ring processing-ring-delay"></span>
+                        <span class="processing-icon" id="processingIcon"><i data-lucide="shield-check"></i></span>
+                    </div>
+                    <div class="processing-copy">
+                        <span class="form-kicker">SECURE TRANSMISSION</span>
+                        <strong id="processingTitle">Submitting clearance request</strong>
+                        <span id="processingMessage">Encrypting and routing your application to the PGENRO administrator…</span>
+                    </div>
+                    <div class="processing-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+                </div>
+            </div>
+
             
             <!-- Panel Header -->
             <div class="form-panel-header">
@@ -265,15 +307,7 @@
                             <span class="error-msg" id="contactError"></span>
                         </div>
 
-                        <div class="input-container full-width">
-                            <label for="govId">Government Employee ID or PRC License No. <span>*</span></label>
-                            <div class="input-wrapper">
-                                <i data-lucide="award" class="icon-left"></i>
-                                <input type="text" id="govId" required placeholder="e.g. PGQ-ENV-2024-041 or PRC-0089124" autocomplete="off">
-                            </div>
-                            <span class="field-help">Used for cross-verifying active government appointment.</span>
-                            <span class="error-msg" id="govIdError"></span>
-                        </div>
+                        
 
                         <div class="input-container">
                             <label for="password">Create Secure Password <span>*</span></label>
@@ -371,49 +405,32 @@
 
                         <!-- Role Tier Choice -->
                         <fieldset class="input-container role-field full-width">
-                            <legend>Requested Clearance Level <span>*</span></legend>
+                            <legend>Account Access Level</legend>
                             <select id="role" class="sr-only" required aria-label="Requested IMS access role">
-                                <option value="" disabled selected>Choose an access role</option>
-                                <option value="User">User</option>
-                                <option value="Admin">Admin</option>
+                                <option value="System Staff" selected>System Staff</option>
                             </select>
 
-                            <div class="role-choice-grid" role="group" aria-label="Select access role tier">
-                                <button type="button" class="role-choice" data-role="User" aria-pressed="false">
-                                    <div class="role-badge-tag">Standard Staff</div>
+                            <div class="role-choice-grid single-role">
+                                <div class="role-choice" aria-label="Standard personnel access controlled by administrator">
+                                    <div class="role-badge-tag">Admin Controlled</div>
                                     <div class="role-choice-head">
                                         <span class="role-choice-icon user-icon">
                                             <i data-lucide="user-check"></i>
                                         </span>
                                         <div class="role-title-block">
-                                            <strong>Division User</strong>
-                                            <span>Operational Staff Tier</span>
+                                            <strong>Standard Personnel Request</strong>
+                                            <span>Role is assigned by the PGENRO Administrator</span>
                                         </div>
-                                        <span class="role-choice-check"><i data-lucide="check"></i></span>
-                                    </div>
-                                    <p class="role-desc">
-                                        Field encoding, viewing GIS spatial layers, submitting quarry/forestry reports, and monitoring municipal permits.
-                                    </p>
-                                </button>
-
-                                <button type="button" class="role-choice" data-role="Admin" aria-pressed="false">
-                                    <div class="role-badge-tag admin-tag">Privileged</div>
-                                    <div class="role-choice-head">
-                                        <span class="role-choice-icon admin-icon">
-                                            <i data-lucide="shield-alert"></i>
+                                        <span class="role-choice-check" style="background:var(--forest-600);border-color:var(--forest-600);color:#fff;">
+                                            <i data-lucide="check"></i>
                                         </span>
-                                        <div class="role-title-block">
-                                            <strong>Division Admin</strong>
-                                            <span>Supervisory &amp; Clearance Tier</span>
-                                        </div>
-                                        <span class="role-choice-check"><i data-lucide="check"></i></span>
                                     </div>
                                     <p class="role-desc">
-                                        Approve staff clearance requests, manage division user roles, audit data logs, and export provincial executive summaries.
+                                        Applicants cannot grant themselves administrator access. The System Administrator assigns the final role and account privileges after verification.
                                     </p>
-                                </button>
+                                </div>
                             </div>
-                            <span class="field-help">Choose <strong>Division User</strong> unless you have been officially designated with executive system clearance.</span>
+                            <span class="field-help">Your final access role, division privileges, and account status are controlled by the administrator.</span>
                             <span class="error-msg" id="roleError"></span>
                         </fieldset>
 
@@ -464,7 +481,7 @@
                                     <strong id="sumName">--</strong>
                                 </div>
                                 <div class="dossier-item">
-                                    <small>Official ID / License</small>
+                                    <small>Official Email</small>
                                     <strong id="sumId">--</strong>
                                 </div>
                                 <div class="dossier-item">
@@ -593,6 +610,29 @@
     <!-- Toast Notification Anchor -->
     <div id="toastContainer" class="toast-container" aria-live="assertive"></div>
 
-    <script type="module" src="../user-javascript/requestACC.js"></script>
+
+    <!-- Loader safety fallback: never let a failed external module block the interface -->
+    <script>
+        window.addEventListener("load", function () {
+            window.setTimeout(function () {
+                var loader = document.getElementById("appLoader");
+                if (!loader || !document.body.classList.contains("is-loading")) return;
+                document.body.classList.remove("is-loading");
+                document.body.classList.add("app-ready");
+                loader.classList.add("is-hidden");
+                loader.setAttribute("aria-hidden", "true");
+                window.setTimeout(function () { loader.remove(); }, 700);
+            }, 1600);
+        });
+    </script>
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script type="module" src="../user-javascript/requestACC.js"></script>
+  <script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/repaired-ui.js?v=20260913"></script>
 </body>
 </html>

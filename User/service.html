@@ -1,683 +1,576 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+
+<html data-theme="light" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Service Request Tracker</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Service Request Tracker</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- CSS -->
+<link rel="stylesheet" href="service.css?v=20260913-clean">
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="service.css" />
+
 </head>
-
-<body>
-  <!-- Overlay Backdrop -->
-  <div class="overlay" id="overlay"></div>
-
-  <!-- NAVBAR -->
-  <header class="navbar">
-    <!-- Left Section: Menu Toggle & Brand Logo -->
-    <div class="nav-left-container">
-      <button class="hamburger-menu" id="hamburgerMenu" aria-label="Toggle Navigation Menu" type="button">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
-
-      <a href="homepage.html" class="logo-area">
-        <div class="logo-icon">
-          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'">
-        </div>
-        <div class="logo-text">
-          <h2>Provincial Government</h2>
-          <span>Environment & Natural Resources Office</span>
-        </div>
-      </a>
-    </div>
-
-    <!-- Right Section: Profile & Portal Status -->
-    <div class="right-nav">
-      <div class="profile-menu" id="profileMenu">
-        <button class="profile-btn" id="profileBtn" type="button">
-          <div class="profile-avatar">
-            <i data-lucide="shield-alert"></i>
-          </div>
-          <div class="profile-text">
-            <h4>SERVICE TRACKER</h4>
-            <span>Public Inquiry Portal</span>
-          </div>
-          <i data-lucide="chevron-down" class="profile-chevron"></i>
-        </button>
-
-        <div class="profile-dropdown" id="profileDropdown">
-          <div class="profile-dropdown-header">
-            <div class="profile-avatar big">
-              <i data-lucide="shield-alert"></i>
-            </div>
-            <div>
-              <h3>Service Portal</h3>
-              <p>Online Tracking Active</p>
-            </div>
-          </div>
-
-          <a href="homepage.html">
-            <i data-lucide="layout-dashboard"></i>
+<body class="pgenro-user" data-requires-auth="user">
+<!-- Overlay Backdrop -->
+<div class="overlay" id="overlay"></div>
+<!-- NAVBAR -->
+<header class="navbar">
+<!-- Left Section: Menu Toggle & Brand Logo -->
+<div class="nav-left-container">
+<button aria-label="Toggle Navigation Menu" class="hamburger-menu" id="hamburgerMenu" type="button">
+<span></span>
+<span></span>
+<span></span>
+</button>
+<a class="logo-area" href="homepage.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'" src="../logo/enro.png"/>
+</div>
+<div class="logo-text">
+<h2>Provincial Government</h2>
+<span>Environment &amp; Natural Resources Office</span>
+</div>
+</a>
+</div>
+<!-- Right Section: Profile & Portal Status -->
+<div class="right-nav">
+<div class="profile-menu" id="profileMenu">
+<button class="profile-btn" id="profileBtn" type="button">
+<div class="profile-avatar">
+<i data-lucide="shield-alert"></i>
+</div>
+<div class="profile-text">
+<h4>SERVICE TRACKER</h4>
+<span>Public Inquiry Portal</span>
+</div>
+<i class="profile-chevron" data-lucide="chevron-down"></i>
+</button>
+<div class="profile-dropdown" id="profileDropdown">
+<div class="profile-dropdown-header">
+<div class="profile-avatar big">
+<i data-lucide="shield-alert"></i>
+</div>
+<div>
+<h3>Service Portal</h3>
+<p>Online Tracking Active</p>
+</div>
+</div>
+<a href="homepage.html">
+<i data-lucide="layout-dashboard"></i>
             Dashboard Overview
           </a>
-
-          <a href="visitorsView.html">
-            <i data-lucide="clipboard-signature"></i>
+<a href="visitorsView.html">
+<i data-lucide="clipboard-signature"></i>
             Visitor's Logbook
           </a>
 
-          <a href="/Capstone-IMS/SettingIMS/Settings.html">
-            <i data-lucide="settings"></i>
-            Portal Settings
-          </a>
-
-          <button class="logout-btn" id="logoutBtn" type="button">
-            <i data-lucide="log-out"></i>
+<button class="logout-btn" id="logoutBtn" type="button">
+<i data-lucide="log-out"></i>
             Exit Portal
           </button>
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <div class="app-container">
-    <!-- FLOATING SIDEBAR -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <h3>IMS Modules</h3>
-        <p class="sidebar-subtext">Office Management Modules</p>
-      </div>
-
-      <ul class="modules-list">
-        <li>
-          <a href="homepage.html">
-            <i data-lucide="layout-dashboard"></i>
-            <span>Dashboard Overview</span>
-          </a>
-        </li>
-        <li>
-          <a href="Communication.html">
-            <i data-lucide="mail"></i>
-            <span>Communications</span>
-          </a>
-        </li>
-        <li>
-          <a href="#travel">
-            <i data-lucide="navigation"></i>
-            <span>Travel Orders</span>
-          </a>
-        </li>
-        <li>
-          <a href="officememo.html">
-            <i data-lucide="file-text"></i>
-            <span>Office Memo Logs</span>
-          </a>
-        </li>
-        <li>
-          <a href="employee.html">
-            <i data-lucide="users-round"></i>
-            <span>Employee Records</span>
-          </a>
-        </li>
-        <li>
-          <a href="#inventory">
-            <i data-lucide="package"></i>
-            <span>Inventory Records</span>
-          </a>
-        </li>
-        <li>
-          <a href="visitorsView.html">
-            <i data-lucide="clipboard-signature"></i>
-            <span>Visitor's Logbook</span>
-          </a>
-        </li>
-        <li>
-          <a href="service.html" class="active">
-            <i data-lucide="shield-alert"></i>
-            <span>Service Requests</span>
-          </a>
-        </li>
-        <li>
-          <a href="ICS.html">
-            <i data-lucide="layers"></i>
-            <span>ICS Records</span>
-          </a>
-        </li>
-      </ul>
-
-      <!-- Systems Status Widget -->
-      <div class="sidebar-footer">
-        <div class="system-status">
-          <span class="status-indicator online"></span>
-          <span class="status-text">Live Service Database Connected</span>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content" id="mainContent">
-      <!-- HERO HEADER -->
-      <section class="hero" id="home">
-        <div class="hero-center-copy reveal">
-          <span class="badge">
-            <i data-lucide="shield-check"></i>
+</div>
+</div>
+</div>
+</header>
+<div class="app-container">
+<!-- FLOATING SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>IMS Workspace</h3>
+<p class="sidebar-subtext">User Modules</p>
+</div>
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
+<li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+<li><a class="active" aria-current="page" href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+</ul>
+<!-- Systems Status Widget -->
+<div class="sidebar-footer">
+<div class="system-status">
+<span class="status-indicator online"></span>
+<span class="status-text">Live Service Database Connected</span>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="main-content" id="mainContent">
+<!-- HERO HEADER -->
+<section class="hero" id="home">
+<div class="hero-center-copy reveal">
+<span class="badge">
+<i data-lucide="shield-check"></i>
             Live Verification Active
           </span>
-
-          <h1>
+<h1>
             Service Request <span>Tracking Portal</span>
-          </h1>
-          <p class="hero-subtitle">
-            PGENRO Environmental Action & Technical Assistance System
+</h1>
+<p class="hero-subtitle">
+            PGENRO Environmental Action &amp; Technical Assistance System
           </p>
-
-          <p class="hero-description">
+<p class="hero-description">
             Monitor environmental clearances, technical assistance directives, and progress milestones across all 5 verification workflow stages in real-time.
           </p>
-
-          <!-- QUICK SEARCH TRACKER BAR -->
-          <div class="tracker-search-bar">
-            <div class="tracker-input-box">
-              <i data-lucide="search"></i>
-              <input type="text" id="quickSearchInput" placeholder="Enter Service No. (e.g. SR-2025-001) or Requester Name..." />
-            </div>
-            <button type="button" class="btn btn-primary" id="btnTrack">
-              <i data-lucide="locate-fixed"></i> Track Status
+<!-- QUICK SEARCH TRACKER BAR -->
+<div class="tracker-search-bar">
+<div class="tracker-input-box">
+<i data-lucide="search"></i>
+<input id="quickSearchInput" placeholder="Enter Service No. (e.g. SR-2025-001) or Requester Name..." type="text"/>
+</div>
+<button class="btn btn-primary" id="btnTrack" type="button">
+<i data-lucide="locate-fixed"></i> Track Status
             </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- KPI METRICS SUMMARY SECTION -->
-      <section class="metrics-section reveal">
-        <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-icon-wrap">
-              <i data-lucide="layers"></i>
-            </div>
-            <div class="metric-info">
-              <span class="metric-label">Total Registered Requests</span>
-              <h3 id="kpiTotal">0</h3>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-icon-wrap pending">
-              <i data-lucide="clock"></i>
-            </div>
-            <div class="metric-info">
-              <span class="metric-label">Under Evaluation</span>
-              <h3 id="kpiEvaluation">0</h3>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-icon-wrap active">
-              <i data-lucide="activity"></i>
-            </div>
-            <div class="metric-info">
-              <span class="metric-label">In Progress / Field</span>
-              <h3 id="kpiInProgress">0</h3>
-            </div>
-          </div>
-
-          <div class="metric-card">
-            <div class="metric-icon-wrap completed">
-              <i data-lucide="check-circle-2"></i>
-            </div>
-            <div class="metric-info">
-              <span class="metric-label">Completed & Released</span>
-              <h3 id="kpiCompleted">0</h3>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- PUBLIC LOGS / INQUIRY DIRECTORY TABLE -->
-      <section class="registry-section" id="requestRegistry">
-        <div class="section-title reveal">
-          <span>Public Directory</span>
-          <h2>Service Request Master Inquiries</h2>
-          <p>
+</div>
+</div>
+</section>
+<!-- KPI METRICS SUMMARY SECTION -->
+<section class="metrics-section reveal">
+<div class="metrics-grid">
+<div class="metric-card">
+<div class="metric-icon-wrap">
+<i data-lucide="layers"></i>
+</div>
+<div class="metric-info">
+<span class="metric-label">Total Registered Requests</span>
+<h3 id="kpiTotal">0</h3>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon-wrap pending">
+<i data-lucide="clock"></i>
+</div>
+<div class="metric-info">
+<span class="metric-label">Under Evaluation</span>
+<h3 id="kpiEvaluation">0</h3>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon-wrap active">
+<i data-lucide="activity"></i>
+</div>
+<div class="metric-info">
+<span class="metric-label">In Progress / Field</span>
+<h3 id="kpiInProgress">0</h3>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon-wrap completed">
+<i data-lucide="check-circle-2"></i>
+</div>
+<div class="metric-info">
+<span class="metric-label">Completed &amp; Released</span>
+<h3 id="kpiCompleted">0</h3>
+</div>
+</div>
+</div>
+</section>
+<!-- PUBLIC LOGS / INQUIRY DIRECTORY TABLE -->
+<section class="registry-section" id="requestRegistry">
+<div class="section-title reveal">
+<span>Public Directory</span>
+<h2>Service Request Master Inquiries</h2>
+<p>
             Review registered service actions or click on <strong>Inspect Record</strong> to view detailed official documentation.
           </p>
-        </div>
-
-        <div class="table-card reveal">
-          <div class="table-toolbar">
-            <div class="search-box">
-              <i data-lucide="search" class="search-icon"></i>
-              <input type="text" id="tableSearchInput" placeholder="Filter Service No., Client Name, or Category..." />
-            </div>
-
-            <div class="filter-group">
-              <select id="filterStatusSelect" class="filter-select">
-                <option value="ALL">All Statuses</option>
-                <option value="Under Evaluation">Under Evaluation</option>
-                <option value="Field Inspection Active">Field Inspection Active</option>
-                <option value="In Progress">In Progress</option>
-                <option value="Completed">Completed & Dispatched</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="table-responsive">
-            <table class="data-table" id="serviceLogsTable">
-              <thead>
-                <tr>
-                  <th>Service No.</th>
-                  <th>Client / Requester</th>
-                  <th>Agency / Organization</th>
-                  <th>Category</th>
-                  <th>Date Requested</th>
-                  <th>Current Status</th>
-                  <th class="text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody id="tableBody">
-                <tr>
-                  <td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
+</div>
+<div class="table-card reveal">
+<div class="table-toolbar">
+<div class="search-box">
+<i class="search-icon" data-lucide="search"></i>
+<input id="tableSearchInput" placeholder="Filter Service No., Client Name, or Category..." type="text"/>
+</div>
+<div class="filter-group">
+<select class="filter-select" id="filterStatusSelect">
+<option value="ALL">All Statuses</option>
+<option value="Under Evaluation">Under Evaluation</option>
+<option value="Field Inspection Active">Field Inspection Active</option>
+<option value="In Progress">In Progress</option>
+<option value="Completed">Completed &amp; Dispatched</option>
+</select>
+</div>
+</div>
+<div class="table-responsive">
+<table class="data-table" id="serviceLogsTable">
+<thead>
+<tr>
+<th>Service No.</th>
+<th>Client / Requester</th>
+<th>Agency / Organization</th>
+<th>Category</th>
+<th>Date Requested</th>
+<th>Current Status</th>
+<th class="text-right">Action</th>
+</tr>
+</thead>
+<tbody id="tableBody">
+<tr>
+<td colspan="7" style="text-align: center; padding: 30px; color: var(--text-muted);">
                     Connecting to live database...
                   </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="table-footer">
-            <span class="table-summary-info" id="tableSummaryText">Loading requests...</span>
-          </div>
-        </div>
-      </section>
-
-      <!-- FOOTER -->
-      <footer class="footer" id="contact">
-        <div class="footer-container">
-          <div class="footer-brand">
-            <h2>PGENRO IMS</h2>
-            <p>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-footer">
+<span class="table-summary-info" id="tableSummaryText">Loading requests...</span>
+</div>
+</div>
+</section>
+<!-- FOOTER -->
+<footer class="footer" id="contact">
+<div class="footer-container">
+<div class="footer-brand">
+<h2>PGENRO IMS</h2>
+<p>
               Provincial Government Environment and Natural Resources Office of Quezon Province. Managing resources through reliable software architecture.
             </p>
-          </div>
-
-          <div class="footer-group">
-            <h4>Quick Access</h4>
-            <div class="footer-links-grid">
-              <a href="homepage.html">Home Monitor</a>
-              <a href="Communication.html">Communications</a>
-              <a href="visitorsView.html">Visitor Logs</a>
-              <a href="service.html">Service Requests</a>
-              <a href="officememo.html">Office Memos</a>
-            </div>
-          </div>
-
-          <div class="footer-contact">
-            <h4>Inquiry Helpdesk</h4>
-            <p><strong>Hotline:</strong> (042) 710-3841</p>
-            <p><strong>Email:</strong> services@pgenro.gov.ph</p>
-            <p><strong>Location:</strong> Capitol Compound, Lucena City, Quezon Province</p>
-          </div>
-        </div>
-
-        <div class="footer-bottom">
-          <p>&copy; 2025 PGENRO. All Rights Reserved. Province of Quezon.</p>
-        </div>
-      </footer>
-    </main>
-  </div>
-
-  <!-- =========================================================================
+</div>
+<div class="footer-group">
+<h4>Quick Access</h4>
+<div class="footer-links-grid">
+<a href="homepage.html">Home Monitor</a>
+<a href="communication.html">Communications</a>
+<a href="visitorsView.html">Visitor Logs</a>
+<a href="service.html">Service Requests</a>
+<a href="officememo.html">Office Memos</a>
+</div>
+</div>
+<div class="footer-contact">
+<h4>Inquiry Helpdesk</h4>
+<p><strong>Hotline:</strong> (042) 710-3841</p>
+<p><strong>Email:</strong> services@pgenro.gov.ph</p>
+<p><strong>Location:</strong> Capitol Compound, Lucena City, Quezon Province</p>
+</div>
+</div>
+<div class="footer-bottom">
+<p>© 2025 PGENRO. All Rights Reserved. Province of Quezon.</p>
+</div>
+</footer>
+</main>
+</div>
+<!-- =========================================================================
        INSPECT RECORD MODAL POP-UP (STRICTLY VIEW-ONLY)
        ========================================================================= -->
-  <div class="modal-overlay" id="inspectModal">
-    <div class="modal-card inspect-modal-card">
-      <!-- Window Title Bar -->
-      <div class="modal-header-window">
-        <div class="window-title-group">
-          <div class="window-controls">
-            <span class="win-btn win-min"></span>
-            <span class="win-btn win-max"></span>
-            <span class="win-btn win-close" id="closeInspectModalBtn"></span>
-          </div>
-          <div class="window-text-info">
-            <i data-lucide="file-text"></i>
-            <span id="popupModalTitle">Service Request Record (View-Only)</span>
-          </div>
-        </div>
-        <button type="button" class="modal-close-icon" id="dismissModalIcon" aria-label="Close">
-          <i data-lucide="x"></i>
-        </button>
-      </div>
-
-      <!-- Live Stepper Inside Modal -->
-      <div class="modal-stepper-container">
-        <div class="stepper-header">
-          <div>
-            <span class="stepper-label">Tracking Number</span>
-            <h3 id="stepperServiceNo">---</h3>
-          </div>
-          <span class="badge-status-tag inspection" id="stepperStatusBadge">Under Evaluation</span>
-        </div>
-
-        <div class="stepper-track">
-          <div class="step" id="step1">
-            <div class="step-circle"><i data-lucide="check"></i></div>
-            <span class="step-title">1. Received</span>
-            <span class="step-date" id="stepDate1">--</span>
-          </div>
-          <div class="step-line" id="line1"></div>
-
-          <div class="step" id="step2">
-            <div class="step-circle"><i data-lucide="search"></i></div>
-            <span class="step-title">2. Assessed</span>
-            <span class="step-date" id="stepDate2">--</span>
-          </div>
-          <div class="step-line" id="line2"></div>
-
-          <div class="step" id="step3">
-            <div class="step-circle"><i data-lucide="clock"></i></div>
-            <span class="step-title">3. PGDH Action</span>
-            <span class="step-date" id="stepDate3">--</span>
-          </div>
-          <div class="step-line" id="line3"></div>
-
-          <div class="step" id="step4">
-            <div class="step-circle"><i data-lucide="cog"></i></div>
-            <span class="step-title">4. Processed</span>
-            <span class="step-date" id="stepDate4">--</span>
-          </div>
-          <div class="step-line" id="line4"></div>
-
-          <div class="step" id="step5">
-            <div class="step-circle"><i data-lucide="check-circle"></i></div>
-            <span class="step-title">5. Released</span>
-            <span class="step-date" id="stepDate5">--</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tabbed Form Header -->
-      <div class="tab-header-bar">
-        <button type="button" class="tab-btn active" id="tabBtn1" data-tab="1">
+<div class="modal-overlay" id="inspectModal">
+<div class="modal-card inspect-modal-card">
+<!-- Window Title Bar -->
+<div class="modal-header-window">
+<div class="window-title-group">
+<div class="window-controls">
+<span class="win-btn win-min"></span>
+<span class="win-btn win-max"></span>
+<span class="win-btn win-close" id="closeInspectModalBtn"></span>
+</div>
+<div class="window-text-info">
+<i data-lucide="file-text"></i>
+<span id="popupModalTitle">Service Request Record (View-Only)</span>
+</div>
+</div>
+<button aria-label="Close" class="modal-close-icon" id="dismissModalIcon" type="button">
+<i data-lucide="x"></i>
+</button>
+</div>
+<!-- Live Stepper Inside Modal -->
+<div class="modal-stepper-container">
+<div class="stepper-header">
+<div>
+<span class="stepper-label">Tracking Number</span>
+<h3 id="stepperServiceNo">---</h3>
+</div>
+<span class="badge-status-tag inspection" id="stepperStatusBadge">Under Evaluation</span>
+</div>
+<div class="stepper-track">
+<div class="step" id="step1">
+<div class="step-circle"><i data-lucide="check"></i></div>
+<span class="step-title">1. Received</span>
+<span class="step-date" id="stepDate1">--</span>
+</div>
+<div class="step-line" id="line1"></div>
+<div class="step" id="step2">
+<div class="step-circle"><i data-lucide="search"></i></div>
+<span class="step-title">2. Assessed</span>
+<span class="step-date" id="stepDate2">--</span>
+</div>
+<div class="step-line" id="line2"></div>
+<div class="step" id="step3">
+<div class="step-circle"><i data-lucide="clock"></i></div>
+<span class="step-title">3. PGDH Action</span>
+<span class="step-date" id="stepDate3">--</span>
+</div>
+<div class="step-line" id="line3"></div>
+<div class="step" id="step4">
+<div class="step-circle"><i data-lucide="cog"></i></div>
+<span class="step-title">4. Processed</span>
+<span class="step-date" id="stepDate4">--</span>
+</div>
+<div class="step-line" id="line4"></div>
+<div class="step" id="step5">
+<div class="step-circle"><i data-lucide="check-circle"></i></div>
+<span class="step-title">5. Released</span>
+<span class="step-date" id="stepDate5">--</span>
+</div>
+</div>
+</div>
+<!-- Tabbed Form Header -->
+<div class="tab-header-bar">
+<button class="tab-btn active" data-tab="1" id="tabBtn1" type="button">
           I. Client Information
         </button>
-        <button type="button" class="tab-btn" id="tabBtn2" data-tab="2">
+<button class="tab-btn" data-tab="2" id="tabBtn2" type="button">
           II. Service Request Details
         </button>
-        <button type="button" class="tab-btn" id="tabBtn3" data-tab="3">
-          III. Course of Action & Routing
+<button class="tab-btn" data-tab="3" id="tabBtn3" type="button">
+          III. Course of Action &amp; Routing
         </button>
-      </div>
-
-      <!-- Tab Body Form Panels (VIEW ONLY) -->
-      <div class="modal-body-panel">
-        <form id="viewOnlyForm" onsubmit="return false;">
-          
-          <!-- TAB 1: CLIENT INFORMATION -->
-          <div class="tab-pane active" id="tabPane1">
-            <div class="fields-layout-grid">
-              <div class="form-field-group">
-                <label class="field-label">Service No.:</label>
-                <div class="read-value-box highlight" id="viewServiceNo">--</div>
-              </div>
-
-              <div class="form-field-group">
-                <label class="field-label">Requester Name:</label>
-                <div class="read-value-box" id="viewClientName">--</div>
-              </div>
-
-              <div class="form-field-group full-row">
-                <label class="field-label">Agency / Organization:</label>
-                <div class="read-value-box" id="viewOrganization">--</div>
-              </div>
-
-              <div class="form-field-group">
-                <label class="field-label">Contact Number:</label>
-                <div class="read-value-box" id="viewContactNo">--</div>
-              </div>
-
-              <div class="form-field-group">
-                <label class="field-label">Email Address:</label>
-                <div class="read-value-box" id="viewEmailAddress">--</div>
-              </div>
-
-              <div class="form-field-group">
-                <label class="field-label">Date Requested:</label>
-                <div class="read-value-box" id="viewDateRequest">--</div>
-              </div>
-            </div>
-
-            <div class="tab-nav-arrow-container">
-              <button type="button" class="arrow-nav-btn next-arrow" id="arrowNextTo2">
+</div>
+<!-- Tab Body Form Panels (VIEW ONLY) -->
+<div class="modal-body-panel">
+<form id="viewOnlyForm" onsubmit="return false;">
+<!-- TAB 1: CLIENT INFORMATION -->
+<div class="tab-pane active" id="tabPane1">
+<div class="fields-layout-grid">
+<div class="form-field-group">
+<label class="field-label">Service No.:</label>
+<div class="read-value-box highlight" id="viewServiceNo">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Requester Name:</label>
+<div class="read-value-box" id="viewClientName">--</div>
+</div>
+<div class="form-field-group full-row">
+<label class="field-label">Agency / Organization:</label>
+<div class="read-value-box" id="viewOrganization">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Contact Number:</label>
+<div class="read-value-box" id="viewContactNo">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Email Address:</label>
+<div class="read-value-box" id="viewEmailAddress">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Date Requested:</label>
+<div class="read-value-box" id="viewDateRequest">--</div>
+</div>
+</div>
+<div class="tab-nav-arrow-container">
+<button class="arrow-nav-btn next-arrow" id="arrowNextTo2" type="button">
                 Next: Service Scope <i data-lucide="arrow-right"></i>
+</button>
+</div>
+</div>
+<!-- TAB 2: SERVICE REQUEST -->
+<div class="tab-pane" id="tabPane2">
+<div class="fields-layout-grid-tab2">
+<div class="category-block">
+<div class="form-field-group">
+<label class="field-label">Primary Category:</label>
+<div class="read-value-box highlight" id="viewPrimaryCategory">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Secondary Category / Type:</label>
+<div class="read-value-box" id="viewSecondaryCategory">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Environmental Concerns / Material:</label>
+<div class="read-value-box" id="viewConcernsCategory">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Certifications Required:</label>
+<div class="read-value-box" id="viewCertifications">--</div>
+</div>
+</div>
+<div class="details-block">
+<div class="form-field-group">
+<label class="field-label">Other Services / Notes:</label>
+<div class="read-value-box multi-line" id="viewOtherServices">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Request Details &amp; Scope:</label>
+<div class="read-value-box multi-line" id="viewRequestDetails">--</div>
+</div>
+<div class="sub-grid-2">
+<div class="form-field-group">
+<label class="field-label">Date Needed:</label>
+<div class="read-value-box" id="viewDateNeeded">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Location / Site:</label>
+<div class="read-value-box" id="viewLocation">--</div>
+</div>
+</div>
+<div class="sub-grid-3">
+<div class="form-field-group">
+<label class="field-label">Requested By:</label>
+<div class="read-value-box" id="viewRequestedBy">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Endorsed By:</label>
+<div class="read-value-box" id="viewEndorsedBy">--</div>
+</div>
+<div class="form-field-group">
+<label class="field-label">Current Status:</label>
+<div class="read-value-box highlight-status" id="viewServiceStatus">--</div>
+</div>
+</div>
+</div>
+</div>
+<div class="tab-nav-arrow-container dual">
+<button class="arrow-nav-btn prev-arrow" id="arrowBackTo1" type="button">
+<i data-lucide="arrow-left"></i> Previous
               </button>
-            </div>
-          </div>
-
-          <!-- TAB 2: SERVICE REQUEST -->
-          <div class="tab-pane" id="tabPane2">
-            <div class="fields-layout-grid-tab2">
-              <div class="category-block">
-                <div class="form-field-group">
-                  <label class="field-label">Primary Category:</label>
-                  <div class="read-value-box highlight" id="viewPrimaryCategory">--</div>
-                </div>
-
-                <div class="form-field-group">
-                  <label class="field-label">Secondary Category / Type:</label>
-                  <div class="read-value-box" id="viewSecondaryCategory">--</div>
-                </div>
-
-                <div class="form-field-group">
-                  <label class="field-label">Environmental Concerns / Material:</label>
-                  <div class="read-value-box" id="viewConcernsCategory">--</div>
-                </div>
-
-                <div class="form-field-group">
-                  <label class="field-label">Certifications Required:</label>
-                  <div class="read-value-box" id="viewCertifications">--</div>
-                </div>
-              </div>
-
-              <div class="details-block">
-                <div class="form-field-group">
-                  <label class="field-label">Other Services / Notes:</label>
-                  <div class="read-value-box multi-line" id="viewOtherServices">--</div>
-                </div>
-
-                <div class="form-field-group">
-                  <label class="field-label">Request Details & Scope:</label>
-                  <div class="read-value-box multi-line" id="viewRequestDetails">--</div>
-                </div>
-
-                <div class="sub-grid-2">
-                  <div class="form-field-group">
-                    <label class="field-label">Date Needed:</label>
-                    <div class="read-value-box" id="viewDateNeeded">--</div>
-                  </div>
-                  <div class="form-field-group">
-                    <label class="field-label">Location / Site:</label>
-                    <div class="read-value-box" id="viewLocation">--</div>
-                  </div>
-                </div>
-
-                <div class="sub-grid-3">
-                  <div class="form-field-group">
-                    <label class="field-label">Requested By:</label>
-                    <div class="read-value-box" id="viewRequestedBy">--</div>
-                  </div>
-                  <div class="form-field-group">
-                    <label class="field-label">Endorsed By:</label>
-                    <div class="read-value-box" id="viewEndorsedBy">--</div>
-                  </div>
-                  <div class="form-field-group">
-                    <label class="field-label">Current Status:</label>
-                    <div class="read-value-box highlight-status" id="viewServiceStatus">--</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-nav-arrow-container dual">
-              <button type="button" class="arrow-nav-btn prev-arrow" id="arrowBackTo1">
-                <i data-lucide="arrow-left"></i> Previous
-              </button>
-              <button type="button" class="arrow-nav-btn next-arrow" id="arrowNextTo3">
+<button class="arrow-nav-btn next-arrow" id="arrowNextTo3" type="button">
                 Next: Course of Action <i data-lucide="arrow-right"></i>
+</button>
+</div>
+</div>
+<!-- TAB 3: COURSE OF ACTION -->
+<div class="tab-pane" id="tabPane3">
+<div class="action-rows-container">
+<!-- 1. Received By -->
+<div class="action-row">
+<div class="action-col who">
+<label class="field-label">1. Received By:</label>
+<div class="read-value-box" id="viewReceivedBy">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Date Received:</label>
+<div class="read-value-box" id="viewDateReceived">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Time Received:</label>
+<div class="read-value-box" id="viewTimeReceived">--</div>
+</div>
+<div class="action-col remarks">
+<label class="field-label">Remarks:</label>
+<div class="read-value-box" id="viewReceivedRemarks">--</div>
+</div>
+</div>
+<!-- 2. Assessed By -->
+<div class="action-row">
+<div class="action-col who">
+<label class="field-label">2. Assessed By:</label>
+<div class="read-value-box" id="viewAssessedBy">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Date Assessed:</label>
+<div class="read-value-box" id="viewDateAssessed">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Time Assessed:</label>
+<div class="read-value-box" id="viewTimeAssessed">--</div>
+</div>
+<div class="action-col remarks">
+<label class="field-label">Assessment Remarks:</label>
+<div class="read-value-box" id="viewAssessedRemarks">--</div>
+</div>
+</div>
+<!-- 3. Recommended By -->
+<div class="action-row">
+<div class="action-col who">
+<label class="field-label">3. Recommended By:</label>
+<div class="read-value-box" id="viewRecommendedBy">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Date / Time:</label>
+<div class="read-value-box" id="viewRecDate">--</div>
+</div>
+<div class="action-col remarks full-width-field">
+<label class="field-label">Recommendation Remarks:</label>
+<div class="read-value-box" id="viewRecRemarks">--</div>
+</div>
+</div>
+<!-- 4. PGDH Action -->
+<div class="action-row highlight-pgdh">
+<div class="action-col who">
+<label class="field-label">4. PGDH Action:</label>
+<div class="read-value-box highlight" id="viewPgdhAction">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Date &amp; Time Acted:</label>
+<div class="read-value-box" id="viewPgdhDateActed">--</div>
+</div>
+<div class="action-col instructions full-width-field">
+<label class="field-label">Directives / Instructions:</label>
+<div class="read-value-box" id="viewPgdhInstructions">--</div>
+</div>
+</div>
+<!-- 5. Processed By -->
+<div class="action-row">
+<div class="action-col who">
+<label class="field-label">5. Processed By:</label>
+<div class="read-value-box" id="viewProcessedBy">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Date / Time Processed:</label>
+<div class="read-value-box" id="viewDateProcessed">--</div>
+</div>
+<div class="action-col remarks">
+<label class="field-label">Processing Remarks:</label>
+<div class="read-value-box" id="viewProcessedRemarks">--</div>
+</div>
+</div>
+<!-- 6. Service Released / Received -->
+<div class="action-row">
+<div class="action-col who">
+<label class="field-label">6. Service Received By:</label>
+<div class="read-value-box" id="viewServiceReceivedBy">--</div>
+</div>
+<div class="action-col">
+<label class="field-label">Date &amp; Time Picked-up:</label>
+<div class="read-value-box" id="viewFinalDateRec">--</div>
+</div>
+<div class="action-col remarks">
+<label class="field-label">Final Release Remarks:</label>
+<div class="read-value-box" id="viewFinalRemarks">--</div>
+</div>
+</div>
+</div>
+<div class="tab-nav-arrow-container">
+<button class="arrow-nav-btn prev-arrow" id="arrowBackTo2" type="button">
+<i data-lucide="arrow-left"></i> Previous
               </button>
-            </div>
-          </div>
-
-          <!-- TAB 3: COURSE OF ACTION -->
-          <div class="tab-pane" id="tabPane3">
-            <div class="action-rows-container">
-              <!-- 1. Received By -->
-              <div class="action-row">
-                <div class="action-col who">
-                  <label class="field-label">1. Received By:</label>
-                  <div class="read-value-box" id="viewReceivedBy">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Date Received:</label>
-                  <div class="read-value-box" id="viewDateReceived">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Time Received:</label>
-                  <div class="read-value-box" id="viewTimeReceived">--</div>
-                </div>
-                <div class="action-col remarks">
-                  <label class="field-label">Remarks:</label>
-                  <div class="read-value-box" id="viewReceivedRemarks">--</div>
-                </div>
-              </div>
-
-              <!-- 2. Assessed By -->
-              <div class="action-row">
-                <div class="action-col who">
-                  <label class="field-label">2. Assessed By:</label>
-                  <div class="read-value-box" id="viewAssessedBy">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Date Assessed:</label>
-                  <div class="read-value-box" id="viewDateAssessed">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Time Assessed:</label>
-                  <div class="read-value-box" id="viewTimeAssessed">--</div>
-                </div>
-                <div class="action-col remarks">
-                  <label class="field-label">Assessment Remarks:</label>
-                  <div class="read-value-box" id="viewAssessedRemarks">--</div>
-                </div>
-              </div>
-
-              <!-- 3. Recommended By -->
-              <div class="action-row">
-                <div class="action-col who">
-                  <label class="field-label">3. Recommended By:</label>
-                  <div class="read-value-box" id="viewRecommendedBy">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Date / Time:</label>
-                  <div class="read-value-box" id="viewRecDate">--</div>
-                </div>
-                <div class="action-col remarks full-width-field">
-                  <label class="field-label">Recommendation Remarks:</label>
-                  <div class="read-value-box" id="viewRecRemarks">--</div>
-                </div>
-              </div>
-
-              <!-- 4. PGDH Action -->
-              <div class="action-row highlight-pgdh">
-                <div class="action-col who">
-                  <label class="field-label">4. PGDH Action:</label>
-                  <div class="read-value-box highlight" id="viewPgdhAction">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Date & Time Acted:</label>
-                  <div class="read-value-box" id="viewPgdhDateActed">--</div>
-                </div>
-                <div class="action-col instructions full-width-field">
-                  <label class="field-label">Directives / Instructions:</label>
-                  <div class="read-value-box" id="viewPgdhInstructions">--</div>
-                </div>
-              </div>
-
-              <!-- 5. Processed By -->
-              <div class="action-row">
-                <div class="action-col who">
-                  <label class="field-label">5. Processed By:</label>
-                  <div class="read-value-box" id="viewProcessedBy">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Date / Time Processed:</label>
-                  <div class="read-value-box" id="viewDateProcessed">--</div>
-                </div>
-                <div class="action-col remarks">
-                  <label class="field-label">Processing Remarks:</label>
-                  <div class="read-value-box" id="viewProcessedRemarks">--</div>
-                </div>
-              </div>
-
-              <!-- 6. Service Released / Received -->
-              <div class="action-row">
-                <div class="action-col who">
-                  <label class="field-label">6. Service Received By:</label>
-                  <div class="read-value-box" id="viewServiceReceivedBy">--</div>
-                </div>
-                <div class="action-col">
-                  <label class="field-label">Date & Time Picked-up:</label>
-                  <div class="read-value-box" id="viewFinalDateRec">--</div>
-                </div>
-                <div class="action-col remarks">
-                  <label class="field-label">Final Release Remarks:</label>
-                  <div class="read-value-box" id="viewFinalRemarks">--</div>
-                </div>
-              </div>
-            </div>
-
-            <div class="tab-nav-arrow-container">
-              <button type="button" class="arrow-nav-btn prev-arrow" id="arrowBackTo2">
-                <i data-lucide="arrow-left"></i> Previous
-              </button>
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- Bottom Action Footer -->
-      <div class="modal-window-footer">
-        <button type="button" class="btn btn-secondary" onclick="window.print()">
-          <i data-lucide="printer"></i> Print Record
+</div>
+</div>
+</form>
+</div>
+<!-- Bottom Action Footer -->
+<div class="modal-window-footer">
+<button class="btn btn-secondary" onclick="window.print()" type="button">
+<i data-lucide="printer"></i> Print Record
         </button>
-        <button type="button" class="btn btn-primary" id="closeInspectModalBottom">
+<button class="btn btn-primary" id="closeInspectModalBottom" type="button">
           Close Inspection
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scroll-to-Top Floating Trigger Button -->
-  <button id="scrollToTopBtn" class="scroll-to-top-btn" aria-label="Scroll to top" type="button">
-    <i data-lucide="chevron-up"></i>
-  </button>
-
-  <!-- FIREBASE COMPAT SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
-  <!-- JS -->
-  <script src="../user-javascript/service.js"></script>
+</div>
+</div>
+</div>
+<!-- Scroll-to-Top Floating Trigger Button -->
+<button aria-label="Scroll to top" class="scroll-to-top-btn" id="scrollToTopBtn" type="button">
+<i data-lucide="chevron-up"></i>
+</button>
+<!-- SUPABASE COMPAT SDKs -->
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../user-javascript/service.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/repaired-ui.js?v=20260913"></script>
 </body>
 </html>

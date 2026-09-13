@@ -1,42 +1,29 @@
 // ==========================================================================
-// PGENRO IMS - ACCOUNT ACCESS REQUESTS CONTROLLER (FIREBASE RTDB)
+// PGENRO IMS - ACCOUNT ACCESS REQUESTS CONTROLLER (SUPABASE)
+// Uses the shared Supabase compatibility adapter during the Supabase-to-Supabase migration.
 // ==========================================================================
 
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { 
-    getAuth, 
-    onAuthStateChanged,
-    signOut 
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import { 
-    getDatabase, 
-    ref, 
-    get,
-    onValue, 
-    off,
-    set, 
-    update, 
-    remove, 
-    push,
-    serverTimestamp 
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+const firebase = window.firebase;
+const auth = firebase.auth();
+const db = firebase.database();
+const supabase = window.pgenroSupabase;
+const PGENRO_API = window.PGENRO_API;
 
-// --- 1. FIREBASE CONFIGURATION ---
-const firebaseConfig = {
-    apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
-    authDomain: "ims-capstone-bc65f.firebaseapp.com",
-    databaseURL: "https://ims-capstone-bc65f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ims-capstone-bc65f",
-    storageBucket: "ims-capstone-bc65f.firebasestorage.app",
-    messagingSenderId: "972207120140",
-    appId: "1:972207120140:web:6a94e2e1e9e8511e933329",
-    measurementId: "G-W4TPE7CHC8"
+const onAuthStateChanged = (authApi, callback) => authApi.onAuthStateChanged(callback);
+const signOut = (authApi) => authApi.signOut();
+const ref = (_db, path = "") => _db.ref(path);
+const get = (reference) => reference.once("value");
+const onValue = (reference, callback, errorCallback) => reference.on("value", callback, errorCallback);
+const off = (reference) => reference.off();
+const set = (reference, value) => reference.set(value);
+const update = (reference, value) => reference.update(value);
+const remove = (reference) => reference.remove();
+const push = async (reference, value) => {
+    const child = reference.push();
+    if (value !== undefined) await child.set(value);
+    return child;
 };
-
-// INITIALIZE FIREBASE SAFELY
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const auth = getAuth(app);
-const db = getDatabase(app, firebaseConfig.databaseURL);
+const serverTimestamp = () => new Date().toISOString();
 
 // --- GLOBAL STATE ---
 let requestsData = [];
@@ -172,61 +159,47 @@ function showCustomConfirm({
 // ==========================================================================
 // INITIALIZATION
 // ==========================================================================
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     renderIcons();
     setupUIInteractions();
     setupEventListeners();
-
-    // 1. Monitor Connection
     monitorDatabaseConnection();
 
-    // 2. Auth State Observer with Admin Privilege Verification
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            try {
-                const adminSnap = await get(ref(db, `admins/${user.uid}`));
-                const isAdmin = adminSnap.exists();
-
-                currentAdmin = {
-                    uid: user.uid,
-                    email: user.email,
-                    name: user.displayName || user.email.split("@")[0],
-                    role: isAdmin ? (adminSnap.val()?.role || "Super Admin") : "Admin User"
-                };
-
-                updateAdminProfileUI(currentAdmin);
-                listenToRealtimeRequests();
-            } catch (err) {
-                console.error("Admin verification error:", err);
-                currentAdmin = {
-                    uid: user.uid,
-                    email: user.email,
-                    name: user.displayName || user.email.split("@")[0],
-                    role: "Super Admin"
-                };
-                updateAdminProfileUI(currentAdmin);
-                listenToRealtimeRequests();
-            }
-        } else {
-            console.warn("⚠️ No active admin session. Redirecting to login...");
-            window.location.href = "login.html";
+    try {
+        if (!supabase || window.PGENRO_SUPABASE?.configured === false) {
+            throw new Error("Supabase is not configured. Add the Publishable/Anon key in shared/supabase.js.");
         }
-    });
+
+        const profile = await PGENRO_API.requireAdmin();
+        currentAdmin = {
+            uid: profile.user_id,
+            email: profile.email || profile.authUser?.email || "",
+            name: profile.full_name || profile.username || profile.authUser?.email?.split("@")[0] || "PGENRO Admin",
+            role: profile.role || "Super Admin"
+        };
+
+        updateAdminProfileUI(currentAdmin);
+        listenToRealtimeRequests();
+    } catch (err) {
+        console.warn("Admin authorization failed:", err);
+        try { await supabase?.auth?.signOut(); } catch {}
+        window.location.href = "../User/login.html";
+    }
 });
 
 // ==========================================================================
-// MONITOR FIREBASE RTDB CONNECTION
+// MONITOR SUPABASE REALTIME CONNECTION
 // ==========================================================================
 function monitorDatabaseConnection() {
     const connectedRef = ref(db, ".info/connected");
     onValue(connectedRef, (snap) => {
         if (snap.val() === true) {
-            console.log("🟢 Firebase RTDB: Connected Successfully");
+            console.log("🟢 Supabase Realtime: Connected Successfully");
             if (dbStatusDot) dbStatusDot.className = "status-dot online";
             if (dbStatusText) dbStatusText.textContent = "Live Synchronized";
         } else {
             if (dbStatusDot) dbStatusDot.className = "status-dot offline";
-            if (dbStatusText) dbStatusText.textContent = "Connecting RTDB...";
+            if (dbStatusText) dbStatusText.textContent = "Connecting Supabase...";
         }
     });
 }
@@ -267,13 +240,13 @@ function listenToRealtimeRequests() {
         filterAndRender();
         updateNotificationsUI();
     }, (error) => {
-        console.error("🔴 Firebase Database Error:", error);
+        console.error("🔴 Supabase Database Error:", error);
         if (error.code === "PERMISSION_DENIED" || error.message.includes("PERMISSION_DENIED")) {
             showToast("Database Permission Denied: Ensure current account is listed in /admins.");
             if (dbStatusText) dbStatusText.textContent = "Permission Denied";
             if (dbStatusDot) dbStatusDot.className = "status-dot offline";
         } else {
-            showToast("Failed to connect to Firebase Realtime Database.");
+            showToast("Failed to connect to Supabase Realtime Database.");
         }
         filterAndRender();
     });
@@ -396,11 +369,10 @@ function filterAndRender() {
         const name = (req.fullName || req.name || "").toLowerCase();
         const email = (req.email || "").toLowerCase();
         const id = (req.id || req.refCode || "").toLowerCase();
-        const govId = (req.govId || "").toLowerCase();
         const position = (req.position || "").toLowerCase();
         const reqStatus = (req.status || "Pending").toLowerCase();
 
-        const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm) || id.includes(searchTerm) || govId.includes(searchTerm) || position.includes(searchTerm);
+        const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm) || id.includes(searchTerm) || position.includes(searchTerm);
         const matchesDivision = (selectedDivision === "ALL") || (req.division === selectedDivision);
         const matchesStatus = (selectedStatus === "all") || (reqStatus === selectedStatus);
 
@@ -474,7 +446,7 @@ function openReviewModal(requestKey) {
     if (reviewFullName) reviewFullName.textContent = selectedRequest.fullName || selectedRequest.name || "N/A";
     if (reviewEmail) reviewEmail.textContent = selectedRequest.email || "N/A";
     if (reviewContact) reviewContact.textContent = selectedRequest.contact || "N/A";
-    if (reviewGovId) reviewGovId.textContent = selectedRequest.govId || "N/A";
+    if (reviewGovId) reviewGovId.textContent = "Supabase Auth";
     if (reviewPosition) reviewPosition.textContent = selectedRequest.position || "N/A";
     if (reviewDivision) reviewDivision.textContent = selectedRequest.division || "Unassigned";
     if (reviewRole) reviewRole.textContent = selectedRequest.role || "System Staff";
@@ -482,7 +454,8 @@ function openReviewModal(requestKey) {
     if (reviewReason) reviewReason.textContent = selectedRequest.reason || "None Provided";
 
     const requestedRole = selectedRequest.role || "System Staff";
-    const isRequestedAdmin = requestedRole.includes("Admin");
+    const normalizedRequestedRole = requestedRole === "User" ? "System Staff" : requestedRole;
+    const isRequestedAdmin = normalizedRequestedRole.includes("Admin");
 
     if (assignAccountTypeSelect) {
         assignAccountTypeSelect.value = isRequestedAdmin ? "ADMIN" : "USER";
@@ -490,7 +463,7 @@ function openReviewModal(requestKey) {
     }
 
     if (assignRoleSelect) {
-        assignRoleSelect.value = requestedRole;
+        assignRoleSelect.value = normalizedRequestedRole;
     }
 
     reviewModal?.classList.add("open");
@@ -533,70 +506,25 @@ function closeAllModals() {
 // DATABASE WRITE OPERATIONS
 // ==========================================================================
 async function grantAccountAccess(requestObj, confirmedRole, accountType = "USER") {
-    const roleToAssign = confirmedRole || requestObj.role || "System Staff";
+    const rawRoleToAssign = confirmedRole || requestObj.role || "System Staff";
+    const roleToAssign = rawRoleToAssign === "User" ? "System Staff" : rawRoleToAssign;
     const targetKey = requestObj.key || requestObj.id;
-    const targetUserId = requestObj.uid || targetKey;
-    const isAdminAccount = accountType === "ADMIN" || roleToAssign.includes("Admin");
 
     try {
-        // 1. Update the access_requests node
-        const reqRef = ref(db, `access_requests/${targetKey}`);
-        await update(reqRef, {
-            status: "Approved",
-            role: roleToAssign,
-            accountType: isAdminAccount ? "Administrator" : "Standard User",
-            approvedAt: serverTimestamp(),
-            approvedBy: currentAdmin?.email || "System Administrator"
-        });
-
-        // 2. Write to users/{uid} node
-        const userRef = ref(db, `users/${targetUserId}`);
-        await set(userRef, {
-            fullName: requestObj.fullName || requestObj.name || "User",
-            username: requestObj.username || (requestObj.email ? requestObj.email.split("@")[0] : "user"),
-            email: requestObj.email || "",
-            contact: requestObj.contact || "",
-            govId: requestObj.govId || "",
-            position: requestObj.position || "",
-            division: requestObj.division || "Admin Office",
-            role: roleToAssign,
-            accountType: isAdminAccount ? "Administrator" : "Standard User",
-            endorser: requestObj.endorser || "N/A",
-            reason: requestObj.reason || "N/A",
-            password: requestObj.password || "",
-            status: "Active",
-            createdAt: serverTimestamp(),
-            lastLogin: "Never"
-        });
-
-        // 3. Admin Routing
-        const adminRef = ref(db, `admins/${targetUserId}`);
-        if (isAdminAccount) {
-            await set(adminRef, {
-                email: requestObj.email || "",
-                fullName: requestObj.fullName || requestObj.name || "Admin User",
-                role: roleToAssign,
-                status: "Active",
-                assignedAt: serverTimestamp(),
-                assignedBy: currentAdmin?.email || "Super Admin"
-            });
-        } else {
-            await remove(adminRef).catch(() => {});
+        if (!PGENRO_API?.invokeAdmin) {
+            throw new Error("Supabase administrator service is unavailable.");
         }
 
-        // 4. Record to admin_logs
-        await push(ref(db, "admin_logs"), {
-            action: "APPROVE_ACCOUNT_REQUEST",
-            performedBy: currentAdmin?.email || "Admin",
-            targetUser: requestObj.email || "N/A",
-            assignedRole: roleToAssign,
-            accountType: isAdminAccount ? "Administrator" : "Standard User",
-            timestamp: serverTimestamp()
+        await PGENRO_API.invokeAdmin("approve_request", {
+            requestId: targetKey,
+            userId: requestObj.uid || "",
+            role: roleToAssign,
+            accountType
         });
 
         showToast(`Access granted: ${requestObj.fullName || requestObj.name} approved as ${roleToAssign}`);
     } catch (err) {
-        console.error("RTDB Approve Error:", err);
+        console.error("Supabase approval error:", err);
         showToast(`Failed to approve: ${err.message}`);
     }
 
@@ -605,28 +533,22 @@ async function grantAccountAccess(requestObj, confirmedRole, accountType = "USER
 
 async function declineAccountAccess(requestObj, reason, remarks) {
     const targetKey = requestObj.key || requestObj.id;
-    try {
-        const reqRef = ref(db, `access_requests/${targetKey}`);
-        await update(reqRef, {
-            status: "Rejected",
-            declineReason: reason,
-            declineRemarks: remarks || "",
-            declinedAt: serverTimestamp(),
-            declinedBy: currentAdmin?.email || "System Administrator"
-        });
 
-        await push(ref(db, "admin_logs"), {
-            action: "DECLINE_ACCOUNT_REQUEST",
-            performedBy: currentAdmin?.email || "Admin",
-            targetUser: requestObj.email || "N/A",
-            reason: reason,
-            remarks: remarks || "",
-            timestamp: serverTimestamp()
+    try {
+        if (!PGENRO_API?.invokeAdmin) {
+            throw new Error("Supabase administrator service is unavailable.");
+        }
+
+        await PGENRO_API.invokeAdmin("reject_request", {
+            requestId: targetKey,
+            userId: requestObj.uid || "",
+            reason,
+            remarks: remarks || ""
         });
 
         showToast(`Request for ${requestObj.fullName || requestObj.name} declined.`);
     } catch (err) {
-        console.error("RTDB Decline Error:", err);
+        console.error("Supabase decline error:", err);
         showToast(`Failed to decline: ${err.message}`);
     }
 
@@ -835,7 +757,7 @@ function setupUIInteractions() {
 
         if (confirmed) {
             await signOut(auth);
-            window.location.href = "login.html";
+            window.location.href = "../User/login.html";
         }
     });
 

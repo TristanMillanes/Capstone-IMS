@@ -1,17 +1,9 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
 /* ============================================================
-   SUPABASE CONFIGURATION
+   SHARED SUPABASE CONFIGURATION
+   Configure credentials once in ../shared/supabase.js
    ============================================================ */
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY";
-
-const isSupabaseConfigured =
-  SUPABASE_URL.startsWith("http") && !SUPABASE_URL.includes("YOUR_SUPABASE");
-
-const supabase = isSupabaseConfigured
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+const supabase = window.pgenroSupabase;
+const isSupabaseConfigured = !!supabase && window.PGENRO_SUPABASE?.configured !== false;
 
 // Helpers
 const $ = (id) => document.getElementById(id);
@@ -128,6 +120,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   if (isSupabaseConfigured) {
     await loadEmployees();
+    supabase.channel("employees-admin-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "employees" }, loadEmployees)
+      .subscribe();
   } else {
     setStatus(false, "Offline / Demo Mode (Set Supabase URL)");
     loadFromLocalStorage();

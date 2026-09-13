@@ -14,10 +14,13 @@
 
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="login.css?v=20260913-clean">
+  
+
+
 </head>
 
-<body>
+<body class="pgenro-auth pgenro-login">
     <!-- ================================================================
          HARDWARE-ACCELERATED ENVIRONMENTAL CANOPY CANVAS (60 FPS)
          ================================================================ -->
@@ -55,7 +58,7 @@
                                 src="../logo/Quezonlogo.png"
                                 alt="Provincial Government of Quezon Seal"
                                 class="seal-img"
-                                onerror="this.onerror=null; this.src='logo/quezonLLOGO.png'; this.parentElement.classList.add('fallback-mode')"
+                                onerror="this.onerror=null; this.src='../logo/quezonLLOGO.png'; this.parentElement.classList.add('fallback-mode')"
                             >
                             <span class="seal-fallback">QUEZON</span>
                         </div>
@@ -112,7 +115,7 @@
                     <div class="mobile-seal-header">
                         <img 
                             src="../logo/enro.png" 
-                            onerror="this.onerror=null; this.src='logo/enro.png'" 
+                            onerror="this.onerror=null; this.src='../logo/enro.png'"
                             alt="PGENRO Logo" 
                             class="mobile-logo"
                         >
@@ -290,6 +293,13 @@
     </main>
 
     <!-- App Script -->
-    <script type="module" src="../user-javascript/login.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script type="module" src="../user-javascript/login.js"></script>
+  <script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/repaired-ui.js?v=20260913"></script>
 </body>
 </html>

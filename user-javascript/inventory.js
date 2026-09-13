@@ -8,6 +8,12 @@ const hamburgerMenu = document.getElementById("hamburgerMenu");
 const sidebar = document.getElementById("sidebar");
 const mainContent = document.querySelector(".main-content");
 
+// Shared Supabase connection (loaded by ../shared/supabase.js)
+const supabase = window.pgenroSupabase;
+const isSupabaseConfigured = !!window.PGENRO_SUPABASE?.configured && !!supabase;
+let inventoryRealtimeChannel = null;
+let currentProfile = null;
+
 // Form Inputs
 const inputId = document.getElementById("itemId");
 const inputName = document.getElementById("itemName");
@@ -29,8 +35,10 @@ const reportTableBody = document.getElementById("reportTableBody");
 const reportSelectAll = document.getElementById("reportSelectAll");
 const confirmPrintBtn = document.getElementById("confirmPrintBtn");
 
-// LocalStorage Integration
-let inventoryRecords = JSON.parse(localStorage.getItem("inventoryRecords")) || [];
+// Supabase is the primary data source. localStorage is only an offline fallback.
+let inventoryRecords = isSupabaseConfigured
+  ? []
+  : (() => { try { const rows = JSON.parse(localStorage.getItem("inventoryRecords") || "[]"); return Array.isArray(rows) ? rows : []; } catch { return []; } })();
 let currentFilter = "All";
 
 // Initialize Lucide Icons
@@ -157,7 +165,7 @@ overlay.addEventListener("click", () => {
 /* ==========================================================================
    CRUD SUBMIT LOGIC
    ========================================================================== */
-form.addEventListener("submit", function(e) {
+form.addEventListener("submit", async function(e) {
   e.preventDefault();
 
   const editIndex = editIndexInput.value;
@@ -166,13 +174,9 @@ form.addEventListener("submit", function(e) {
   const balanceVal = qtyVal - usedVal;
   const alertThreshold = Math.max(0, parseInt(inputThreshold.value) || 5);
 
-  // Status mapping
   let status = "In-Stock";
-  if (balanceVal <= 0) {
-    status = "Out-of-Stock";
-  } else if (balanceVal <= alertThreshold) {
-    status = "Low-Stock";
-  }
+  if (balanceVal <= 0) status = "Out-of-Stock";
+  else if (balanceVal <= alertThreshold) status = "Low-Stock";
 
   const record = {
     itemId: inputId.value,
@@ -184,23 +188,78 @@ form.addEventListener("submit", function(e) {
     balance: balanceVal,
     threshold: alertThreshold,
     remarks: inputRemarks.value.trim(),
-    status: status
+    status
   };
 
-  if (editIndex === "") {
-    inventoryRecords.push(record);
-    showToast("Inventory item encoded successfully.");
-  } else {
-    inventoryRecords[editIndex] = record;
-    showToast("Inventory item updated successfully.");
+  try {
+    if (isSupabaseConfigured) {
+      const existing = editIndex === "" ? null : inventoryRecords[Number(editIndex)];
+      const payload = {
+        control_no: record.itemId,
+        item_name: record.name,
+        category: existing?.category || "Office Supplies",
+        unit: record.unit,
+        quantity: record.balance,
+        threshold: record.threshold,
+        description: record.desc,
+        remarks: record.remarks,
+        updated_at: new Date().toISOString()
+      };
+
+      let saved;
+      if (existing?._dbId) {
+        const { data, error } = await supabase
+          .from("inventory")
+          .update(payload)
+          .eq("id", existing._dbId)
+          .select()
+          .single();
+        if (error) throw error;
+        saved = data;
+      } else {
+        const { data, error } = await supabase
+          .from("inventory")
+          .insert(payload)
+          .select()
+          .single();
+        if (error) throw error;
+        saved = data;
+
+        // Record initial consumption as a proper inventory movement so the
+        // admin and user views remain consistent.
+        if (usedVal > 0) {
+          const { error: movementError } = await supabase
+            .from("inventory_movements")
+            .insert({
+              item_id: saved.id,
+              movement_type: "OUT",
+              quantity: usedVal,
+              balance_after: balanceVal,
+              reference_no: record.itemId,
+              remarks: "Initial consumed quantity entered from user inventory screen.",
+              recorded_by: currentProfile?.email || currentProfile?.full_name || "PGENRO User"
+            });
+          if (movementError) throw movementError;
+        }
+      }
+
+      await loadInventoryFromSupabase();
+      showToast(existing ? "Inventory item updated in Supabase." : "Inventory item saved to Supabase.");
+    } else {
+      if (editIndex === "") inventoryRecords.push(record);
+      else inventoryRecords[editIndex] = record;
+      localStorage.setItem("inventoryRecords", JSON.stringify(inventoryRecords));
+      showToast(editIndex === "" ? "Inventory item encoded locally." : "Inventory item updated locally.");
+    }
+
+    clearForm();
+    closeEncodingModal();
+    displayRecords();
+    updateDashboard();
+  } catch (error) {
+    console.error("Inventory save failed:", error);
+    showToast(error.message || "Unable to save inventory record.", "error");
   }
-
-  localStorage.setItem("inventoryRecords", JSON.stringify(inventoryRecords));
-
-  clearForm();
-  closeEncodingModal();
-  displayRecords();
-  updateDashboard();
 });
 
 function clearForm() {
@@ -305,13 +364,33 @@ window.editRecord = function(index) {
 }
 
 // Delete Record Logic
-window.deleteRecord = function(index) {
-  if (confirm("Are you sure you want to delete this inventory item? This action is irreversible.")) {
+window.deleteRecord = async function(index) {
+  const record = inventoryRecords[index];
+  if (!record) return;
+  if (!confirm("Are you sure you want to delete this inventory item? This action is irreversible.")) return;
+
+  try {
+    if (isSupabaseConfigured && record._dbId) {
+      const isAdmin = window.PGENRO_API?.isAdminRole?.(currentProfile?.role);
+      if (!isAdmin) {
+        showToast("Only an administrator can permanently delete inventory records.", "warning");
+        return;
+      }
+      const { error } = await supabase.from("inventory").delete().eq("id", record._dbId);
+      if (error) throw error;
+      await loadInventoryFromSupabase();
+      showToast("Inventory item deleted from Supabase.", "warning");
+      return;
+    }
+
     inventoryRecords.splice(index, 1);
     localStorage.setItem("inventoryRecords", JSON.stringify(inventoryRecords));
     displayRecords();
     updateDashboard();
-    showToast("Inventory item deleted.", "warning");
+    showToast("Inventory item deleted locally.", "warning");
+  } catch (error) {
+    console.error("Inventory delete failed:", error);
+    showToast(error.message || "Unable to delete inventory item.", "error");
   }
 }
 
@@ -618,9 +697,79 @@ confirmPrintBtn.addEventListener("click", () => {
 });
 
 /* ==========================================================================
+   SUPABASE LIVE DATA SOURCE
+   ========================================================================== */
+async function loadInventoryFromSupabase() {
+  if (!isSupabaseConfigured) return;
+
+  const [{ data: items, error: itemError }, { data: movements, error: movementError }] = await Promise.all([
+    supabase.from("inventory").select("*").order("created_at", { ascending: false }),
+    supabase.from("inventory_movements").select("item_id,movement_type,quantity,created_at")
+  ]);
+
+  if (itemError) throw itemError;
+  if (movementError) throw movementError;
+
+  const usedByItem = new Map();
+  (movements || []).forEach((movement) => {
+    if (movement.movement_type !== "OUT") return;
+    const key = String(movement.item_id);
+    usedByItem.set(key, (usedByItem.get(key) || 0) + Number(movement.quantity || 0));
+  });
+
+  inventoryRecords = (items || []).map((row) => {
+    const balance = Number(row.quantity || 0);
+    const used = usedByItem.get(String(row.id)) || 0;
+    const qty = balance + used;
+    const threshold = Number(row.threshold || 0);
+    const status = balance <= 0 ? "Out-of-Stock" : balance <= threshold ? "Low-Stock" : "In-Stock";
+    return {
+      _dbId: row.id,
+      category: row.category || "Office Supplies",
+      itemId: row.control_no || "",
+      name: row.item_name || "",
+      unit: row.unit || "",
+      desc: row.description || "",
+      qty,
+      used,
+      balance,
+      threshold,
+      remarks: row.remarks || "",
+      status
+    };
+  });
+
+  displayRecords();
+  updateDashboard();
+}
+
+async function initializeSupabaseInventory() {
+  if (!isSupabaseConfigured) return;
+  try {
+    currentProfile = await window.PGENRO_API?.requireApprovedUser?.();
+    await loadInventoryFromSupabase();
+
+    inventoryRealtimeChannel = supabase
+      .channel(`user-inventory-live-${crypto.randomUUID()}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "inventory" }, () => loadInventoryFromSupabase().catch(console.error))
+      .on("postgres_changes", { event: "*", schema: "public", table: "inventory_movements" }, () => loadInventoryFromSupabase().catch(console.error))
+      .subscribe();
+  } catch (error) {
+    console.error("Supabase inventory initialization failed:", error);
+    showToast(error.message || "Unable to load Supabase inventory.", "error");
+  }
+}
+
+window.addEventListener("pagehide", () => {
+  if (inventoryRealtimeChannel && supabase) {
+    try { supabase.removeChannel(inventoryRealtimeChannel); } catch {}
+  }
+}, { once: true });
+
+/* ==========================================================================
    INITIAL STOCKS / PLACEHOLDER DATA fallbacks
    ========================================================================== */
-if (inventoryRecords.length === 0) {
+if (!isSupabaseConfigured && inventoryRecords.length === 0) {
   inventoryRecords = [
     { itemId: "ITEM-2024-0001", name: "A4 BOND PAPER", unit: "REAM", desc: "White, 80gsm, 8.27x11.69 inches", qty: 250, used: 124, balance: 126, threshold: 10, remarks: "Restocked Dec 4", status: "In-Stock" },
     { itemId: "ITEM-2024-0002", name: "ALCOHOL 70%", unit: "GALLON", desc: "Isopropyl Antiseptic Disinfectant", qty: 15, used: 12, balance: 3, threshold: 5, remarks: "Refill requested", status: "Low-Stock" },
@@ -632,3 +781,4 @@ if (inventoryRecords.length === 0) {
 // Initializing application layouts
 displayRecords();
 updateDashboard();
+initializeSupabaseInventory();

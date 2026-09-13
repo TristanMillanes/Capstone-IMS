@@ -1,0 +1,39 @@
+PGENRO IMS - CSS / FILE ORGANIZATION CLEANUP
+Date: 2026-09-13
+
+Goal
+- Keep only one local CSS file per page/module.
+- Remove the extra global/repair/admin override CSS files that were making the project hard to maintain.
+- Preserve the previous CSS cascade order so the existing layout/design is not intentionally changed.
+
+What changed
+- 25 HTML pages now load exactly one local CSS file each.
+- Consolidated 142 previous local stylesheet links plus 2 inline <style> blocks into their proper page/module stylesheet.
+- Removed these redundant CSS files after consolidation:
+  * USER-CSS/pgenro-global.css
+  * USER-CSS/pgenro-user.css
+  * admin/admin-modern.css
+  * admin/admin-ui.css
+  * admin/visitors-admin-enhanced.css
+  * shared/pgenro-global.css
+  * shared/repaired-ui.css
+  * shared/workspace.css
+- Moved USER-CSS/pgenro-user.js to user-javascript/pgenro-user.js and updated all HTML references.
+- Removed the now-empty USER-CSS folder.
+- Added supabase-test.css for SUPABASE_CONNECTION_TEST.html so that page also follows the one-CSS rule.
+
+Examples
+- admin/admincommunication.html -> admin/admincommunication.css only
+- admin/serviceAdmin.html -> admin/serviceAdmin.css only
+- admin/visitors-admin.html -> admin/visitor.css only
+- User/communication.html -> User/Communication.css only
+- User/service.html -> User/service.css only
+- User/travelOR.html -> User/travelOR.css only
+
+Validation
+- All 25 HTML pages have exactly one local stylesheet reference.
+- All local CSS references resolve to existing files.
+- All CSS files parse without syntax errors.
+- Existing regression test: PASS.
+- Project audit: 0 issues.
+- All JavaScript files pass node --check.

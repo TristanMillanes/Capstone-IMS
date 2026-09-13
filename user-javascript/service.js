@@ -4,110 +4,11 @@ document.addEventListener("DOMContentLoaded", () => {
     lucide.createIcons();
   }
 
-  // --- FIREBASE REALTIME DB CONFIGURATION ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
-    authDomain: "ims-capstone-bc65f.firebaseapp.com",
-    databaseURL: "https://ims-capstone-bc65f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ims-capstone-bc65f",
-    storageBucket: "ims-capstone-bc65f.firebasestorage.app",
-    messagingSenderId: "972207120140",
-    appId: "1:972207120140:web:6a94e2e1e9e8511e933329",
-    measurementId: "G-W4TPE7CHC8"
-  };
-
-  if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-  }
-  const db = firebase.database();
-
+  // --- SUPABASE REALTIME DB CONFIGURATION ---
+  const supabase = window.pgenroSupabase;
+  const isSupabaseConfigured = !!window.PGENRO_SUPABASE?.configured && !!supabase;
+  let serviceRealtimeChannel = null;
   let serviceRecords = [];
-
-  // Fallback demo data
-  const defaultFallbackData = [
-    {
-      id: "demo-1",
-      serviceNo: "SR-2025-001",
-      clientName: "Engr. Ricardo Mendoza",
-      organization: "LGU Tayabas City - City Engineer Office",
-      contactNo: "0917-554-3210",
-      emailAddress: "r.mendoza@tayabas.gov.ph",
-      dateRequest: "10/24/2025",
-      primaryCategory: "TECHNICAL ASSISTANCE",
-      secondaryCategory: "INFORMATION & EDUCATION (IEC)",
-      concernsCategory: "Tree Cutting / Pruning Clearance Inspection",
-      certifications: "Environmental Clearance Certificate (ECC Audit)",
-      otherServices: "Joint inspection with DPWH 1st District Engineering Office.",
-      requestDetails: "Assessment of 14 roadside trees along the Maharlika Highway widening corridor for safety clearance.",
-      dateNeeded: "11/05/2025",
-      location: "Brgy. Isabang, Tayabas City, Quezon",
-      requestedBy: "Engr. Ricardo Mendoza",
-      endorsedBy: "Mayor Lovely Reynoso-Pontillas",
-      serviceStatus: "Under Evaluation",
-      receivedBy: "ASD Records Officer - J. Del Rosario",
-      dateReceived: "10/24/2025",
-      timeReceived: "09:15 AM",
-      receivedRemarks: "Complete supporting documents attached.",
-      assessedBy: "Forester Maria Clara Ramos (FNRD)",
-      dateAssessed: "10/25/2025",
-      timeAssessed: "02:30 PM",
-      assessedRemarks: "Site inspection verified. Tree inventory prepared.",
-      recommendedBy: "Division Chief - Roberto Alcantara",
-      recDate: "10/26/2025 • 03:45 PM",
-      recRemarks: "Endorsed for PGDH issuance of technical certificate.",
-      pgdhAction: "APPROVED FOR CLEARANCE",
-      pgdhDateActed: "10/27/2025 • 04:00 PM",
-      pgdhInstructions: "Release permit with seedling replacement condition (1:50 ratio).",
-      processedBy: "Technical Staff - D. Mendoza",
-      dateProcessed: "10/28/2025 • 10:30 AM",
-      processedRemarks: "Clearance documents dispatched for client release.",
-      serviceReceivedBy: "Pending Client Pick-up",
-      finalDateRec: "--",
-      finalRemarks: "Client notified via SMS & Email.",
-      currentStep: 3
-    },
-    {
-      id: "demo-2",
-      serviceNo: "SR-2025-002",
-      clientName: "Maria Santos",
-      organization: "Quezon Eco-Tourism Association",
-      contactNo: "0928-112-9843",
-      emailAddress: "m.santos@quezonecotour.org",
-      dateRequest: "10/25/2025",
-      primaryCategory: "CLEARANCE & PERMIT",
-      secondaryCategory: "ENVIRONMENTAL CERTIFICATE",
-      concernsCategory: "Watershed Impact Review",
-      certifications: "Watershed Compliance Certificate",
-      otherServices: "Resource sustainability mapping.",
-      requestDetails: "Request for technical assessment of eco-trail campsite in Lucban watershed buffer zone.",
-      dateNeeded: "11/12/2025",
-      location: "Brgy. Samil, Lucban, Quezon",
-      requestedBy: "Maria Santos",
-      endorsedBy: "Hon. Celso Dator",
-      serviceStatus: "Completed",
-      receivedBy: "Reception Desk - A. Gomez",
-      dateReceived: "10/25/2025",
-      timeReceived: "10:30 AM",
-      receivedRemarks: "Formal request letter attached.",
-      assessedBy: "EnP. Gabriel Reyes",
-      dateAssessed: "10/26/2025",
-      timeAssessed: "11:00 AM",
-      assessedRemarks: "Site passed safety and watershed buffer standards.",
-      recommendedBy: "Division Chief - Roberto Alcantara",
-      recDate: "10/27/2025 • 02:15 PM",
-      recRemarks: "Recommended for immediate approval.",
-      pgdhAction: "APPROVED",
-      pgdhDateActed: "10/28/2025 • 09:00 AM",
-      pgdhInstructions: "Grant temporary eco-camp clearance.",
-      processedBy: "Records Unit - R. Cruz",
-      dateProcessed: "10/29/2025 • 01:30 PM",
-      processedRemarks: "Official permit issued.",
-      serviceReceivedBy: "Maria Santos",
-      finalDateRec: "10/30/2025 • 03:00 PM",
-      finalRemarks: "Original signed copy released.",
-      currentStep: 5
-    }
-  ];
 
   function calculateCurrentStep(status) {
     if (!status) return 1;
@@ -170,86 +71,119 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      if (confirm("Are you sure you want to end your current session?")) {
+    logoutBtn.addEventListener("click", async () => {
+      if (window.confirm("Are you sure you want to end your current session?")) {
+        try { await window.pgenroSupabase?.auth?.signOut(); } catch (error) { console.warn("Sign-out warning:", error); }
+        try {
+          localStorage.removeItem("pgenro_current_user");
+          sessionStorage.removeItem("pgenro_session_active");
+          sessionStorage.removeItem("pgenro_session_token");
+        } catch {}
         window.location.href = "login.html";
       }
     });
   }
 
-  // --- REAL-TIME DATABASE LISTENER ---
-  const serviceRequestsRef = db.ref("service_requests");
+  // --- REAL-TIME DATABASE LISTENER (SUPABASE) ---
+  const serviceField = (item, ...keys) => {
+    for (const key of keys) {
+      if (item?.[key] !== undefined && item?.[key] !== null && item?.[key] !== "") return item[key];
+    }
+    return undefined;
+  };
 
-  serviceRequestsRef.on("value", (snapshot) => {
-    const data = snapshot.val();
-    serviceRecords = [];
+  function normalizeServiceRecord(raw = {}) {
+    const item = raw?.data && typeof raw.data === "object" ? { ...raw, ...raw.data } : raw;
+    const status = serviceField(item, "serviceStatus", "service_status", "status") || "Under Evaluation";
+    const id = serviceField(item, "id", "serviceNo", "service_no", "trackingNo", "tracking_no") || crypto.randomUUID();
+    const joinDateTime = (dateKeys, timeKeys) => {
+      const date = serviceField(item, ...dateKeys);
+      const time = serviceField(item, ...timeKeys);
+      return date ? `${date}${time ? ` • ${time}` : ""}` : "--";
+    };
 
-    if (data) {
-      Object.keys(data).forEach((key) => {
-        const item = data[key];
-        serviceRecords.push({
-          id: key,
-          serviceNo: item.serviceNo || item.trackingNo || key,
-          clientName: item.clientName || item.fullName || item.name || "--",
-          organization: item.organization || item.agency || "--",
-          contactNo: item.contactNo || item.contact || "--",
-          emailAddress: item.emailAddress || item.email || "--",
-          dateRequest: item.dateRequest || item.dateRequested || "--",
-          primaryCategory: item.primaryCategory || item.category || "TECHNICAL ASSISTANCE",
-          secondaryCategory: item.secondaryCategory || item.type || "--",
-          concernsCategory: item.concernsCategory || item.concern || "--",
-          certifications: item.certifications || "--",
-          otherServices: item.otherServices || "--",
-          requestDetails: item.requestDetails || item.details || item.scope || "--",
-          dateNeeded: item.dateNeeded || "--",
-          location: item.location || item.site || "--",
-          requestedBy: item.requestedBy || item.clientName || "--",
-          endorsedBy: item.endorsedBy || "--",
-          serviceStatus: item.serviceStatus || item.status || "Under Evaluation",
+    return {
+      id: String(id),
+      serviceNo: serviceField(item, "serviceNo", "service_no", "trackingNo", "tracking_no") || String(id),
+      clientName: serviceField(item, "clientName", "client_name", "fullName", "full_name", "name") || "--",
+      organization: serviceField(item, "organization", "agency") || "--",
+      contactNo: serviceField(item, "contactNo", "contact_no", "contact") || "--",
+      emailAddress: serviceField(item, "emailAddress", "email_address", "email") || "--",
+      dateRequest: serviceField(item, "dateRequest", "date_request", "dateRequested", "date_requested", "created_at") || "--",
+      primaryCategory: serviceField(item, "primaryCategory", "primary_category", "category") || "TECHNICAL ASSISTANCE",
+      secondaryCategory: serviceField(item, "secondaryCategory", "secondary_category", "type") || "--",
+      concernsCategory: serviceField(item, "concernsCategory", "concerns_category", "concern") || "--",
+      certifications: serviceField(item, "certifications") || "--",
+      otherServices: serviceField(item, "otherServices", "other_services") || "--",
+      requestDetails: serviceField(item, "requestDetails", "request_details", "details", "scope") || "--",
+      dateNeeded: serviceField(item, "dateNeeded", "date_needed") || "--",
+      location: serviceField(item, "location", "site") || "--",
+      requestedBy: serviceField(item, "requestedBy", "requested_by", "clientName", "client_name") || "--",
+      endorsedBy: serviceField(item, "endorsedBy", "endorsed_by") || "--",
+      serviceStatus: String(status),
+      receivedBy: serviceField(item, "receivedBy", "received_by") || "--",
+      dateReceived: serviceField(item, "dateReceived", "date_received") || "--",
+      timeReceived: serviceField(item, "timeReceived", "time_received") || "--",
+      receivedRemarks: serviceField(item, "receivedRemarks", "received_remarks") || "--",
+      assessedBy: serviceField(item, "assessedBy", "assessed_by") || "--",
+      dateAssessed: serviceField(item, "dateAssessed", "date_assessed") || "--",
+      timeAssessed: serviceField(item, "timeAssessed", "time_assessed") || "--",
+      assessedRemarks: serviceField(item, "assessedRemarks", "assessed_remarks") || "--",
+      recommendedBy: serviceField(item, "recommendedBy", "recommended_by") || "--",
+      recDate: joinDateTime(["recDate", "rec_date"], ["recTime", "rec_time"]),
+      recRemarks: serviceField(item, "recRemarks", "rec_remarks") || "--",
+      pgdhAction: serviceField(item, "pgdhAction", "pgdh_action") || "--",
+      pgdhDateActed: joinDateTime(["pgdhDateActed", "pgdh_date_acted"], ["pgdhTimeActed", "pgdh_time_acted"]),
+      pgdhInstructions: serviceField(item, "pgdhInstructions", "pgdh_instructions") || "--",
+      processedBy: serviceField(item, "processedBy", "processed_by") || "--",
+      dateProcessed: joinDateTime(["dateProcessed", "date_processed"], ["timeProcessed", "time_processed"]),
+      processedRemarks: serviceField(item, "processedRemarks", "processed_remarks") || "--",
+      serviceReceivedBy: serviceField(item, "serviceReceivedBy", "service_received_by") || "--",
+      finalDateRec: joinDateTime(["finalDateRec", "final_date_rec"], ["finalTimeRec", "final_time_rec"]),
+      finalRemarks: serviceField(item, "finalRemarks", "final_remarks") || "--",
+      currentStep: Number(serviceField(item, "currentStep", "current_step")) || calculateCurrentStep(status)
+    };
+  }
 
-          receivedBy: item.receivedBy || "--",
-          dateReceived: item.dateReceived || "--",
-          timeReceived: item.timeReceived || "--",
-          receivedRemarks: item.receivedRemarks || "--",
-
-          assessedBy: item.assessedBy || "--",
-          dateAssessed: item.dateAssessed || "--",
-          timeAssessed: item.timeAssessed || "--",
-          assessedRemarks: item.assessedRemarks || "--",
-
-          recommendedBy: item.recommendedBy || "--",
-          recDate: item.recDate ? `${item.recDate} • ${item.recTime || ""}` : "--",
-          recRemarks: item.recRemarks || "--",
-
-          pgdhAction: item.pgdhAction || "--",
-          pgdhDateActed: item.pgdhDateActed ? `${item.pgdhDateActed} • ${item.pgdhTimeActed || ""}` : "--",
-          pgdhInstructions: item.pgdhInstructions || "--",
-
-          processedBy: item.processedBy || "--",
-          dateProcessed: item.dateProcessed ? `${item.dateProcessed} • ${item.timeProcessed || ""}` : "--",
-          processedRemarks: item.processedRemarks || "--",
-
-          serviceReceivedBy: item.serviceReceivedBy || "--",
-          finalDateRec: item.finalDateRec ? `${item.finalDateRec} • ${item.finalTimeRec || ""}` : "--",
-          finalRemarks: item.finalRemarks || "--",
-
-          currentStep: item.currentStep ? parseInt(item.currentStep, 10) : calculateCurrentStep(item.serviceStatus || item.status)
-        });
-      });
+  async function loadServiceRecords({ silent = false } = {}) {
+    if (!isSupabaseConfigured) {
+      try {
+        const local = JSON.parse(localStorage.getItem("serviceRequests") || "[]");
+        serviceRecords = Array.isArray(local) ? local.map(normalizeServiceRecord) : [];
+      } catch { serviceRecords = []; }
+      updateMetricsSummary();
+      renderTable();
+      return;
     }
 
-    if (serviceRecords.length === 0) {
-      serviceRecords = [...defaultFallbackData];
+    try {
+      const { data, error } = await supabase
+        .from("service_requests")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      serviceRecords = (data || []).map(normalizeServiceRecord);
+      updateMetricsSummary();
+      renderTable();
+    } catch (error) {
+      console.error("Supabase service request read failed:", error);
+      serviceRecords = [];
+      updateMetricsSummary();
+      renderTable();
+      if (!silent) window.PGENRO_UI?.toast?.("Unable to load service requests from Supabase.", "error");
     }
+  }
 
-    updateMetricsSummary();
-    renderTable();
-  }, (error) => {
-    console.error("Firebase read error:", error);
-    serviceRecords = [...defaultFallbackData];
-    updateMetricsSummary();
-    renderTable();
-  });
+  function startServiceRealtime() {
+    if (!isSupabaseConfigured) return;
+    if (serviceRealtimeChannel) {
+      try { supabase.removeChannel(serviceRealtimeChannel); } catch {}
+    }
+    serviceRealtimeChannel = supabase
+      .channel(`user-service-requests-${crypto.randomUUID()}`)
+      .on("postgres_changes", { event: "*", schema: "public", table: "service_requests" }, () => loadServiceRecords({ silent: true }))
+      .subscribe();
+  }
 
   // --- KPI SUMMARY METRICS ---
   function updateMetricsSummary() {
@@ -524,4 +458,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("scroll", runScrollReveal);
   runScrollReveal();
+
+  loadServiceRecords();
+  startServiceRealtime();
+
+  window.addEventListener("pagehide", () => {
+    if (serviceRealtimeChannel && supabase) {
+      try { supabase.removeChannel(serviceRealtimeChannel); } catch {}
+    }
+  }, { once: true });
 });

@@ -1,509 +1,406 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Communications Log Admin</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Communications Log Admin</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- Google Identity Services (OAuth Token Client) -->
+<script async="" defer="" src="https://accounts.google.com/gsi/client"></script>
+<!-- Supabase SDKs (v10 Compatibility Mode) -->
+<!-- External Stylesheets -->
+<link rel="stylesheet" href="admincommunication.css?v=20260913-clean">
 
-  <!-- Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- Google Identity Services (OAuth Token Client) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
 
-  <!-- Firebase SDKs (v10 Compatibility Mode) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
-  <!-- External Stylesheets -->
-  <link rel="stylesheet" href="admin.css" />
-  <link rel="stylesheet" href="admincommunication.css" />
+
 </head>
+<body class="pgenro-admin" data-admin-page="admincommunication.html" data-requires-auth="admin">
+<div class="app-layout">
+<!-- SIDEBAR NAVIGATION -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<a class="logo-area" href="admin.html#dashboard">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" src="../logo/enro.png"/>
+<i data-lucide="shield-check" style="display:none; color: var(--emerald-400);"></i>
+</div>
+<div class="logo-text">
+<h2>PGENRO IMS</h2>
+<span>Admin Control Center</span>
+</div>
+</a>
+<button class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu">
+<i data-lucide="panel-left-close"></i>
+</button>
+</div>
+<nav aria-label="Administrator navigation" class="sidebar-nav">
+<div class="nav-group">
+<span class="nav-label">Main Panel</span>
+<ul>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Operations &amp; Records</span>
+<ul>
+<li><a aria-current="page" class="nav-item active" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase-business"></i><span>Travel Orders</span></a></li>
+<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span><span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">User &amp; Access</span>
+<ul>
+<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
+<li><a class="nav-item" href="requestACC.html"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">System Control</span>
+<ul>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
+<li><a class="nav-item" href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account &amp; System Settings</span></a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-footer">
+<div class="system-status-indicator">
+<span class="status-dot online" id="dbStatusDot"></span>
+<div class="status-info">
+<span class="status-title">System Health</span>
+<span class="status-sub" id="dbStatusText">Google Drive &amp; Firestore Ready</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN WRAPPER -->
+<div class="main-wrapper">
+<!-- TOPBAR -->
+<header class="topbar">
+<div class="topbar-left">
+<button aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn">
+<i data-lucide="menu"></i>
+</button>
+<div class="global-search">
+<i class="search-icon" data-lucide="search"></i>
+<input id="globalSearchInput" placeholder="Search control no, subject, document type, office..." type="text"/>
+<kbd class="search-shortcut">Ctrl K</kbd>
+</div>
+</div>
+<div class="topbar-right">
+<!-- Notification Button -->
+<div class="notification-wrapper">
+<button class="icon-btn" id="notificationsBtn" title="Notifications">
+<i data-lucide="bell"></i>
+<span class="notification-ping" id="notifPing" style="display: none;"></span>
+</button>
+<div class="notification-dropdown" id="notificationDropdown">
+<div class="notification-header">
+<h3>Notifications</h3>
+<span class="badge-count" id="notifBadgeCount">0 Unread</span>
+</div>
+<div class="notification-list" id="notificationList">
+<div class="empty-notif-state">No new notifications</div>
+</div>
+</div>
+</div>
+<div class="v-divider"></div>
+<!-- Profile Menu -->
+<div class="profile-menu admin-profile-menu" id="profileMenu">
+<button aria-label="Open administrator profile" class="profile-btn profile-icon-only" id="profileBtn" title="Administrator profile" type="button">
+<div class="profile-avatar"><i data-lucide="user-round"></i></div>
 
-<body>
-  <div class="app-layout">
-    <!-- SIDEBAR NAVIGATION -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-header">
-        <a href="admin.html#dashboard" class="logo-area">
-          <div class="logo-icon">
-            <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" />
-            <i data-lucide="shield-check" style="display:none; color: var(--emerald-400);"></i>
-          </div>
-          <div class="logo-text">
-            <h2>PGENRO IMS</h2>
-            <span>Admin Control Center</span>
-          </div>
-        </a>
-        <button class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu">
-          <i data-lucide="panel-left-close"></i>
-        </button>
-      </div>
 
-      <nav class="sidebar-nav">
-        <div class="nav-group">
-          <span class="nav-label">Main Panel</span>
-          <ul>
-            <li>
-              <a href="admin.html#dashboard" class="nav-item">
-                <i data-lucide="layout-dashboard"></i>
-                <span>Executive Dashboard</span>
-              </a>
-            </li>
-            <li>
-              <a href="admin-communication.html" class="nav-item active">
-                <i data-lucide="arrow-left-right"></i>
-                <span>Communications Log</span>
-              </a>
-            </li>
-            <li>
-              <a href="travelOR-admin.html" class="nav-item">
-                <i data-lucide="briefcase"></i>
-                <span>Travel Orders</span>
-              </a>
-            </li>
-            <li>
-              <a href="Officememo.html" class="nav-item">
-                <i data-lucide="file-text"></i>
-                <span>Office Memos</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/employee.html" class="nav-item">
-                <i data-lucide="folder-git-2"></i>
-                <span>Employee Profiles</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/inventory.html" class="nav-item">
-                <i data-lucide="boxes"></i>
-                <span>Supplies Inventory</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/visitorsView.html" class="nav-item">
-                <i data-lucide="clipboard-check"></i>
-                <span>Visitors Log</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/servicerequest.html" class="nav-item">
-                <i data-lucide="wrench"></i>
-                <span>Service Requests</span>
-                <span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/ics.html" class="nav-item">
-                <i data-lucide="file-check-2"></i>
-                <span>ICS Property Slips</span>
-              </a>
-            </li>
-          </ul>
-        </div>
+</button>
 
-        <div class="nav-group">
-          <span class="nav-label">User & System Control</span>
-          <ul>
-            <li>
-              <a href="Usermanagement.html" class="nav-item">
-                <i data-lucide="users"></i>
-                <span>User Management</span>
-              </a>
-            </li>
-            <li>
-              <a href="../User/requestACC.html" class="nav-item">
-                <i data-lucide="user-plus"></i>
-                <span>Account Requests</span>
-                <span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span>
-              </a>
-            </li>
-            <li>
-              <a href="admin.html#audit" class="nav-item">
-                <i data-lucide="shield-alert"></i>
-                <span>Security Audit Trail</span>
-              </a>
-            </li>
-            <li>
-              <a href="admin.html#backup" class="nav-item">
-                <i data-lucide="database"></i>
-                <span>System Backups</span>
-              </a>
-            </li>
-            <li>
-              <a href="admin.html#settings" class="nav-item">
-                <i data-lucide="settings"></i>
-                <span>Global Settings</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="system-status-indicator">
-          <span class="status-dot online" id="dbStatusDot"></span>
-          <div class="status-info">
-            <span class="status-title">System Health</span>
-            <span class="status-sub" id="dbStatusText">Google Drive & Firestore Ready</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <!-- MAIN WRAPPER -->
-    <div class="main-wrapper">
-      <!-- TOPBAR -->
-      <header class="topbar">
-        <div class="topbar-left">
-          <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Navigation">
-            <i data-lucide="menu"></i>
-          </button>
-          
-          <div class="global-search">
-            <i data-lucide="search" class="search-icon"></i>
-            <input type="text" id="globalSearchInput" placeholder="Search control no, subject, document type, office..." />
-            <kbd class="search-shortcut">Ctrl K</kbd>
-          </div>
-        </div>
-
-        <div class="topbar-right">
-          <!-- Notification Button -->
-          <div class="notification-wrapper">
-            <button class="icon-btn" id="notificationsBtn" title="Notifications">
-              <i data-lucide="bell"></i>
-              <span class="notification-ping" id="notifPing" style="display: none;"></span>
-            </button>
-
-            <div class="notification-dropdown" id="notificationDropdown">
-              <div class="notification-header">
-                <h3>Notifications</h3>
-                <span class="badge-count" id="notifBadgeCount">0 Unread</span>
-              </div>
-              <div class="notification-list" id="notificationList">
-                <div class="empty-notif-state">No new notifications</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="v-divider"></div>
-
-          <!-- Profile Menu -->
-          <div class="profile-menu" id="profileMenu">
-            <button class="profile-btn" id="profileBtn" type="button">
-              <div class="profile-avatar">
-                <i data-lucide="shield-check"></i>
-              </div>
-              <div class="profile-text">
-                <span class="user-name" id="currentUserName">Admin User</span>
-                <span class="user-role" id="currentUserRole">System Administrator</span>
-              </div>
-              <i data-lucide="chevron-down" class="profile-chevron"></i>
-            </button>
-
-            <div class="profile-dropdown" id="profileDropdown">
-              <div class="profile-dropdown-header">
-                <div class="profile-avatar big">
-                  <i data-lucide="user"></i>
+<div class="profile-dropdown" id="profileDropdown">
+<div class="profile-dropdown-header">
+<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+<div class="profile-dropdown-copy">
+<h3 id="dropdownUserName">PGENRO Admin</h3>
+<p id="dropdownUserEmail">Administrator Session</p>
+<span class="role-badge" id="dropdownUserRole">Administrator</span>
+</div>
+</div>
+<div class="dropdown-links">
+<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
+<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
+<a href="requestACC.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
+<a href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account Settings</span></a>
+</div>
+<div class="dropdown-footer">
+<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+</div>
+</div></div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="main-content">
+<!-- BREADCRUMB & HEADER -->
+<section class="page-header">
+<div class="header-title">
+<div class="breadcrumb">
+<span>Admin Console</span>
+<i data-lucide="chevron-right"></i>
+<span class="active">Communications Log</span>
+</div>
+<h1>Incoming &amp; Outgoing Communications</h1>
+<p>Encode official communications with direct Google Drive repository folder routing and OCR text extraction.</p>
+</div>
+<div class="header-actions">
+<button class="btn btn-primary" id="openEncodingModalBtn">
+<i data-lucide="plus-circle"></i>
+<span>Encode New Communication</span>
+</button>
+</div>
+</section>
+<!-- KPI SUMMARY GRID -->
+<section class="kpi-grid">
+<div class="kpi-card">
+<div class="kpi-header">
+<span class="kpi-label">Total Communications</span>
+<div class="kpi-icon emerald"><i data-lucide="database"></i></div>
+</div>
+<div class="kpi-body">
+<h3 class="counter" data-target="0" id="kpiTotalRecords">0</h3>
+<span class="kpi-trend positive"><i data-lucide="layers"></i> Total Registered</span>
+</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-header">
+<span class="kpi-label">Incoming Letters</span>
+<div class="kpi-icon blue"><i data-lucide="arrow-down-left"></i></div>
+</div>
+<div class="kpi-body">
+<h3 class="counter" data-target="0" id="kpiIncomingCount">0</h3>
+<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> External &amp; Internal</span>
+</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-header">
+<span class="kpi-label">Outgoing Letters</span>
+<div class="kpi-icon purple"><i data-lucide="arrow-up-right"></i></div>
+</div>
+<div class="kpi-body">
+<h3 class="counter" data-target="0" id="kpiOutgoingCount">0</h3>
+<span class="kpi-trend positive"><i data-lucide="send"></i> Released Docs</span>
+</div>
+</div>
+<div class="kpi-card urgent-border">
+<div class="kpi-header">
+<span class="kpi-label">Pending Action</span>
+<div class="kpi-icon amber"><i data-lucide="clock"></i></div>
+</div>
+<div class="kpi-body">
+<h3 class="counter" data-target="0" id="kpiPendingCount">0</h3>
+<span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Needs Resolution</span>
+</div>
+</div>
+</section>
+<!-- DATA TABLE CARD -->
+<section class="card">
+<div class="communication-table-tools">
+<div class="filter-tab-bar">
+<button class="filter-tab active" data-type="All">All Communications</button>
+<button class="filter-tab" data-type="Incoming">Incoming Only</button>
+<button class="filter-tab" data-type="Outgoing">Outgoing Only</button>
+</div>
+<div class="section-header communication-section-header">
+<div>
+<h2>Document Records</h2>
+<p>Real-time view of routed letters, endorsements, transmittals, and Google Drive links.</p>
+</div>
+<div class="table-actions">
+<select class="input-sm communication-status-filter" id="statusFilter">
+<option value="All">All Statuses</option>
+<option value="Pending">Pending</option>
+<option value="Received">Received</option>
+<option value="Forwarded">Forwarded</option>
+<option value="Released">Released</option>
+<option value="Archived">Archived</option>
+</select>
+<input class="input-sm" id="tableSearchInput" placeholder="Search table..." type="text"/>
+</div>
+</div>
+</div>
+<div class="table-responsive">
+<table class="data-table">
+<thead>
+<tr>
+<th width="40"><input id="selectAllRows" type="checkbox"/></th>
+<th>Control No. &amp; Type</th>
+<th>Date</th>
+<th>Office / Recipient</th>
+<th>Subject Matter / Particulars</th>
+<th>Drive Sync &amp; File</th>
+<th>Status</th>
+<th class="communication-actions-column" width="120">Actions</th>
+</tr>
+</thead>
+<tbody id="communicationTableBody">
+<tr>
+<td class="empty-table-cell" colspan="8">Loading communication records...</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="table-footer">
+<span class="text-muted" id="tablePaginationInfo">Showing 0 entries</span>
+</div>
+</section>
+<!-- FOOTER -->
+<footer class="admin-footer">
+<div>
+<p>© 2026 Provincial Government Environment and Natural Resources Office (PGENRO).</p>
+</div>
+<div class="footer-links">
+<a href="admin.html#audit">Security &amp; Audit</a>
+<a href="../SettingIMS/Settings.html?from=admin">System Settings</a>
+<a href="admin.html#backup">Backup &amp; Recovery</a>
+</div>
+</footer>
+</main>
+</div>
+</div>
+<!-- ENCODING & DIRECT GOOGLE DRIVE UPLOAD MODAL -->
+<div class="modal-overlay" id="encodingModal">
+<div class="modal-container">
+<div class="modal-header">
+<h2 id="modalTitle">Encoding Communication Record</h2>
+<button class="modal-close-btn" id="closeEncodingModalBtn">×</button>
+</div>
+<form id="communicationForm">
+<div class="modal-body">
+<input id="editIndex" type="hidden" value=""/>
+<div class="form-grid">
+<div class="form-group">
+<label>Communication Type</label>
+<select class="form-control" id="typeSelect" required="">
+<option value="">Select Type</option>
+<option value="Incoming">Incoming</option>
+<option value="Outgoing">Outgoing</option>
+</select>
+</div>
+<div class="form-group">
+<label>Control No. (Auto-Generated)</label>
+<input class="form-control" id="controlNoInput" placeholder="e.g. INC-2026-0001" readonly="" type="text"/>
+</div>
+<div class="form-group">
+<label>Document Type</label>
+<select class="form-control" id="docTypeSelect" required="">
+<option value="">Select Document Type</option>
+<option value="Request Letter">Request Letter</option>
+<option value="Endorsement Letter">Endorsement Letter</option>
+<option value="Transmittal Letter">Transmittal Letter</option>
+<option value="Response Letter">Response Letter</option>
+<option value="Notice of Meeting">Notice of Meeting</option>
+<option value="Invitation">Invitation</option>
+<option value="Report">Report</option>
+<option value="Memorandum">Memorandum</option>
+<option value="Other Communication">Other Communication</option>
+</select>
+</div>
+<div class="form-group">
+<label>Date Received / Released</label>
+<input class="form-control" id="dateInput" required="" type="date"/>
+</div>
+<div class="form-group">
+<label>Status</label>
+<select class="form-control" id="statusSelect" required="">
+<option value="">Select Status</option>
+<option value="Pending">Pending</option>
+<option value="Received">Received</option>
+<option value="Forwarded">Forwarded</option>
+<option value="Released">Released</option>
+<option value="Archived">Archived</option>
+</select>
+</div>
+<div class="form-group full-width">
+<label>Received From / Recipient Office</label>
+<textarea class="form-control" id="officeInput" placeholder="e.g. Governor's Office / PENRO / City ENRO" required=""></textarea>
+</div>
+<div class="form-group full-width">
+<label>Subject Matter / Particulars</label>
+<textarea class="form-control" id="subjectInput" placeholder="Enter full subject details" required=""></textarea>
+</div>
+<div class="form-group full-width">
+<label>Date Forwarded / Action Taken</label>
+<textarea class="form-control" id="actionTakenInput" placeholder="e.g. Forwarded to Admin Division for review"></textarea>
+</div>
+<div class="form-group full-width">
+<label>Remarks</label>
+<textarea class="form-control" id="remarksInput" placeholder="Additional notes or references"></textarea>
+</div>
+<!-- DIRECT GOOGLE DRIVE UPLOAD & OCR ATTACHMENT DIRECTIVE -->
+<div class="form-group full-width">
+<label>Attach Soft Copy File (Auto Directs to Google Drive)</label>
+<div class="gdrive-upload-card">
+<div class="gdrive-status-badge">
+<i data-lucide="cloud"></i> Google Drive Storage Directive Active
                 </div>
-                <div>
-                  <h3 id="dropdownUserName">PGENRO Admin</h3>
-                  <p id="dropdownUserEmail">admin@pgenro.gov.ph</p>
-                  <span class="role-badge">Super Admin</span>
-                </div>
-              </div>
-
-              <div class="dropdown-links">
-                <a href="admin.html#settings"><i data-lucide="sliders"></i> Preferences</a>
-                <a href="../User/requestACC.html"><i data-lucide="user-check"></i> Pending Approvals</a>
-              </div>
-
-              <div class="dropdown-footer">
-                <button class="logout-btn" id="logoutBtn" type="button">
-                  <i data-lucide="log-out"></i> Sign Out
+<input accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" class="form-control" id="documentFileInput" type="file"/>
+<button class="btn-ocr" id="runOcrBtn" type="button">
+<i data-lucide="scan-text"></i> Run OCR Text Reader
                 </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      <!-- MAIN CONTENT -->
-      <main class="main-content">
-        <!-- BREADCRUMB & HEADER -->
-        <section class="page-header">
-          <div class="header-title">
-            <div class="breadcrumb">
-              <span>Admin Console</span>
-              <i data-lucide="chevron-right"></i>
-              <span class="active">Communications Log</span>
-            </div>
-            <h1>Incoming & Outgoing Communications</h1>
-            <p>Encode official communications with direct Google Drive repository folder routing and OCR text extraction.</p>
-          </div>
-
-          <div class="header-actions">
-            <button class="btn btn-primary" id="openEncodingModalBtn">
-              <i data-lucide="plus-circle"></i>
-              <span>Encode New Communication</span>
-            </button>
-          </div>
-        </section>
-
-        <!-- KPI SUMMARY GRID -->
-        <section class="kpi-grid">
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-label">Total Communications</span>
-              <div class="kpi-icon emerald"><i data-lucide="database"></i></div>
-            </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiTotalRecords" data-target="0">0</h3>
-              <span class="kpi-trend positive"><i data-lucide="layers"></i> Total Registered</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-label">Incoming Letters</span>
-              <div class="kpi-icon blue"><i data-lucide="arrow-down-left"></i></div>
-            </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiIncomingCount" data-target="0">0</h3>
-              <span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> External & Internal</span>
-            </div>
-          </div>
-
-          <div class="kpi-card">
-            <div class="kpi-header">
-              <span class="kpi-label">Outgoing Letters</span>
-              <div class="kpi-icon purple"><i data-lucide="arrow-up-right"></i></div>
-            </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiOutgoingCount" data-target="0">0</h3>
-              <span class="kpi-trend positive"><i data-lucide="send"></i> Released Docs</span>
-            </div>
-          </div>
-
-          <div class="kpi-card urgent-border">
-            <div class="kpi-header">
-              <span class="kpi-label">Pending Action</span>
-              <div class="kpi-icon amber"><i data-lucide="clock"></i></div>
-            </div>
-            <div class="kpi-body">
-              <h3 class="counter" id="kpiPendingCount" data-target="0">0</h3>
-              <span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Needs Resolution</span>
-            </div>
-          </div>
-        </section>
-
-        <!-- DATA TABLE CARD -->
-        <section class="card">
-          <div style="padding: 20px 20px 0 20px;">
-            <div class="filter-tab-bar">
-              <button class="filter-tab active" data-type="All">All Communications</button>
-              <button class="filter-tab" data-type="Incoming">Incoming Only</button>
-              <button class="filter-tab" data-type="Outgoing">Outgoing Only</button>
-            </div>
-
-            <div class="section-header" style="margin-bottom: 16px;">
-              <div>
-                <h2>Document Records</h2>
-                <p>Real-time view of routed letters, endorsements, transmittals, and Google Drive links.</p>
-              </div>
-              <div class="table-actions">
-                <select id="statusFilter" class="input-sm" style="width: auto;">
-                  <option value="All">All Statuses</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Received">Received</option>
-                  <option value="Forwarded">Forwarded</option>
-                  <option value="Released">Released</option>
-                  <option value="Archived">Archived</option>
-                </select>
-                <input type="text" id="tableSearchInput" class="input-sm" placeholder="Search table..." />
-              </div>
-            </div>
-          </div>
-
-          <div class="table-responsive">
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th width="40"><input type="checkbox" id="selectAllRows" /></th>
-                  <th>Control No. & Type</th>
-                  <th>Date</th>
-                  <th>Office / Recipient</th>
-                  <th>Subject Matter / Particulars</th>
-                  <th>Drive Sync & File</th>
-                  <th>Status</th>
-                  <th width="120" style="text-align: right;">Actions</th>
-                </tr>
-              </thead>
-              <tbody id="communicationTableBody">
-                <tr>
-                  <td colspan="8" class="empty-table-cell">Loading communication records...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="table-footer">
-            <span class="text-muted" id="tablePaginationInfo">Showing 0 entries</span>
-          </div>
-        </section>
-
-        <!-- FOOTER -->
-        <footer class="admin-footer">
-          <div>
-            <p>&copy; 2026 Provincial Government Environment and Natural Resources Office (PGENRO).</p>
-          </div>
-          <div class="footer-links">
-            <a href="#">Privacy Security</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Support</a>
-          </div>
-        </footer>
-      </main>
-    </div>
-  </div>
-
-  <!-- ENCODING & DIRECT GOOGLE DRIVE UPLOAD MODAL -->
-  <div class="modal-overlay" id="encodingModal">
-    <div class="modal-container">
-      <div class="modal-header">
-        <h2 id="modalTitle">Encoding Communication Record</h2>
-        <button class="modal-close-btn" id="closeEncodingModalBtn">&times;</button>
-      </div>
-
-      <form id="communicationForm">
-        <div class="modal-body">
-          <input type="hidden" id="editIndex" value="" />
-
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Communication Type</label>
-              <select id="typeSelect" class="form-control" required>
-                <option value="">Select Type</option>
-                <option value="Incoming">Incoming</option>
-                <option value="Outgoing">Outgoing</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Control No. (Auto-Generated)</label>
-              <input type="text" id="controlNoInput" class="form-control" readonly placeholder="e.g. INC-2026-0001" />
-            </div>
-
-            <div class="form-group">
-              <label>Document Type</label>
-              <select id="docTypeSelect" class="form-control" required>
-                <option value="">Select Document Type</option>
-                <option value="Request Letter">Request Letter</option>
-                <option value="Endorsement Letter">Endorsement Letter</option>
-                <option value="Transmittal Letter">Transmittal Letter</option>
-                <option value="Response Letter">Response Letter</option>
-                <option value="Notice of Meeting">Notice of Meeting</option>
-                <option value="Invitation">Invitation</option>
-                <option value="Report">Report</option>
-                <option value="Memorandum">Memorandum</option>
-                <option value="Other Communication">Other Communication</option>
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label>Date Received / Released</label>
-              <input type="date" id="dateInput" class="form-control" required />
-            </div>
-
-            <div class="form-group">
-              <label>Status</label>
-              <select id="statusSelect" class="form-control" required>
-                <option value="">Select Status</option>
-                <option value="Pending">Pending</option>
-                <option value="Received">Received</option>
-                <option value="Forwarded">Forwarded</option>
-                <option value="Released">Released</option>
-                <option value="Archived">Archived</option>
-              </select>
-            </div>
-
-            <div class="form-group full-width">
-              <label>Received From / Recipient Office</label>
-              <textarea id="officeInput" class="form-control" placeholder="e.g. Governor's Office / PENRO / City ENRO" required></textarea>
-            </div>
-
-            <div class="form-group full-width">
-              <label>Subject Matter / Particulars</label>
-              <textarea id="subjectInput" class="form-control" placeholder="Enter full subject details" required></textarea>
-            </div>
-
-            <div class="form-group full-width">
-              <label>Date Forwarded / Action Taken</label>
-              <textarea id="actionTakenInput" class="form-control" placeholder="e.g. Forwarded to Admin Division for review"></textarea>
-            </div>
-
-            <div class="form-group full-width">
-              <label>Remarks</label>
-              <textarea id="remarksInput" class="form-control" placeholder="Additional notes or references"></textarea>
-            </div>
-
-            <!-- DIRECT GOOGLE DRIVE UPLOAD & OCR ATTACHMENT DIRECTIVE -->
-            <div class="form-group full-width">
-              <label>Attach Soft Copy File (Auto Directs to Google Drive)</label>
-              <div class="gdrive-upload-card">
-                <div class="gdrive-status-badge">
-                  <i data-lucide="cloud"></i> Google Drive Storage Directive Active
-                </div>
-                <input type="file" id="documentFileInput" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" class="form-control" />
-                <button type="button" class="btn-ocr" id="runOcrBtn">
-                  <i data-lucide="scan-text"></i> Run OCR Text Reader
-                </button>
-              </div>
-
-              <!-- Live Upload Progress Feedback -->
-              <div class="upload-progress-box" id="encodingUploadProgressBox">
-                <span id="encodingUploadStatusText" style="font-size:11px; font-weight:700; color:var(--slate-700);">Preparing Google Drive Stream...</span>
-                <div class="progress-bar-sm"><div class="fill emerald" id="encodingProgressBar" style="width:0%;"></div></div>
-              </div>
-            </div>
-
-            <div class="form-group full-width">
-              <label>Extracted Document Text (OCR Result)</label>
-              <textarea id="ocrTextInput" class="form-control" placeholder="Extracted OCR text will appear here..."></textarea>
-            </div>
-          </div>
-        </div>
-
-        <div class="modal-header" style="justify-content: flex-end; gap: 10px; background-color: var(--slate-100);">
-          <button type="button" class="btn btn-secondary" id="cancelEncodingBtn">Cancel</button>
-          <button type="submit" class="btn btn-primary" id="saveRecordBtn">
-            <i data-lucide="cloud-upload"></i> Encode & Upload File
+</div>
+<!-- Live Upload Progress Feedback -->
+<div class="upload-progress-box" id="encodingUploadProgressBox">
+<span class="upload-status-text" id="encodingUploadStatusText">Preparing Google Drive Stream...</span>
+<div class="progress-bar-sm"><div class="fill emerald" id="encodingProgressBar" style="width:0%;"></div></div>
+</div>
+</div>
+<div class="form-group full-width">
+<label>Extracted Document Text (OCR Result)</label>
+<textarea class="form-control" id="ocrTextInput" placeholder="Extracted OCR text will appear here..."></textarea>
+</div>
+</div>
+</div>
+<div class="modal-actions">
+<button class="btn btn-secondary" id="cancelEncodingBtn" type="button">Cancel</button>
+<button class="btn btn-primary" id="saveRecordBtn" type="submit">
+<i data-lucide="cloud-upload"></i> Encode &amp; Upload File
           </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- VIEW OCR TEXT MODAL -->
-  <div class="modal-overlay" id="viewOcrModal">
-    <div class="modal-container modal-sm">
-      <div class="modal-header">
-        <h2>Document Text Content</h2>
-        <button class="modal-close-btn" id="closeViewOcrModalBtn">&times;</button>
-      </div>
-      <div class="modal-body">
-        <p id="viewOcrFileName" style="font-weight: 700; color: var(--emerald-600); font-size: 12px;"></p>
-        <textarea id="viewOcrContent" class="form-control" style="min-height: 250px;" readonly></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- External Communication JavaScript Directive -->
-  <script src="../admin-javascript/admincommunication.js"></script>
+</div>
+</form>
+</div>
+</div>
+<!-- VIEW OCR TEXT MODAL -->
+<div class="modal-overlay" id="viewOcrModal">
+<div class="modal-container modal-sm">
+<div class="modal-header">
+<h2>Document Text Content</h2>
+<button class="modal-close-btn" id="closeViewOcrModalBtn">×</button>
+</div>
+<div class="modal-body">
+<p class="ocr-file-name" id="viewOcrFileName"></p>
+<textarea class="form-control ocr-content-view" id="viewOcrContent" readonly=""></textarea>
+</div>
+</div>
+</div>
+<!-- External Communication JavaScript Directive -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../admin-javascript/supabase-compat.js"></script>
+<script src="../admin-javascript/admincommunication.js"></script>
+<script src="../admin-javascript/admin-ui.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/repaired-ui.js?v=20260913"></script>
 </body>
 </html>

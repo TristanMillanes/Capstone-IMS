@@ -26,16 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 1. FIREBASE CONFIGURATION & INITIALIZATION
+  // 1. SUPABASE CONFIGURATION & INITIALIZATION
   // =========================================================================
-  const firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_FIREBASE_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_FIREBASE_PROJECT_ID",
-    storageBucket: "YOUR_FIREBASE_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-    appId: "YOUR_FIREBASE_APP_ID"
-  };
+  const firebaseConfig = {}; // Legacy API shape; all persistence is routed to Supabase. // Legacy API adapter; configure Supabase in shared/supabase.js.
 
   let db = null;
   let firebaseInitialized = false;
@@ -47,7 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       db = firebase.firestore();
       firebaseInitialized = true;
-      updateDbStatusUI(true, "Firebase Connected (office_memos)");
+      updateDbStatusUI(true, "Supabase Connected (office_memos)");
     }
   } catch (err) {
     console.warn("Operating with local storage fallback mode:", err);
@@ -195,7 +188,7 @@ document.addEventListener("DOMContentLoaded", () => {
             calculateKpis();
           },
           (err) => {
-            console.error("Firestore error, switching to localStorage:", err);
+            console.error("Supabase error, switching to localStorage:", err);
             loadLocalMemos();
           }
         );

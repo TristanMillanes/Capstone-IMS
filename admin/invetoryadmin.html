@@ -1,428 +1,446 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Admin Inventory Management</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link rel="stylesheet" href="invetoryadmin.css" />
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Admin Inventory Management</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="invetoryadmin.css?v=20260913-clean">
+
+
+
+
+
 </head>
-<body>
-
+<body class="pgenro-admin" data-admin-page="invetoryadmin.html" data-requires-auth="admin">
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
 <div class="app-layout">
-  <!-- SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <a href="../admin/homepage.html" class="logo-area" aria-label="PGENRO IMS Dashboard">
-        <div class="logo-icon">
-          <img src="../logo/enro.png" alt="PGENRO Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block';">
-          <i data-lucide="shield-check" style="display:none"></i>
-        </div>
-        <div class="logo-text">
-          <h2>PGENRO IMS</h2>
-          <span>Admin Control Center</span>
-        </div>
-      </a>
-      <button class="icon-btn sidebar-toggle" id="sidebarCollapseBtn" type="button" title="Close Menu">
-        <i data-lucide="panel-left-close"></i>
-      </button>
-    </div>
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<a aria-label="PGENRO IMS Dashboard" class="logo-area" href="../admin/admin.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" src="../logo/enro.png"/>
+<i data-lucide="shield-check" style="display:none"></i>
+</div>
+<div class="logo-text">
+<h2>PGENRO IMS</h2>
+<span>Admin Control Center</span>
+</div>
+</a>
+<button class="icon-btn sidebar-toggle" id="sidebarCollapseBtn" title="Close Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+</button>
+</div>
+<nav aria-label="Administrator navigation" class="sidebar-nav">
+<div class="nav-group">
+<span class="nav-label">Main Panel</span>
+<ul>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Operations &amp; Records</span>
+<ul>
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase-business"></i><span>Travel Orders</span></a></li>
+<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+<li><a aria-current="page" class="nav-item active" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span><span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">User &amp; Access</span>
+<ul>
+<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
+<li><a class="nav-item" href="requestACC.html"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">System Control</span>
+<ul>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
+<li><a class="nav-item" href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account &amp; System Settings</span></a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-footer">
+<div class="system-status-indicator">
+<span class="status-dot" id="statusDot"></span>
+<div>
+<span class="status-title">Supabase Database</span>
+<span class="status-sub" id="statusText">Checking connection...</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN WRAPPER -->
+<div class="main-wrapper">
+<!-- TOPBAR -->
+<header class="topbar">
+<div class="topbar-left">
+<button aria-label="Toggle Navigation" class="mobile-menu-btn icon-btn" id="mobileMenuBtn" type="button">
+<i data-lucide="menu"></i>
+</button>
+<div class="global-search">
+<i data-lucide="search"></i>
+<input autocomplete="off" id="globalSearch" placeholder="Search inventory by item, category, or control no... (Ctrl + K)" type="search"/>
+<kbd>Ctrl K</kbd>
+</div>
+</div>
+<div class="topbar-right">
+<button class="icon-btn" id="refreshBtn" title="Refresh inventory" type="button">
+<i data-lucide="refresh-cw"></i>
+</button>
+<div class="profile profile-menu admin-profile-menu" data-shared-profile-handler="true" id="profileMenu"><button aria-label="Open administrator profile" class="profile-btn profile-icon-only" id="profileBtn" title="Administrator profile" type="button"><div class="profile-avatar"><i data-lucide="user-round"></i></div></button>
 
-    <nav class="sidebar-nav" aria-label="Main administration">
-      <div class="nav-group">
-        <span class="nav-label">Main Panel</span>
-        <ul>
-          <li><a href="admin.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
-          <li><a href="admincommunication.html" class="nav-item"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
-          <li><a href="travelOR-admin.html" class="nav-item"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
-          <li><a href="Memo-admin.html" class="nav-item"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-          <li><a href="employee-admin.html" class="nav-item"><i data-lucide="users"></i><span>Employee Profiles</span></a></li>
-          <li><a href="#" class="nav-item active" aria-current="page"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
-          <li><a href="../User/visitorsView.html" class="nav-item"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
-          <li><a href="serviceAdmin.html" class="nav-item"><i data-lucide="wrench"></i><span>Service Requests</span><span class="nav-badge emerald">0 Open</span></a></li>
-          <li><a href="ics-admin.html" class="nav-item"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
-        </ul>
-      </div>
-      <div class="nav-group">
-        <span class="nav-label">User &amp; System Control</span>
-        <ul>
-          <li><a href="Usermanagement.html" class="nav-item"><i data-lucide="users"></i><span>User Management</span></a></li>
-          <li><a href="../admin/requestACC.html" class="nav-item"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge emerald">0 New</span></a></li>
-          <li><a href="#" class="nav-item"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
-          <li><a href="#" class="nav-item"><i data-lucide="database"></i><span>System Backups</span></a></li>
-          <li><a href="#" class="nav-item"><i data-lucide="settings"></i><span>Global Settings</span></a></li>
-        </ul>
-      </div>
-    </nav>
 
-    <div class="sidebar-footer">
-      <div class="system-status-indicator">
-        <span class="status-dot" id="statusDot"></span>
-        <div>
-          <span class="status-title">Supabase Database</span>
-          <span class="status-sub" id="statusText">Checking connection...</span>
-        </div>
-      </div>
-    </div>
-  </aside>
-
-  <!-- MAIN WRAPPER -->
-  <div class="main-wrapper">
-    <!-- TOPBAR -->
-    <header class="topbar">
-      <div class="topbar-left">
-        <button class="mobile-menu-btn icon-btn" id="mobileMenuBtn" type="button" aria-label="Toggle Navigation">
-          <i data-lucide="menu"></i>
-        </button>
-        <div class="global-search">
-          <i data-lucide="search"></i>
-          <input id="globalSearch" type="search" placeholder="Search inventory by item, category, or control no... (Ctrl + K)" autocomplete="off">
-          <kbd>Ctrl K</kbd>
-        </div>
-      </div>
-      <div class="topbar-right">
-        <button class="icon-btn" id="refreshBtn" type="button" title="Refresh inventory">
-          <i data-lucide="refresh-cw"></i>
-        </button>
-        <div class="profile">
-          <div class="avatar"><i data-lucide="shield-check"></i></div>
-          <div class="profile-text">
-            <b id="adminName">Admin User</b>
-            <small>System Administrator</small>
-          </div>
-        </div>
-      </div>
-    </header>
-
-    <!-- MAIN CONTENT -->
-    <main class="main-content">
-      <!-- HERO HEADER -->
-      <section class="page-header">
-        <div>
-          <div class="breadcrumb">
-            <span>Admin Console</span>
-            <i data-lucide="chevron-right"></i>
-            <span>Supplies & Inventory</span>
-          </div>
-          <div class="eyebrow">
-            <i data-lucide="boxes"></i>
+<div class="profile-dropdown" id="profileDropdown">
+<div class="profile-dropdown-header">
+<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+<div class="profile-dropdown-copy">
+<h3 id="dropdownUserName">PGENRO Admin</h3>
+<p id="dropdownUserEmail">Administrator Session</p>
+<span class="role-badge" id="dropdownUserRole">Administrator</span>
+</div>
+</div>
+<div class="dropdown-links">
+<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
+<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
+<a href="requestACC.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
+<a href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account Settings</span></a>
+</div>
+<div class="dropdown-footer">
+<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+</div>
+</div><span aria-hidden="true" class="admin-profile-data" id="adminName">Admin User</span></div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="main-content">
+<!-- HERO HEADER -->
+<section class="page-header">
+<div>
+<div class="breadcrumb">
+<span>Admin Console</span>
+<i data-lucide="chevron-right"></i>
+<span>Supplies &amp; Inventory</span>
+</div>
+<div class="eyebrow">
+<i data-lucide="boxes"></i>
             ADMIN INVENTORY CONTROL
           </div>
-          <h1>Office Supplies &amp; Inventory</h1>
-          <p>Supervise supply stock levels, manage stock-in / stock-out transactions, set reorder thresholds, and generate official supply reports.</p>
-        </div>
-        <div class="page-header-actions">
-          <button class="secondary-btn light" id="openReportBtn" type="button">
-            <i data-lucide="printer"></i>
+<h1>Office Supplies &amp; Inventory</h1>
+<p>Supervise supply stock levels, manage stock-in / stock-out transactions, set reorder thresholds, and generate official supply reports.</p>
+</div>
+<div class="page-header-actions">
+<button class="secondary-btn light" id="openReportBtn" type="button">
+<i data-lucide="printer"></i>
             Print Report
           </button>
-          <button class="primary-btn large" id="addItemBtn" type="button">
-            <i data-lucide="plus"></i>
+<button class="primary-btn large" id="addItemBtn" type="button">
+<i data-lucide="plus"></i>
             Add Inventory Item
           </button>
-        </div>
-      </section>
-
-      <!-- STATS KPI GRID -->
-      <section class="stats-grid" aria-label="Inventory summary">
-        <div class="stat-card">
-          <div class="stat-icon blue"><i data-lucide="boxes"></i></div>
-          <div>
-            <span>Total Item Types</span>
-            <strong id="totalItems">0</strong>
-            <small>Registered records</small>
-          </div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-icon green"><i data-lucide="layers"></i></div>
-          <div>
-            <span>Total Stock on Hand</span>
-            <strong id="totalStock">0</strong>
-            <small>Physical count balance</small>
-          </div>
-        </div>
-        <div class="stat-card warning-state">
-          <div class="stat-icon yellow"><i data-lucide="alert-triangle"></i></div>
-          <div>
-            <span>Low Stock Alert</span>
-            <strong id="lowStock">0</strong>
-            <small>At or below threshold</small>
-          </div>
-        </div>
-        <div class="stat-card critical-state">
-          <div class="stat-icon red"><i data-lucide="x-circle"></i></div>
-          <div>
-            <span>Out of Stock</span>
-            <strong id="outStock">0</strong>
-            <small>Requires immediate procurement</small>
-          </div>
-        </div>
-      </section>
-
-      <!-- INVENTORY DATABASE PANEL -->
-      <section class="panel">
-        <div class="panel-header">
-          <div>
-            <h2>Supplies Directory</h2>
-            <p>Filter, edit specifications, update threshold levels, and record stock usage.</p>
-          </div>
-          <div class="header-actions">
-            <button class="secondary-btn" id="exportBtn" type="button">
-              <i data-lucide="download"></i>Export CSV
-            </button>
-            <button class="primary-btn" id="movementBtn" type="button">
-              <i data-lucide="arrow-left-right"></i>Record Movement
-            </button>
-          </div>
-        </div>
-
-        <div class="tabs">
-          <button class="tab active" data-filter="all" type="button">All Items <b id="countAll">0</b></button>
-          <button class="tab" data-filter="in" type="button">In Stock <b id="countIn">0</b></button>
-          <button class="tab" data-filter="low" type="button">Low Stock <b id="countLow">0</b></button>
-          <button class="tab" data-filter="out" type="button">Out of Stock <b id="countOut">0</b></button>
-        </div>
-
-        <div class="toolbar">
-          <div class="search-box">
-            <i data-lucide="search"></i>
-            <input id="searchInput" type="search" placeholder="Search item name, control ID, category, or specs..." autocomplete="off">
-          </div>
-          <select id="categoryFilter" aria-label="Filter by category">
-            <option value="">All Categories</option>
-          </select>
-          <select id="sortFilter" aria-label="Sort inventory items">
-            <option value="name">Item Name (A–Z)</option>
-            <option value="stock-low">Stock: Low to High</option>
-            <option value="stock-high">Stock: High to Low</option>
-            <option value="newest">Newest First</option>
-          </select>
-        </div>
-
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 140px;">Control No.</th>
-                <th>Item &amp; Specifications</th>
-                <th>Category</th>
-                <th>Unit</th>
-                <th>Stock on Hand</th>
-                <th>Threshold</th>
-                <th>Status</th>
-                <th>Last Movement</th>
-                <th style="text-align: right; width: 140px;">Actions</th>
-              </tr>
-            </thead>
-            <tbody id="inventoryBody">
-              <tr><td colspan="9" class="empty">Loading inventory database...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <!-- AUDIT LOG / MOVEMENTS -->
-      <section class="panel movement-panel">
-        <div class="panel-header">
-          <div>
-            <h2>Stock Movement History &amp; Audit Trail</h2>
-            <p>Detailed ledger of stock replenishment, disbursements, and physical inventory reconciliations.</p>
-          </div>
-        </div>
-        <div class="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Timestamp</th>
-                <th>Control No.</th>
-                <th>Item Description</th>
-                <th>Type</th>
-                <th>Quantity</th>
-                <th>Balance After</th>
-                <th>Reference / Remarks</th>
-                <th>Officer</th>
-              </tr>
-            </thead>
-            <tbody id="movementBody">
-              <tr><td colspan="8" class="empty">Loading movement history...</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <footer>
-        &copy; 2026 Provincial Government Environment and Natural Resources Office (PGENRO). IMS Administration.
-      </footer>
-    </main>
-  </div>
 </div>
-
+</section>
+<!-- STATS KPI GRID -->
+<section aria-label="Inventory summary" class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon blue"><i data-lucide="boxes"></i></div>
+<div>
+<span>Total Item Types</span>
+<strong id="totalItems">0</strong>
+<small>Registered records</small>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon green"><i data-lucide="layers"></i></div>
+<div>
+<span>Total Stock on Hand</span>
+<strong id="totalStock">0</strong>
+<small>Physical count balance</small>
+</div>
+</div>
+<div class="stat-card warning-state">
+<div class="stat-icon yellow"><i data-lucide="alert-triangle"></i></div>
+<div>
+<span>Low Stock Alert</span>
+<strong id="lowStock">0</strong>
+<small>At or below threshold</small>
+</div>
+</div>
+<div class="stat-card critical-state">
+<div class="stat-icon red"><i data-lucide="x-circle"></i></div>
+<div>
+<span>Out of Stock</span>
+<strong id="outStock">0</strong>
+<small>Requires immediate procurement</small>
+</div>
+</div>
+</section>
+<!-- INVENTORY DATABASE PANEL -->
+<section class="panel">
+<div class="panel-header">
+<div>
+<h2>Supplies Directory</h2>
+<p>Filter, edit specifications, update threshold levels, and record stock usage.</p>
+</div>
+<div class="header-actions">
+<button class="secondary-btn" id="exportBtn" type="button">
+<i data-lucide="download"></i>Export CSV
+            </button>
+<button class="primary-btn" id="movementBtn" type="button">
+<i data-lucide="arrow-left-right"></i>Record Movement
+            </button>
+</div>
+</div>
+<div class="tabs">
+<button class="tab active" data-filter="all" type="button">All Items <b id="countAll">0</b></button>
+<button class="tab" data-filter="in" type="button">In Stock <b id="countIn">0</b></button>
+<button class="tab" data-filter="low" type="button">Low Stock <b id="countLow">0</b></button>
+<button class="tab" data-filter="out" type="button">Out of Stock <b id="countOut">0</b></button>
+</div>
+<div class="toolbar">
+<div class="search-box">
+<i data-lucide="search"></i>
+<input autocomplete="off" id="searchInput" placeholder="Search item name, control ID, category, or specs..." type="search"/>
+</div>
+<select aria-label="Filter by category" id="categoryFilter">
+<option value="">All Categories</option>
+</select>
+<select aria-label="Sort inventory items" id="sortFilter">
+<option value="name">Item Name (A–Z)</option>
+<option value="stock-low">Stock: Low to High</option>
+<option value="stock-high">Stock: High to Low</option>
+<option value="newest">Newest First</option>
+</select>
+</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th style="width: 140px;">Control No.</th>
+<th>Item &amp; Specifications</th>
+<th>Category</th>
+<th>Unit</th>
+<th>Stock on Hand</th>
+<th>Threshold</th>
+<th>Status</th>
+<th>Last Movement</th>
+<th style="text-align: right; width: 140px;">Actions</th>
+</tr>
+</thead>
+<tbody id="inventoryBody">
+<tr><td class="empty" colspan="9">Loading inventory database...</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- AUDIT LOG / MOVEMENTS -->
+<section class="panel movement-panel">
+<div class="panel-header">
+<div>
+<h2>Stock Movement History &amp; Audit Trail</h2>
+<p>Detailed ledger of stock replenishment, disbursements, and physical inventory reconciliations.</p>
+</div>
+</div>
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Timestamp</th>
+<th>Control No.</th>
+<th>Item Description</th>
+<th>Type</th>
+<th>Quantity</th>
+<th>Balance After</th>
+<th>Reference / Remarks</th>
+<th>Officer</th>
+</tr>
+</thead>
+<tbody id="movementBody">
+<tr><td class="empty" colspan="8">Loading movement history...</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<footer>
+        © 2026 Provincial Government Environment and Natural Resources Office (PGENRO). IMS Administration.
+      </footer>
+</main>
+</div>
+</div>
 <!-- ITEM MODAL (ADD / EDIT) -->
 <div class="modal-backdrop" id="itemModal">
-  <div class="modal">
-    <div class="modal-head">
-      <div>
-        <span class="modal-kicker">INVENTORY MASTERFILE</span>
-        <h2 id="itemModalTitle">Add Inventory Item</h2>
-      </div>
-      <button class="icon-btn close" data-close="itemModal" type="button"><i data-lucide="x"></i></button>
-    </div>
-    <form id="itemForm">
-      <input type="hidden" id="itemDbId">
-      <div class="form-grid">
-        <label>
+<div class="modal">
+<div class="modal-head">
+<div>
+<span class="modal-kicker">INVENTORY MASTERFILE</span>
+<h2 id="itemModalTitle">Add Inventory Item</h2>
+</div>
+<button class="icon-btn close" data-close="itemModal" type="button"><i data-lucide="x"></i></button>
+</div>
+<form id="itemForm">
+<input id="itemDbId" type="hidden"/>
+<div class="form-grid">
+<label>
           Control No. / Item ID
-          <input id="controlNo" placeholder="e.g. INV-2026-001" required>
-        </label>
-        <label>
+          <input id="controlNo" placeholder="e.g. INV-2026-001" required=""/>
+</label>
+<label>
           Item Name
-          <input id="itemName" placeholder="e.g. A4 Copy Paper 80GSM" required>
-        </label>
-        <label>
+          <input id="itemName" placeholder="e.g. A4 Copy Paper 80GSM" required=""/>
+</label>
+<label>
           Category
-          <input id="itemCategory" list="categoryList" placeholder="Select or type category">
-          <datalist id="categoryList">
-            <option>Office Supplies</option>
-            <option>Computer &amp; IT Supplies</option>
-            <option>Cleaning &amp; Janitorial</option>
-            <option>Electrical &amp; Hardware</option>
-            <option>Forms &amp; Printing</option>
-            <option>Safety &amp; Field Gear</option>
-          </datalist>
-        </label>
-        <label>
+          <input id="itemCategory" list="categoryList" placeholder="Select or type category"/>
+<datalist id="categoryList">
+<option>Office Supplies</option>
+<option>Computer &amp; IT Supplies</option>
+<option>Cleaning &amp; Janitorial</option>
+<option>Electrical &amp; Hardware</option>
+<option>Forms &amp; Printing</option>
+<option>Safety &amp; Field Gear</option>
+</datalist>
+</label>
+<label>
           Unit of Measure
-          <input id="itemUnit" placeholder="e.g. REAM, BOX, ROLL, PCS" required>
-        </label>
-        <label>
+          <input id="itemUnit" placeholder="e.g. REAM, BOX, ROLL, PCS" required=""/>
+</label>
+<label>
           Initial / Current Quantity
-          <input id="itemQuantity" type="number" min="0" value="0" required>
-        </label>
-        <label>
+          <input id="itemQuantity" min="0" required="" type="number" value="0"/>
+</label>
+<label>
           Low Stock Alert Level
-          <input id="itemThreshold" type="number" min="0" value="5" required>
-        </label>
-        <label class="full">
+          <input id="itemThreshold" min="0" required="" type="number" value="5"/>
+</label>
+<label class="full">
           Specifications / Description
           <textarea id="itemDescription" placeholder="Brand, dimensions, color, serials, packing specifications..."></textarea>
-        </label>
-        <label class="full">
+</label>
+<label class="full">
           Remarks / Storage Location
           <textarea id="itemRemarks" placeholder="Cabinet shelf location, supplier details, or handling instructions..."></textarea>
-        </label>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="secondary-btn" data-close="itemModal">Cancel</button>
-        <button class="primary-btn" id="saveItemBtn" type="submit">
-          <i data-lucide="save"></i>Save Item
-        </button>
-      </div>
-    </form>
-  </div>
+</label>
 </div>
-
+<div class="modal-actions">
+<button class="secondary-btn" data-close="itemModal" type="button">Cancel</button>
+<button class="primary-btn" id="saveItemBtn" type="submit">
+<i data-lucide="save"></i>Save Item
+        </button>
+</div>
+</form>
+</div>
+</div>
 <!-- STOCK MOVEMENT MODAL -->
 <div class="modal-backdrop" id="movementModal">
-  <div class="modal small-modal">
-    <div class="modal-head">
-      <div>
-        <span class="modal-kicker">STOCK DISBURSEMENT / REPLENISHMENT</span>
-        <h2>Record Stock Movement</h2>
-      </div>
-      <button class="icon-btn close" data-close="movementModal" type="button"><i data-lucide="x"></i></button>
-    </div>
-    <form id="movementForm">
-      <label>
+<div class="modal small-modal">
+<div class="modal-head">
+<div>
+<span class="modal-kicker">STOCK DISBURSEMENT / REPLENISHMENT</span>
+<h2>Record Stock Movement</h2>
+</div>
+<button class="icon-btn close" data-close="movementModal" type="button"><i data-lucide="x"></i></button>
+</div>
+<form id="movementForm">
+<label>
         Select Inventory Item
-        <select id="movementItem" required></select>
-      </label>
-      <div class="form-grid two">
-        <label>
+        <select id="movementItem" required=""></select>
+</label>
+<div class="form-grid two">
+<label>
           Movement Type
           <select id="movementType">
-            <option value="IN">Stock In (Replenishment)</option>
-            <option value="OUT">Stock Out (Issuance)</option>
-            <option value="ADJUSTMENT">Stock Adjustment (Audit Count)</option>
-          </select>
-        </label>
-        <label>
+<option value="IN">Stock In (Replenishment)</option>
+<option value="OUT">Stock Out (Issuance)</option>
+<option value="ADJUSTMENT">Stock Adjustment (Audit Count)</option>
+</select>
+</label>
+<label>
           Quantity
-          <input id="movementQty" type="number" min="1" value="1" required>
-        </label>
-      </div>
-      <label>
+          <input id="movementQty" min="1" required="" type="number" value="1"/>
+</label>
+</div>
+<label>
         Reference / Requisition Slip / PO No.
-        <input id="movementReference" placeholder="e.g. RIS-2026-089 or PO-1029" required>
-      </label>
-      <label>
+        <input id="movementReference" placeholder="e.g. RIS-2026-089 or PO-1029" required=""/>
+</label>
+<label>
         Purpose / Issuance Remarks
         <textarea id="movementRemarks" placeholder="Issued to Forest Management Unit / Received from Supplier..."></textarea>
-      </label>
-      
-      <div class="movement-preview" id="movementPreview">
+</label>
+<div class="movement-preview" id="movementPreview">
         Select an item to preview balance updates.
       </div>
-
-      <div class="modal-actions">
-        <button type="button" class="secondary-btn" data-close="movementModal">Cancel</button>
-        <button class="primary-btn" type="submit">
-          <i data-lucide="check"></i>Record Transaction
+<div class="modal-actions">
+<button class="secondary-btn" data-close="movementModal" type="button">Cancel</button>
+<button class="primary-btn" type="submit">
+<i data-lucide="check"></i>Record Transaction
         </button>
-      </div>
-    </form>
-  </div>
 </div>
-
+</form>
+</div>
+</div>
 <!-- PRINT REPORT SELECTION MODAL -->
 <div class="modal-backdrop" id="reportModal">
-  <div class="modal">
-    <div class="modal-head">
-      <div>
-        <span class="modal-kicker">OFFICIAL INVENTORY REPORT</span>
-        <h2>Generate Inventory Report</h2>
-      </div>
-      <button class="icon-btn close" data-close="reportModal" type="button"><i data-lucide="x"></i></button>
-    </div>
-    <div class="modal-body-pad">
-      <p class="modal-subtext">
+<div class="modal">
+<div class="modal-head">
+<div>
+<span class="modal-kicker">OFFICIAL INVENTORY REPORT</span>
+<h2>Generate Inventory Report</h2>
+</div>
+<button class="icon-btn close" data-close="reportModal" type="button"><i data-lucide="x"></i></button>
+</div>
+<div class="modal-body-pad">
+<p class="modal-subtext">
         Select which items you would like to include on the printable supply accountability ledger.
       </p>
-      <div class="table-wrap selection-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 46px; text-align: center;">
-                <input type="checkbox" id="selectAllReport" title="Select All Items">
-              </th>
-              <th>Control No.</th>
-              <th>Item Name</th>
-              <th>Current Stock</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody id="reportItemsBody"></tbody>
-        </table>
-      </div>
-      <div class="modal-actions">
-        <button type="button" class="secondary-btn" data-close="reportModal">Cancel</button>
-        <button class="primary-btn" id="confirmPrintBtn" type="button">
-          <i data-lucide="printer"></i>Print Selected Items
-        </button>
-      </div>
-    </div>
-  </div>
+<div class="table-wrap selection-table-wrap">
+<table>
+<thead>
+<tr>
+<th style="width: 46px; text-align: center;">
+<input id="selectAllReport" title="Select All Items" type="checkbox"/>
+</th>
+<th>Control No.</th>
+<th>Item Name</th>
+<th>Current Stock</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody id="reportItemsBody"></tbody>
+</table>
 </div>
-
+<div class="modal-actions">
+<button class="secondary-btn" data-close="reportModal" type="button">Cancel</button>
+<button class="primary-btn" id="confirmPrintBtn" type="button">
+<i data-lucide="printer"></i>Print Selected Items
+        </button>
+</div>
+</div>
+</div>
+</div>
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
-
 <!-- SCRIPT -->
-<script type="module" src="../admin-javascript/admin-invetory.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../admin-javascript/supabase-compat.js"></script>
+<script src="../admin-javascript/admin-invetory.js" type="module"></script>
+<script src="../admin-javascript/admin-ui.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/repaired-ui.js?v=20260913"></script>
 </body>
 </html>

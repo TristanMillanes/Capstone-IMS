@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const viewModalClose = document.getElementById("viewModalClose");
 
   // Database State: Communication Records
-  let records = JSON.parse(localStorage.getItem("communicationRecords")) || [];
+  let records = window.PGENRO_SUPABASE?.configured ? [] : (() => { try { const rows = JSON.parse(localStorage.getItem("communicationRecords") || "[]"); return Array.isArray(rows) ? rows : []; } catch { return []; } })();
   let currentFilter = "All";
 
   // Sidebar Menu Interaction
@@ -67,8 +67,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Logout Trigger
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
-      if (confirm("Are you sure you want to end your current session?")) {
+    logoutBtn.addEventListener("click", async () => {
+      if (window.confirm("Are you sure you want to end your current session?")) {
+        try { await window.pgenroSupabase?.auth?.signOut(); } catch (error) { console.warn("Sign-out warning:", error); }
+        try {
+          localStorage.removeItem("pgenro_current_user");
+          sessionStorage.removeItem("pgenro_session_active");
+          sessionStorage.removeItem("pgenro_session_token");
+        } catch {}
         window.location.href = "login.html";
       }
     });
@@ -152,7 +158,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    filteredRecords.forEach((record, index) => {
+    filteredRecords.forEach((record) => {
+      const originalIndex = records.indexOf(record);
       table.innerHTML += `
         <tr>
           <td>
@@ -165,7 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <td>${record.dateForwarded || "-"}</td>
           <td><span class="badge-status ${record.status || "Pending"}">${record.status || "Pending"}</span></td>
           <td style="text-align: center;">
-            <button class="btn-icon-action" onclick="openRecordView(${index})" title="Inspect Details" type="button">
+            <button class="btn-icon-action" onclick="openRecordView(${originalIndex})" title="Inspect Details" type="button">
               <i data-lucide="eye"></i>
             </button>
           </td>

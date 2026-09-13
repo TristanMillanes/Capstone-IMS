@@ -1,32 +1,13 @@
 // =========================================================================
 // PGENRO IMS - REQUEST ACCOUNT PORTAL SCRIPT
-// Features: Firebase Submission, Live Dossier Review, Natural Step Flow
+// Features: Supabase Auth Submission, Live Dossier Review, Natural Step Flow
 // =========================================================================
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import {
-    getDatabase,
-    ref,
-    set,
-    push
-} from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
-
 // =========================================================================
-// FIREBASE CONFIGURATION
+// SUPABASE AUTH + REQUEST SUBMISSION
+// Shared client is initialized by ../shared/supabase.js
 // =========================================================================
-const firebaseConfig = {
-    apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
-    authDomain: "ims-capstone-bc65f.firebaseapp.com",
-    databaseURL: "https://ims-capstone-bc65f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ims-capstone-bc65f",
-    storageBucket: "ims-capstone-bc65f.firebasestorage.app",
-    messagingSenderId: "972207120140",
-    appId: "1:972207120140:web:6a94e2e1e9e8511e933329",
-    measurementId: "G-W4TPE7CHC8"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const supabase = window.pgenroSupabase;
 
 // =========================================================================
 // CONSTANTS & STATE
@@ -37,7 +18,6 @@ const DRAFT_FIELDS = [
     "fullName",
     "email",
     "contact",
-    "govId",
     "position",
     "division",
     "role",
@@ -48,6 +28,7 @@ const DRAFT_FIELDS = [
 ];
 
 let currentPage = 1;
+let renderedPage = 1;
 let isSubmitting = false;
 
 // =========================================================================
@@ -119,6 +100,13 @@ function setSaveStatus(message, saving = false) {
     }
 
     renderIcons();
+
+    [status, controlStatus].forEach((el) => {
+        if (!el) return;
+        el.classList.remove("status-pulse");
+        void el.offsetWidth;
+        el.classList.add("status-pulse");
+    });
 }
 
 // =========================================================================
@@ -126,13 +114,13 @@ function setSaveStatus(message, saving = false) {
 // =========================================================================
 function updateLiveSummary() {
     const name = getField("fullName")?.value.trim() || "--";
-    const govId = getField("govId")?.value.trim() || "--";
+    const officialEmail = getField("email")?.value.trim() || "--";
     const division = getField("division")?.value || "--";
     const position = getField("position")?.value || "--";
     const role = getField("role")?.value || "Unassigned";
 
     if (getField("sumName")) getField("sumName").textContent = name;
-    if (getField("sumId")) getField("sumId").textContent = govId;
+    if (getField("sumId")) getField("sumId").textContent = officialEmail;
     if (getField("sumDivision")) getField("sumDivision").textContent = division;
     if (getField("sumPosition")) getField("sumPosition").textContent = position;
 
@@ -217,6 +205,7 @@ function restoreDraft() {
         updatePasswordStrength();
         updateCharCounter();
         clearValidationVisuals();
+        DRAFT_FIELDS.forEach((id) => updateFieldCompletion(getField(id)));
         window.updateUI();
 
         const banner = getField("draftBanner");
@@ -410,11 +399,178 @@ function clearValidationVisuals() {
 }
 
 // =========================================================================
+// PREMIUM UI / MOTION HELPERS
+// =========================================================================
+function initLoadingScreen() {
+    const loader = getField("appLoader");
+    const status = getField("loaderStatus");
+
+    const messages = [
+        "Initializing personnel access services…",
+        "Loading environmental clearance interface…",
+        "Secure gateway ready."
+    ];
+
+    let messageIndex = 0;
+    const messageTimer = window.setInterval(() => {
+        if (!status || messageIndex >= messages.length - 1) return;
+        messageIndex += 1;
+        status.style.opacity = "0";
+        window.setTimeout(() => {
+            status.textContent = messages[messageIndex];
+            status.style.opacity = "1";
+        }, 150);
+    }, 420);
+
+    const reveal = () => {
+        window.clearInterval(messageTimer);
+        if (status) status.textContent = "Secure gateway ready.";
+        document.body.classList.remove("is-loading");
+        document.body.classList.add("app-ready");
+
+        window.setTimeout(() => {
+            loader?.classList.add("is-hidden");
+            loader?.setAttribute("aria-hidden", "true");
+        }, 180);
+
+        window.setTimeout(() => loader?.remove(), 900);
+    };
+
+    // Keep the splash visible long enough to read, but never block the page for long.
+    window.setTimeout(reveal, 720);
+}
+
+function animateActivePage(direction = "forward") {
+    const page = getField(`page${currentPage}`);
+    if (!page) return;
+
+    page.classList.remove("page-enter-forward", "page-enter-back");
+    void page.offsetWidth;
+    page.classList.add(direction === "back" ? "page-enter-back" : "page-enter-forward");
+
+    window.setTimeout(() => {
+        page.classList.remove("page-enter-forward", "page-enter-back");
+    }, 520);
+}
+
+function pulseCurrentStep() {
+    const currentStep = document.querySelector(`.step[data-step="${currentPage}"]`);
+    if (!currentStep) return;
+    currentStep.classList.remove("step-pulse");
+    void currentStep.offsetWidth;
+    currentStep.classList.add("step-pulse");
+    window.setTimeout(() => currentStep.classList.remove("step-pulse"), 450);
+}
+
+function updateFieldCompletion(input) {
+    if (!input) return;
+
+    const container = input.closest(".input-container");
+    if (!container) return;
+
+    let complete = false;
+    if (input.type === "checkbox") {
+        complete = input.checked;
+    } else if (input.id === "role") {
+        complete = Boolean(input.value);
+    } else {
+        complete = String(input.value ?? "").trim().length > 0 && input.checkValidity();
+    }
+
+    container.classList.toggle("field-complete", complete && !input.classList.contains("invalid-field"));
+}
+
+function shakeInvalidFields(pageNum = currentPage) {
+    const page = getField(`page${pageNum}`);
+    if (!page) return;
+
+    page.querySelectorAll(".invalid-field").forEach((field) => {
+        const container = field.closest(".input-container, .compliance-wrapper");
+        if (!container) return;
+        container.classList.remove("shake");
+        void container.offsetWidth;
+        container.classList.add("shake");
+        window.setTimeout(() => container.classList.remove("shake"), 360);
+    });
+}
+
+function initRipples() {
+    const selector = [
+        ".btn-solid",
+        ".btn-outline",
+        ".btn-inline",
+        ".role-choice",
+        ".sign-in-link",
+        ".password-toggle",
+        ".modal-close-btn"
+    ].join(",");
+
+    document.querySelectorAll(selector).forEach((el) => {
+        el.addEventListener("pointerdown", (event) => {
+            if (el.disabled) return;
+
+            const rect = el.getBoundingClientRect();
+            const ripple = document.createElement("span");
+            ripple.className = "ui-ripple";
+            ripple.style.left = `${event.clientX - rect.left}px`;
+            ripple.style.top = `${event.clientY - rect.top}px`;
+            el.appendChild(ripple);
+            window.setTimeout(() => ripple.remove(), 620);
+        });
+    });
+}
+
+function setProcessingOverlay(state = "loading", refCode = "") {
+    const overlay = getField("formProcessingOverlay");
+    const title = getField("processingTitle");
+    const message = getField("processingMessage");
+    const iconWrap = getField("processingIcon");
+
+    if (!overlay) return;
+
+    if (state === "hide") {
+        overlay.classList.remove("is-visible", "is-success");
+        overlay.setAttribute("aria-hidden", "true");
+        return;
+    }
+
+    overlay.classList.add("is-visible");
+    overlay.classList.toggle("is-success", state === "success");
+    overlay.setAttribute("aria-hidden", "false");
+
+    if (state === "success") {
+        if (title) title.textContent = "Clearance request submitted";
+        if (message) {
+            message.textContent = refCode
+                ? `Reference ${refCode} was securely transmitted for administrator review.`
+                : "Your clearance request was securely transmitted for administrator review.";
+        }
+        if (iconWrap) iconWrap.innerHTML = icon("check");
+    } else {
+        if (title) title.textContent = "Submitting clearance request";
+        if (message) message.textContent = "Encrypting and routing your application to the PGENRO administrator…";
+        if (iconWrap) iconWrap.innerHTML = icon("shield-check");
+    }
+
+    renderIcons();
+}
+
+function refreshDossierAnimation() {
+    const dossier = getField("dossierPreview");
+    if (!dossier) return;
+    dossier.classList.remove("summary-refresh");
+    void dossier.offsetWidth;
+    dossier.classList.add("summary-refresh");
+    window.setTimeout(() => dossier.classList.remove("summary-refresh"), 460);
+}
+
+// =========================================================================
 // INITIALIZATION
 // =========================================================================
 document.addEventListener("DOMContentLoaded", () => {
     initDate();
     renderIcons();
+    initLoadingScreen();
 
     const form = getField("accessForm");
     if (!form) return;
@@ -441,10 +597,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Core UI Transition Routine
     window.updateUI = function () {
+        const transitionDirection = currentPage < renderedPage ? "back" : "forward";
+
         pages.forEach((page, idx) => {
             const active = idx + 1 === currentPage;
             page.style.display = active ? "flex" : "none";
             page.classList.toggle("active", active);
+            page.setAttribute("aria-hidden", active ? "false" : "true");
         });
 
         steps.forEach((step, idx) => {
@@ -467,7 +626,14 @@ document.addEventListener("DOMContentLoaded", () => {
         if (nextBtn) nextBtn.style.display = currentPage === totalPages ? "none" : "inline-flex";
         if (submitBtn) submitBtn.style.display = currentPage === totalPages ? "inline-flex" : "none";
 
-        if (currentPage === 3) updateLiveSummary();
+        if (currentPage === 3) {
+            updateLiveSummary();
+            refreshDossierAnimation();
+        }
+
+        animateActivePage(transitionDirection);
+        pulseCurrentStep();
+        renderedPage = currentPage;
 
         renderIcons();
     };
@@ -479,12 +645,18 @@ document.addEventListener("DOMContentLoaded", () => {
             if (input.id === "password") updatePasswordStrength();
             if (input.id === "confirmPassword" && input.value) validateField(input);
             if (input.id === "reason") updateCharCounter();
+            updateFieldCompletion(input);
             scheduleDraftSave();
         });
 
         input.addEventListener("change", () => {
             if (input.classList.contains("invalid-field")) validateField(input);
+            updateFieldCompletion(input);
             scheduleDraftSave();
+        });
+
+        input.addEventListener("blur", () => {
+            updateFieldCompletion(input);
         });
     });
 
@@ -497,6 +669,7 @@ document.addEventListener("DOMContentLoaded", () => {
             roleInput.value = card.dataset.role;
             syncRoleChoices(roleInput.value);
             clearFieldError(roleInput);
+            updateFieldCompletion(roleInput);
             scheduleDraftSave();
         });
     });
@@ -515,6 +688,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Next / Previous Navigation
     nextBtn?.addEventListener("click", () => {
         if (!validatePage(currentPage)) {
+            shakeInvalidFields(currentPage);
             showToast("Please complete the required environmental fields.", "error");
             return;
         }
@@ -570,7 +744,7 @@ document.addEventListener("DOMContentLoaded", () => {
     getField("discardDraftBtn")?.addEventListener("click", discardDraft);
 
     // =====================================================================
-    // FORM SUBMISSION TO FIREBASE
+    // FORM SUBMISSION TO SUPABASE AUTH
     // =====================================================================
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
@@ -591,6 +765,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const originalBtnHtml = submitBtn.innerHTML;
         submitBtn.disabled = true;
         if (backBtn) backBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        setProcessingOverlay("loading");
 
         submitBtn.innerHTML = `
             ${icon("loader-2")}
@@ -610,27 +786,47 @@ document.addEventListener("DOMContentLoaded", () => {
             minute: "2-digit"
         });
 
-        // Construct Database Payload
-        const payload = {
-            id: refCode,
-            fullName: getField("fullName")?.value.trim(),
-            email: getField("email")?.value.trim().toLowerCase(),
+        // Personnel metadata is sent to Supabase Auth.
+        // The SQL trigger creates the Pending profile + access request.
+        // Password is handled ONLY by Supabase Auth and is never stored in public tables.
+        const email = getField("email")?.value.trim().toLowerCase();
+        const password = getField("password")?.value;
+        const metadata = {
+            request_id: refCode,
+            full_name: getField("fullName")?.value.trim(),
+            username: email?.split("@")[0] || "",
             contact: getField("contact")?.value.trim(),
-            govId: getField("govId")?.value.trim(),
-            password: getField("password")?.value,
             position: getField("position")?.value,
             division: getField("division")?.value,
-            role: getField("role")?.value,
+            requested_role: "System Staff",
             endorser: getField("endorser")?.value.trim() || "N/A",
             reason: getField("reason")?.value.trim() || "N/A",
-            status: "Pending",
-            timestamp: Date.now(),
-            date: formattedDate
+            submitted_at: now.toISOString(),
+            submitted_display: formattedDate
         };
 
         try {
-            const reqRef = push(ref(db, "access_requests"));
-            await set(reqRef, payload);
+            if (!supabase || !window.PGENRO_SUPABASE?.configured) {
+                throw new Error("Supabase is not configured yet. Add the Publishable/Anon key in shared/supabase.js.");
+            }
+
+            const { data, error } = await supabase.auth.signUp({
+                email,
+                password,
+                options: { data: metadata }
+            });
+
+            if (error) throw error;
+            if (!data?.user) throw new Error("Supabase did not create the account request.");
+            if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+                throw new Error("An account request already exists for this email. Please use the Sign In page or contact the administrator.");
+            }
+
+            // A request account must never keep an active application session
+            // before an administrator grants access.
+            if (data.session) {
+                await supabase.auth.signOut();
+            }
 
             // Clean up session
             localStorage.removeItem(DRAFT_KEY);
@@ -643,7 +839,9 @@ document.addEventListener("DOMContentLoaded", () => {
             window.updateUI();
 
             setSaveStatus("Request officially logged.");
+            setProcessingOverlay("success", refCode);
             showToast(`Clearance packet ${refCode} submitted for approval.`, "success");
+            window.setTimeout(() => setProcessingOverlay("hide"), 1200);
 
             if (getField("controlStatus")) {
                 getField("controlStatus").innerHTML = `
@@ -651,13 +849,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 `;
             }
         } catch (err) {
-            console.error("Firebase transmission error:", err);
+            console.error("Supabase account request error:", err);
+            setProcessingOverlay("hide");
             showToast(`Submission failed: ${err.message || "Network error."}`, "error");
             setSaveStatus("Submission failed. Your draft is still saved.");
         } finally {
             isSubmitting = false;
             submitBtn.disabled = false;
             if (backBtn) backBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = false;
             submitBtn.innerHTML = originalBtnHtml;
             renderIcons();
         }
@@ -666,7 +866,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Check on startup for previous draft
     if (hasDraft()) {
         const banner = getField("draftBanner");
-        if (banner) banner.style.display = "flex";
+        if (banner) {
+            banner.style.display = "flex";
+            banner.classList.add("banner-enter");
+        }
         setSaveStatus("Previous draft found.");
     }
 

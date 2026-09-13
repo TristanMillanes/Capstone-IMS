@@ -3,7 +3,7 @@
  * PGENRO IMS - INVENTORY CUSTODIAN SLIP (ICS) VIEWER CONTROLLER
  * =========================================================================
  * Strictly view-only mode:
- * - Reads real records from Firestore collection "ics_records" (with fallback)
+ * - Reads real records from Supabase table "ics_records" (with local fallback)
  * - Live keyword searching and Category/Article filtering
  * - Detailed property inspection modal
  * - Official COA Appendix 59 Slip generation and printing
@@ -16,33 +16,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 1. FIREBASE CONFIGURATION (VIEWER SYNC)
+  // 1. SUPABASE CONFIGURATION (VIEWER SYNC)
   // =========================================================================
-  const firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_FIREBASE_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_FIREBASE_PROJECT_ID",
-    storageBucket: "YOUR_FIREBASE_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-    appId: "YOUR_FIREBASE_APP_ID"
-  };
-
-  let db = null;
-  let firebaseOnline = false;
-
-  try {
-    if (typeof firebase !== "undefined") {
-      if (firebase.apps.length === 0) {
-        firebase.initializeApp(firebaseConfig);
-      }
-      db = firebase.firestore();
-      firebaseOnline = true;
-      updateDbStatus(true, "Firebase Sync Active");
-    }
-  } catch (err) {
-    console.warn("Using offline fallback mode for ICS Viewer:", err);
-    updateDbStatus(false, "Local Database Mode");
-  }
+  const db = window.pgenroSupabase;
+  const supabaseOnline = !!window.PGENRO_SUPABASE?.configured && !!db;
+  let icsRealtimeChannel = null;
 
   function updateDbStatus(online, msg) {
     const dot = document.getElementById("dbStatusDot");
@@ -141,28 +119,66 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================================
   // 3. DATA LOADING (REALTIME OR LOCAL REPOSITORY)
   // =========================================================================
-  function loadData() {
-    if (firebaseOnline && db) {
-      db.collection("ics_records")
-        .orderBy("controlNumber", "desc")
-        .onSnapshot(
-          (snapshot) => {
-            icsRecords = [];
-            snapshot.forEach((doc) => {
-              icsRecords.push({ id: doc.id, ...doc.data() });
-            });
-            populateArticleDropdown();
-            renderTable();
-            updateKpis();
-          },
-          (err) => {
-            console.error("Firestore read error, using local fallback:", err);
-            loadLocalRecords();
-          }
-        );
-    } else {
+  async function loadData() {
+    if (!supabaseOnline) {
+      updateDbStatus(false, "Local Database Mode");
+      loadLocalRecords();
+      return;
+    }
+
+    try {
+      const { data, error } = await db
+        .from("ics_records")
+        .select("*")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+
+      icsRecords = (data || []).map(normalizeIcsRecord);
+      updateDbStatus(true, "Supabase Sync Active");
+      populateArticleDropdown();
+      renderTable();
+      updateKpis();
+
+      if (icsRealtimeChannel) {
+        try { db.removeChannel(icsRealtimeChannel); } catch {}
+      }
+      icsRealtimeChannel = db
+        .channel(`user-ics-live-${crypto.randomUUID()}`)
+        .on("postgres_changes", { event: "*", schema: "public", table: "ics_records" }, () => loadData())
+        .subscribe();
+    } catch (err) {
+      console.error("Supabase ICS read error, using local fallback:", err);
+      updateDbStatus(false, "Local Fallback Mode");
       loadLocalRecords();
     }
+  }
+
+  function normalizeIcsRecord(raw = {}) {
+    const row = raw?.data && typeof raw.data === "object" ? { ...raw, ...raw.data } : raw;
+    const pick = (...keys) => {
+      for (const key of keys) if (row?.[key] !== undefined && row?.[key] !== null && row?.[key] !== "") return row[key];
+      return "";
+    };
+    return {
+      ...row,
+      id: pick("id") || crypto.randomUUID(),
+      controlNumber: pick("controlNumber", "control_number", "control_no"),
+      accountCode: pick("accountCode", "account_code"),
+      article: pick("article", "category"),
+      description: pick("description", "item_description"),
+      serialNumber: pick("serialNumber", "serial_number", "serial_no"),
+      entryNumber: pick("entryNumber", "entry_number"),
+      icsNo: pick("icsNo", "ics_no"),
+      quantity: Number(pick("quantity", "qty") || 0),
+      unit: pick("unit"),
+      unitValue: Number(pick("unitValue", "unit_value") || 0),
+      totalValue: Number(pick("totalValue", "total_value") || 0),
+      dateAcquired: pick("dateAcquired", "date_acquired"),
+      prNo: pick("prNo", "pr_no"),
+      prDate: pick("prDate", "pr_date"),
+      accountable: pick("accountable", "accountable_person"),
+      remarks: pick("remarks")
+    };
   }
 
   function loadLocalRecords() {
@@ -547,4 +563,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Initial Load
   loadData();
+
+  window.addEventListener("pagehide", () => {
+    if (icsRealtimeChannel && db) {
+      try { db.removeChannel(icsRealtimeChannel); } catch {}
+    }
+  }, { once: true });
 });

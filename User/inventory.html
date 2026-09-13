@@ -1,277 +1,258 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>PGENRO IMS | Inventory Module</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Inventory Module</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="inventory.css?v=20260913-clean">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link rel="stylesheet" href="inventory.css" />
+
+
 </head>
-
-<body>
-  <!-- TOAST CONTAINER (Added for modern feedback alerts) -->
-  <div id="toastContainer" class="toast-container"></div>
-
-  <!-- UNCHANGED HEADER -->
-  <header class="navbar">
-    <a href="homepage.html" class="logo-area">
-      <div class="logo-icon">
-        <img src="../logo/enro.png" class="logo-image" alt="PGENRO Logo" onerror="this.style.display='none'">
-      </div>
-      <div>
-        <h2>Provincial Government</h2>
-        <span>Environmental and Natural Resources Office</span>
-      </div>
-    </a>
-
-    <div class="hamburger-menu" id="hamburgerMenu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-  </header>
-
-  <div class="overlay" id="overlay"></div>
-
-  <!-- UNCHANGED SIDEBAR -->
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-header">
-      <h3>IMS Modules</h3>
-      <p>Quick access menu</p>
-    </div>
-
-    <ul class="modules-list">
-      <li><a href="homepage.html"><i data-lucide="home"></i><span>Dashboard</span></a></li> 
-      <li><a href="communication.html"><i data-lucide="repeat-2"></i><span>Incoming/Outgoing<br>Communication</span></a></li>
-      <li><a href="travelorder.html"><i data-lucide="map-pin"></i><span>Travel Order</span></a></li>
-      <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memo</span></a></li>
-      <li><a href="employee.html"><i data-lucide="users"></i><span>Employee Records</span></a></li>
-      <li><a href="inventory.html" class="active"><i data-lucide="box"></i><span>Inventory</span></a></li>
-      <li><a href="visitorsView.html"><i data-lucide="user-check"></i><span>Visitor's Log</span></a></li>
-      <li><a href="servicerequest.html"><i data-lucide="wrench"></i><span>Service Request</span></a></li>
-      <li><a href="ics.html"><i data-lucide="clipboard-list"></i><span>ICS</span></a></li>
-    </ul>
-  </aside>
-
-  <!-- IMPROVED FORM MODAL -->
-  <div class="form-modal" id="formModal" role="dialog" aria-labelledby="formTitle" aria-hidden="true">
-    <div class="modal-header">
-      <h2 id="formTitle">Encode Inventory Record</h2>
-      <button class="modal-close" id="formModalClose" aria-label="Close modal">
-        <i data-lucide="x"></i>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <form id="inventoryForm">
-        <input type="hidden" id="editIndex">
-
-        <div class="form-row">
-          <div>
-            <label for="itemId">Item ID / Control No.</label>
-            <input type="text" id="itemId" readonly placeholder="Auto-generated">
-          </div>
-          <div>
-            <label for="itemName">Item Name</label>
-            <input type="text" id="itemName" required placeholder="e.g. A4 BOND PAPER">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div>
-            <label for="itemUnit">Unit</label>
-            <input type="text" id="itemUnit" required placeholder="e.g. REAM, BOX, PCS">
-          </div>
-          <div>
-            <label for="itemDesc">Description</label>
-            <input type="text" id="itemDesc" placeholder="Brief details (size, color, etc.)">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div>
-            <label for="itemQty">Quantity (Total Stock Added)</label>
-            <input type="number" id="itemQty" required min="0" value="0">
-          </div>
-          <div>
-            <label for="itemUsed">Total Used</label>
-            <input type="number" id="itemUsed" required min="0" value="0">
-          </div>
-        </div>
-
-        <div class="form-row">
-          <div>
-            <label for="itemBalance">Remaining Balance</label>
-            <input type="number" id="itemBalance" readonly placeholder="Auto-calculated">
-          </div>
-          <div>
-            <label for="itemThreshold">Low Stock Alert Threshold</label>
-            <input type="number" id="itemThreshold" required min="1" value="5">
-          </div>
-        </div>
-
-        <label for="itemRemarks">Remarks</label>
-        <textarea id="itemRemarks" placeholder="Enter dates, locations, conditions, or internal notes"></textarea>
-
-        <div class="form-actions">
-          <button type="button" class="clear-btn" onclick="clearForm()">Reset Inputs</button>
-          <button type="submit" class="save-btn" id="submitBtn">Save Record</button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- IMPROVED REPORT MODAL -->
-  <div class="form-modal" id="reportModal" role="dialog" aria-labelledby="reportTitle" aria-hidden="true">
-    <div class="modal-header">
-      <h2 id="reportTitle">Select Items for Report</h2>
-      <button class="modal-close" id="reportModalClose" aria-label="Close modal">
-        <i data-lucide="x"></i>
-      </button>
-    </div>
-    <div class="modal-body">
-      <p style="margin-bottom: 18px; color: var(--muted); font-size: 14px; font-weight: 600;">
+<body class="pgenro-user" data-requires-auth="user">
+<!-- TOAST CONTAINER (Added for modern feedback alerts) -->
+<div class="toast-container" id="toastContainer"></div>
+<!-- UNCHANGED HEADER -->
+<header class="navbar">
+<a class="logo-area" href="homepage.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'" src="../logo/enro.png"/>
+</div>
+<div>
+<h2>Provincial Government</h2>
+<span>Environment &amp; Natural Resources Office</span>
+</div>
+</a>
+<div class="hamburger-menu" id="hamburgerMenu">
+<span></span>
+<span></span>
+<span></span>
+</div>
+</header>
+<div class="overlay" id="overlay"></div>
+<!-- UNCHANGED SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>IMS Workspace</h3>
+<p class="sidebar-subtext">User Modules</p>
+</div>
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+<li><a class="active" aria-current="page" href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
+<li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+</ul>
+</aside>
+<!-- IMPROVED FORM MODAL -->
+<div aria-hidden="true" aria-labelledby="formTitle" class="form-modal" id="formModal" role="dialog">
+<div class="modal-header">
+<h2 id="formTitle">Encode Inventory Record</h2>
+<button aria-label="Close modal" class="modal-close" id="formModalClose">
+<i data-lucide="x"></i>
+</button>
+</div>
+<div class="modal-body">
+<form id="inventoryForm">
+<input id="editIndex" type="hidden"/>
+<div class="form-row">
+<div>
+<label for="itemId">Item ID / Control No.</label>
+<input id="itemId" placeholder="Auto-generated" readonly="" type="text"/>
+</div>
+<div>
+<label for="itemName">Item Name</label>
+<input id="itemName" placeholder="e.g. A4 BOND PAPER" required="" type="text"/>
+</div>
+</div>
+<div class="form-row">
+<div>
+<label for="itemUnit">Unit</label>
+<input id="itemUnit" placeholder="e.g. REAM, BOX, PCS" required="" type="text"/>
+</div>
+<div>
+<label for="itemDesc">Description</label>
+<input id="itemDesc" placeholder="Brief details (size, color, etc.)" type="text"/>
+</div>
+</div>
+<div class="form-row">
+<div>
+<label for="itemQty">Quantity (Total Stock Added)</label>
+<input id="itemQty" min="0" required="" type="number" value="0"/>
+</div>
+<div>
+<label for="itemUsed">Total Used</label>
+<input id="itemUsed" min="0" required="" type="number" value="0"/>
+</div>
+</div>
+<div class="form-row">
+<div>
+<label for="itemBalance">Remaining Balance</label>
+<input id="itemBalance" placeholder="Auto-calculated" readonly="" type="number"/>
+</div>
+<div>
+<label for="itemThreshold">Low Stock Alert Threshold</label>
+<input id="itemThreshold" min="1" required="" type="number" value="5"/>
+</div>
+</div>
+<label for="itemRemarks">Remarks</label>
+<textarea id="itemRemarks" placeholder="Enter dates, locations, conditions, or internal notes"></textarea>
+<div class="form-actions">
+<button class="clear-btn" onclick="clearForm()" type="button">Reset Inputs</button>
+<button class="save-btn" id="submitBtn" type="submit">Save Record</button>
+</div>
+</form>
+</div>
+</div>
+<!-- IMPROVED REPORT MODAL -->
+<div aria-hidden="true" aria-labelledby="reportTitle" class="form-modal" id="reportModal" role="dialog">
+<div class="modal-header">
+<h2 id="reportTitle">Select Items for Report</h2>
+<button aria-label="Close modal" class="modal-close" id="reportModalClose">
+<i data-lucide="x"></i>
+</button>
+</div>
+<div class="modal-body">
+<p style="margin-bottom: 18px; color: var(--muted); font-size: 14px; font-weight: 600;">
         Select the items below to include them in the printable inventory layout.
       </p>
-      
-      <div class="table-wrapper" style="max-height: 380px; margin-bottom: 24px; border: 1px solid var(--border);">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 50px; text-align: center;">
-                <input type="checkbox" id="reportSelectAll" title="Select All Items">
-              </th>
-              <th>Item ID</th>
-              <th>Item Name</th>
-              <th>Current Balance</th>
-            </tr>
-          </thead>
-          <tbody id="reportTableBody"></tbody>
-        </table>
-      </div>
-
-      <div class="form-actions" style="margin-top: 0;">
-        <button type="button" class="clear-btn" id="cancelReportBtn">Cancel Selection</button>
-        <button type="button" class="save-btn" id="confirmPrintBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-          <i data-lucide="printer" style="width: 18px; height: 18px;"></i> Generate & Print Report
+<div class="table-wrapper" style="max-height: 380px; margin-bottom: 24px; border: 1px solid var(--border);">
+<table>
+<thead>
+<tr>
+<th style="width: 50px; text-align: center;">
+<input id="reportSelectAll" title="Select All Items" type="checkbox"/>
+</th>
+<th>Item ID</th>
+<th>Item Name</th>
+<th>Current Balance</th>
+</tr>
+</thead>
+<tbody id="reportTableBody"></tbody>
+</table>
+</div>
+<div class="form-actions" style="margin-top: 0;">
+<button class="clear-btn" id="cancelReportBtn" type="button">Cancel Selection</button>
+<button class="save-btn" id="confirmPrintBtn" style="display: flex; align-items: center; justify-content: center; gap: 8px;" type="button">
+<i data-lucide="printer" style="width: 18px; height: 18px;"></i> Generate &amp; Print Report
         </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- IMPROVED MAIN CONTENT AREA -->
-  <main class="main-content">
-    <section class="page-header">
-      <span class="page-badge">
-        <i data-lucide="package"></i>
+</div>
+</div>
+</div>
+<!-- IMPROVED MAIN CONTENT AREA -->
+<main class="main-content">
+<section class="page-header">
+<span class="page-badge">
+<i data-lucide="package"></i>
         Inventory Module
       </span>
-      <h1>Office Supplies & Inventory</h1>
-      <p>Log central inventory records, monitor physical usage thresholds, manage stock flow balances, and configure reports for the Provincial Office.</p>
-    </section>
-
-    <!-- IMPROVED STATS GRID -->
-    <section class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon-wrapper blue">
-          <i data-lucide="database"></i>
-        </div>
-        <div>
-          <p>Unique Item Types</p>
-          <h2 id="statTotalItems">0</h2>
-        </div>
-      </div>
-
-      <div class="stat-card">
-        <div class="stat-icon-wrapper green">
-          <i data-lucide="layers"></i>
-        </div>
-        <div>
-          <p>Total Stock Quantity</p>
-          <h2 id="statTotalQty">0</h2>
-        </div>
-      </div>
-
-      <div class="stat-card warning-state">
-        <div class="stat-icon-wrapper yellow">
-          <i data-lucide="alert-triangle"></i>
-        </div>
-        <div>
-          <p>Low Stock Items</p>
-          <h2 id="statLowStock">0</h2>
-        </div>
-      </div>
-
-      <div class="stat-card critical-state">
-        <div class="stat-icon-wrapper red">
-          <i data-lucide="x-circle"></i>
-        </div>
-        <div>
-          <p>Out of Stock</p>
-          <h2 id="statOutOfStock">0</h2>
-        </div>
-      </div>
-    </section>
-
-    <!-- IMPROVED RECORDS CARD -->
-    <section class="records-card">
-      <div class="records-header">
-        <div class="card-title">
-          <h2>Inventory Database</h2>
-          <p>Search, filter, update stock quantities, track consumption, and edit recorded inventory details.</p>
-        </div>
-
-        <div class="header-actions">
-          <button class="report-btn" id="generateReportBtn" title="Prepare report selection for print">
-            <i data-lucide="printer"></i>
+<h1>Office Supplies &amp; Inventory</h1>
+<p>Log central inventory records, monitor physical usage thresholds, manage stock flow balances, and configure reports for the Provincial Office.</p>
+</section>
+<!-- IMPROVED STATS GRID -->
+<section class="stats-grid">
+<div class="stat-card">
+<div class="stat-icon-wrapper blue">
+<i data-lucide="database"></i>
+</div>
+<div>
+<p>Unique Item Types</p>
+<h2 id="statTotalItems">0</h2>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon-wrapper green">
+<i data-lucide="layers"></i>
+</div>
+<div>
+<p>Total Stock Quantity</p>
+<h2 id="statTotalQty">0</h2>
+</div>
+</div>
+<div class="stat-card warning-state">
+<div class="stat-icon-wrapper yellow">
+<i data-lucide="alert-triangle"></i>
+</div>
+<div>
+<p>Low Stock Items</p>
+<h2 id="statLowStock">0</h2>
+</div>
+</div>
+<div class="stat-card critical-state">
+<div class="stat-icon-wrapper red">
+<i data-lucide="x-circle"></i>
+</div>
+<div>
+<p>Out of Stock</p>
+<h2 id="statOutOfStock">0</h2>
+</div>
+</div>
+</section>
+<!-- IMPROVED RECORDS CARD -->
+<section class="records-card">
+<div class="records-header">
+<div class="card-title">
+<h2>Inventory Database</h2>
+<p>Search, filter, update stock quantities, track consumption, and edit recorded inventory details.</p>
+</div>
+<div class="header-actions">
+<button class="report-btn" id="generateReportBtn" title="Prepare report selection for print">
+<i data-lucide="printer"></i>
             Generate Report
           </button>
-          <button class="encoding-btn" id="openEncodingBtn" title="Encode new item entry">
-            <i data-lucide="plus-circle"></i>
+<button class="encoding-btn" id="openEncodingBtn" title="Encode new item entry">
+<i data-lucide="plus-circle"></i>
             Encode New Item
           </button>
-        </div>
-      </div>
-
-      <!-- TABS with Dynamic Counters -->
-      <div class="tabs" role="tablist">
-        <button class="tab-btn active" id="tabAll" onclick="setFilter('All', this)" role="tab">All Items <span class="tab-count" id="countAll">0</span></button>
-        <button class="tab-btn" id="tabInStock" onclick="setFilter('In-Stock', this)" role="tab">In Stock <span class="tab-count" id="countInStock">0</span></button>
-        <button class="tab-btn" id="tabLowStock" onclick="setFilter('Low-Stock', this)" role="tab">Low Stock <span class="tab-count" id="countLowStock">0</span></button>
-        <button class="tab-btn" id="tabOutOfStock" onclick="setFilter('Out-of-Stock', this)" role="tab">Out of Stock <span class="tab-count" id="countOutOfStock">0</span></button>
-      </div>
-
-      <div class="tools">
-        <div class="search-field">
-          <i data-lucide="search"></i>
-          <input type="text" id="searchInput" placeholder="Search item name, control ID, or description..." oninput="displayRecords()" aria-label="Search items">
-        </div>
-      </div>
-
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th style="width: 15%;">Item ID</th>
-              <th style="width: 30%;">Item Details</th>
-              <th style="width: 10%;">Initial Qty</th>
-              <th style="width: 10%;">Total Used</th>
-              <th style="width: 15%;">Remaining Balance</th>
-              <th style="width: 10%;">Remarks</th>
-              <th style="width: 10%;">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="recordsTable"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-
-  <script src="../user-javascript/inventory.js"></script>
+</div>
+</div>
+<!-- TABS with Dynamic Counters -->
+<div class="tabs" role="tablist">
+<button class="tab-btn active" id="tabAll" onclick="setFilter('All', this)" role="tab">All Items <span class="tab-count" id="countAll">0</span></button>
+<button class="tab-btn" id="tabInStock" onclick="setFilter('In-Stock', this)" role="tab">In Stock <span class="tab-count" id="countInStock">0</span></button>
+<button class="tab-btn" id="tabLowStock" onclick="setFilter('Low-Stock', this)" role="tab">Low Stock <span class="tab-count" id="countLowStock">0</span></button>
+<button class="tab-btn" id="tabOutOfStock" onclick="setFilter('Out-of-Stock', this)" role="tab">Out of Stock <span class="tab-count" id="countOutOfStock">0</span></button>
+</div>
+<div class="tools">
+<div class="search-field">
+<i data-lucide="search"></i>
+<input aria-label="Search items" id="searchInput" oninput="displayRecords()" placeholder="Search item name, control ID, or description..." type="text"/>
+</div>
+</div>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th style="width: 15%;">Item ID</th>
+<th style="width: 30%;">Item Details</th>
+<th style="width: 10%;">Initial Qty</th>
+<th style="width: 10%;">Total Used</th>
+<th style="width: 15%;">Remaining Balance</th>
+<th style="width: 10%;">Remarks</th>
+<th style="width: 10%;">Actions</th>
+</tr>
+</thead>
+<tbody id="recordsTable"></tbody>
+</table>
+</div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../user-javascript/inventory.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/repaired-ui.js?v=20260913"></script>
 </body>
 </html>

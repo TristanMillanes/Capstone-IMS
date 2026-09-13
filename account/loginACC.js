@@ -1,72 +1,52 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-auth.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.9.0/firebase-database.js";
+// PGENRO IMS - Supabase login compatibility controller.
+// The page using this file must load @supabase/supabase-js@2 and ../shared/supabase.js first.
 
-const firebaseConfig = {
-    apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
-    authDomain: "ims-capstone-bc65f.firebaseapp.com",
-    databaseURL: "https://ims-capstone-bc65f-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "ims-capstone-bc65f",
-    storageBucket: "ims-capstone-bc65f.firebasestorage.app",
-    messagingSenderId: "972207120140",
-    appId: "1:972207120140:web:6a94e2e1e9e8511e933329",
-    measurementId: "G-W4TPE7CHC8"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getDatabase(app);
-
+const supabase = window.pgenroSupabase;
+const PGENRO_API = window.PGENRO_API;
 const loginForm = document.getElementById("loginForm");
 
-loginForm?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
+loginForm?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const email = document.getElementById("email")?.value.trim().toLowerCase() || "";
+  const password = document.getElementById("password")?.value || "";
 
   try {
-    // 1. Authenticate with Firebase Auth
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const uid = userCredential.user.uid;
+    if (!supabase || !window.PGENRO_SUPABASE?.configured) {
+      throw new Error("Supabase is not configured.");
+    }
 
-    // 2. Check kung ADMIN ang nag-login
-    const adminSnap = await get(ref(db, `admins/${uid}`));
-    if (adminSnap.exists() && adminSnap.val() === true) {
-      window.location.href = "admin.html"; // Papasukin sa Admin Console
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+    if (!data.user) throw new Error("No authenticated user returned.");
+
+    const profile = await PGENRO_API.getCurrentProfile();
+    if (!profile || !profile.is_active || !["active", "approved"].includes(String(profile.status || "").toLowerCase())) {
+      await supabase.auth.signOut();
+      alert(`Access denied: account status is ${profile?.status || "unverified"}.`);
       return;
     }
 
-    // 3. Kung Personnel/User: I-CHECK KUNG APPROVED NA NG ADMIN
-    const userSnap = await get(ref(db, `users/${uid}`));
-    
-    if (!userSnap.exists()) {
-      await signOut(auth);
-      alert("Access Denied: No personnel profile found. Please submit an account access request first.");
-      return;
-    }
+    const currentUser = {
+      uid: profile.user_id,
+      id: profile.user_id,
+      fullName: profile.full_name || email.split("@")[0],
+      email: profile.email || email,
+      division: profile.division || "",
+      position: profile.position || "",
+      role: profile.role || "System Staff",
+      status: profile.status || "Active"
+    };
 
-    const userData = userSnap.val();
+    localStorage.setItem("pgenro_current_user", JSON.stringify(currentUser));
+    sessionStorage.setItem("pgenro_session_active", "true");
+    sessionStorage.setItem("pgenro_session_token", profile.user_id);
 
-    // 🚫 HARANG: Kung Pending pa o Declined
-    if (userData.status !== "Approved") {
-      await signOut(auth); // Sign out agad para walang session
-      
-      if (userData.status === "Pending") {
-        alert("⏳ ACCESS PENDING: Your account request is still under review by the Division Head and System Administrator.");
-      } else if (userData.status === "Rejected") {
-        alert("❌ ACCESS DECLINED: Your request was declined. Reason: " + (userData.declineRemarks || "Verification failed."));
-      } else {
-        alert("⛔ Access Denied: Your account is currently inactive.");
-      }
-      return;
-    }
-
-    // ✅ APPROVED: Papasukin sa IMS User Portal
-    alert(`Welcome back, ${userData.fullName}!`);
-    window.location.href = "../User/employee.html";
-
+    window.location.href = PGENRO_API.isAdminRole(profile.role)
+      ? "../admin/admin.html"
+      : "../User/homepage.html";
   } catch (error) {
-    console.error("Login Error:", error);
-    alert("Login Failed: " + error.message);
+    console.error("Supabase login failed:", error);
+    alert(error.message || "Unable to sign in.");
   }
 });

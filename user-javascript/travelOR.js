@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const tableBody = document.getElementById("travelOrderTable");
 
   // Database State: Empty Base
-  let travelOrders = JSON.parse(localStorage.getItem("travelOrders")) || [];
+  let travelOrders = window.PGENRO_SUPABASE?.configured ? [] : (() => { try { const rows = JSON.parse(localStorage.getItem("travelOrders") || "[]"); return Array.isArray(rows) ? rows : []; } catch { return []; } })();
 
   if (window.lucide) lucide.createIcons();
 

@@ -1,156 +1,214 @@
-document.addEventListener("DOMContentLoaded", () => {
-  // 1. Initializations
+document.addEventListener("DOMContentLoaded", async () => {
+  "use strict";
+
   if (window.lucide) lucide.createIcons();
 
-  // DOM Elements
-  const hamburgerMenu = document.getElementById("hamburgerMenu");
-  const sidebar = document.getElementById("sidebar");
-  const overlay = document.getElementById("overlay");
-  const searchInput = document.getElementById("visitorSearch");
-  const purposeFilter = document.getElementById("purposeFilter");
-  const statusFilter = document.getElementById("statusFilter");
-  const visitorTableBody = document.getElementById("visitorTableBody");
-  const emptyState = document.getElementById("emptyState");
+  const $ = (id) => document.getElementById(id);
+  const db = window.PGENRO_DB?.client || null;
+  const TABLE = window.PGENRO_DB?.table || "visitors";
 
-  // Summary Metrics
-  const summaryTotal = document.getElementById("summaryTotal");
-  const summaryToday = document.getElementById("summaryToday");
-  const summaryInside = document.getElementById("summaryInside");
-  const todayDateStr = document.getElementById("todayDateStr");
-  const liveClock = document.getElementById("liveClock");
+  const els = {
+    hamburgerMenu: $("hamburgerMenu"),
+    sidebar: $("sidebar"),
+    overlay: $("overlay"),
+    search: $("visitorSearch"),
+    purpose: $("purposeFilter"),
+    status: $("statusFilter"),
+    body: $("visitorTableBody"),
+    empty: $("emptyState"),
+    total: $("summaryTotal"),
+    today: $("summaryToday"),
+    inside: $("summaryInside"),
+    todayDate: $("todayDateStr"),
+    clock: $("liveClock"),
+    drawer: $("detailDrawer"),
+    closeDrawer: $("closeDrawerBtn"),
+    toggleCheckout: $("toggleCheckoutBtn"),
+    printPass: $("printPassBtn"),
+    prev: $("prevPageBtn"),
+    next: $("nextPageBtn"),
+    page: $("pageIndicator"),
+    showing: $("showingCountText"),
+    exportCsv: $("exportCsvBtn"),
+    refresh: $("refreshBtn")
+  };
 
-  // Slide Drawer Elements
-  const detailDrawer = document.getElementById("detailDrawer");
-  const closeDrawerBtn = document.getElementById("closeDrawerBtn");
-  const toggleCheckoutBtn = document.getElementById("toggleCheckoutBtn");
-  const printPassBtn = document.getElementById("printPassBtn");
-
-  // Pagination Elements
-  const prevPageBtn = document.getElementById("prevPageBtn");
-  const nextPageBtn = document.getElementById("nextPageBtn");
-  const pageIndicator = document.getElementById("pageIndicator");
-  const showingCountText = document.getElementById("showingCountText");
-
-  // Storage & State
-  const storageKey = "pgenro_visitors";
   let visitors = [];
   let selectedVisitor = null;
-  let activeDateFilter = "all"; // "all" | "today" | "week"
+  let activeDateFilter = "all";
   let currentPage = 1;
   const rowsPerPage = 10;
+  let realtimeChannel = null;
 
-  // Live Clock & Current Date display
-  function updateLiveClock() {
-    const now = new Date();
-    if (liveClock) {
-      liveClock.textContent = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-    }
-    if (todayDateStr) {
-      todayDateStr.textContent = now.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
-    }
-  }
-  setInterval(updateLiveClock, 1000);
-  updateLiveClock();
+  const escapeHTML = (value) =>
+    String(value ?? "").replace(/[&<>'"]/g, c => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;"
+    }[c]));
 
-  // Sidebar Controls
-  if (hamburgerMenu && sidebar && overlay) {
-    hamburgerMenu.addEventListener("click", () => {
-      sidebar.classList.toggle("open");
-      hamburgerMenu.classList.toggle("active");
-      overlay.classList.toggle("active");
-    });
-
-    overlay.addEventListener("click", () => {
-      sidebar.classList.remove("open");
-      hamburgerMenu.classList.remove("active");
-      closeDrawer();
-      overlay.classList.remove("active");
-    });
-  }
-
-  // Load Database (Firebase with sample fallback)
-  function loadVisitors() {
-    if (window.firebaseDB) {
-      const ref = window.firebaseDB.ref("visitors");
-      ref.on("value", (snapshot) => {
-        const data = snapshot.val() || {};
-        visitors = Object.keys(data).map(key => ({ ...data[key], _id: key }));
-        ensureSampleData();
-        render();
-      }, (err) => {
-        console.warn("Firebase Read Failed, loading local storage:", err);
-        fallbackLocalData();
+  function toast(message, type = "info") {
+    let el = document.getElementById("pgenroStaffToast");
+    if (!el) {
+      el = document.createElement("div");
+      el.id = "pgenroStaffToast";
+      Object.assign(el.style, {
+        position: "fixed", right: "20px", bottom: "20px", zIndex: "9999",
+        maxWidth: "420px", padding: "12px 16px", borderRadius: "12px",
+        color: "#fff", fontFamily: "Plus Jakarta Sans, sans-serif",
+        fontSize: "13px", fontWeight: "700", boxShadow: "0 12px 36px rgba(0,0,0,.22)",
+        opacity: "0", transform: "translateY(8px)", transition: ".2s ease"
       });
-    } else {
-      fallbackLocalData();
+      document.body.appendChild(el);
+    }
+    el.style.background = type === "error" ? "#b91c1c" : "#047857";
+    el.textContent = message;
+    requestAnimationFrame(() => {
+      el.style.opacity = "1";
+      el.style.transform = "translateY(0)";
+    });
+    clearTimeout(toast.timer);
+    toast.timer = setTimeout(() => {
+      el.style.opacity = "0";
+      el.style.transform = "translateY(8px)";
+    }, 2800);
+  }
+
+  function dateString(date = new Date()) {
+    return date.toLocaleDateString("en-US", {
+      year: "numeric", month: "long", day: "numeric"
+    });
+  }
+
+  function updateClock() {
+    const now = new Date();
+    if (els.clock) {
+      els.clock.textContent = now.toLocaleTimeString([], {
+        hour: "2-digit", minute: "2-digit", second: "2-digit"
+      });
+    }
+    if (els.todayDate) {
+      els.todayDate.textContent = now.toLocaleDateString("en-US", {
+        month: "short", day: "numeric", year: "numeric"
+      });
     }
   }
 
-  function fallbackLocalData() {
-    visitors = JSON.parse(localStorage.getItem(storageKey)) || [];
-    ensureSampleData();
-    render();
+  function normalizeVisitor(row) {
+    const timeIn = row.time_in || row.created_at || null;
+    const timeOut = row.time_out || null;
+    const visitDate = row.visit_date
+      ? new Date(`${row.visit_date}T00:00:00`)
+      : (timeIn ? new Date(timeIn) : null);
+
+    return {
+      _id: row.id,
+      fullName: row.full_name || "",
+      contact: row.contact || "",
+      address: row.address || "",
+      personToVisit: row.person_to_visit || "",
+      purposeCategory: row.purpose_category || "",
+      otherPurposeSpecific: row.other_purpose_specific || "",
+      date: visitDate && !Number.isNaN(visitDate.getTime()) ? dateString(visitDate) : "",
+      dateISO: row.visit_date || "",
+      time: timeIn ? new Date(timeIn).toLocaleTimeString([], {
+        hour: "2-digit", minute: "2-digit"
+      }) : "",
+      timestamp: timeIn ? new Date(timeIn).getTime() : 0,
+      status: row.status || (timeOut ? "completed" : "inside"),
+      timeOut: timeOut ? new Date(timeOut).toLocaleTimeString([], {
+        hour: "2-digit", minute: "2-digit"
+      }) : null,
+      timeOutISO: timeOut
+    };
   }
 
-  // Inject friendly mock data if list is completely empty
-  function ensureSampleData() {
-    if (visitors.length === 0) {
-      const todayStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-      visitors = [
-        {
-          _id: "demo_1",
-          fullName: "Engr. Maria Santos",
-          contact: "+63 917 482 9102",
-          address: "Brgy. Poblacion, Provincial Capitol",
-          personToVisit: "PGENRO Dept Head",
-          purposeCategory: "Environmental Concerns - Water Quality",
-          date: todayStr,
-          time: "09:30 AM",
-          status: "inside",
-          timeOut: null
-        },
-        {
-          _id: "demo_2",
-          fullName: "Juan Dela Cruz Jr.",
-          contact: "+63 920 112 3456",
-          address: "LGU San Jose Environment Office",
-          personToVisit: "Solid Waste Div.",
-          purposeCategory: "Technical Assistance - WACS",
-          date: todayStr,
-          time: "10:15 AM",
-          status: "inside",
-          timeOut: null
-        },
-        {
-          _id: "demo_3",
-          fullName: "Dr. Roberto Aquino",
-          contact: "+63 908 554 9918",
-          address: "Batangas State University",
-          personToVisit: "IEC Unit Head",
-          purposeCategory: "Request for Speaker",
-          date: "May 12, 2025",
-          time: "02:00 PM",
-          status: "completed",
-          timeOut: "04:15 PM"
+  async function requireSignedInUser() {
+    if (!db) {
+      toast("Supabase is not configured. Add your URL and Publishable/Anon key in shared/supabase.js.", "error");
+      return false;
+    }
+
+    try {
+      const session = await window.PGENRO_DB?.getSession?.();
+      if (!session?.user) {
+        toast("Please sign in to access the visitor log.", "error");
+        setTimeout(() => { window.location.href = "login.html"; }, 900);
+        return false;
+      }
+
+      // Do not hard-code only "user" / "admin" here. Real deployments often
+      // use roles such as Staff, Officer, Records Officer, or System Staff.
+      // Approval/activation is the authoritative access check for the user portal.
+      if (window.PGENRO_API?.requireApprovedUser) {
+        await window.PGENRO_API.requireApprovedUser();
+      }
+      return true;
+    } catch (error) {
+      console.error("Auth check failed:", error);
+      toast(error?.message || "Unable to verify your account.", "error");
+      return false;
+    }
+  }
+
+  async function loadVisitors({ silent = false } = {}) {
+    if (!db) return;
+
+    try {
+      const { data, error } = await db
+        .from(TABLE)
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      visitors = (data || []).map(normalizeVisitor);
+      render();
+
+      if (!silent) toast("Visitor records synchronized.");
+    } catch (error) {
+      console.error("Visitor load failed:", error);
+      visitors = [];
+      render();
+      toast(
+        error?.code === "42501"
+          ? "Supabase denied access. Check the user's role and RLS policies."
+          : "Unable to load visitor records.",
+        "error"
+      );
+    }
+  }
+
+  function startRealtime() {
+    if (!db) return;
+
+    if (realtimeChannel) {
+      db.removeChannel(realtimeChannel);
+      realtimeChannel = null;
+    }
+
+    realtimeChannel = db
+      .channel("pgenro-visitors-staff")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: TABLE },
+        () => loadVisitors({ silent: true })
+      )
+      .subscribe(status => {
+        if (status === "CHANNEL_ERROR") {
+          console.warn("Visitor realtime channel error.");
         }
-      ];
-      localStorage.setItem(storageKey, JSON.stringify(visitors));
-    }
+      });
   }
 
-  // Helpers
   function getInitials(name) {
-    if (!name) return "??";
-    return name
-      .split(" ")
+    return (name || "Guest")
+      .split(/\s+/)
       .filter(Boolean)
       .slice(0, 2)
-      .map(part => part[0].toUpperCase())
-      .join("");
+      .map(part => part[0]?.toUpperCase())
+      .join("") || "??";
   }
 
-  function getPurposeTagClass(purpose) {
-    if (!purpose) return "tag-gray";
+  function purposeClass(purpose = "") {
     if (purpose.includes("Speaker")) return "tag-purple";
     if (purpose.includes("Water Quality")) return "tag-blue";
     if (purpose.includes("Technical")) return "tag-orange";
@@ -158,313 +216,323 @@ document.addEventListener("DOMContentLoaded", () => {
     return "tag-gray";
   }
 
-  // Filter Logic
-  function getFilteredVisitors() {
-    const search = searchInput.value.trim().toLowerCase();
-    const purpose = purposeFilter.value;
-    const status = statusFilter.value;
+  function filteredVisitors() {
+    const search = (els.search?.value || "").trim().toLowerCase();
+    const purpose = els.purpose?.value || "all";
+    const status = els.status?.value || "all";
+    const today = dateString();
 
-    const todayStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-    const oneWeekAgo = new Date();
-    oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    const weekAgo = new Date();
+    weekAgo.setDate(weekAgo.getDate() - 7);
+    weekAgo.setHours(0, 0, 0, 0);
 
-    return visitors.filter((visitor) => {
-      // Search matches
-      const text = [
-        visitor.fullName,
-        visitor.contact,
-        visitor.address,
-        visitor.personToVisit,
-        visitor.purposeCategory
-      ].join(" ").toLowerCase();
-      const searchMatch = !search || text.includes(search);
+    return visitors
+      .filter(v => {
+        const haystack = [
+          v.fullName, v.contact, v.address,
+          v.personToVisit, v.purposeCategory, v.otherPurposeSpecific
+        ].join(" ").toLowerCase();
 
-      // Purpose filter
-      const purposeMatch = purpose === "all" || visitor.purposeCategory === purpose;
+        const searchMatch = !search || haystack.includes(search);
+        const purposeMatch = purpose === "all" || v.purposeCategory === purpose;
+        const statusMatch = status === "all" || v.status === status;
 
-      // Status filter
-      const visitorStatus = visitor.status || "inside";
-      const statusMatch = status === "all" || visitorStatus === status;
+        let dateMatch = true;
+        if (activeDateFilter === "today") {
+          dateMatch = v.date === today;
+        } else if (activeDateFilter === "week") {
+          const d = v.timestamp ? new Date(v.timestamp) : new Date(v.date);
+          dateMatch = !Number.isNaN(d.getTime()) && d >= weekAgo;
+        }
 
-      // Date chips
-      let dateMatch = true;
-      if (activeDateFilter === "today") {
-        dateMatch = visitor.date === todayStr;
-      } else if (activeDateFilter === "week") {
-        const visitDate = new Date(visitor.date);
-        dateMatch = !isNaN(visitDate) && visitDate >= oneWeekAgo;
-      }
-
-      return searchMatch && purposeMatch && statusMatch && dateMatch;
-    });
+        return searchMatch && purposeMatch && statusMatch && dateMatch;
+      })
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
   }
 
-  // Metric Counter
   function updateMetrics() {
-    const todayStr = new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
-    const todayCount = visitors.filter(item => item.date === todayStr).length;
-    const insideCount = visitors.filter(item => (item.status || "inside") === "inside").length;
-
-    summaryTotal.textContent = visitors.length;
-    summaryToday.textContent = todayCount;
-    summaryInside.textContent = insideCount;
+    const today = dateString();
+    if (els.total) els.total.textContent = visitors.length;
+    if (els.today) els.today.textContent = visitors.filter(v => v.date === today).length;
+    if (els.inside) els.inside.textContent =
+      visitors.filter(v => v.status === "inside").length;
   }
 
-  // Render Table
   function renderTable(list) {
-    visitorTableBody.innerHTML = "";
-    const totalRecords = list.length;
-    const totalPages = Math.ceil(totalRecords / rowsPerPage) || 1;
+    if (!els.body) return;
+    els.body.innerHTML = "";
 
-    // Boundary adjust
-    if (currentPage > totalPages) currentPage = totalPages;
-    if (currentPage < 1) currentPage = 1;
+    const total = list.length;
+    const pages = Math.max(1, Math.ceil(total / rowsPerPage));
+    currentPage = Math.min(Math.max(currentPage, 1), pages);
 
-    const startIdx = (currentPage - 1) * rowsPerPage;
-    const pageRecords = list.slice(startIdx, startIdx + rowsPerPage);
+    const start = (currentPage - 1) * rowsPerPage;
+    const pageRows = list.slice(start, start + rowsPerPage);
 
-    showingCountText.textContent = totalRecords 
-      ? `Showing ${startIdx + 1} - ${Math.min(startIdx + rowsPerPage, totalRecords)} of ${totalRecords} visitors`
-      : "No records found";
+    if (els.showing) {
+      els.showing.textContent = total
+        ? `Showing ${start + 1} - ${Math.min(start + rowsPerPage, total)} of ${total} visitors`
+        : "No records found";
+    }
+    if (els.page) els.page.textContent = `${currentPage} / ${pages}`;
+    if (els.prev) els.prev.disabled = currentPage <= 1;
+    if (els.next) els.next.disabled = currentPage >= pages;
 
-    pageIndicator.textContent = `${currentPage} / ${totalPages}`;
-    prevPageBtn.disabled = currentPage <= 1;
-    nextPageBtn.disabled = currentPage >= totalPages;
-
-    if (!pageRecords.length) {
-      emptyState.classList.remove("hidden");
+    if (!pageRows.length) {
+      els.empty?.classList.remove("hidden");
       return;
     }
+    els.empty?.classList.add("hidden");
 
-    emptyState.classList.add("hidden");
+    pageRows.forEach(v => {
+      const inside = v.status === "inside";
+      const tr = document.createElement("tr");
 
-    pageRecords.forEach((visitor) => {
-      const row = document.createElement("tr");
-      if (selectedVisitor && selectedVisitor._id === visitor._id) {
-        row.classList.add("selected-row");
-      }
-
-      const isInside = (visitor.status || "inside") === "inside";
-      const initials = getInitials(visitor.fullName);
-      const tagClass = getPurposeTagClass(visitor.purposeCategory);
-
-      row.innerHTML = `
+      tr.innerHTML = `
         <td>
           <div class="visitor-profile-cell">
-            <div class="table-avatar">${initials}</div>
+            <div class="table-avatar">${escapeHTML(getInitials(v.fullName))}</div>
             <div class="profile-meta">
-              <strong>${visitor.fullName || "Anonymous Guest"}</strong>
-              <span>${visitor.address || "Address unspecified"}</span>
+              <strong>${escapeHTML(v.fullName || "Anonymous Guest")}</strong>
+              <span>${escapeHTML(v.address || "Address unspecified")}</span>
             </div>
           </div>
         </td>
+        <td><div style="font-weight:700;color:var(--dark)">${escapeHTML(v.contact || "No Contact")}</div></td>
+        <td><span class="dept-pill">${escapeHTML(v.personToVisit || "General Personnel")}</span></td>
+        <td><span class="tag-badge ${purposeClass(v.purposeCategory)}">${escapeHTML(v.purposeCategory || "General Inquiry")}</span></td>
         <td>
-          <div style="font-weight: 700; color: var(--dark);">${visitor.contact || "No Contact"}</div>
+          <div style="font-weight:700;font-size:13px">${escapeHTML(v.time || "--:--")}</div>
+          <small style="color:var(--muted);font-size:11px">${escapeHTML(v.date || "")}</small>
         </td>
         <td>
-          <span class="dept-pill">${visitor.personToVisit || "General Personnel"}</span>
-        </td>
-        <td>
-          <span class="tag-badge ${tagClass}">${visitor.purposeCategory || "General Inquiry"}</span>
-        </td>
-        <td>
-          <div style="font-weight: 700; font-size: 13px;">${visitor.time || "--:--"}</div>
-          <small style="color: var(--muted); font-size: 11px;">${visitor.date || ""}</small>
-        </td>
-        <td>
-          <span class="status-pill ${isInside ? 'status-inside' : 'status-completed'}">
-            ${isInside ? "In Building" : "Checked Out"}
+          <span class="status-pill ${inside ? "status-inside" : "status-completed"}">
+            ${inside ? "In Building" : "Checked Out"}
           </span>
         </td>
-        <td style="text-align: right;">
+        <td style="text-align:right">
           <button class="btn-view-row" title="Open details">
             <i data-lucide="chevron-right"></i>
           </button>
         </td>
       `;
 
-      row.addEventListener("click", () => openDrawer(visitor));
-      visitorTableBody.appendChild(row);
+      tr.addEventListener("click", () => openDrawer(v));
+      els.body.appendChild(tr);
     });
 
     if (window.lucide) lucide.createIcons();
   }
 
-  // Open & Populate Slide Drawer
-  function openDrawer(visitor) {
-    selectedVisitor = visitor;
+  function render() {
+    updateMetrics();
+    renderTable(filteredVisitors());
+  }
 
-    document.getElementById("drawerName").textContent = visitor.fullName || "Guest Details";
-    document.getElementById("drawerFullname").textContent = visitor.fullName || "—";
-    document.getElementById("drawerAvatar").textContent = getInitials(visitor.fullName);
-    document.getElementById("drawerContact").textContent = visitor.contact || "—";
-    document.getElementById("drawerAddress").textContent = visitor.address || "—";
-    document.getElementById("drawerPerson").textContent = visitor.personToVisit || "—";
-    document.getElementById("drawerPurpose").textContent = visitor.purposeCategory || "—";
-    document.getElementById("drawerTimeIn").textContent = visitor.time || "—";
-    document.getElementById("drawerDate").textContent = visitor.date || "—";
-    document.getElementById("drawerTimeOut").textContent = visitor.timeOut || "Still in Premises";
+  function openDrawer(v) {
+    selectedVisitor = v;
+    $("drawerName").textContent = v.fullName || "Guest Details";
+    $("drawerFullname").textContent = v.fullName || "—";
+    $("drawerAvatar").textContent = getInitials(v.fullName);
+    $("drawerContact").textContent = v.contact || "—";
+    $("drawerAddress").textContent = v.address || "—";
+    $("drawerPerson").textContent = v.personToVisit || "—";
+    $("drawerPurpose").textContent =
+      [v.purposeCategory, v.otherPurposeSpecific].filter(Boolean).join(" — ") || "—";
+    $("drawerTimeIn").textContent = v.time || "—";
+    $("drawerDate").textContent = v.date || "—";
+    $("drawerTimeOut").textContent = v.timeOut || "Still in Premises";
 
-    const isInside = (visitor.status || "inside") === "inside";
-    const statusBadge = document.getElementById("drawerStatusBadge");
+    const inside = v.status === "inside";
+    const badge = $("drawerStatusBadge");
+    badge.textContent = inside ? "Currently Inside" : "Signed Out";
+    badge.className = `badge ${inside ? "status-inside" : "status-completed"}`;
 
-    if (isInside) {
-      statusBadge.textContent = "Currently Inside";
-      statusBadge.style.background = "#dcfce7";
-      statusBadge.style.color = "#15803d";
-      toggleCheckoutBtn.innerHTML = `<i data-lucide="log-out"></i> Log Departure`;
-      toggleCheckoutBtn.className = "btn btn-success";
-    } else {
-      statusBadge.textContent = "Signed Out";
-      statusBadge.style.background = "#f1f5f9";
-      statusBadge.style.color = "#64748b";
-      toggleCheckoutBtn.innerHTML = `<i data-lucide="rotate-ccw"></i> Re-open Visit`;
-      toggleCheckoutBtn.className = "btn btn-secondary";
-    }
+    els.toggleCheckout.innerHTML = inside
+      ? `<i data-lucide="log-out"></i> Mark Departure`
+      : `<i data-lucide="rotate-ccw"></i> Re-open Visit`;
 
-    detailDrawer.classList.add("open");
-    overlay.classList.add("active");
+    els.toggleCheckout.className = inside ? "btn btn-success" : "btn btn-secondary";
+    els.drawer?.classList.add("open");
+    els.drawer?.setAttribute("aria-hidden", "false");
+    els.overlay?.classList.add("active");
+
     if (window.lucide) lucide.createIcons();
   }
 
   function closeDrawer() {
-    detailDrawer.classList.remove("open");
-    overlay.classList.remove("active");
+    els.drawer?.classList.remove("open");
+    els.drawer?.setAttribute("aria-hidden", "true");
+    els.overlay?.classList.remove("active");
   }
 
-  closeDrawerBtn.addEventListener("click", closeDrawer);
+  async function toggleCheckout() {
+    if (!selectedVisitor || !db) return;
 
-  // Toggle Departure / Check-in State
-  toggleCheckoutBtn.addEventListener("click", () => {
-    if (!selectedVisitor) return;
+    const inside = selectedVisitor.status === "inside";
+    const patch = {
+      status: inside ? "completed" : "inside",
+      time_out: inside ? new Date().toISOString() : null
+    };
 
-    const isInside = (selectedVisitor.status || "inside") === "inside";
-    const nowTime = new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    els.toggleCheckout.disabled = true;
 
-    selectedVisitor.status = isInside ? "completed" : "inside";
-    selectedVisitor.timeOut = isInside ? nowTime : null;
+    try {
+      const { error } = await db
+        .from(TABLE)
+        .update(patch)
+        .eq("id", selectedVisitor._id);
 
-    // Sync state locally
-    const idx = visitors.findIndex(v => v._id === selectedVisitor._id);
-    if (idx !== -1) visitors[idx] = selectedVisitor;
-    localStorage.setItem(storageKey, JSON.stringify(visitors));
+      if (error) throw error;
 
-    // Sync to Firebase if available
-    if (window.firebaseDB && selectedVisitor._id) {
-      window.firebaseDB.ref(`visitors/${selectedVisitor._id}`).update({
-        status: selectedVisitor.status,
-        timeOut: selectedVisitor.timeOut
-      });
+      await loadVisitors({ silent: true });
+      selectedVisitor = visitors.find(v => v._id === selectedVisitor._id) || null;
+
+      if (selectedVisitor) openDrawer(selectedVisitor);
+      toast(inside ? "Visitor departure recorded." : "Visitor visit re-opened.");
+    } catch (error) {
+      console.error("Checkout update failed:", error);
+      toast(
+        error?.code === "42501"
+          ? "Your account cannot update this visitor record."
+          : "Unable to update visitor status.",
+        "error"
+      );
+    } finally {
+      els.toggleCheckout.disabled = false;
     }
+  }
 
-    openDrawer(selectedVisitor);
-    render();
-  });
-
-  // Print Visitor Pass Action
-  printPassBtn.addEventListener("click", () => {
+  function printPass() {
     if (!selectedVisitor) return;
-    const printWindow = window.open("", "_blank", "width=600,height=600");
-    printWindow.document.write(`
+    const v = selectedVisitor;
+    const w = window.open("", "_blank", "width=620,height=650");
+    if (!w) return toast("Popup blocked. Allow popups to print the pass.", "error");
+
+    w.document.write(`
       <html>
-        <head>
-          <title>Visitor Pass - ${selectedVisitor.fullName}</title>
-          <style>
-            body { font-family: sans-serif; padding: 30px; text-align: center; }
-            .pass-card { border: 2px dashed #0f6b3d; padding: 25px; border-radius: 12px; }
-            h2 { color: #0f6b3d; margin-bottom: 5px; }
-            .meta { font-size: 14px; color: #555; margin-bottom: 20px; }
-            .field { text-align: left; margin: 10px 0; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-            .field label { font-size: 11px; text-transform: uppercase; color: #777; font-weight: bold; }
-            .field div { font-size: 16px; font-weight: bold; }
-          </style>
-        </head>
-        <body>
-          <div class="pass-card">
-            <h2>PGENRO VISITOR PASS</h2>
-            <div class="meta">Provincial Environmental & Natural Resources Office</div>
-            <div class="field"><label>Visitor Name</label><div>${selectedVisitor.fullName}</div></div>
-            <div class="field"><label>Visiting Dept / Host</label><div>${selectedVisitor.personToVisit}</div></div>
-            <div class="field"><label>Purpose</label><div>${selectedVisitor.purposeCategory}</div></div>
-            <div class="field"><label>Date / Time In</label><div>${selectedVisitor.date} @ ${selectedVisitor.time}</div></div>
-            <p style="margin-top: 25px; font-size: 12px; color: #888;">Please wear this badge visibly while inside premises.</p>
-          </div>
-        </body>
+      <head>
+        <title>Visitor Pass - ${escapeHTML(v.fullName)}</title>
+        <style>
+          body{font-family:Arial,sans-serif;padding:30px;text-align:center}
+          .pass{border:2px dashed #047857;padding:25px;border-radius:14px}
+          h2{color:#047857}
+          .field{text-align:left;margin:12px 0;padding-bottom:7px;border-bottom:1px solid #eee}
+          .field small{display:block;color:#64748b;text-transform:uppercase;font-weight:bold}
+          .field strong{font-size:16px}
+        </style>
+      </head>
+      <body>
+        <div class="pass">
+          <h2>PGENRO VISITOR PASS</h2>
+          <p>Provincial Environment and Natural Resources Office</p>
+          <div class="field"><small>Visitor Name</small><strong>${escapeHTML(v.fullName)}</strong></div>
+          <div class="field"><small>Host / Department</small><strong>${escapeHTML(v.personToVisit)}</strong></div>
+          <div class="field"><small>Purpose</small><strong>${escapeHTML(v.purposeCategory)}</strong></div>
+          <div class="field"><small>Date / Time In</small><strong>${escapeHTML(v.date)} @ ${escapeHTML(v.time)}</strong></div>
+        </div>
+      </body>
       </html>
     `);
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
+    w.document.close();
+    w.focus();
+    w.print();
+  }
+
+  function exportCsv() {
+    const list = filteredVisitors();
+    if (!list.length) return toast("No visitor records to export.", "error");
+
+    const safe = value => `"${String(value ?? "").replace(/"/g, '""')}"`;
+    const headers = [
+      "Full Name", "Contact", "Address", "Host / Department",
+      "Purpose", "Specific Purpose", "Date",
+      "Time In", "Time Out", "Status"
+    ];
+
+    const lines = list.map(v => [
+      v.fullName, v.contact, v.address, v.personToVisit,
+      v.purposeCategory, v.otherPurposeSpecific, v.date,
+      v.time, v.timeOut, v.status
+    ].map(safe).join(","));
+
+    const blob = new Blob(
+      [[headers.map(safe).join(","), ...lines].join("\n")],
+      { type: "text/csv;charset=utf-8" }
+    );
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `PGENRO_Visitors_${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  els.hamburgerMenu?.addEventListener("click", () => {
+    els.sidebar?.classList.toggle("open");
+    els.hamburgerMenu?.classList.toggle("active");
+    els.overlay?.classList.toggle("active");
   });
 
-  // Export CSV Feature
-  document.getElementById("exportCsvBtn").addEventListener("click", () => {
-    const list = getFilteredVisitors();
-    if (!list.length) return alert("No visitors to export.");
-
-    const headers = ["Full Name", "Contact", "Address", "Host Dept", "Purpose", "Date", "Time In", "Time Out", "Status"];
-    const rows = list.map(v => [
-      `"${v.fullName || ''}"`,
-      `"${v.contact || ''}"`,
-      `"${v.address || ''}"`,
-      `"${v.personToVisit || ''}"`,
-      `"${v.purposeCategory || ''}"`,
-      `"${v.date || ''}"`,
-      `"${v.time || ''}"`,
-      `"${v.timeOut || ''}"`,
-      `"${v.status || 'inside'}"`
-    ]);
-
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map(e => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `PGENRO_Visitors_${new Date().toISOString().slice(0,10)}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  els.overlay?.addEventListener("click", () => {
+    els.sidebar?.classList.remove("open");
+    els.hamburgerMenu?.classList.remove("active");
+    closeDrawer();
   });
 
-  // Refresh Sync
-  document.getElementById("refreshBtn").addEventListener("click", () => {
-    loadVisitors();
-  });
+  els.closeDrawer?.addEventListener("click", closeDrawer);
+  els.toggleCheckout?.addEventListener("click", toggleCheckout);
+  els.printPass?.addEventListener("click", printPass);
+  els.exportCsv?.addEventListener("click", exportCsv);
+  els.refresh?.addEventListener("click", () => loadVisitors());
 
-  // Date Range Quick Filter Chips
-  document.querySelectorAll(".date-chip").forEach(chip => {
-    chip.addEventListener("click", () => {
-      document.querySelectorAll(".date-chip").forEach(c => c.classList.remove("active"));
-      chip.classList.add("active");
-      activeDateFilter = chip.getAttribute("data-range");
-      currentPage = 1;
-      render();
-    });
-  });
-
-  // Pagination Controls
-  prevPageBtn.addEventListener("click", () => {
+  els.prev?.addEventListener("click", () => {
     if (currentPage > 1) {
       currentPage--;
       render();
     }
   });
 
-  nextPageBtn.addEventListener("click", () => {
+  els.next?.addEventListener("click", () => {
     currentPage++;
     render();
   });
 
-  // Listeners for Live Filtering
-  searchInput.addEventListener("input", () => { currentPage = 1; render(); });
-  purposeFilter.addEventListener("change", () => { currentPage = 1; render(); });
-  statusFilter.addEventListener("change", () => { currentPage = 1; render(); });
+  els.search?.addEventListener("input", () => {
+    currentPage = 1;
+    render();
+  });
 
-  function render() {
-    const filtered = getFilteredVisitors();
-    updateMetrics();
-    renderTable(filtered);
-  }
+  [els.purpose, els.status].forEach(el => {
+    el?.addEventListener("change", () => {
+      currentPage = 1;
+      render();
+    });
+  });
 
-  // Kickstart
-  loadVisitors();
+  document.querySelectorAll(".date-chip").forEach(chip => {
+    chip.addEventListener("click", () => {
+      document.querySelectorAll(".date-chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+      activeDateFilter = chip.dataset.range || "all";
+      currentPage = 1;
+      render();
+    });
+  });
+
+  document.addEventListener("keydown", e => {
+    if (e.key === "Escape") closeDrawer();
+  });
+
+  const allowed = await requireSignedInUser();
+  if (!allowed) return;
+
+  await loadVisitors({ silent: true });
+  startRealtime();
 });

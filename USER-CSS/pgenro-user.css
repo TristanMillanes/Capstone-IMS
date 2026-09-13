@@ -1,0 +1,526 @@
+/* ========================================================================== 
+   PGENRO IMS — User Portal Unified UI
+   One visual system for Dashboard, Communications, Travel, Memo, Employee,
+   Inventory, Visitors, Services, and ICS.
+   ========================================================================== */
+body.pgenro-user {
+  --primary: var(--pgenro-primary);
+  --primary-dark: var(--pgenro-primary-700);
+  --primary-light: #2f9668;
+  --primary-glow: rgba(11, 93, 59, .10);
+  --accent: var(--pgenro-accent);
+  --bg: var(--pgenro-bg);
+  --card: #fff;
+  --text: var(--pgenro-text);
+  --text-muted: var(--pgenro-muted);
+  --muted: var(--pgenro-muted);
+  --border: var(--pgenro-border);
+  --shadow-sm: var(--pgenro-shadow-sm);
+  --shadow-md: var(--pgenro-shadow);
+  --shadow-lg: var(--pgenro-shadow-lg);
+  margin: 0;
+  min-height: 100vh;
+  color: var(--pgenro-text);
+  background:
+    radial-gradient(circle at 88% 3%, rgba(231,185,50,.10), transparent 24rem),
+    radial-gradient(circle at 4% 34%, rgba(11,93,59,.07), transparent 28rem),
+    var(--pgenro-bg);
+  overflow-x: hidden;
+}
+
+body.pgenro-user::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--pgenro-primary-900), var(--pgenro-primary), var(--pgenro-accent));
+  z-index: 5000;
+  pointer-events: none;
+}
+
+/* ------------------------------ TOP NAV ---------------------------------- */
+body.pgenro-user .navbar {
+  position: fixed !important;
+  inset: 14px 18px auto 18px !important;
+  width: auto !important;
+  min-height: 64px;
+  margin: 0 !important;
+  padding: 9px 14px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 16px;
+  background: rgba(255,255,255,.94) !important;
+  border: 1px solid rgba(205,221,212,.92) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 30px rgba(10,50,34,.09) !important;
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  z-index: 1300 !important;
+}
+
+body.pgenro-user .nav-left-container,
+body.pgenro-user .nav-right-container,
+body.pgenro-user .right-nav,
+body.pgenro-user .nav-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+body.pgenro-user .logo-area {
+  min-width: 0;
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  color: inherit;
+  text-decoration: none !important;
+}
+
+body.pgenro-user .logo-icon {
+  flex: 0 0 42px;
+  width: 42px !important;
+  height: 42px !important;
+  display: grid !important;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid #dbe7e0 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 3px 12px rgba(9,59,39,.06);
+}
+body.pgenro-user .logo-image { width: 84% !important; height: 84% !important; object-fit: contain !important; }
+
+body.pgenro-user .logo-area h2,
+body.pgenro-user .logo-text h2 {
+  margin: 0 !important;
+  color: #0a4831 !important;
+  font-size: 13px !important;
+  line-height: 1.25 !important;
+  font-weight: 800 !important;
+  letter-spacing: -.01em;
+}
+body.pgenro-user .logo-area > div:last-child > span,
+body.pgenro-user .logo-text > span {
+  display: block;
+  margin-top: 2px;
+  color: #718078 !important;
+  font-size: 9.5px !important;
+  line-height: 1.25;
+  font-weight: 650 !important;
+  white-space: nowrap;
+}
+
+body.pgenro-user .nav-links {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  padding: 4px;
+  border: 1px solid #e3ece7;
+  border-radius: 12px;
+  background: #f7faf8;
+}
+body.pgenro-user .nav-links a {
+  padding: 8px 10px !important;
+  border-radius: 9px !important;
+  color: #64756b !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  text-decoration: none;
+}
+body.pgenro-user .nav-links a:hover,
+body.pgenro-user .nav-links a.active { color: #075035 !important; background: #e9f4ed !important; }
+
+/* One compact profile icon only — details live inside the dropdown. */
+body.pgenro-user .profile-menu { position: relative !important; }
+body.pgenro-user .profile-btn,
+body.pgenro-user .pgenro-profile-trigger {
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px solid #d9e5de !important;
+  border-radius: 13px !important;
+  background: #fff !important;
+  color: #0b5d3b !important;
+  box-shadow: 0 3px 12px rgba(9,59,39,.06) !important;
+  cursor: pointer;
+  transition: transform var(--pgenro-ease), border-color var(--pgenro-ease), box-shadow var(--pgenro-ease) !important;
+}
+body.pgenro-user .profile-btn:hover,
+body.pgenro-user .pgenro-profile-trigger:hover {
+  transform: translateY(-1px);
+  border-color: #8fc3a8 !important;
+  box-shadow: 0 8px 20px rgba(9,59,39,.11) !important;
+}
+body.pgenro-user .profile-btn > .profile-text,
+body.pgenro-user .profile-btn > .profile-chevron { display: none !important; }
+body.pgenro-user .profile-btn .profile-avatar,
+body.pgenro-user .pgenro-profile-trigger .profile-avatar {
+  width: 30px !important;
+  height: 30px !important;
+  display: grid !important;
+  place-items: center;
+  border-radius: 10px !important;
+  color: #fff !important;
+  background: linear-gradient(145deg, #0b6a43, #0a4c34) !important;
+  box-shadow: none !important;
+}
+body.pgenro-user .profile-btn .profile-avatar svg { width: 15px; height: 15px; }
+
+body.pgenro-user .profile-dropdown,
+body.pgenro-user .pgenro-profile-dropdown {
+  position: absolute !important;
+  top: calc(100% + 10px) !important;
+  right: 0 !important;
+  left: auto !important;
+  width: 260px !important;
+  padding: 8px !important;
+  border: 1px solid #dce7e0 !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,.98) !important;
+  box-shadow: 0 18px 48px rgba(8,49,33,.16) !important;
+  z-index: 1800 !important;
+}
+body.pgenro-user .pgenro-profile-dropdown { display: none; }
+body.pgenro-user .pgenro-profile-dropdown.open { display: block; }
+body.pgenro-user .profile-dropdown-header {
+  padding: 12px !important;
+  margin-bottom: 5px;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #eff8f2, #fbfdfc) !important;
+  border: 1px solid #e0ece4;
+}
+body.pgenro-user .profile-dropdown a,
+body.pgenro-user .profile-dropdown button,
+body.pgenro-user .pgenro-profile-dropdown a,
+body.pgenro-user .pgenro-profile-dropdown button {
+  width: 100%;
+  min-height: 40px;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 11px !important;
+  border: 0;
+  border-radius: 10px !important;
+  background: transparent;
+  color: #314b3f !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+body.pgenro-user .profile-dropdown a:hover,
+body.pgenro-user .profile-dropdown button:hover,
+body.pgenro-user .pgenro-profile-dropdown a:hover,
+body.pgenro-user .pgenro-profile-dropdown button:hover { background: #f0f6f2 !important; }
+body.pgenro-user .profile-dropdown .logout-btn,
+body.pgenro-user .pgenro-profile-dropdown .logout-btn { color: #b42318 !important; }
+
+body.pgenro-user .system-status-pill,
+body.pgenro-user .panel-pill,
+body.pgenro-user .system-badge,
+body.pgenro-user .admin-badge,
+body.pgenro-user .system-time {
+  border: 1px solid #dfe9e3 !important;
+  border-radius: 999px !important;
+  background: #f7faf8 !important;
+  color: #466156 !important;
+  font-size: 10px !important;
+  font-weight: 750 !important;
+}
+
+/* ----------------------------- SIDEBAR ----------------------------------- */
+body.pgenro-user .sidebar {
+  position: fixed !important;
+  top: 92px !important;
+  bottom: 18px !important;
+  left: 18px !important;
+  width: 254px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 16px 13px !important;
+  display: flex !important;
+  flex-direction: column;
+  overflow: auto !important;
+  transform: none !important;
+  background: linear-gradient(165deg, #073c2b 0%, #0b5438 57%, #073c2b 100%) !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 20px !important;
+  box-shadow: 0 18px 45px rgba(5,47,31,.22) !important;
+  z-index: 1180 !important;
+}
+body.pgenro-user .sidebar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at 15% 4%, rgba(231,185,50,.14), transparent 28%);
+}
+body.pgenro-user .sidebar-header {
+  position: relative;
+  padding: 8px 10px 15px !important;
+  margin: 0 0 10px !important;
+  border-bottom: 1px solid rgba(255,255,255,.10) !important;
+}
+body.pgenro-user .sidebar-header h3 {
+  margin: 0 0 2px !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  letter-spacing: -.01em;
+}
+body.pgenro-user .sidebar-header p,
+body.pgenro-user .sidebar-subtext {
+  margin: 0 !important;
+  color: rgba(224,242,232,.62) !important;
+  font-size: 10px !important;
+  font-weight: 650 !important;
+}
+body.pgenro-user .modules-nav { display: block; }
+body.pgenro-user .modules-list {
+  position: relative;
+  list-style: none !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  flex: 1;
+}
+body.pgenro-user .modules-list li { margin: 0 !important; padding: 0 !important; }
+body.pgenro-user .modules-list a {
+  min-height: 42px;
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  padding: 9px 11px !important;
+  border: 1px solid transparent !important;
+  border-radius: 12px !important;
+  color: rgba(238,248,242,.76) !important;
+  background: transparent !important;
+  font-size: 11.5px !important;
+  line-height: 1.25 !important;
+  font-weight: 680 !important;
+  text-decoration: none !important;
+  transition: background var(--pgenro-ease), color var(--pgenro-ease), transform var(--pgenro-ease), border-color var(--pgenro-ease) !important;
+}
+body.pgenro-user .modules-list a svg {
+  flex: 0 0 17px;
+  width: 17px !important;
+  height: 17px !important;
+  color: rgba(222,241,230,.70) !important;
+  stroke-width: 2;
+}
+body.pgenro-user .modules-list a:hover {
+  color: #fff !important;
+  background: rgba(255,255,255,.08) !important;
+  border-color: rgba(255,255,255,.06) !important;
+  transform: translateX(2px) !important;
+}
+body.pgenro-user .modules-list a.active {
+  position: relative;
+  color: #fff !important;
+  background: linear-gradient(90deg, rgba(255,255,255,.16), rgba(255,255,255,.10)) !important;
+  border-color: rgba(255,255,255,.12) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.025);
+}
+body.pgenro-user .modules-list a.active::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 99px;
+  background: var(--pgenro-accent);
+  box-shadow: 0 0 12px rgba(231,185,50,.55);
+}
+body.pgenro-user .modules-list a.active svg { color: #ffe17d !important; }
+
+body.pgenro-user .sidebar-footer {
+  position: relative;
+  padding: 11px 3px 0 !important;
+  margin-top: 10px !important;
+  border-top: 1px solid rgba(255,255,255,.09) !important;
+}
+body.pgenro-user .sidebar .system-status {
+  padding: 9px 10px !important;
+  border: 1px solid rgba(255,255,255,.08) !important;
+  border-radius: 11px !important;
+  background: rgba(255,255,255,.06) !important;
+}
+body.pgenro-user .sidebar .status-text { color: rgba(235,246,239,.72) !important; font-size: 9.5px !important; }
+
+/* Hamburger is only needed when the sidebar becomes off-canvas. */
+body.pgenro-user .hamburger-menu {
+  display: none !important;
+  width: 42px !important;
+  height: 42px !important;
+  min-width: 42px;
+  padding: 0 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex-direction: column !important;
+  gap: 5px !important;
+  border: 1px solid #d9e5de !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  cursor: pointer;
+}
+body.pgenro-user .hamburger-menu span {
+  display: block !important;
+  width: 18px !important;
+  height: 2px !important;
+  margin: 0 !important;
+  border-radius: 2px;
+  background: #15563d !important;
+}
+
+/* ---------------------------- MAIN LAYOUT -------------------------------- */
+body.pgenro-user .app-container,
+body.pgenro-user .app-layout { min-height: 100vh; }
+
+body.pgenro-user .main-content {
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0;
+  margin: 0 18px 0 290px !important;
+  padding: 100px 0 44px !important;
+  transition: margin var(--pgenro-ease), filter var(--pgenro-ease) !important;
+}
+
+body.pgenro-user .main-content > section,
+body.pgenro-user .main-content > .section {
+  scroll-margin-top: 100px;
+}
+
+/* Consistent page hero/header without erasing page-specific structure. */
+body.pgenro-user .page-header,
+body.pgenro-user .module-header,
+body.pgenro-user .hero.dashboard-header-banner,
+body.pgenro-user .hero:not(.dashboard-header-banner) {
+  border-radius: 22px !important;
+  border: 1px solid #dce7e0 !important;
+  box-shadow: 0 9px 28px rgba(9,57,38,.07) !important;
+}
+body.pgenro-user .page-header,
+body.pgenro-user .module-header {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(231,185,50,.12), transparent 32%),
+    linear-gradient(145deg, #ffffff, #f7fbf8) !important;
+}
+body.pgenro-user .page-header h1,
+body.pgenro-user .module-header h1,
+body.pgenro-user .hero h1 { letter-spacing: -.035em !important; }
+
+/* Cards and panels */
+body.pgenro-user :is(.kpi-card,.metric-card,.records-card,.table-card,.dashboard-card,.summary-panel,.analytics-card,.telemetry-card,.workflow-card,.stat-card,.info-card,.panel,.card) {
+  border-color: #dfe9e3 !important;
+  box-shadow: 0 7px 24px rgba(10,55,37,.065) !important;
+}
+body.pgenro-user :is(.kpi-card,.metric-card,.records-card,.table-card,.dashboard-card,.summary-panel,.analytics-card,.telemetry-card,.workflow-card,.stat-card,.info-card,.panel,.card):hover {
+  border-color: #c9dbd0 !important;
+}
+
+/* Buttons */
+body.pgenro-user :is(.btn,.save-btn,.primary-btn,.action-btn,.export-btn,.refresh-btn) {
+  border-radius: 11px !important;
+  font-weight: 750 !important;
+  transition: transform var(--pgenro-ease), box-shadow var(--pgenro-ease), background var(--pgenro-ease) !important;
+}
+body.pgenro-user :is(.btn-primary,.save-btn,.primary-btn) {
+  background: linear-gradient(145deg, #0c6843, #084b32) !important;
+  color: #fff !important;
+  border-color: transparent !important;
+  box-shadow: 0 7px 16px rgba(9,82,53,.16) !important;
+}
+body.pgenro-user :is(.btn,.save-btn,.primary-btn,.action-btn):hover { transform: translateY(-1px); }
+
+/* Inputs */
+body.pgenro-user :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]) {
+  border-color: #d6e3db !important;
+  border-radius: 11px !important;
+  background-color: #fff !important;
+  color: #1e352b !important;
+  box-shadow: none !important;
+}
+body.pgenro-user :is(input,select,textarea):not([type="checkbox"]):not([type="radio"]):focus {
+  border-color: #67a889 !important;
+  box-shadow: 0 0 0 3px rgba(11,93,59,.09) !important;
+}
+
+/* Tables */
+body.pgenro-user .table-wrapper,
+body.pgenro-user .records-table-wrapper { border-radius: 14px; overflow-x: auto; }
+body.pgenro-user table { border-collapse: separate !important; border-spacing: 0 !important; }
+body.pgenro-user thead th {
+  background: #f2f7f4 !important;
+  color: #4b6257 !important;
+  border-bottom-color: #dfe8e2 !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .055em !important;
+  text-transform: uppercase !important;
+}
+body.pgenro-user tbody td { border-bottom-color: #edf2ef !important; }
+body.pgenro-user tbody tr:hover td { background: #fbfdfc !important; }
+
+/* Overlay */
+body.pgenro-user .overlay {
+  position: fixed !important;
+  inset: 0 !important;
+  background: rgba(4,31,21,.38) !important;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  z-index: 1120 !important;
+}
+
+/* Scrollbar */
+body.pgenro-user ::-webkit-scrollbar { width: 8px; height: 8px; }
+body.pgenro-user ::-webkit-scrollbar-track { background: transparent; }
+body.pgenro-user ::-webkit-scrollbar-thumb { background: #b9c9bf; border-radius: 99px; }
+body.pgenro-user .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,.18); }
+
+/* ---------------------------- RESPONSIVE --------------------------------- */
+@media (max-width: 1180px) {
+  body.pgenro-user .nav-links { display: none !important; }
+}
+
+@media (max-width: 1024px) {
+  body.pgenro-user .navbar { inset: 10px 12px auto 12px !important; min-height: 60px; }
+  body.pgenro-user .hamburger-menu { display: flex !important; }
+  body.pgenro-user .sidebar {
+    top: 82px !important;
+    left: 12px !important;
+    bottom: 12px !important;
+    width: min(290px, calc(100vw - 24px)) !important;
+    transform: translateX(calc(-100% - 24px)) !important;
+    z-index: 1220 !important;
+  }
+  body.pgenro-user .sidebar.open { transform: translateX(0) !important; }
+  body.pgenro-user .main-content { margin: 0 12px !important; padding-top: 84px !important; }
+}
+
+@media (max-width: 680px) {
+  body.pgenro-user .navbar { gap: 8px; padding: 8px 9px !important; border-radius: 15px !important; }
+  body.pgenro-user .logo-icon { width: 38px !important; height: 38px !important; flex-basis: 38px; }
+  body.pgenro-user .logo-area h2,
+  body.pgenro-user .logo-text h2 { font-size: 11px !important; }
+  body.pgenro-user .logo-area > div:last-child > span,
+  body.pgenro-user .logo-text > span { display: none !important; }
+  body.pgenro-user .system-status-pill,
+  body.pgenro-user .panel-pill,
+  body.pgenro-user .system-badge,
+  body.pgenro-user .admin-badge { display: none !important; }
+  body.pgenro-user .system-time { padding: 6px 9px !important; }
+  body.pgenro-user .profile-dropdown,
+  body.pgenro-user .pgenro-profile-dropdown { position: fixed !important; top: 78px !important; right: 12px !important; width: min(300px, calc(100vw - 24px)) !important; }
+  body.pgenro-user .main-content { margin: 0 10px !important; padding-top: 80px !important; padding-bottom: 26px !important; }
+  body.pgenro-user .page-header,
+  body.pgenro-user .module-header,
+  body.pgenro-user .hero { border-radius: 18px !important; }
+}

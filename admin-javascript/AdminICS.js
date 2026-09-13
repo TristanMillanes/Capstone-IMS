@@ -80,17 +80,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ========================================================================
-  // FIREBASE CONFIGURATION
+  // SUPABASE CONFIGURATION
   // ========================================================================
 
-  const firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_FIREBASE_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_FIREBASE_PROJECT_ID",
-    storageBucket: "YOUR_FIREBASE_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_FIREBASE_MESSAGING_SENDER_ID",
-    appId: "YOUR_FIREBASE_APP_ID"
-  };
+  const firebaseConfig = {}; // Legacy API shape; all persistence is routed to Supabase. // Legacy API adapter; configure Supabase in shared/supabase.js.
 
 
   let db = null;
@@ -102,13 +95,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   // ========================================================================
-  // FIREBASE INITIALIZATION
+  // SUPABASE INITIALIZATION
   // ========================================================================
 
   try {
 
     if (typeof firebase === "undefined") {
-      throw new Error("Firebase SDK is not loaded.");
+      throw new Error("Supabase SDK is not loaded.");
     }
 
     if (firebase.apps.length === 0) {
@@ -121,13 +114,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     updateDatabaseStatus(
       true,
-      "Firebase Connected"
+      "Supabase Connected"
     );
 
   } catch (error) {
 
     console.error(
-      "Firebase initialization error:",
+      "Supabase initialization error:",
       error
     );
 
@@ -664,7 +657,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!firebaseReady || !db) {
 
           alert(
-            "Firebase is not connected. Please check your Firebase configuration."
+            "Supabase is not connected. Please check shared/supabase.js."
           );
 
           return;
@@ -782,7 +775,7 @@ document.addEventListener("DOMContentLoaded", () => {
           );
 
           alert(
-            "Unable to save the ICS record.\n\nCheck your Firebase configuration and Firestore security rules."
+            "Unable to save the ICS record.\n\nCheck your Supabase configuration and RLS policies."
           );
 
         } finally {
@@ -849,20 +842,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
           updateDatabaseStatus(
             true,
-            "Firebase Connected"
+            "Supabase Connected"
           );
 
         },
         (error) => {
 
           console.error(
-            "Firestore listener error:",
+            "Supabase realtime listener error:",
             error
           );
 
           updateDatabaseStatus(
             false,
-            "Firestore Read Error"
+            "Supabase Read Error"
           );
 
           renderTable([]);
@@ -1915,7 +1908,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!firebaseReady || !db) {
 
       alert(
-        "Firebase is not connected."
+        "Supabase is not connected."
       );
 
       return;
@@ -1930,7 +1923,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const confirmed =
       confirm(
-        `Delete ICS record "${label}"?\n\nThis will permanently remove the record from Firestore.`
+        `Delete ICS record "${label}"?\n\nThis will permanently remove the record from Supabase.`
       );
 
 
@@ -1958,7 +1951,7 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
       alert(
-        "Delete failed.\n\nCheck your Firestore security rules."
+        "Delete failed.\n\nCheck your Supabase RLS policies."
       );
     }
   }

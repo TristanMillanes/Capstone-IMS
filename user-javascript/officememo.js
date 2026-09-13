@@ -1,5 +1,5 @@
 // Database State: Empty Base
-let memoDataset = JSON.parse(localStorage.getItem("officeMemos")) || [];
+let memoDataset = window.PGENRO_SUPABASE?.configured ? [] : (() => { try { const rows = JSON.parse(localStorage.getItem("officeMemos") || "[]"); return Array.isArray(rows) ? rows : []; } catch { return []; } })();
 
 document.addEventListener("DOMContentLoaded", () => {
   if (window.lucide) lucide.createIcons();
@@ -54,7 +54,8 @@ function renderTable() {
     return;
   }
 
-  filtered.forEach((item, index) => {
+  filtered.forEach((item) => {
+    const originalIndex = memoDataset.indexOf(item);
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td><span class="memo-code-badge">${item.id || "-"}</span></td>
@@ -63,7 +64,7 @@ function renderTable() {
       <td class="memo-subject-cell">${item.subject || "-"}</td>
       <td><span style="font-size:12px; color:var(--text);">${item.receivedBy || "-"}</span></td>
       <td style="text-align: center;">
-        <button class="action-btn" onclick="openViewModal(${index})" title="View Attachment">
+        <button class="action-btn" onclick="openViewModal(${originalIndex})" title="View Attachment">
           <i data-lucide="eye"></i>
         </button>
       </td>

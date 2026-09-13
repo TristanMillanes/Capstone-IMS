@@ -386,7 +386,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const issuedDate = getFirstValue(memo, ["issued_date", "date_issued", "created_at", "date"], "—");
       const issuedBy = getFirstValue(memo, ["issued_by", "author", "department"], "PGENRO Admin");
       const target = getFirstValue(memo, ["target", "audience"], "All Units");
-      const detailsUrl = getFirstValue(memo, ["details_url", "url", "link"], "officememo.html");
+      const detailsUrl = getFirstValue(memo, ["details_url", "url", "link"], "officememo-admin.html");
       const downloadUrl = getFirstValue(memo, ["download_url", "file_url", "fileUrl"], "");
       const isHigh = String(priority).toLowerCase() === "high";
 
@@ -642,8 +642,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Logout Trigger ---
   if (logoutBtn) {
-    logoutBtn.addEventListener("click", () => {
+    logoutBtn.addEventListener("click", async () => {
       if (window.confirm("Are you sure you want to end your current session?")) {
+        try { await window.pgenroSupabase?.auth?.signOut(); } catch (error) { console.warn("Sign-out warning:", error); }
+        try {
+          localStorage.removeItem("pgenro_current_user");
+          sessionStorage.removeItem("pgenro_session_active");
+          sessionStorage.removeItem("pgenro_session_token");
+        } catch {}
         window.location.href = "login.html";
       }
     });

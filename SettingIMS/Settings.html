@@ -2,413 +2,132 @@
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>PGENRO IMS | Account Settings & Profile</title>
-
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Account & System Settings</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-
-  <!-- Lucide Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- External Stylesheet -->
-  <link rel="stylesheet" href="Setting.css" />
+  <link rel="stylesheet" href="Setting.css?v=20260913-clean">
+  
+  
 </head>
+<body class="pgenro-user pgenro-settings" data-requires-auth="user">
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
-<body>
-  <!-- TOAST NOTIFICATION CONTAINER -->
-  <div class="toast-container" id="toastContainer"></div>
-
-  <!-- TOP NAVIGATION NAVBAR WITH BACK BUTTON -->
-  <header class="navbar">
-    <div class="nav-left-container">
-      <!-- BACK TO DASHBOARD BUTTON -->
-      <a href="/Capstone-IMS/User/Homepage.html" class="btn-back" title="Return to Dashboard Overview">
-        <i data-lucide="arrow-left"></i>
-        <span class="btn-back-text">Dashboard</span>
-      </a>
-
-      <div class="nav-divider"></div>
-
-      <a href="homepage.html" class="logo-area">
-        <div class="logo-icon">
-          <img src="../logo/enro.png" alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'; this.nextElementSibling.style.display='block';">
-          <i data-lucide="trees" class="logo-fallback-icon" style="display:none;"></i>
-        </div>
-        <div class="logo-text">
-          <h2>Provincial Government</h2>
-          <span>Environment & Natural Resources Office</span>
-        </div>
-      </a>
+  <header class="settings-topbar">
+    <a class="settings-back" id="backToWorkspace" href="../User/homepage.html">
+      <i data-lucide="arrow-left"></i><span>Back to workspace</span>
+    </a>
+    <div class="settings-brand">
+      <img src="../logo/enro.png" alt="PGENRO" />
+      <div><strong>PGENRO IMS</strong><span>Account & System Settings</span></div>
     </div>
-
-    <div class="nav-right-container">
-      <div class="system-badge">
-        <span class="badge-pulse"></span>
-        <span class="badge-text">Settings Console</span>
-      </div>
-    </div>
+    <button class="settings-signout" type="button" data-pgenro-logout title="Sign out"><i data-lucide="log-out"></i><span>Sign out</span></button>
   </header>
 
-  <!-- MAIN CONTENT CONTAINER -->
-  <div class="app-container">
-    <main class="main-content">
-      
-      <!-- HEADER BANNER -->
-      <section class="module-header">
-        <div class="module-title">
-          <div class="title-badge">
-            <i data-lucide="shield-check"></i> User Credentials & Control
-          </div>
-          <h1>Account Settings & Profile</h1>
-          <p>Manage your account credentials, security authentication, system notifications, and personal profile.</p>
-        </div>
-      </section>
-
-      <!-- SETTINGS LAYOUT GRID -->
-      <div class="settings-grid">
-        
-        <!-- LEFT COLUMN: USER PROFILE CARD & TAB NAVIGATION -->
-        <div class="settings-sidebar-card">
-          <div class="profile-summary">
-            <div class="avatar-container">
-              <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=300" alt="Profile Picture" id="avatarPreview" class="avatar-img" />
-              <button class="avatar-edit-btn" id="changeAvatarBtn" title="Change Avatar Image" type="button">
-                <i data-lucide="camera"></i>
-              </button>
-              <input type="file" id="avatarFileInput" accept="image/*" hidden />
-            </div>
-
-            <h2 class="profile-name" id="profileNameDisplay">EnP JOHN FRANCIS L. LUZANO, MPA</h2>
-            <p class="profile-role" id="profileRoleDisplay">Provincial Environment Head</p>
-            <span class="profile-badge"><i data-lucide="shield"></i> Administrator Account</span>
-          </div>
-
-          <!-- TAB NAVIGATION LIST -->
-          <ul class="settings-tab-menu">
-            <li>
-              <button class="tab-btn active" data-tab="personal-tab" type="button">
-                <i data-lucide="user"></i>
-                <span>Personal Information</span>
-              </button>
-            </li>
-            <li>
-              <button class="tab-btn" data-tab="security-tab" type="button">
-                <i data-lucide="key-round"></i>
-                <span>Security & Password</span>
-              </button>
-            </li>
-            <li>
-              <button class="tab-btn" data-tab="preferences-tab" type="button">
-                <i data-lucide="sliders"></i>
-                <span>System Preferences</span>
-              </button>
-            </li>
-            <li>
-              <button class="tab-btn" data-tab="audit-tab" type="button">
-                <i data-lucide="history"></i>
-                <span>Activity & Audit Log</span>
-              </button>
-            </li>
-          </ul>
-        </div>
-
-        <!-- RIGHT COLUMN: SETTINGS TAB PANELS -->
-        <div class="settings-panel-container">
-          
-          <!-- TAB 1: PERSONAL INFORMATION -->
-          <div class="tab-panel active" id="personal-tab">
-            <div class="panel-card">
-              <div class="panel-header">
-                <div>
-                  <h3>Personal Information</h3>
-                  <p>Update your personal details, official title, and contact metadata.</p>
-                </div>
-              </div>
-
-              <form id="personalInfoForm">
-                <div class="form-grid">
-                  <div class="form-group full-width">
-                    <label for="fullNameInput">Full Name with Qualifications <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="user"></i>
-                      <input type="text" id="fullNameInput" class="form-control padded" value="EnP JOHN FRANCIS L. LUZANO, MPA" required />
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="employeeIdInput">Employee / Control ID <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="badge-check"></i>
-                      <input type="text" id="employeeIdInput" class="form-control padded" value="PGENRO-2024-001" required readOnly />
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="designationInput">Official Designation <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="briefcase"></i>
-                      <input type="text" id="designationInput" class="form-control padded" value="Provincial Environment Head" required />
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="emailInput">Official Email Address <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="mail"></i>
-                      <input type="email" id="emailInput" class="form-control padded" value="j.luzano@quezon.gov.ph" required />
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="phoneInput">Contact / Extension Phone</label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="phone"></i>
-                      <input type="text" id="phoneInput" class="form-control padded" value="+63 (042) 710-3456" />
-                    </div>
-                  </div>
-
-                  <div class="form-group full-width">
-                    <label for="divisionSelect">Assigned Office / Division <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="building-2"></i>
-                      <select id="divisionSelect" class="form-control padded" required>
-                        <option value="Executive Office">Executive Office (PG ENRO)</option>
-                        <option value="Administrative & Finance">Administrative & Finance</option>
-                        <option value="Technical Operations">Technical Operations</option>
-                        <option value="Mines & Geosciences">Mines & Geosciences</option>
-                        <option value="Forestry Division">Forestry Division</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="panel-footer">
-                  <button type="submit" class="btn-primary-modal">
-                    <i data-lucide="save"></i> Save Profile Changes
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- TAB 2: SECURITY & PASSWORD -->
-          <div class="tab-panel" id="security-tab">
-            <div class="panel-card">
-              <div class="panel-header">
-                <div>
-                  <h3>Security & Authentication</h3>
-                  <p>Change your login password and manage two-factor account verification.</p>
-                </div>
-              </div>
-
-              <form id="securityForm">
-                <div class="form-grid">
-                  <div class="form-group full-width">
-                    <label for="currentPasswordInput">Current Password <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="lock"></i>
-                      <input type="password" id="currentPasswordInput" class="form-control padded" placeholder="••••••••••••" required />
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="newPasswordInput">New Password <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="key"></i>
-                      <input type="password" id="newPasswordInput" class="form-control padded" placeholder="At least 8 characters..." required />
-                    </div>
-                  </div>
-
-                  <div class="form-group">
-                    <label for="confirmPasswordInput">Confirm New Password <span class="required">*</span></label>
-                    <div class="input-icon-wrapper">
-                      <i data-lucide="check-circle-2"></i>
-                      <input type="password" id="confirmPasswordInput" class="form-control padded" placeholder="Repeat new password..." required />
-                    </div>
-                  </div>
-                </div>
-
-                <div class="divider"><span>ENHANCED AUTHENTICATION</span></div>
-
-                <div class="toggle-card">
-                  <div class="toggle-info">
-                    <i data-lucide="smartphone"></i>
-                    <div>
-                      <strong>Two-Factor Authentication (2FA)</strong>
-                      <p>Require a 6-digit verification code sent via SMS/Email when logging in.</p>
-                    </div>
-                  </div>
-                  <label class="switch">
-                    <input type="checkbox" id="twoFactorToggle" checked />
-                    <span class="slider"></span>
-                  </label>
-                </div>
-
-                <div class="panel-footer">
-                  <button type="submit" class="btn-primary-modal">
-                    <i data-lucide="shield-check"></i> Update Password & Security
-                  </button>
-                </div>
-              </form>
-
-              <div class="divider"><span>ACTIVE LOGIN SESSIONS</span></div>
-
-              <div class="session-list" id="sessionListContainer">
-                <div class="session-item">
-                  <div class="session-icon"><i data-lucide="laptop"></i></div>
-                  <div class="session-details">
-                    <strong>Windows Workstation - Chrome Browser</strong>
-                    <small>Lucena Office Subnet (192.168.1.15) • Current Active Session</small>
-                  </div>
-                  <span class="session-status active">Active Now</span>
-                </div>
-
-                <div class="session-item" id="mobileSessionItem">
-                  <div class="session-icon"><i data-lucide="smartphone"></i></div>
-                  <div class="session-details">
-                    <strong>PGENRO Mobile Field Portal</strong>
-                    <small>Android 14 App • Last sync 2 hours ago</small>
-                  </div>
-                  <button class="btn-secondary-modal sm" type="button" id="revokeMobileSessionBtn">Revoke</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- TAB 3: SYSTEM PREFERENCES -->
-          <div class="tab-panel" id="preferences-tab">
-            <div class="panel-card">
-              <div class="panel-header">
-                <div>
-                  <h3>System Preferences & Automation</h3>
-                  <p>Configure interface themes, automated parsing triggers, and system alert preferences.</p>
-                </div>
-              </div>
-
-              <form id="preferencesForm">
-                <div class="preference-group">
-                  <h4>Appearance & Interface Theme</h4>
-                  <div class="theme-selector-grid">
-                    <label class="theme-card active" id="lightThemeCard">
-                      <input type="radio" name="themeMode" value="light" id="themeLightRadio" checked />
-                      <div class="theme-preview light"></div>
-                      <span>PG ENRO Light Theme</span>
-                    </label>
-
-                    <label class="theme-card" id="darkThemeCard">
-                      <input type="radio" name="themeMode" value="dark" id="themeDarkRadio" />
-                      <div class="theme-preview dark"></div>
-                      <span>Executive Dark Mode</span>
-                    </label>
-                  </div>
-                </div>
-
-                <div class="divider"><span>AUTOMATION & NOTIFICATIONS</span></div>
-
-                <div class="toggle-card">
-                  <div class="toggle-info">
-                    <i data-lucide="sparkles"></i>
-                    <div>
-                      <strong>Auto-Parse PDF Executive Orders on Upload</strong>
-                      <p>Automatically process uploaded PDF text to pre-fill control number, target, and subject fields.</p>
-                    </div>
-                  </div>
-                  <label class="switch">
-                    <input type="checkbox" id="autoParseToggle" checked />
-                    <span class="slider"></span>
-                  </label>
-                </div>
-
-                <div class="toggle-card">
-                  <div class="toggle-info">
-                    <i data-lucide="bell"></i>
-                    <div>
-                      <strong>Email Notifications for Directives & Orders</strong>
-                      <p>Receive immediate email copy when high-priority memos are issued to your division.</p>
-                    </div>
-                  </div>
-                  <label class="switch">
-                    <input type="checkbox" id="emailNotifToggle" checked />
-                    <span class="slider"></span>
-                  </label>
-                </div>
-
-                <div class="panel-footer">
-                  <button type="submit" class="btn-primary-modal">
-                    <i data-lucide="sliders"></i> Save System Preferences
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- TAB 4: AUDIT & ACTIVITY LOG -->
-          <div class="tab-panel" id="audit-tab">
-            <div class="panel-card">
-              <div class="panel-header">
-                <div>
-                  <h3>Account Audit & Activity Log</h3>
-                  <p>Recent administrative actions, directive logs, and system modifications recorded under your ID.</p>
-                </div>
-              </div>
-
-              <div class="audit-timeline">
-                <div class="audit-item">
-                  <div class="audit-dot green"></div>
-                  <div class="audit-content">
-                    <div class="audit-title-bar">
-                      <strong>Issued Memorandum Control No. 26-234</strong>
-                      <span class="audit-time">May 11, 2026 - 10:38 AM</span>
-                    </div>
-                    <p>Issued directive to HON. SUNDAE E. ALVAREZ regarding Villanueva SWM Reorientation.</p>
-                  </div>
-                </div>
-
-                <div class="audit-item">
-                  <div class="audit-dot blue"></div>
-                  <div class="audit-content">
-                    <div class="audit-title-bar">
-                      <strong>Updated Control No. 26-233 Particulars</strong>
-                      <span class="audit-time">May 07, 2026 - 02:15 PM</span>
-                    </div>
-                    <p>Updated PGSO inspection request details for office accessibility compliance.</p>
-                  </div>
-                </div>
-
-                <div class="audit-item">
-                  <div class="audit-dot gold"></div>
-                  <div class="audit-content">
-                    <div class="audit-title-bar">
-                      <strong>Pinned Priority Directive No. PG ENRO 25-002</strong>
-                      <span class="audit-time">May 06, 2026 - 08:30 AM</span>
-                    </div>
-                    <p>Featured Work Augmentation directive on overview dashboard banner.</p>
-                  </div>
-                </div>
-
-                <div class="audit-item">
-                  <div class="audit-dot green"></div>
-                  <div class="audit-content">
-                    <div class="audit-title-bar">
-                      <strong>System Authentication Success</strong>
-                      <span class="audit-time">May 05, 2026 - 07:45 AM</span>
-                    </div>
-                    <p>Logged in securely via Local Network Subnet 192.168.1.15.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
+  <main class="settings-shell" id="workspaceMain">
+    <section class="settings-heading">
+      <div>
+        <span class="eyebrow"><i data-lucide="settings-2"></i> Workspace configuration</span>
+        <h1>Account & System Settings</h1>
+        <p>Manage your profile, password, interface preferences, and administrator-level system controls.</p>
       </div>
-    </main>
-  </div>
+      <div class="settings-status" id="settingsDbStatus"><span></span> Connecting to Supabase…</div>
+    </section>
 
-  <!-- External JavaScript Logic -->
-  <script src="Settings.js"></script>
+    <div class="settings-layout">
+      <aside class="settings-nav-card">
+        <div class="settings-profile-summary">
+          <div class="settings-avatar" id="profileInitials">PG</div>
+          <div><strong id="profileNameDisplay">PGENRO User</strong><span id="profileRoleDisplay">Authorized Personnel</span></div>
+        </div>
+        <nav class="settings-tabs" aria-label="Settings sections">
+          <button type="button" class="tab-btn active" data-tab="accountPanel"><i data-lucide="user-round"></i><span>Account Profile</span></button>
+          <button type="button" class="tab-btn" data-tab="securityPanel"><i data-lucide="shield-check"></i><span>Password & Security</span></button>
+          <button type="button" class="tab-btn" data-tab="preferencesPanel"><i data-lucide="palette"></i><span>Preferences</span></button>
+          <button type="button" class="tab-btn admin-only" data-tab="systemPanel" hidden><i data-lucide="sliders-horizontal"></i><span>System Settings</span></button>
+        </nav>
+        <div class="account-meta">
+          <div><span>Account status</span><strong id="profileStatus">—</strong></div>
+          <div><span>Last login</span><strong id="profileLastLogin">—</strong></div>
+        </div>
+      </aside>
+
+      <section class="settings-panels">
+        <article class="settings-panel active" id="accountPanel">
+          <div class="panel-title"><div><h2>Account profile</h2><p>These details come from your Supabase personnel profile.</p></div><span class="panel-icon"><i data-lucide="id-card"></i></span></div>
+          <form id="profileForm" class="settings-form">
+            <div class="field-grid">
+              <label class="field full"><span>Full name</span><input id="fullNameInput" required maxlength="120" autocomplete="name" /></label>
+              <label class="field"><span>Username</span><input id="usernameInput" maxlength="80" autocomplete="username" /></label>
+              <label class="field"><span>Official email</span><input id="emailInput" type="email" readonly /></label>
+              <label class="field"><span>Contact number</span><input id="contactInput" maxlength="40" autocomplete="tel" /></label>
+              <label class="field"><span>Position / designation</span><input id="positionInput" maxlength="120" /></label>
+              <label class="field"><span>Division / office</span><input id="divisionInput" maxlength="120" /></label>
+              <label class="field"><span>Role</span><input id="roleInput" readonly /></label>
+              <label class="field"><span>Account type</span><input id="accountTypeInput" readonly /></label>
+            </div>
+            <div class="form-actions"><span class="form-note"><i data-lucide="info"></i> Role, status, and account type remain administrator-controlled.</span><button class="primary-btn" type="submit"><i data-lucide="save"></i> Save profile</button></div>
+          </form>
+        </article>
+
+        <article class="settings-panel" id="securityPanel">
+          <div class="panel-title"><div><h2>Password & security</h2><p>Changing your password updates the current Supabase Auth account.</p></div><span class="panel-icon"><i data-lucide="lock-keyhole"></i></span></div>
+          <form id="passwordForm" class="settings-form narrow-form">
+            <label class="field"><span>Current password</span><input id="currentPasswordInput" type="password" required autocomplete="current-password" /></label>
+            <label class="field"><span>New password</span><input id="newPasswordInput" type="password" required minlength="8" autocomplete="new-password" /></label>
+            <label class="field"><span>Confirm new password</span><input id="confirmPasswordInput" type="password" required minlength="8" autocomplete="new-password" /></label>
+            <div class="security-note"><i data-lucide="shield-check"></i><div><strong>Secure password update</strong><p>Your current password is verified first. Passwords are never stored in the public database.</p></div></div>
+            <div class="form-actions right"><button class="primary-btn" type="submit"><i data-lucide="key-round"></i> Update password</button></div>
+          </form>
+        </article>
+
+        <article class="settings-panel" id="preferencesPanel">
+          <div class="panel-title"><div><h2>Interface preferences</h2><p>Preferences sync to your profile and are applied on both Admin and User workspaces.</p></div><span class="panel-icon"><i data-lucide="paintbrush"></i></span></div>
+          <form id="preferencesForm" class="settings-form">
+            <div class="preference-block">
+              <h3>Theme</h3>
+              <div class="theme-options">
+                <label class="theme-option"><input type="radio" name="theme" value="light" checked /><span class="theme-preview light"></span><strong>Light</strong></label>
+                <label class="theme-option"><input type="radio" name="theme" value="dark" /><span class="theme-preview dark"></span><strong>Dark</strong></label>
+              </div>
+            </div>
+            <div class="toggle-list">
+              <label class="toggle-row"><div><strong>Compact tables & cards</strong><span>Show more information with tighter spacing.</span></div><input id="compactToggle" type="checkbox" /></label>
+              <label class="toggle-row"><div><strong>Reduce interface animations</strong><span>Minimize movement and transition effects.</span></div><input id="reduceMotionToggle" type="checkbox" /></label>
+              <label class="toggle-row"><div><strong>Email notification preference</strong><span>Store your preference for system email alerts.</span></div><input id="emailNotificationsToggle" type="checkbox" checked /></label>
+            </div>
+            <div class="form-actions right"><button class="primary-btn" type="submit"><i data-lucide="save"></i> Save preferences</button></div>
+          </form>
+        </article>
+
+        <article class="settings-panel admin-only" id="systemPanel" hidden>
+          <div class="panel-title"><div><h2>System settings</h2><p>Administrator settings shared by both Admin and User workspaces.</p></div><span class="panel-icon"><i data-lucide="server-cog"></i></span></div>
+          <form id="systemSettingsForm" class="settings-form">
+            <div class="field-grid">
+              <label class="field full"><span>Organization name</span><input id="organizationNameInput" maxlength="120" /></label>
+              <label class="field full"><span>System / office name</span><input id="officeNameInput" maxlength="160" /></label>
+              <label class="field"><span>Session timeout (minutes)</span><input id="sessionTimeoutInput" type="number" min="5" max="480" step="5" /></label>
+              <label class="field"><span>Default records per page</span><select id="pageSizeInput"><option>10</option><option>25</option><option>50</option><option>100</option></select></label>
+            </div>
+            <div class="toggle-list">
+              <label class="toggle-row"><div><strong>Allow new account requests</strong><span>Controls whether the public personnel request form accepts submissions.</span></div><input id="accountRequestsToggle" type="checkbox" checked /></label>
+              <label class="toggle-row"><div><strong>Maintenance notice</strong><span>Marks the workspace as undergoing maintenance without locking administrators out.</span></div><input id="maintenanceToggle" type="checkbox" /></label>
+              <label class="toggle-row"><div><strong>Show system announcement</strong><span>Display the announcement across Admin and User pages.</span></div><input id="announcementEnabledToggle" type="checkbox" /></label>
+            </div>
+            <label class="field full"><span>System announcement</span><textarea id="announcementInput" rows="4" maxlength="500" placeholder="Example: Scheduled maintenance on Friday at 5:00 PM."></textarea></label>
+            <div class="form-actions"><span class="form-note"><i data-lucide="database"></i> Saved in public.system_settings through an admin-only Supabase RPC.</span><button class="primary-btn" type="submit"><i data-lucide="database-zap"></i> Save system settings</button></div>
+          </form>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../shared/supabase.js"></script>
+  <script src="../shared/settings-runtime.js?v=20260913"></script>
+  <script src="Settings.js?v=20260913"></script>
+  <script src="../shared/repaired-ui.js?v=20260913"></script>
 </body>
 </html>

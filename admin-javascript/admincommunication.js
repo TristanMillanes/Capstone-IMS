@@ -4,19 +4,10 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================================================================
-  // 1. FIREBASE FIRESTORE CONFIGURATION & INITIALIZATION
+  // 1. SUPABASE FIRESTORE CONFIGURATION & INITIALIZATION
   // =========================================================================
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyAwiRrYub7tl1EXwehKbsCjfwQiyGKxiyE",
-  authDomain: "ims-capstone-bc65f.firebaseapp.com",
-  databaseURL: "https://ims-capstone-bc65f-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "ims-capstone-bc65f",
-  storageBucket: "ims-capstone-bc65f.firebasestorage.app",
-  messagingSenderId: "972207120140",
-  appId: "1:972207120140:web:6a94e2e1e9e8511e933329",
-  measurementId: "G-W4TPE7CHC8"
-};
+  // For Supabase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {}; // Legacy API shape; all persistence is routed to Supabase. // Legacy API adapter; configure Supabase in shared/supabase.js.
 
   let db = null;
   let firebaseInitialized = false;
@@ -28,10 +19,10 @@ const firebaseConfig = {
       }
       db = firebase.firestore();
       firebaseInitialized = true;
-      updateDbStatusUI(true, "Firebase Live Sync (0 Default Base)");
+      updateDbStatusUI(true, "Supabase Live Sync (0 Default Base)");
     }
   } catch (err) {
-    console.warn("Firebase starting in offline mode.", err);
+    console.warn("Supabase starting in offline mode.", err);
     updateDbStatusUI(false, "Offline Mode (0 Base Records)");
   }
 
@@ -255,10 +246,10 @@ const firebaseConfig = {
           records.push({ id: doc.id, ...doc.data() });
         });
         renderRecords();
-        updateDbStatusUI(true, `Firestore Live (${records.length} Records)`);
+        updateDbStatusUI(true, `Supabase Live (${records.length} Records)`);
       },
       (error) => {
-        console.warn("Firestore snapshot error, loading fallback:", error);
+        console.warn("Supabase realtime error, loading fallback:", error);
         renderRecords();
       }
     );
@@ -461,7 +452,7 @@ const firebaseConfig = {
           await db.collection("communications").add(recordPayload);
         }
       } catch (err) {
-        console.error("Firestore save error:", err);
+        console.error("Supabase save error:", err);
       }
     } else {
       // Local Storage fallback
@@ -503,7 +494,7 @@ const firebaseConfig = {
         try {
           await db.collection("communications").doc(recordToDelete.id).delete();
         } catch (err) {
-          console.error("Error deleting from Firestore:", err);
+          console.error("Error deleting from Supabase:", err);
         }
       } else {
         records.splice(index, 1);

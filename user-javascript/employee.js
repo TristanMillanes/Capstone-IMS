@@ -12,7 +12,7 @@ const exportBtn = document.getElementById("exportBtn");
 const profileModal = document.getElementById("profileModal");
 
 // Database State: Empty Base
-let employees = JSON.parse(localStorage.getItem("employees")) || [];
+let employees = window.PGENRO_SUPABASE?.configured ? [] : (() => { try { const rows = JSON.parse(localStorage.getItem("employees") || "[]"); return Array.isArray(rows) ? rows : []; } catch { return []; } })();
 
 if (window.lucide) lucide.createIcons();
 
@@ -96,7 +96,8 @@ function displayEmployees() {
     return;
   }
 
-  filtered.forEach((employee, index) => {
+  filtered.forEach((employee) => {
+    const originalIndex = employees.indexOf(employee);
     const fullName = `${employee.firstName || ""} ${employee.lastName || ""}`.trim();
     const initials = getInitials(employee.firstName, employee.lastName);
 
@@ -122,7 +123,7 @@ function displayEmployees() {
         </td>
         <td><span class="status ${(employee.status || "Active").replace(" ", "")}">${employee.status || "Active"}</span></td>
         <td class="text-center">
-          <button class="action-btn view-btn" onclick="viewEmployee(${index})" title="Inspect Profile">
+          <button class="action-btn view-btn" onclick="viewEmployee(${originalIndex})" title="Inspect Profile">
             <i data-lucide="eye" style="width: 14px; height: 14px;"></i>
           </button>
         </td>

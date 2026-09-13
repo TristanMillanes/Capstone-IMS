@@ -1,18 +1,9 @@
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
 /* ============================================================
-   SUPABASE CONFIGURATION
-   Replace these two placeholders with your Supabase credentials.
+   SHARED SUPABASE CONFIGURATION
+   Configure credentials once in ../shared/supabase.js
    ============================================================ */
-const SUPABASE_URL = "YOUR_SUPABASE_PROJECT_URL";
-const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_OR_PUBLISHABLE_KEY";
-
-const isSupabaseConfigured =
-  SUPABASE_URL.startsWith("http") && !SUPABASE_URL.includes("YOUR_SUPABASE");
-
-const supabase = isSupabaseConfigured
-  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-  : null;
+const supabase = window.pgenroSupabase;
+const isSupabaseConfigured = !!supabase && window.PGENRO_SUPABASE?.configured !== false;
 
 // Shorthand selector
 const $ = (id) => document.getElementById(id);
@@ -111,6 +102,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   if (isSupabaseConfigured) {
     await loadInventory();
     await loadMovements();
+    supabase.channel("inventory-admin-live")
+      .on("postgres_changes", { event: "*", schema: "public", table: "inventory" }, async () => {
+        await loadInventory();
+        await loadMovements();
+      })
+      .on("postgres_changes", { event: "*", schema: "public", table: "inventory_movements" }, loadMovements)
+      .subscribe();
   } else {
     setStatus(false, "Offline / Demo Mode (Set Supabase URL)");
     loadFromLocalStorage();
@@ -536,26 +534,18 @@ async function saveMovement(e) {
   }
 
   if (isSupabaseConfigured) {
-    const { error: updateError } = await supabase
-      .from("inventory")
-      .update({ quantity: newQty, updated_at: new Date().toISOString() })
-      .eq("id", item.id);
-
-    if (updateError) return toast(updateError.message, "error");
-
-    const { error: movError } = await supabase.from("inventory_movements").insert({
-      item_id: item.id,
-      movement_type: type,
-      quantity: qty,
-      balance_after: newQty,
-      reference_no: ref,
-      remarks: remarks,
-      recorded_by: $("adminName").textContent.trim()
+    const { error } = await supabase.rpc("record_inventory_movement", {
+      p_item_id: item.id,
+      p_movement_type: type,
+      p_quantity: qty,
+      p_reference_no: ref || null,
+      p_remarks: remarks || null,
+      p_recorded_by: $("adminName").textContent.trim() || "PGENRO Administrator"
     });
 
-    if (movError) toast("Quantity updated but movement logging failed.", "warning");
-    else toast("Stock movement successfully recorded.", "success");
+    if (error) return toast(error.message || "Unable to record stock movement.", "error");
 
+    toast("Stock movement successfully recorded.", "success");
     await loadInventory();
     await loadMovements();
   } else {
