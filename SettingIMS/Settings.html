@@ -1,127 +1,134 @@
 <!DOCTYPE html>
-
-<html data-css-scope="user-settings" data-theme="light" lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>PGENRO IMS | Account &amp; System Settings</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/lucide@latest"></script>
-
-
-<link href="Setting.css?v=20260915-css-organized" rel="stylesheet"/>
-<link href="../User/user-shell.css?v=20260915-css-organized" rel="stylesheet"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PGENRO IMS | Account & System Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="Setting.css?v=20260913-clean">
+  
+  
+<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
 </head>
-<body class="pgenro-user pgenro-settings" data-css-scope="user-settings" data-requires-auth="user">
-<div aria-live="polite" class="toast-container" id="toastContainer"></div>
-<header class="settings-topbar">
-<a class="settings-back" href="../User/homepage.html" id="backToWorkspace">
-<i data-lucide="arrow-left"></i><span>Back to workspace</span>
-</a>
-<div class="settings-brand">
-<img alt="PGENRO" src="../logo/enro.png"/>
-<div><strong>PGENRO IMS</strong><span>Account &amp; System Settings</span></div>
-</div>
-<button class="settings-signout" data-pgenro-logout="" title="Sign out" type="button"><i data-lucide="log-out"></i><span>Sign out</span></button>
-</header>
-<main class="settings-shell" id="workspaceMain">
-<section class="settings-heading">
-<div>
-<span class="eyebrow"><i data-lucide="settings-2"></i> Workspace configuration</span>
-<h1>Account &amp; System Settings</h1>
-<p>Manage your profile, password, interface preferences, and administrator-level system controls.</p>
-</div>
-<div class="settings-status" id="settingsDbStatus"><span></span> Connecting to Supabase…</div>
-</section>
-<div class="settings-layout">
-<aside class="settings-nav-card">
-<div class="settings-profile-summary">
-<div class="settings-avatar" id="profileInitials">PG</div>
-<div><strong id="profileNameDisplay">PGENRO User</strong><span id="profileRoleDisplay">Authorized Personnel</span></div>
-</div>
-<nav aria-label="Settings sections" class="settings-tabs">
-<button class="tab-btn active" data-tab="accountPanel" type="button"><i data-lucide="user-round"></i><span>Account Profile</span></button>
-<button class="tab-btn" data-tab="securityPanel" type="button"><i data-lucide="shield-check"></i><span>Password &amp; Security</span></button>
-<button class="tab-btn" data-tab="preferencesPanel" type="button"><i data-lucide="palette"></i><span>Preferences</span></button>
-<button class="tab-btn admin-only" data-tab="systemPanel" hidden="" type="button"><i data-lucide="sliders-horizontal"></i><span>System Settings</span></button>
-</nav>
-<div class="account-meta">
-<div><span>Account status</span><strong id="profileStatus">—</strong></div>
-<div><span>Last login</span><strong id="profileLastLogin">—</strong></div>
-</div>
-</aside>
-<section class="settings-panels">
-<article class="settings-panel active" id="accountPanel">
-<div class="panel-title"><div><h2>Account profile</h2><p>These details come from your Supabase personnel profile.</p></div><span class="panel-icon"><i data-lucide="id-card"></i></span></div>
-<form class="settings-form" id="profileForm">
-<div class="field-grid">
-<label class="field full"><span>Full name</span><input autocomplete="name" id="fullNameInput" maxlength="120" required=""/></label>
-<label class="field"><span>Username</span><input autocomplete="username" id="usernameInput" maxlength="80"/></label>
-<label class="field"><span>Official email</span><input id="emailInput" readonly="" type="email"/></label>
-<label class="field"><span>Contact number</span><input autocomplete="tel" id="contactInput" maxlength="40"/></label>
-<label class="field"><span>Position / designation</span><input id="positionInput" maxlength="120"/></label>
-<label class="field"><span>Division / office</span><input id="divisionInput" maxlength="120"/></label>
-<label class="field"><span>Role</span><input id="roleInput" readonly=""/></label>
-<label class="field"><span>Account type</span><input id="accountTypeInput" readonly=""/></label>
-</div>
-<div class="form-actions"><span class="form-note"><i data-lucide="info"></i> Role, status, and account type remain administrator-controlled.</span><button class="primary-btn" type="submit"><i data-lucide="save"></i> Save profile</button></div>
-</form>
-</article>
-<article class="settings-panel" id="securityPanel">
-<div class="panel-title"><div><h2>Password &amp; security</h2><p>Changing your password updates the current Supabase Auth account.</p></div><span class="panel-icon"><i data-lucide="lock-keyhole"></i></span></div>
-<form class="settings-form narrow-form" id="passwordForm">
-<label class="field"><span>Current password</span><input autocomplete="current-password" id="currentPasswordInput" required="" type="password"/></label>
-<label class="field"><span>New password</span><input autocomplete="new-password" id="newPasswordInput" minlength="8" required="" type="password"/></label>
-<label class="field"><span>Confirm new password</span><input autocomplete="new-password" id="confirmPasswordInput" minlength="8" required="" type="password"/></label>
-<div class="security-note"><i data-lucide="shield-check"></i><div><strong>Secure password update</strong><p>Your current password is verified first. Passwords are never stored in the public database.</p></div></div>
-<div class="form-actions right"><button class="primary-btn" type="submit"><i data-lucide="key-round"></i> Update password</button></div>
-</form>
-</article>
-<article class="settings-panel" id="preferencesPanel">
-<div class="panel-title"><div><h2>Interface preferences</h2><p>Preferences sync to your profile and are applied on both Admin and User workspaces.</p></div><span class="panel-icon"><i data-lucide="paintbrush"></i></span></div>
-<form class="settings-form" id="preferencesForm">
-<div class="preference-block">
-<h3>Theme</h3>
-<div class="theme-options">
-<label class="theme-option"><input checked="" name="theme" type="radio" value="light"/><span class="theme-preview light"></span><strong>Light</strong></label>
-<label class="theme-option"><input name="theme" type="radio" value="dark"/><span class="theme-preview dark"></span><strong>Dark</strong></label>
-</div>
-</div>
-<div class="toggle-list">
-<label class="toggle-row"><div><strong>Compact tables &amp; cards</strong><span>Show more information with tighter spacing.</span></div><input id="compactToggle" type="checkbox"/></label>
-<label class="toggle-row"><div><strong>Reduce interface animations</strong><span>Minimize movement and transition effects.</span></div><input id="reduceMotionToggle" type="checkbox"/></label>
-<label class="toggle-row"><div><strong>Email notification preference</strong><span>Store your preference for system email alerts.</span></div><input checked="" id="emailNotificationsToggle" type="checkbox"/></label>
-</div>
-<div class="form-actions right"><button class="primary-btn" type="submit"><i data-lucide="save"></i> Save preferences</button></div>
-</form>
-</article>
-<article class="settings-panel admin-only" hidden="" id="systemPanel">
-<div class="panel-title"><div><h2>System settings</h2><p>Administrator settings shared by both Admin and User workspaces.</p></div><span class="panel-icon"><i data-lucide="server-cog"></i></span></div>
-<form class="settings-form" id="systemSettingsForm">
-<div class="field-grid">
-<label class="field full"><span>Organization name</span><input id="organizationNameInput" maxlength="120"/></label>
-<label class="field full"><span>System / office name</span><input id="officeNameInput" maxlength="160"/></label>
-<label class="field"><span>Session timeout (minutes)</span><input id="sessionTimeoutInput" max="480" min="5" step="5" type="number"/></label>
-<label class="field"><span>Default records per page</span><select id="pageSizeInput"><option>10</option><option>25</option><option>50</option><option>100</option></select></label>
-</div>
-<div class="toggle-list">
-<label class="toggle-row"><div><strong>Allow new account requests</strong><span>Controls whether the public personnel request form accepts submissions.</span></div><input checked="" id="accountRequestsToggle" type="checkbox"/></label>
-<label class="toggle-row"><div><strong>Maintenance notice</strong><span>Marks the workspace as undergoing maintenance without locking administrators out.</span></div><input id="maintenanceToggle" type="checkbox"/></label>
-<label class="toggle-row"><div><strong>Show system announcement</strong><span>Display the announcement across Admin and User pages.</span></div><input id="announcementEnabledToggle" type="checkbox"/></label>
-</div>
-<label class="field full"><span>System announcement</span><textarea id="announcementInput" maxlength="500" placeholder="Example: Scheduled maintenance on Friday at 5:00 PM." rows="4"></textarea></label>
-<div class="form-actions"><span class="form-note"><i data-lucide="database"></i> Saved in public.system_settings through an admin-only Supabase RPC.</span><button class="primary-btn" type="submit"><i data-lucide="database-zap"></i> Save system settings</button></div>
-</form>
-</article>
-</section>
-</div>
-</main>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js?v=20260914-fixed"></script>
-<script src="../shared/settings-runtime.js?v=20260913"></script>
-<script src="Settings.js?v=20260914-organized"></script>
+<body class="pgenro-user pgenro-settings" data-requires-auth="user">
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
+  <header class="settings-topbar">
+    <a class="settings-back" id="backToWorkspace" href="../User/homepage.html">
+      <i data-lucide="arrow-left"></i><span>Back to workspace</span>
+    </a>
+    <div class="settings-brand">
+      <img src="../logo/enro.png" alt="PGENRO" />
+      <div><strong>PGENRO IMS</strong><span>Account & System Settings</span></div>
+    </div>
+    <button class="settings-signout" type="button" data-pgenro-logout title="Sign out"><i data-lucide="log-out"></i><span>Sign out</span></button>
+  </header>
+
+  <main class="settings-shell" id="workspaceMain">
+    <section class="settings-heading">
+      <div>
+        <span class="eyebrow"><i data-lucide="settings-2"></i> Workspace configuration</span>
+        <h1>Account & System Settings</h1>
+        <p>Manage your profile, password, interface preferences, and administrator-level system controls.</p>
+      </div>
+      <div class="settings-status" id="settingsDbStatus"><span></span> Connecting to Supabase…</div>
+    </section>
+
+    <div class="settings-layout">
+      <aside class="settings-nav-card">
+        <div class="settings-profile-summary">
+          <div class="settings-avatar" id="profileInitials">PG</div>
+          <div><strong id="profileNameDisplay">PGENRO User</strong><span id="profileRoleDisplay">Authorized Personnel</span></div>
+        </div>
+        <nav class="settings-tabs" aria-label="Settings sections">
+          <button type="button" class="tab-btn active" data-tab="accountPanel"><i data-lucide="user-round"></i><span>Account Profile</span></button>
+          <button type="button" class="tab-btn" data-tab="securityPanel"><i data-lucide="shield-check"></i><span>Password & Security</span></button>
+          <button type="button" class="tab-btn" data-tab="preferencesPanel"><i data-lucide="palette"></i><span>Preferences</span></button>
+          <button type="button" class="tab-btn admin-only" data-tab="systemPanel" hidden><i data-lucide="sliders-horizontal"></i><span>System Settings</span></button>
+        </nav>
+        <div class="account-meta">
+          <div><span>Account status</span><strong id="profileStatus">—</strong></div>
+          <div><span>Last login</span><strong id="profileLastLogin">—</strong></div>
+        </div>
+      </aside>
+
+      <section class="settings-panels">
+        <article class="settings-panel active" id="accountPanel">
+          <div class="panel-title"><div><h2>Account profile</h2><p>These details come from your Supabase personnel profile.</p></div><span class="panel-icon"><i data-lucide="id-card"></i></span></div>
+          <form id="profileForm" class="settings-form">
+            <div class="field-grid">
+              <label class="field full"><span>Full name</span><input id="fullNameInput" required maxlength="120" autocomplete="name" /></label>
+              <label class="field"><span>Username</span><input id="usernameInput" maxlength="80" autocomplete="username" /></label>
+              <label class="field"><span>Official email</span><input id="emailInput" type="email" readonly /></label>
+              <label class="field"><span>Contact number</span><input id="contactInput" maxlength="40" autocomplete="tel" /></label>
+              <label class="field"><span>Position / designation</span><input id="positionInput" maxlength="120" /></label>
+              <label class="field"><span>Division / office</span><input id="divisionInput" maxlength="120" /></label>
+              <label class="field"><span>Role</span><input id="roleInput" readonly /></label>
+              <label class="field"><span>Account type</span><input id="accountTypeInput" readonly /></label>
+            </div>
+            <div class="form-actions"><span class="form-note"><i data-lucide="info"></i> Role, status, and account type remain administrator-controlled.</span><button class="primary-btn" type="submit"><i data-lucide="save"></i> Save profile</button></div>
+          </form>
+        </article>
+
+        <article class="settings-panel" id="securityPanel">
+          <div class="panel-title"><div><h2>Password & security</h2><p>Changing your password updates the current Supabase Auth account.</p></div><span class="panel-icon"><i data-lucide="lock-keyhole"></i></span></div>
+          <form id="passwordForm" class="settings-form narrow-form">
+            <label class="field"><span>Current password</span><input id="currentPasswordInput" type="password" required autocomplete="current-password" /></label>
+            <label class="field"><span>New password</span><input id="newPasswordInput" type="password" required minlength="8" autocomplete="new-password" /></label>
+            <label class="field"><span>Confirm new password</span><input id="confirmPasswordInput" type="password" required minlength="8" autocomplete="new-password" /></label>
+            <div class="security-note"><i data-lucide="shield-check"></i><div><strong>Secure password update</strong><p>Your current password is verified first. Passwords are never stored in the public database.</p></div></div>
+            <div class="form-actions right"><button class="primary-btn" type="submit"><i data-lucide="key-round"></i> Update password</button></div>
+          </form>
+        </article>
+
+        <article class="settings-panel" id="preferencesPanel">
+          <div class="panel-title"><div><h2>Interface preferences</h2><p>Preferences sync to your profile and are applied on both Admin and User workspaces.</p></div><span class="panel-icon"><i data-lucide="paintbrush"></i></span></div>
+          <form id="preferencesForm" class="settings-form">
+            <div class="preference-block">
+              <h3>Theme</h3>
+              <div class="theme-options">
+                <label class="theme-option"><input type="radio" name="theme" value="light" checked /><span class="theme-preview light"></span><strong>Light</strong></label>
+                <label class="theme-option"><input type="radio" name="theme" value="dark" /><span class="theme-preview dark"></span><strong>Dark</strong></label>
+              </div>
+            </div>
+            <div class="toggle-list">
+              <label class="toggle-row"><div><strong>Compact tables & cards</strong><span>Show more information with tighter spacing.</span></div><input id="compactToggle" type="checkbox" /></label>
+              <label class="toggle-row"><div><strong>Reduce interface animations</strong><span>Minimize movement and transition effects.</span></div><input id="reduceMotionToggle" type="checkbox" /></label>
+              <label class="toggle-row"><div><strong>Email notification preference</strong><span>Store your preference for system email alerts.</span></div><input id="emailNotificationsToggle" type="checkbox" checked /></label>
+            </div>
+            <div class="form-actions right"><button class="primary-btn" type="submit"><i data-lucide="save"></i> Save preferences</button></div>
+          </form>
+        </article>
+
+        <article class="settings-panel admin-only" id="systemPanel" hidden>
+          <div class="panel-title"><div><h2>System settings</h2><p>Administrator settings shared by both Admin and User workspaces.</p></div><span class="panel-icon"><i data-lucide="server-cog"></i></span></div>
+          <form id="systemSettingsForm" class="settings-form">
+            <div class="field-grid">
+              <label class="field full"><span>Organization name</span><input id="organizationNameInput" maxlength="120" /></label>
+              <label class="field full"><span>System / office name</span><input id="officeNameInput" maxlength="160" /></label>
+              <label class="field"><span>Session timeout (minutes)</span><input id="sessionTimeoutInput" type="number" min="5" max="480" step="5" /></label>
+              <label class="field"><span>Default records per page</span><select id="pageSizeInput"><option>10</option><option>25</option><option>50</option><option>100</option></select></label>
+            </div>
+            <div class="toggle-list">
+              <label class="toggle-row"><div><strong>Allow new account requests</strong><span>Controls whether the public personnel request form accepts submissions.</span></div><input id="accountRequestsToggle" type="checkbox" checked /></label>
+              <label class="toggle-row"><div><strong>Maintenance notice</strong><span>Marks the workspace as undergoing maintenance without locking administrators out.</span></div><input id="maintenanceToggle" type="checkbox" /></label>
+              <label class="toggle-row"><div><strong>Show system announcement</strong><span>Display the announcement across Admin and User pages.</span></div><input id="announcementEnabledToggle" type="checkbox" /></label>
+            </div>
+            <label class="field full"><span>System announcement</span><textarea id="announcementInput" rows="4" maxlength="500" placeholder="Example: Scheduled maintenance on Friday at 5:00 PM."></textarea></label>
+            <div class="form-actions"><span class="form-note"><i data-lucide="database"></i> Saved in public.system_settings through an admin-only Supabase RPC.</span><button class="primary-btn" type="submit"><i data-lucide="database-zap"></i> Save system settings</button></div>
+          </form>
+        </article>
+      </section>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../shared/supabase.js"></script>
+  <script src="../shared/settings-runtime.js?v=20260913"></script>
+  <script src="Settings.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
 </body>
 </html>

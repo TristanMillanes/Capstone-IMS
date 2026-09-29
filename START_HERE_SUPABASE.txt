@@ -1,0 +1,47 @@
+PGENRO IMS — FINAL SUPABASE BUILD
+=================================
+
+Project Ref: zssrxubajhqryrwijyzm
+Project URL: https://zssrxubajhqryrwijyzm.supabase.co
+Region: ap-southeast-1
+
+1) DATABASE
+-----------
+Run the whole file below once in Supabase Dashboard > SQL Editor:
+
+  supabase/PGENRO_FULL_SETUP.sql
+
+It is also safe to use as the final upgrade script for the existing PGENRO schema.
+
+2) FIRST ADMIN (only if none exists)
+-----------------------------------
+Create the account in Authentication > Users, then run:
+
+  select public.promote_pgenro_first_admin('YOUR_ADMIN_EMAIL');
+
+3) ADMIN AUTH EDGE FUNCTION
+---------------------------
+Deploy:
+
+  supabase login
+  supabase link --project-ref zssrxubajhqryrwijyzm
+  supabase functions deploy admin-users
+
+4) FRONTEND
+-----------
+All frontend pages use ONE client:
+
+  shared/supabase.js
+
+Visitors Log no longer creates a second Supabase Auth client.
+Never put a secret/service-role key in browser code.
+
+5) TEST
+-------
+Run the project with VS Code Live Server (or another web server), then open:
+
+  SUPABASE_CONNECTION_TEST.html
+
+All three checks should be green.
+
+See FINAL_SETUP_GUIDE.md for the complete verification checklist.

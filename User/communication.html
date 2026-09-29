@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+
+<html data-theme="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Communication Logs</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- CSS -->
+<link rel="stylesheet" href="communication.css?v=20260913-clean">
+
+
+
+
+<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
+</head>
+<body class="pgenro-user" data-requires-auth="user">
+<!-- Overlay Backdrop -->
+<div class="overlay" id="overlay"></div>
+<!-- NAVBAR -->
+<header class="navbar">
+<!-- Left Section: Menu Toggle & Brand Logo -->
+<div class="nav-left-container">
+<button aria-label="Toggle Navigation Menu" class="hamburger-menu" id="hamburgerMenu" type="button">
+<span></span>
+<span></span>
+<span></span>
+</button>
+<a class="logo-area" href="homepage.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'" src="../logo/enro.png"/>
+</div>
+<div class="logo-text">
+<h2>Provincial Government</h2>
+<span>Environment &amp; Natural Resources Office</span>
+</div>
+</a>
+</div>
+<!-- Right Section: Profile Menu -->
+<div class="right-nav">
+<div class="profile-menu" id="profileMenu">
+<button class="profile-btn" id="profileBtn" type="button">
+<div class="profile-avatar">
+<i data-lucide="user"></i>
+</div>
+<div class="profile-text">
+<h4>PGENRO OFFICER</h4>
+<span>Authorized Account</span>
+</div>
+<i class="profile-chevron" data-lucide="chevron-down"></i>
+</button>
+<div class="profile-dropdown" id="profileDropdown">
+<div class="profile-dropdown-header">
+<div class="profile-avatar big">
+<i data-lucide="user"></i>
+</div>
+<div>
+<h3>PGENRO User</h3>
+<p>Authorized Viewer</p>
+</div>
+</div>
+<a href="homepage.html">
+<i data-lucide="layout-dashboard"></i>
+            Dashboard Overview
+          </a>
+
+<button class="logout-btn" id="logoutBtn" type="button">
+<i data-lucide="log-out"></i>
+            Logout
+          </button>
+</div>
+</div>
+</div>
+</header>
+<div class="app-container">
+<!-- FLOATING SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>IMS Workspace</h3>
+<p class="sidebar-subtext">User Modules</p>
+</div>
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a class="active" aria-current="page" href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a href="travelor.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
+<li><a href="visitorsview.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+</ul>
+<div class="sidebar-footer">
+<div class="system-status">
+<span class="status-indicator online"></span>
+<span class="status-text">IMS Database Connected</span>
+</div>
+</div>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="main-content" id="mainContent">
+<!-- HERO HEADER -->
+<section class="page-header reveal">
+<div class="header-content">
+<span class="badge">
+<i data-lucide="shield-check"></i>
+            Database Viewer Active
+          </span>
+<h1>Incoming &amp; Outgoing <span>Communications</span></h1>
+<p>Real-time database records of official documents, transmittals, inquiries, and routing actions.</p>
+</div>
+</section>
+<!-- METRICS CARDS -->
+<section class="stats-grid reveal">
+<div class="stat-card">
+<div class="stat-icon-container">
+<i data-lucide="database"></i>
+</div>
+<div class="stat-info">
+<p>Total Records</p>
+<h2 id="totalRecords">0</h2>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon-container">
+<i data-lucide="inbox"></i>
+</div>
+<div class="stat-info">
+<p>Incoming Documents</p>
+<h2 id="incomingCount">0</h2>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon-container">
+<i data-lucide="send"></i>
+</div>
+<div class="stat-info">
+<p>Outgoing Releases</p>
+<h2 id="outgoingCount">0</h2>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon-container">
+<i data-lucide="clock-3"></i>
+</div>
+<div class="stat-info">
+<p>Pending Action</p>
+<h2 id="pendingCount">0</h2>
+</div>
+</div>
+</section>
+<!-- RECORDS REGISTRY TABLE -->
+<section class="records-card reveal">
+<div class="records-header">
+<div class="card-title">
+<span>Official Records</span>
+<h2>Communication Database</h2>
+<p>Search, filter, and inspect registered communication entries.</p>
+</div>
+</div>
+<div class="filter-bar">
+<div class="tabs">
+<button class="tab-btn active" onclick="setFilter('All', this)">All Records</button>
+<button class="tab-btn" onclick="setFilter('Incoming', this)">Incoming</button>
+<button class="tab-btn" onclick="setFilter('Outgoing', this)">Outgoing</button>
+</div>
+<div class="tools">
+<div class="search-field">
+<i data-lucide="search"></i>
+<input id="searchInput" oninput="displayRecords()" placeholder="Search control no., subject, office..." type="text"/>
+</div>
+<select id="statusFilter" onchange="displayRecords()">
+<option value="All">All Statuses</option>
+<option value="Pending">Pending</option>
+<option value="Received">Received</option>
+<option value="Forwarded">Forwarded</option>
+<option value="Released">Released</option>
+<option value="Archived">Archived</option>
+</select>
+</div>
+</div>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th>Control No.</th>
+<th>Date</th>
+<th>Sender / Recipient Office</th>
+<th>Subject / Particulars</th>
+<th>Action Taken</th>
+<th>Status</th>
+<th style="text-align: center; width: 80px;">Action</th>
+</tr>
+</thead>
+<tbody id="recordsTable"></tbody>
+</table>
+</div>
+</section>
+<!-- FOOTER -->
+<footer class="footer" id="contact">
+<div class="footer-container">
+<div class="footer-brand">
+<h2>PGENRO IMS</h2>
+<p>
+              Provincial Government Environment and Natural Resources Office of Quezon Province. Managing resources through stable software architecture.
+            </p>
+</div>
+<div class="footer-group">
+<h4>IMS Modules</h4>
+<div class="footer-links-grid">
+<a href="homepage.html">Home Overview</a>
+<a href="homepage.html#analytics">Analytics</a>
+<a href="officememo.html">Office Memos</a>
+<a href="communication.html">Communications</a>
+<a href="visitorsview.html">Visitor Logs</a>
+</div>
+</div>
+<div class="footer-contact">
+<h4>Contact Support</h4>
+<p><strong>Email:</strong> systems@pgenro.gov.ph</p>
+<p><strong>Location:</strong> PGENRO Building, Lucena City, Quezon Province</p>
+</div>
+</div>
+<div class="footer-bottom">
+<p>© 2025 PGENRO. All Rights Reserved. Province of Quezon.</p>
+</div>
+</footer>
+</main>
+</div>
+<!-- READ-ONLY INSPECTION MODAL -->
+<div class="form-modal" id="viewModal">
+<div class="modal-header">
+<div>
+<h3>Document Information</h3>
+<p>Complete communication metadata</p>
+</div>
+<button class="modal-close" id="viewModalClose" type="button">
+<i data-lucide="x"></i>
+</button>
+</div>
+<div class="modal-body">
+<div class="form-row">
+<div>
+<label>Control No.</label>
+<input id="viewControlNo" readonly="" type="text"/>
+</div>
+<div>
+<label>Type</label>
+<input id="viewType" readonly="" type="text"/>
+</div>
+</div>
+<div class="form-row">
+<div>
+<label>Document Category</label>
+<input id="viewDocType" readonly="" type="text"/>
+</div>
+<div>
+<label>Status</label>
+<input id="viewStatus" readonly="" type="text"/>
+</div>
+</div>
+<label>Office / Correspondent</label>
+<textarea id="viewOffice" readonly=""></textarea>
+<label>Subject / Particulars</label>
+<textarea id="viewSubject" readonly=""></textarea>
+<label>Action Taken / Date Forwarded</label>
+<textarea id="viewDateForwarded" readonly=""></textarea>
+<label>Extracted OCR Content</label>
+<textarea id="viewOcrText" readonly="" style="min-height: 110px;"></textarea>
+</div>
+</div>
+<!-- Scroll-to-Top Floating Trigger Button -->
+<button aria-label="Scroll back to top" class="scroll-to-top-btn" id="scrollToTopBtn" type="button">
+<i data-lucide="chevron-up"></i>
+</button>
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../user-javascript/Communication.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
+</body>
+</html>

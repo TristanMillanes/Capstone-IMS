@@ -1,244 +1,266 @@
 <!DOCTYPE html>
-
-<html data-css-scope="public-visitors" lang="en">
+<html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="#075f4b" name="theme-color"/>
-<title>PGENRO IMS | Visitors Log</title>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="visitorslog.css?v=20260915-uiux-fixed" rel="stylesheet"/>
-</head>
-<body class="pgenro-public-visitor" data-css-scope="public-visitors">
-<div aria-hidden="true" class="day" id="sky-background">
-<div class="stars"></div>
-<div class="sky-glow"></div>
-<div class="sun-moon" id="celestialBody"></div>
-<div class="cloud cloud-1"></div>
-<div class="cloud cloud-2"></div>
-<div class="cloud cloud-3"></div>
-<div class="cloud cloud-4"></div>
-<div class="mist mist-1"></div>
-<div class="mist mist-2"></div>
-<div class="mountain-scene">
-<svg preserveaspectratio="none" role="presentation" viewbox="0 0 1440 560">
-<path class="mountain ridge-back" d="M0 410 L118 320 L224 354 L348 258 L472 326 L602 226 L716 310 L858 216 L982 320 L1118 235 L1248 318 L1374 260 L1440 300 L1440 560 L0 560Z"></path>
-<path class="mountain far" d="M0 444 L146 275 L288 351 L458 180 L628 351 L794 223 L984 372 L1168 194 L1440 393 L1440 560 L0 560Z"></path>
-<path class="mountain mid" d="M0 488 L216 284 C318 158 432 148 528 228 C628 318 732 270 846 177 C968 76 1094 190 1208 308 L1440 450 L1440 560 L0 560Z"></path>
-<path class="mountain front" d="M0 560 L0 456 C164 374 287 326 418 265 C530 212 622 176 728 219 C830 261 936 352 1042 376 C1172 402 1308 348 1440 288 L1440 560Z"></path>
-<path class="mountain forest" d="M0 560 L0 515 L54 493 L78 450 L100 490 L145 474 L170 430 L193 474 L247 462 L272 416 L298 462 L352 450 L385 401 L412 452 L472 441 L506 389 L536 442 L594 433 L624 380 L655 436 L716 428 L749 369 L781 430 L844 426 L876 378 L906 428 L964 435 L997 391 L1032 441 L1090 448 L1118 407 L1146 454 L1198 461 L1224 418 L1250 469 L1304 475 L1330 432 L1354 482 L1402 490 L1440 478 L1440 560Z"></path>
-</svg>
-</div>
-</div>
-<div aria-hidden="true" id="leaves-container"></div>
-<div aria-hidden="true" class="screen-overlay"></div>
-<a aria-label="Open PGENRO staff login" class="admin-login-btn" href="../User/login.html">
-<span aria-hidden="true" class="admin-login-icon">
-<svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="18">
-<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-<polyline points="10 17 15 12 10 7"></polyline>
-<line x1="15" x2="3" y1="12" y2="12"></line>
-</svg>
-</span>
-<span>Staff Login</span>
-</a>
-<main class="page-layout">
-<section class="hero-panel">
-<div class="brand-header animate-pop">
-<div class="logo-glass">
-<img alt="PGENRO Logo" onerror="this.style.display='none'" src="../logo/enro.png"/>
-</div>
-<div class="brand-copy">
-<span class="brand-overline">Province of Quezon</span>
-<h1>PROVINCIAL GOVERNMENT</h1>
-<p>Environment and Natural Resources Office</p>
-</div>
-</div>
-<div class="welcome-text animate-fade-in">
-<div class="eyebrow"><span class="status-dot"></span> VISITORS LOG • PGENRO IMS</div>
-<h2>Welcome to the<br/><span>Office Premises</span></h2>
-<p>Complete the visitor log before entering. Your information is recorded securely for office monitoring, visitor assistance, and proper coordination.</p>
-<div aria-label="Visitor log benefits" class="hero-features">
-<div class="hero-feature">
-<span class="feature-icon">✓</span>
-<span>Quick registration</span>
-</div>
-<div class="hero-feature">
-<span class="feature-icon">⌁</span>
-<span>Secure monitoring</span>
-</div>
-<div class="hero-feature">
-<span class="feature-icon">◎</span>
-<span>Live office log</span>
-</div>
-</div>
-</div>
-<div class="clock-widget glass-card animate-scale-in">
-<div aria-hidden="true" class="analog-clock">
-<span class="clock-mark mark-12"></span>
-<span class="clock-mark mark-3"></span>
-<span class="clock-mark mark-6"></span>
-<span class="clock-mark mark-9"></span>
-<div class="hand hour-hand" id="hourHand"></div>
-<div class="hand min-hand" id="minHand"></div>
-<div class="hand sec-hand" id="secHand"></div>
-<div class="clock-center"></div>
-</div>
-<div class="clock-details">
-<span class="clock-caption">Current office time</span>
-<span id="todayDate">Loading date...</span>
-<div aria-label="Current time" class="time-line">
-<strong id="timeHour">00</strong><strong class="time-colon">:</strong><strong id="timeMinute">00</strong><strong class="time-colon">:</strong><strong id="timeSecond">00</strong><em id="timeAmpm">AM</em>
-</div>
-</div>
-</div>
-</section>
-<section class="form-panel">
-<div class="form-container glass-card interactive-card animate-slide-up" id="visitorCard">
-<div aria-hidden="true" class="card-shine"></div>
-<div class="form-header">
-<div class="kiosk-status-row">
-<span class="connection-pill is-ready" id="dbConnectionStatus" role="status">
-<span class="connection-dot"></span>
-<span class="connection-label">Ready to register</span>
-</span>
-<span class="required-note">Required fields are checked automatically</span>
-</div>
-<div class="form-heading-row">
-<div>
-<span class="form-kicker"><span class="status-dot"></span> Visitor Registration</span>
-<h2>Register Your Visit</h2>
-<p>Complete the required details below before entering the office.</p>
-</div>
-<div aria-live="polite" class="step-badge" id="progressPercent">0%</div>
-</div>
-</div>
-<div class="progress-block">
-<div class="progress-meta">
-<span id="progressText">Start your visitor entry</span>
-<span id="progressCount">0 / 5 fields</span>
-</div>
-<div aria-hidden="true" class="progress-track">
-<div class="progress-fill" id="progressBar"></div>
-</div>
-</div>
-<div class="form-section-label"><span>Visitor information</span><small>All fields marked by the form are required</small></div>
-<form id="visitorForm" novalidate="">
-<div class="form-row">
-<div class="input-group">
-<div class="floating-input">
-<span aria-hidden="true" class="field-icon">✦</span>
-<input autocomplete="name" id="fullName" maxlength="100" name="fullName" placeholder=" " required="" type="text"/>
-<label for="fullName">Full Name</label>
-<span aria-hidden="true" class="field-state"></span>
-</div>
-<span aria-live="polite" class="error-msg"></span>
-</div>
-<div class="input-group">
-<div class="floating-input">
-<span aria-hidden="true" class="field-icon">⌕</span>
-<input autocomplete="tel" aria-describedby="contactHint" id="contact" inputmode="numeric" maxlength="11" name="contact" placeholder=" " required="" type="tel"/>
-<label for="contact">Mobile Number</label>
-<span aria-hidden="true" class="field-state"></span>
-</div>
-<span aria-live="polite" class="error-msg"></span>
-<small class="field-hint" id="contactHint">Format: 09XXXXXXXXX</small>
-</div>
-</div>
-<div class="input-group">
-<div class="floating-input">
-<span aria-hidden="true" class="field-icon">⌂</span>
-<input autocomplete="street-address" id="address" maxlength="160" name="address" placeholder=" " required="" type="text"/>
-<label for="address">Address / Agency / Office</label>
-<span aria-hidden="true" class="field-state"></span>
-</div>
-<span aria-live="polite" class="error-msg"></span>
-</div>
-<div class="input-group">
-<div class="floating-input">
-<span aria-hidden="true" class="field-icon">◉</span>
-<input id="personToVisit" maxlength="100" name="personToVisit" placeholder=" " required="" type="text"/>
-<label for="personToVisit">Person / Department to Visit</label>
-<span aria-hidden="true" class="field-state"></span>
-</div>
-<span aria-live="polite" class="error-msg"></span>
-</div>
-<div class="input-group">
-<div class="floating-input select-input">
-<span aria-hidden="true" class="field-icon">≡</span>
-<select id="purposeCategory" name="purposeCategory" required="">
-<option disabled="" hidden="" selected="" value=""></option>
-<optgroup label="Technical Assistance">
-<option value="Technical Assistance - Tree Planting">Tree Planting</option>
-<option value="Technical Assistance - WACS">WACS</option>
-<option value="Technical Assistance - 10 Year SWM Plan">10 Year SWM Plan</option>
-<option value="Technical Assistance - Others">Others (Please specify)</option>
-</optgroup>
-<optgroup label="I.E.C">
-<option value="I.E.C - Request for Speaker">Request for Speaker</option>
-<option value="I.E.C - Request for Information">Request for Information</option>
-<option value="I.E.C - Request for Interview">Request for Interview</option>
-<option value="I.E.C - Others">Others (Please specify)</option>
-</optgroup>
-<optgroup label="Provision of Planting Materials">
-<option value="Provision of Planting Materials - Native Tree Seedlings">Native Tree Seedlings</option>
-</optgroup>
-<optgroup label="Environmental Concerns &amp; Complaints">
-<option value="Environmental Concerns - Solid Waste">Solid Waste</option>
-<option value="Environmental Concerns - Air Quality">Air Quality</option>
-<option value="Environmental Concerns - Water Quality">Water Quality</option>
-<option value="Environmental Concerns - Wildlife">Wildlife</option>
-<option value="Environmental Concerns - Natural Resources">Natural Resources</option>
-<option value="Environmental Concerns - Others">Others (Please specify)</option>
-</optgroup>
-<optgroup label="Certification">
-<option value="Certification - Orientation (PA Memo 2023-03)">Orientation (PA Memo 2023-03 &amp; 2023-03B)</option>
-<option value="Certification - Ambulant Vendors/Stalls">Certificates for Ambulant Vendors &amp; Stalls</option>
-</optgroup>
-<option value="Other Service not listed">Other Service not listed</option>
-</select>
-<label for="purposeCategory">Purpose Category</label>
-<span aria-hidden="true" class="select-chevron">⌄</span>
-<span aria-hidden="true" class="field-state"></span>
-</div>
-<span aria-live="polite" class="error-msg"></span>
-</div>
-<div aria-hidden="true" class="input-group other-purpose-group" id="otherPurposeGroup">
-<div class="floating-input">
-<span aria-hidden="true" class="field-icon">＋</span>
-<input id="otherPurposeSpecific" maxlength="180" name="otherPurposeSpecific" placeholder=" " type="text"/>
-<label for="otherPurposeSpecific">Please specify 'Other'</label>
-<span aria-hidden="true" class="field-state"></span>
-</div>
-<span aria-live="polite" class="error-msg"></span>
-</div>
-<button class="submit-btn" id="submitBtn" type="submit">
-<span class="submit-btn-label">Submit Entry Log</span>
-<span aria-hidden="true" class="submit-btn-arrow">→</span>
-<span aria-hidden="true" class="submit-spinner"></span>
-</button>
-<p class="security-note">
-<span aria-hidden="true" class="security-icon">◆</span>
-<span>Your information is used only for office visitor monitoring and coordination.</span>
-</p>
-</form>
-</div>
-</section>
-</main>
-<div aria-atomic="true" aria-live="polite" class="toast-stack" id="toastStack"></div>
-<div aria-hidden="true" class="modal-overlay" id="successModal">
-<div aria-labelledby="successTitle" aria-modal="true" class="modal-content glass-card" role="dialog" tabindex="-1">
-<div aria-hidden="true" class="success-rings"><div class="success-circle">✓</div></div>
-<span class="modal-kicker">Registration Complete</span>
-<h2 id="successTitle">Entry Authorized</h2>
-<p>Thank you, <strong id="visitorNameDisplay">Visitor</strong>.<br/>Your entry is recorded. You may now proceed to the front desk.</p>
-<button id="closeModalBtn" type="button">Done</button>
-</div>
-</div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="visitorslog.js?v=20260915-uiux-fixed"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#075f4b" />
+  <title>PGENRO IMS | Visitors Log</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="visitorslog.css?v=20260913-clean">
+  
+
+
+<link rel="stylesheet" href="../shared/public.css?v=20260913-clean2">
+</head>
+<body class="pgenro-public-visitor">
+  <div id="sky-background" class="day" aria-hidden="true">
+    <div class="stars"></div>
+    <div class="sky-glow"></div>
+    <div class="sun-moon" id="celestialBody"></div>
+
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <div class="cloud cloud-3"></div>
+    <div class="cloud cloud-4"></div>
+
+    <div class="mist mist-1"></div>
+    <div class="mist mist-2"></div>
+
+    <div class="mountain-scene">
+      <svg viewBox="0 0 1440 560" preserveAspectRatio="none" role="presentation">
+        <path class="mountain ridge-back" d="M0 410 L118 320 L224 354 L348 258 L472 326 L602 226 L716 310 L858 216 L982 320 L1118 235 L1248 318 L1374 260 L1440 300 L1440 560 L0 560Z"/>
+        <path class="mountain far" d="M0 444 L146 275 L288 351 L458 180 L628 351 L794 223 L984 372 L1168 194 L1440 393 L1440 560 L0 560Z"/>
+        <path class="mountain mid" d="M0 488 L216 284 C318 158 432 148 528 228 C628 318 732 270 846 177 C968 76 1094 190 1208 308 L1440 450 L1440 560 L0 560Z"/>
+        <path class="mountain front" d="M0 560 L0 456 C164 374 287 326 418 265 C530 212 622 176 728 219 C830 261 936 352 1042 376 C1172 402 1308 348 1440 288 L1440 560Z"/>
+        <path class="mountain forest" d="M0 560 L0 515 L54 493 L78 450 L100 490 L145 474 L170 430 L193 474 L247 462 L272 416 L298 462 L352 450 L385 401 L412 452 L472 441 L506 389 L536 442 L594 433 L624 380 L655 436 L716 428 L749 369 L781 430 L844 426 L876 378 L906 428 L964 435 L997 391 L1032 441 L1090 448 L1118 407 L1146 454 L1198 461 L1224 418 L1250 469 L1304 475 L1330 432 L1354 482 L1402 490 L1440 478 L1440 560Z"/>
+      </svg>
+    </div>
+  </div>
+
+  <div id="leaves-container" aria-hidden="true"></div>
+  <div class="screen-overlay" aria-hidden="true"></div>
+
+  <a class="admin-login-btn" href="../User/login.html" aria-label="Open administrator login">
+    <span class="admin-login-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+        <polyline points="10 17 15 12 10 7"/>
+        <line x1="15" y1="12" x2="3" y2="12"/>
+      </svg>
+    </span>
+    <span>Log-In Form</span>
+  </a>
+
+  <main class="page-layout">
+    <section class="hero-panel">
+      <div class="brand-header animate-pop">
+        <div class="logo-glass">
+          <img src="../logo/enro.png" alt="PGENRO Logo" onerror="this.style.display='none'">
+        </div>
+        <div class="brand-copy">
+          <span class="brand-overline">Province of Quezon</span>
+          <h1>PROVINCIAL GOVERNMENT</h1>
+          <p>Environment and Natural Resources Office</p>
+        </div>
+      </div>
+
+      <div class="welcome-text animate-fade-in">
+        <div class="eyebrow"><span class="status-dot"></span> VISITORS LOG • PGENRO IMS</div>
+        <h2>Welcome to the<br><span>Office Premises</span></h2>
+        <p>Complete the visitor log before entering. Your information is recorded securely for office monitoring, visitor assistance, and proper coordination.</p>
+
+        <div class="hero-features" aria-label="Visitor log benefits">
+          <div class="hero-feature">
+            <span class="feature-icon">✓</span>
+            <span>Quick registration</span>
+          </div>
+          <div class="hero-feature">
+            <span class="feature-icon">⌁</span>
+            <span>Secure monitoring</span>
+          </div>
+          <div class="hero-feature">
+            <span class="feature-icon">◎</span>
+            <span>Live office log</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="clock-widget glass-card animate-scale-in">
+        <div class="analog-clock" aria-hidden="true">
+          <span class="clock-mark mark-12"></span>
+          <span class="clock-mark mark-3"></span>
+          <span class="clock-mark mark-6"></span>
+          <span class="clock-mark mark-9"></span>
+          <div class="hand hour-hand" id="hourHand"></div>
+          <div class="hand min-hand" id="minHand"></div>
+          <div class="hand sec-hand" id="secHand"></div>
+          <div class="clock-center"></div>
+        </div>
+        <div class="clock-details">
+          <span class="clock-caption">Current office time</span>
+          <span id="todayDate">Loading date...</span>
+          <div class="time-line" aria-label="Current time">
+            <strong id="timeHour">00</strong><strong class="time-colon">:</strong><strong id="timeMinute">00</strong><strong class="time-colon">:</strong><strong id="timeSecond">00</strong><em id="timeAmpm">AM</em>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="form-panel">
+      <div class="form-container glass-card interactive-card animate-slide-up" id="visitorCard">
+        <div class="card-shine" aria-hidden="true"></div>
+
+        <div class="form-header">
+          <div class="form-heading-row">
+            <div>
+              <span class="form-kicker"><span class="status-dot"></span> Secure Digital Registration</span>
+              <h2>Visitor Log Entry</h2>
+              <p>Please complete all required fields before submitting.</p>
+            </div>
+            <div class="step-badge" id="progressPercent" aria-live="polite">0%</div>
+          </div>
+        </div>
+
+        <div class="progress-block">
+          <div class="progress-meta">
+            <span id="progressText">Start your visitor entry</span>
+            <span id="progressCount">0 / 5 fields</span>
+          </div>
+          <div class="progress-track" aria-hidden="true">
+            <div class="progress-fill" id="progressBar"></div>
+          </div>
+        </div>
+
+        <form id="visitorForm" novalidate>
+          <div class="form-row">
+            <div class="input-group">
+              <div class="floating-input">
+                <span class="field-icon" aria-hidden="true">✦</span>
+                <input type="text" id="fullName" name="fullName" placeholder=" " autocomplete="name" maxlength="100" required>
+                <label for="fullName">Full Name</label>
+                <span class="field-state" aria-hidden="true"></span>
+              </div>
+              <span class="error-msg" aria-live="polite"></span>
+            </div>
+
+            <div class="input-group">
+              <div class="floating-input">
+                <span class="field-icon" aria-hidden="true">⌕</span>
+                <input type="tel" id="contact" name="contact" placeholder=" " maxlength="11" inputmode="numeric" autocomplete="tel" required>
+                <label for="contact">Mobile Number</label>
+                <span class="field-state" aria-hidden="true"></span>
+              </div>
+              <span class="error-msg" aria-live="polite"></span>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <div class="floating-input">
+              <span class="field-icon" aria-hidden="true">⌂</span>
+              <input type="text" id="address" name="address" placeholder=" " autocomplete="street-address" maxlength="160" required>
+              <label for="address">Address / Agency / Office</label>
+              <span class="field-state" aria-hidden="true"></span>
+            </div>
+            <span class="error-msg" aria-live="polite"></span>
+          </div>
+
+          <div class="input-group">
+            <div class="floating-input">
+              <span class="field-icon" aria-hidden="true">◉</span>
+              <input type="text" id="personToVisit" name="personToVisit" placeholder=" " maxlength="100" required>
+              <label for="personToVisit">Person / Department to Visit</label>
+              <span class="field-state" aria-hidden="true"></span>
+            </div>
+            <span class="error-msg" aria-live="polite"></span>
+          </div>
+
+          <div class="input-group">
+            <div class="floating-input select-input">
+              <span class="field-icon" aria-hidden="true">≡</span>
+              <select id="purposeCategory" name="purposeCategory" required>
+                <option value="" disabled selected hidden></option>
+                <optgroup label="Technical Assistance">
+                  <option value="Technical Assistance - Tree Planting">Tree Planting</option>
+                  <option value="Technical Assistance - WACS">WACS</option>
+                  <option value="Technical Assistance - 10 Year SWM Plan">10 Year SWM Plan</option>
+                  <option value="Technical Assistance - Others">Others (Please specify)</option>
+                </optgroup>
+                <optgroup label="I.E.C">
+                  <option value="I.E.C - Request for Speaker">Request for Speaker</option>
+                  <option value="I.E.C - Request for Information">Request for Information</option>
+                  <option value="I.E.C - Request for Interview">Request for Interview</option>
+                  <option value="I.E.C - Others">Others (Please specify)</option>
+                </optgroup>
+                <optgroup label="Provision of Planting Materials">
+                  <option value="Provision of Planting Materials - Native Tree Seedlings">Native Tree Seedlings</option>
+                </optgroup>
+                <optgroup label="Environmental Concerns & Complaints">
+                  <option value="Environmental Concerns - Solid Waste">Solid Waste</option>
+                  <option value="Environmental Concerns - Air Quality">Air Quality</option>
+                  <option value="Environmental Concerns - Water Quality">Water Quality</option>
+                  <option value="Environmental Concerns - Wildlife">Wildlife</option>
+                  <option value="Environmental Concerns - Natural Resources">Natural Resources</option>
+                  <option value="Environmental Concerns - Others">Others (Please specify)</option>
+                </optgroup>
+                <optgroup label="Certification">
+                  <option value="Certification - Orientation (PA Memo 2023-03)">Orientation (PA Memo 2023-03 & 2023-03B)</option>
+                  <option value="Certification - Ambulant Vendors/Stalls">Certificates for Ambulant Vendors & Stalls</option>
+                </optgroup>
+                <option value="Other Service not listed">Other Service not listed</option>
+              </select>
+              <label for="purposeCategory">Purpose Category</label>
+              <span class="select-chevron" aria-hidden="true">⌄</span>
+              <span class="field-state" aria-hidden="true"></span>
+            </div>
+            <span class="error-msg" aria-live="polite"></span>
+          </div>
+
+          <div class="input-group other-purpose-group" id="otherPurposeGroup" aria-hidden="true">
+            <div class="floating-input">
+              <span class="field-icon" aria-hidden="true">＋</span>
+              <input type="text" id="otherPurposeSpecific" name="otherPurposeSpecific" placeholder=" " maxlength="180">
+              <label for="otherPurposeSpecific">Please specify 'Other'</label>
+              <span class="field-state" aria-hidden="true"></span>
+            </div>
+            <span class="error-msg" aria-live="polite"></span>
+          </div>
+
+          <button type="submit" class="submit-btn" id="submitBtn">
+            <span class="submit-btn-label">Submit Entry Log</span>
+            <span class="submit-btn-arrow" aria-hidden="true">→</span>
+            <span class="submit-spinner" aria-hidden="true"></span>
+          </button>
+
+          <p class="security-note">
+            <span class="security-icon" aria-hidden="true">◆</span>
+            <span>Protected visitor registration powered by your Supabase visitor database.</span>
+          </p>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="true"></div>
+
+  <div class="modal-overlay" id="successModal" aria-hidden="true">
+    <div class="modal-content glass-card" role="dialog" aria-modal="true" aria-labelledby="successTitle" tabindex="-1">
+      <div class="success-rings" aria-hidden="true"><div class="success-circle">✓</div></div>
+      <span class="modal-kicker">Registration Complete</span>
+      <h2 id="successTitle">Entry Authorized</h2>
+      <p>Thank you, <strong id="visitorNameDisplay">Visitor</strong>.<br>Your visitor entry has been successfully recorded.</p>
+      <button id="closeModalBtn" type="button">Continue</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+  <script src="visitorslog.js"></script>
+  <script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
 </body>
 </html>

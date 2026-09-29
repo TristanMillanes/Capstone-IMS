@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PGENRO IMS</title>
+  <meta name="description" content="Provincial Government Environment and Natural Resources Office Information Management System for Quezon Province">
+  <meta property="og:title" content="PGENRO IMS">
+  <meta property="og:description" content="Provincial Government Environment and Natural Resources Office Information Management System for Quezon Province">
+  <meta http-equiv="refresh" content="0; url=User/login.html">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 30%, #073c2b, #031409);
+      color: #ffffff;
+      text-align: center;
+      padding: 24px;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 20px;
+      padding: 40px;
+      max-width: 480px;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .logo-img {
+      width: 76px;
+      height: 76px;
+      object-fit: contain;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.01em;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 28px 0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 28px;
+      background: #0b5d3b;
+      color: #ffffff;
+      font-weight: 600;
+      font-size: 15px;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 20px rgba(11, 93, 59, 0.4);
+    }
+    .btn:hover {
+      background: #0e744d;
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <img src="logo/enro.png" alt="PGENRO Seal" class="logo-img" onerror="this.style.display='none'">
+    <h1>PGENRO IMS</h1>
+    <p>Provincial Government Environment and Natural Resources Office Information Management System for Quezon Province</p>
+    <a href="User/login.html" class="btn">Enter Personnel Portal &rarr;</a>
+  </div>
+  <script>
+    window.location.replace('User/login.html');
+  </script>
+</body>
+</html>

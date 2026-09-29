@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="PGENRO IMS">
-  <rect width="64" height="64" rx="16" fill="#125b42"/>
-  <path d="M16 46c0-18 11-28 31-29-1 19-11 30-31 29Z" fill="#bde3a9"/>
-  <path d="M16 47c8-12 17-18 31-30" fill="none" stroke="#125b42" stroke-linecap="round" stroke-width="3"/>
-  <path d="M29 38c-5-6-9-8-13-8M36 30c-2-5-4-8-6-10" fill="none" stroke="#125b42" stroke-linecap="round" stroke-width="2"/>
-</svg>

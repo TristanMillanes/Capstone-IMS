@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Visitor Management</title>
+<!-- Google Font -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Lucide Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<!-- Custom CSS -->
+<link rel="stylesheet" href="visitorsview.css?v=20260913-clean">
+
+
+
+
+<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
+</head>
+<body class="pgenro-user" data-requires-auth="user">
+<!-- TOP NAVBAR -->
+<header class="navbar">
+<button aria-label="Toggle navigation menu" class="hamburger-menu" id="hamburgerMenu">
+<span></span>
+<span></span>
+<span></span>
+</button>
+<a class="logo-area" href="homepage.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.src='https://via.placeholder.com/50?text=ENRO'" src="../logo/enro.png"/>
+</div>
+<div class="logo-text">
+<h2>Provincial Government</h2>
+<span>Environment and Natural Resources Office</span>
+</div>
+</a>
+<div class="nav-right-actions">
+<span class="system-time" id="liveClock">--:--:--</span>
+<div class="admin-badge">
+<i data-lucide="shield-check"></i>
+<span>IMS Portal</span>
+</div>
+</div>
+</header>
+<!-- OVERLAY FOR SIDEBAR & DRAWER -->
+<div class="overlay" id="overlay"></div>
+<div class="app-layout">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>IMS Workspace</h3>
+<p class="sidebar-subtext">User Modules</p>
+</div>
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a href="travelor.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
+<li><a class="active" aria-current="page" href="visitorsview.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+</ul>
+</aside>
+<!-- MAIN CONTENT -->
+<main class="main-content">
+<!-- HEADER -->
+<section class="page-header">
+<div class="header-content">
+<span class="page-badge">
+<i data-lucide="user-check"></i> Front desk
+          </span>
+<h1>Visitor log</h1>
+<p>Real-time audit log of public guests, visiting delegations, and service transactions in PGENRO.</p>
+</div>
+<div class="header-quick-actions">
+<button class="btn btn-secondary" id="exportCsvBtn">
+<i data-lucide="download"></i> Export CSV
+          </button>
+<button class="btn btn-primary" id="refreshBtn">
+<i data-lucide="refresh-cw"></i> Sync Data
+          </button>
+</div>
+</section>
+<!-- KPI METRICS -->
+<section class="stats-section">
+<div class="stat-card">
+<div class="stat-icon icon-primary">
+<i data-lucide="users"></i>
+</div>
+<div class="stat-info">
+<p>Total Records</p>
+<h2 id="summaryTotal">0</h2>
+<span class="stat-meta">Accumulated visits</span>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon icon-today">
+<i data-lucide="calendar-clock"></i>
+</div>
+<div class="stat-info">
+<p>Today's Arrivals</p>
+<h2 id="summaryToday">0</h2>
+<span class="stat-meta" id="todayDateStr">Current Date</span>
+</div>
+</div>
+<div class="stat-card">
+<div class="stat-icon icon-active">
+<i data-lucide="activity"></i>
+</div>
+<div class="stat-info">
+<p>Currently In-Building</p>
+<h2 id="summaryInside">0</h2>
+<span class="stat-meta text-emerald">Active passes</span>
+</div>
+</div>
+</section>
+<!-- DATA SECTION -->
+<section class="visitors-section">
+<div class="section-toolbar">
+<div class="date-filter-group">
+<button class="date-chip active" data-range="all">All Dates</button>
+<button class="date-chip" data-range="today">Today</button>
+<button class="date-chip" data-range="week">This Week</button>
+</div>
+<div class="search-filter-row">
+<div class="search-field">
+<i data-lucide="search"></i>
+<input autocomplete="off" id="visitorSearch" placeholder="Search visitor name, purpose, office..." type="search"/>
+</div>
+<select aria-label="Filter by purpose" class="filter-select" id="purposeFilter">
+<option value="all">All Purposes</option>
+<option value="Request for Speaker">Request for Speaker</option>
+<option value="I.E.C - Request for Information">I.E.C - Request for Information</option>
+<option value="Environmental Concerns - Water Quality">Water Quality Concerns</option>
+<option value="Technical Assistance - WACS">Technical Assistance (WACS)</option>
+<option value="Other Service not listed">Other Inquiries</option>
+</select>
+<select aria-label="Filter by status" class="filter-select" id="statusFilter">
+<option value="all">All Statuses</option>
+<option value="inside">Currently Inside</option>
+<option value="completed">Completed / Signed Out</option>
+</select>
+</div>
+</div>
+<!-- TABLE -->
+<div class="table-wrapper">
+<table class="visitor-table" id="visitorTable">
+<thead>
+<tr>
+<th>Visitor Profile</th>
+<th>Contact &amp; Address</th>
+<th>Person / Dept To Visit</th>
+<th>Purpose Category</th>
+<th>Time In / Date</th>
+<th>Status</th>
+<th style="text-align: right;">Action</th>
+</tr>
+</thead>
+<tbody id="visitorTableBody">
+<!-- Dynamically injected rows -->
+</tbody>
+</table>
+<div class="empty-state hidden" id="emptyState">
+<div class="empty-icon"><i data-lucide="user-x"></i></div>
+<p>No visitor logs match your search or filter criteria.</p>
+<small>Reset filters or try searching for a different keyword.</small>
+</div>
+</div>
+<!-- TABLE FOOTER -->
+<div class="table-footer">
+<span id="showingCountText">Showing 0 entries</span>
+<div class="pagination-controls">
+<button class="btn-page" disabled="" id="prevPageBtn"><i data-lucide="chevron-left"></i></button>
+<span id="pageIndicator">1 / 1</span>
+<button class="btn-page" disabled="" id="nextPageBtn"><i data-lucide="chevron-right"></i></button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- SLIDE-OVER DETAIL DRAWER -->
+<aside aria-hidden="true" class="detail-drawer" id="detailDrawer">
+<div class="drawer-header">
+<div class="drawer-title-group">
+<span class="drawer-tag">Visitor Information</span>
+<h3 id="drawerName">Guest Name</h3>
+</div>
+<button aria-label="Close drawer" class="drawer-close-btn" id="closeDrawerBtn">
+<i data-lucide="x"></i>
+</button>
+</div>
+<div class="drawer-body">
+<div class="visitor-avatar-card">
+<div class="visitor-lg-avatar" id="drawerAvatar">JD</div>
+<div class="avatar-info">
+<h4 id="drawerFullname">—</h4>
+<span class="badge" id="drawerStatusBadge">Checked In</span>
+</div>
+</div>
+<div class="drawer-info-grid">
+<div class="info-group">
+<label><i data-lucide="phone"></i> Contact Number</label>
+<p id="drawerContact">—</p>
+</div>
+<div class="info-group">
+<label><i data-lucide="map-pin"></i> Address / Agency</label>
+<p id="drawerAddress">—</p>
+</div>
+<div class="info-group">
+<label><i data-lucide="briefcase"></i> Person / Office Visiting</label>
+<p id="drawerPerson">—</p>
+</div>
+<div class="info-group">
+<label><i data-lucide="tag"></i> Purpose Category</label>
+<p id="drawerPurpose">—</p>
+</div>
+<div class="info-group full-width">
+<label><i data-lucide="clock"></i> Timeline Record</label>
+<div class="timeline-box">
+<div>
+<span>Arrival Time:</span>
+<strong id="drawerTimeIn">—</strong>
+</div>
+<div>
+<span>Date:</span>
+<strong id="drawerDate">—</strong>
+</div>
+<div>
+<span>Checkout Time:</span>
+<strong id="drawerTimeOut">Still Inside</strong>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="drawer-footer">
+<button class="btn btn-secondary" id="printPassBtn">
+<i data-lucide="printer"></i> Print Pass
+      </button>
+<button class="btn btn-success" id="toggleCheckoutBtn">
+<i data-lucide="check-circle"></i> Mark Departure
+      </button>
+</div>
+</aside>
+<!-- SUPABASE & APPLICATION LOGIC -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="visitorsView.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
+</body>
+</html>
