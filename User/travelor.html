@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html data-css-scope="user-travelor" lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -9,50 +9,34 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
-<link rel="stylesheet" href="travelor.css?v=20260913-clean">
 
-
-
-
-
-<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
+<link href="travelOR.css" rel="stylesheet"/>
 </head>
-<body class="pgenro-user" data-requires-auth="user">
-<header class="navbar">
-<a class="logo-area" href="homepage.html">
-<div class="logo-icon">
-<img alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'" src="../logo/enro.png"/>
+<body class="pgenro-user" data-css-scope="user-travelor" data-requires-auth="user"><div class="overlay" id="overlay"></div><button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button"><span></span><span></span><span></span></button>
+<div class="app-container"><aside class="sidebar" id="sidebar">
+<div class="sidebar-brand">
+<div class="sidebar-logo"><img alt="PGENRO Logo" class="logo-image" src="../logo/enro.png"/></div>
+<div class="sidebar-brand-copy"><strong>PGENRO IMS</strong><span>Quezon Province</span></div>
 </div>
-<div>
-<h2>Provincial Government</h2>
-<span>Environment &amp; Natural Resources Office</span>
+<div class="sidebar-header"><h3>Office Modules</h3><p class="sidebar-subtext">Information Management System</p></div>
+<ul class="modules-list"><li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li><li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li><li><a aria-current="page" class="active" href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li><li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li><li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li><li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li><li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li><li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li><li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li></ul>
+<div class="sidebar-footer">
+<div class="system-status"><span class="status-indicator standby"></span><span class="status-text">System ready</span></div>
+<div class="profile-menu" id="profileMenu">
+<button aria-expanded="false" aria-haspopup="true" class="profile-btn" id="profileBtn" type="button">
+<span class="profile-avatar"><i data-lucide="user"></i></span>
+<span class="profile-text"><strong>PGENRO User</strong><small>Authorized account</small></span>
+<i class="profile-chevron" data-lucide="chevron-up"></i>
+</button>
+<div class="profile-dropdown" id="profileDropdown" role="menu">
+<div class="profile-dropdown-header"><span class="profile-avatar big"><i data-lucide="user"></i></span><div><h3>PGENRO User</h3><p>Office account</p></div></div>
+<a href="homepage.html" role="menuitem"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+<a data-profile-settings="" href="../SettingIMS/Settings.html?from=user" role="menuitem"><i data-lucide="settings"></i><span>Settings</span></a>
+<button class="logout-btn" id="logoutBtn" role="menuitem" type="button"><i data-lucide="log-out"></i><span>Logout</span></button>
 </div>
-</a>
-<div class="hamburger-menu" id="hamburgerMenu">
-<span></span>
-<span></span>
-<span></span>
 </div>
-</header>
-<div class="overlay" id="overlay"></div>
-<aside class="sidebar" id="sidebar">
-<div class="sidebar-header">
-<h3>IMS Workspace</h3>
-<p class="sidebar-subtext">User Modules</p>
 </div>
-<ul class="modules-list">
-<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
-<li><a class="active" aria-current="page" href="travelor.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
-<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
-<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
-<li><a href="visitorsview.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
-<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
-<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
-</ul>
-</aside>
-<main class="main-content">
+</aside><main class="main-content" id="mainContent">
 <section class="page-header">
 <div class="header-overlay-glow"></div>
 <span class="page-badge">
@@ -113,13 +97,8 @@
 </table>
 </div>
 </section>
-</main>
+</main></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js"></script>
-<script src="../shared/settings-runtime.js?v=20260913"></script>
-<script src="../user-javascript/travelOR.js"></script>
-<script src="../shared/pgenro-global.js?v=20260912"></script>
-<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
-<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
+<script src="travelOR.js?v=20260916-role-routing"></script>
 </body>
 </html>

@@ -1,359 +1,582 @@
 <!DOCTYPE html>
-
-<html data-theme="light" lang="en">
+<html data-css-scope="user-ics" data-theme="light" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>PGENRO IMS | ICS Module (Viewer)</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;family=JetBrains+Mono:wght@500;700&amp;display=swap" rel="stylesheet"/>
-<!-- Lucide Icons -->
-<script src="https://unpkg.com/lucide@latest"></script>
-<!-- Supabase SDKs (v10 Compatibility Mode) -->
-<!-- CSS -->
-<link rel="stylesheet" href="ics.css?v=20260913-clean">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
 
+  <title>PGENRO IMS | ICS / Property</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-
-<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="ics.css?v=20260915-logout-dialog" rel="stylesheet">
 </head>
-<body class="pgenro-user" data-requires-auth="user">
-<div class="overlay" id="overlay"></div>
-<!-- GLASSMORPHISM TOPBAR -->
-<header class="navbar">
-<div class="nav-left-container">
-<button aria-label="Toggle Navigation Menu" class="hamburger-menu" id="hamburgerMenu" type="button">
-<span></span><span></span><span></span>
-</button>
-<a class="logo-area" href="homepage.html">
-<div class="logo-icon">
-<img alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0'" src="../logo/enro.png"/>
-</div>
-<div class="logo-text">
-<h2>Provincial Government</h2>
-<span>Environment &amp; Natural Resources Office</span>
-</div>
-</a>
-</div>
-<div class="right-nav">
-<div class="system-status-pill">
-<span class="status-dot online" id="dbStatusDot"></span>
-<span class="status-label" id="dbStatusText">Connecting...</span>
-</div>
-<span class="panel-pill">Viewer Mode</span>
-</div>
-</header>
-<div class="app-container">
-<!-- SIDEBAR NAVIGATION -->
-<aside class="sidebar" id="sidebar">
-<div class="sidebar-header">
-<h3>IMS Workspace</h3>
-<p class="sidebar-subtext">User Modules</p>
-</div>
-<ul class="modules-list">
-<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
-<li><a href="travelor.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
-<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
-<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
-<li><a href="visitorsview.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
-<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
-<li><a class="active" aria-current="page" href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
-</ul>
-<div class="sidebar-footer">
-<div class="system-status">
-<div class="status-indicator"></div>
-<span class="status-text">COA Appendix 59 Compliant</span>
-</div>
-</div>
-</aside>
-<!-- MAIN VIEWPORT -->
-<main class="main-content" id="mainContent">
-<!-- HERO HEADER -->
-<section class="hero page-hero">
-<div class="hero-center-copy">
-<span class="badge">
-<i data-lucide="eye"></i>
-            VIEWER ACCESS
-          </span>
-<h1>Inventory Custodian Slip <span>(ICS)</span></h1>
-<p class="hero-subtitle">Tangible Equipment &amp; Asset Accountability Viewer</p>
-<p class="hero-description">Audit issued semi-expendable property assignments, serial tracking numbers, and accountable personnel across PGENRO divisions.</p>
-</div>
-</section>
-<!-- KPI METRICS SUMMARY -->
-<section class="stats-section">
-<div class="stats-grid">
-<div class="stat-card">
-<div class="stat-icon-wrapper primary"><i data-lucide="clipboard-check"></i></div>
-<div class="stat-info">
-<span class="stat-value" id="statTotalSlips">0</span>
-<span class="stat-label">Total Custodian Slips</span>
-</div>
-</div>
-<div class="stat-card">
-<div class="stat-icon-wrapper info"><i data-lucide="package-open"></i></div>
-<div class="stat-info">
-<span class="stat-value" id="statIssuedItems">0</span>
-<span class="stat-label">Total Issued Items</span>
-</div>
-</div>
-<div class="stat-card">
-<div class="stat-icon-wrapper warning"><i data-lucide="banknote"></i></div>
-<div class="stat-info">
-<span class="stat-value" id="statTotalValue">₱0.00</span>
-<span class="stat-label">Total Recorded Value</span>
-</div>
-</div>
-<div class="stat-card">
-<div class="stat-icon-wrapper primary"><i data-lucide="hash"></i></div>
-<div class="stat-info">
-<span class="stat-value font-mono" id="statLatestControl">---</span>
-<span class="stat-label">Latest Control No.</span>
-</div>
-</div>
-</div>
-</section>
-<!-- REGISTRY TABLE VIEW -->
-<section class="panel panel-records">
-<div class="panel-header">
-<div>
-<h3><i data-lucide="list-filter"></i> Custodian Slips Registry</h3>
-<p>Official record of issued property. Click any row or the eye icon to view complete details.</p>
-</div>
-<button class="btn btn-secondary btn-sm" id="printRegistryBtn" type="button">
-<i data-lucide="printer"></i> Print Table
+
+<body class="pgenro-user"
+      data-css-scope="user-ics"
+      data-requires-auth="user"
+      data-login-url="login.html">
+
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <button class="hamburger-menu"
+          id="hamburgerMenu"
+          type="button"
+          aria-label="Open module menu"
+          aria-controls="sidebar"
+          aria-expanded="false">
+    <span></span>
+    <span></span>
+    <span></span>
+  </button>
+
+  <div class="app-container">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">
+          <img class="logo-image" src="../logo/enro.png" alt="PGENRO Logo">
+        </div>
+
+        <div class="sidebar-brand-copy">
+          <strong>PGENRO IMS</strong>
+          <span>Quezon Province</span>
+        </div>
+      </div>
+
+      <div class="sidebar-header">
+        <h2>Office Modules</h2>
+        <p>Information Management System</p>
+      </div>
+
+      <nav class="sidebar-nav" aria-label="Office modules">
+        <ul class="modules-list">
+          <li>
+            <a href="homepage.html">
+              <i data-lucide="layout-dashboard"></i>
+              <span>Dashboard</span>
+            </a>
+          </li>
+          <li>
+            <a href="communication.html">
+              <i data-lucide="mail"></i>
+              <span>Communications</span>
+            </a>
+          </li>
+          <li>
+            <a href="travelOR.html">
+              <i data-lucide="navigation"></i>
+              <span>Travel Orders</span>
+            </a>
+          </li>
+          <li>
+            <a href="officememo.html">
+              <i data-lucide="file-text"></i>
+              <span>Office Memos</span>
+            </a>
+          </li>
+          <li>
+            <a href="employee.html">
+              <i data-lucide="users-round"></i>
+              <span>Employee Records</span>
+            </a>
+          </li>
+          <li>
+            <a href="inventory.html">
+              <i data-lucide="package"></i>
+              <span>Inventory</span>
+            </a>
+          </li>
+          <li>
+            <a href="visitorsView.html">
+              <i data-lucide="clipboard-signature"></i>
+              <span>Visitor Log</span>
+            </a>
+          </li>
+          <li>
+            <a href="service.html">
+              <i data-lucide="wrench"></i>
+              <span>Service Requests</span>
+            </a>
+          </li>
+          <li>
+            <a class="active" aria-current="page" href="ics.html">
+              <i data-lucide="layers"></i>
+              <span>ICS / Property</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="system-status" role="status">
+          <span class="status-indicator standby" id="dbStatusDot"></span>
+          <span class="status-text" id="dbStatusText">Connecting to ICS records…</span>
+        </div>
+
+        <div class="profile-menu" id="profileMenu">
+          <button class="profile-btn"
+                  id="profileBtn"
+                  type="button"
+                  aria-haspopup="true"
+                  aria-expanded="false">
+            <span class="profile-avatar">
+              <i data-lucide="user"></i>
+            </span>
+
+            <span class="profile-text">
+              <strong>PGENRO User</strong>
+              <small>Authorized account</small>
+            </span>
+
+            <i class="profile-chevron" data-lucide="chevron-up"></i>
           </button>
-</div>
-<div class="table-toolbar">
-<div class="search-box">
-<i class="search-icon" data-lucide="search"></i>
-<input id="tableSearchInput" placeholder="Search Control No., Account Code, Description, Serial No., or Custodian..." type="text"/>
-</div>
-<select class="filter-select" id="filterArticleSelect">
-<option value="ALL">All Articles / Categories</option>
-</select>
-</div>
-<div class="table-wrapper">
-<table class="data-table">
-<thead>
-<tr>
-<th style="width: 105px;">Control No.</th>
-<th style="width: 120px;">Account Code</th>
-<th style="width: 140px;">Article</th>
-<th>Item Description</th>
-<th style="width: 170px;">Serial Number</th>
-<th style="width: 90px; text-align: center;">Quantity</th>
-<th style="width: 120px; text-align: right;">Total Value</th>
-<th style="width: 220px;">Person Accountable</th>
-<th style="width: 80px; text-align: center;">View</th>
-</tr>
-</thead>
-<tbody id="slipTableBody">
-<tr>
-<td class="empty-table-cell" colspan="9">Connecting to database records...</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="table-footer-info">
-<span id="recordsCounterText">Showing 0 records</span>
-</div>
-</section>
-</main>
-</div>
-<!-- READ-ONLY DETAILS MODAL -->
-<div class="modal-backdrop" id="viewDetailsModal">
-<div class="modal-container large">
-<div class="modal-header">
-<div class="modal-title-group">
-<div class="modal-header-icon"><i data-lucide="file-badge"></i></div>
-<div>
-<h2 id="modalControlNoTitle">ICS Record Details</h2>
-<p>Property Custody &amp; Accountability Specification</p>
-</div>
-</div>
-<button class="modal-close-btn" id="closeDetailsModalBtn" type="button">
-<i data-lucide="x"></i>
-</button>
-</div>
-<div class="modal-body">
-<div class="detail-grid-layout">
-<!-- Main Specifications Card -->
-<div class="detail-card main-spec-card">
-<div class="spec-header">
-<span class="detail-badge" id="modalArticleBadge">Article</span>
-<span class="detail-code font-mono" id="modalAccountCode">Acct: ---</span>
-</div>
-<h3 class="detail-description-text" id="modalDescription">Item Description</h3>
-<div class="detail-inline-specs">
-<div class="spec-item">
-<span class="spec-label">Serial Number:</span>
-<strong class="font-mono" id="modalSerialNo">---</strong>
-</div>
-<div class="spec-item">
-<span class="spec-label">ICS Number:</span>
-<strong class="font-mono" id="modalIcsNo">---</strong>
-</div>
-<div class="spec-item">
-<span class="spec-label">Entry Number:</span>
-<strong id="modalEntryNo">---</strong>
-</div>
-</div>
-</div>
-<!-- Valuation & Quantity Card -->
-<div class="detail-card">
-<h4 class="card-subtitle"><i data-lucide="coins"></i> Quantity &amp; Financial Valuation</h4>
-<div class="detail-keyvalue-list">
-<div class="kv-row">
-<span>Quantity Issued:</span>
-<strong id="modalQty">0</strong>
-</div>
-<div class="kv-row">
-<span>Unit of Measure:</span>
-<strong id="modalUnit">unit</strong>
-</div>
-<div class="kv-row">
-<span>Unit Cost:</span>
-<strong id="modalUnitVal">₱0.00</strong>
-</div>
-<div class="kv-row highlight">
-<span>Total Value:</span>
-<strong id="modalTotalVal">₱0.00</strong>
-</div>
-</div>
-</div>
-<!-- Procurement References -->
-<div class="detail-card">
-<h4 class="card-subtitle"><i data-lucide="calendar"></i> Acquisition &amp; Procurement</h4>
-<div class="detail-keyvalue-list">
-<div class="kv-row">
-<span>Date Acquired:</span>
-<strong class="font-mono" id="modalDateAcquired">---</strong>
-</div>
-<div class="kv-row">
-<span>Purchase Request (P.R.) No.:</span>
-<strong class="font-mono" id="modalPrNo">---</strong>
-</div>
-<div class="kv-row">
-<span>P.R. Date:</span>
-<strong class="font-mono" id="modalPrDate">---</strong>
-</div>
-</div>
-</div>
-<!-- Accountability & Remarks (Full Width) -->
-<div class="detail-card col-span-2">
-<h4 class="card-subtitle"><i data-lucide="user-check"></i> Accountability &amp; Whereabout</h4>
-<div class="custodian-box">
-<p class="custodian-name" id="modalAccountable">---</p>
-</div>
-<div class="remarks-box" style="margin-top: 14px;">
-<span class="spec-label">Historical / Remarks:</span>
-<p id="modalRemarks">No additional remarks noted.</p>
-</div>
-</div>
-</div>
-</div>
-<div class="modal-footer">
-<button class="btn btn-primary" id="modalPrintSlipBtn" type="button">
-<i data-lucide="printer"></i> Print Official ICS Slip (Appendix 59)
+
+          <div class="profile-dropdown"
+               id="profileDropdown"
+               role="menu"
+               aria-hidden="true">
+            <div class="profile-dropdown-header">
+              <span class="profile-avatar big">
+                <i data-lucide="user"></i>
+              </span>
+
+              <div>
+                <h3>PGENRO User</h3>
+                <p>Office account</p>
+              </div>
+            </div>
+
+            <a href="homepage.html" role="menuitem">
+              <i data-lucide="layout-dashboard"></i>
+              <span>Dashboard</span>
+            </a>
+
+            <a href="../SettingIMS/Settings.html?from=user" role="menuitem">
+              <i data-lucide="settings"></i>
+              <span>Settings</span>
+            </a>
+
+            <button class="logout-btn" id="logoutBtn" role="menuitem" type="button">
+              <i data-lucide="log-out"></i>
+              <span>Logout</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content" id="mainContent">
+      <div class="content-shell">
+        <section class="page-header reveal">
+          <div class="header-copy">
+            <div class="eyebrow">
+              <i data-lucide="shield-check"></i>
+              <span>Property Accountability</span>
+            </div>
+
+            <h1>Inventory Custodian Slip</h1>
+
+            <p>
+              Review semi-expendable property assignments, acquisition references,
+              serial numbers, recorded values, and accountable personnel.
+            </p>
+          </div>
+
+          <div class="header-actions">
+            <span class="access-pill">
+              <span class="status-dot"></span>
+              Viewer access
+            </span>
+
+            <button class="secondary-action" id="printRegistryBtn" type="button">
+              <i data-lucide="printer"></i>
+              <span>Print Registry</span>
+            </button>
+
+            <button class="primary-action" id="refreshRecordsBtn" type="button">
+              <i data-lucide="refresh-cw"></i>
+              <span>Sync Data</span>
+            </button>
+          </div>
+        </section>
+
+        <section class="stats-grid reveal" aria-label="ICS summary">
+          <article class="stat-card">
+            <div class="stat-icon green">
+              <i data-lucide="clipboard-check"></i>
+            </div>
+            <div class="stat-copy">
+              <p>Total Custodian Slips</p>
+              <h2 id="statTotalSlips">0</h2>
+              <span>Recorded ICS transactions</span>
+            </div>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-icon blue">
+              <i data-lucide="package-open"></i>
+            </div>
+            <div class="stat-copy">
+              <p>Total Issued Items</p>
+              <h2 id="statIssuedItems">0</h2>
+              <span>Combined issued quantity</span>
+            </div>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-icon yellow">
+              <i data-lucide="banknote"></i>
+            </div>
+            <div class="stat-copy">
+              <p>Total Recorded Value</p>
+              <h2 class="currency-stat" id="statTotalValue">₱0.00</h2>
+              <span>Aggregate property value</span>
+            </div>
+          </article>
+
+          <article class="stat-card">
+            <div class="stat-icon emerald">
+              <i data-lucide="hash"></i>
+            </div>
+            <div class="stat-copy">
+              <p>Latest Control No.</p>
+              <h2 class="font-mono" id="statLatestControl">---</h2>
+              <span>Highest recorded control number</span>
+            </div>
+          </article>
+        </section>
+
+        <section class="records-card reveal" aria-labelledby="registryTitle">
+          <div class="records-header">
+            <div>
+              <span class="section-kicker">Official Property Records</span>
+              <h2 id="registryTitle">Custodian Slips Registry</h2>
+              <p>
+                Search by control number, account code, item description,
+                serial number, ICS number, or accountable person.
+              </p>
+            </div>
+
+            <span class="result-count" id="recordsCounterText">Showing 0 records</span>
+          </div>
+
+          <div class="toolbar">
+            <label class="search-field" for="tableSearchInput">
+              <i data-lucide="search"></i>
+              <input id="tableSearchInput"
+                     type="search"
+                     autocomplete="off"
+                     placeholder="Search control no., account code, description, serial no., or custodian…">
+            </label>
+
+            <select class="filter-select"
+                    id="filterArticleSelect"
+                    aria-label="Filter by article or category">
+              <option value="ALL">All Articles / Categories</option>
+            </select>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Control No.</th>
+                  <th>Account Code</th>
+                  <th>Article</th>
+                  <th>Item Description</th>
+                  <th>Serial Number</th>
+                  <th class="qty-column">Quantity</th>
+                  <th class="value-column">Total Value</th>
+                  <th>Person Accountable</th>
+                  <th class="action-column">View</th>
+                </tr>
+              </thead>
+
+              <tbody id="slipTableBody">
+                <tr>
+                  <td class="empty-table-cell" colspan="9">
+                    Connecting to ICS database records…
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <div>
+            <strong>PGENRO IMS</strong>
+            <span>Provincial Government Environment and Natural Resources Office</span>
+          </div>
+          <p>© 2026 Province of Quezon. Internal information management system.</p>
+        </footer>
+      </div>
+    </main>
+  </div>
+
+  <section class="modal-backdrop"
+           id="viewDetailsModal"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="modalControlNoTitle"
+           aria-hidden="true">
+    <div class="modal-container large">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-header-icon">
+            <i data-lucide="file-badge"></i>
+          </span>
+
+          <div>
+            <span class="modal-kicker">ICS Record</span>
+            <h2 id="modalControlNoTitle">ICS Record Details</h2>
+            <p>Property custody and accountability specification</p>
+          </div>
+        </div>
+
+        <button class="modal-close-btn"
+                id="closeDetailsModalBtn"
+                type="button"
+                aria-label="Close ICS record details">
+          <i data-lucide="x"></i>
         </button>
-<button class="btn btn-secondary" id="modalCloseBtn" type="button">Close</button>
-</div>
-</div>
-</div>
-<!-- PRINTABLE COA APPENDIX 59 SHEET -->
-<div class="modal-backdrop" id="printSheetModal">
-<div class="modal-container print-modal">
-<div class="modal-header">
-<div class="modal-title-group">
-<div class="modal-header-icon"><i data-lucide="printer"></i></div>
-<div>
-<h2>Print Preview: Inventory Custodian Slip</h2>
-<p>Commission on Audit (COA) Appendix 59 Format</p>
-</div>
-</div>
-<button class="modal-close-btn" id="closePrintSheetBtn" type="button"><i data-lucide="x"></i></button>
-</div>
-<div class="modal-body print-area-wrapper">
-<div class="coa-print-sheet" id="printableSheet">
-<div class="coa-header">
-<span class="appendix-ref">Appendix 59</span>
-<h2>INVENTORY CUSTODIAN SLIP</h2>
-<p class="agency-title">PROVINCIAL GOVERNMENT ENVIRONMENT &amp; NATURAL RESOURCES OFFICE (PGENRO)</p>
-<p class="agency-sub">Province of Batangas, Republic of the Philippines</p>
-</div>
-<div class="coa-meta-grid">
-<div><strong>Entity Name:</strong> Provincial Government of Batangas</div>
-<div><strong>Fund Cluster:</strong> General Fund (01)</div>
-<div><strong>ICS No.:</strong> <span id="printIcsNo">---</span></div>
-<div><strong>Control No.:</strong> <span id="printControlNo">---</span></div>
-</div>
-<table class="coa-table">
-<thead>
-<tr>
-<th width="60">Quantity</th>
-<th width="70">Unit</th>
-<th width="110">Unit Cost</th>
-<th width="110">Total Cost</th>
-<th>Description</th>
-<th width="130">Item / Inventory No.</th>
-<th width="120">Est. Useful Life</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="text-center" id="printQty">1</td>
-<td class="text-center" id="printUnit">unit</td>
-<td class="text-right" id="printUnitVal">₱0.00</td>
-<td class="text-right" id="printTotalVal">₱0.00</td>
-<td>
-<strong id="printArticle">Article</strong><br/>
-<span id="printDesc">Description</span><br/>
-<small class="font-mono" id="printSerial">SN: ---</small>
-</td>
-<td class="font-mono" id="printItemNo">---</td>
-<td class="text-center">Semi-Expendable</td>
-</tr>
-</tbody>
-</table>
-<div class="coa-signature-section">
-<div class="sig-block">
-<p>Received from:</p>
-<div class="sig-line"></div>
-<p class="sig-name">PGENRO PROPERTY CUSTODIAN</p>
-<p class="sig-sub">Supply &amp; Property Management Unit</p>
-<p class="sig-date">Date: <span id="printDateIssued">---</span></p>
-</div>
-<div class="sig-block">
-<p>Received by:</p>
-<div class="sig-line"></div>
-<p class="sig-name" id="printAccountablePerson">END-USER ACCOUNTABLE OFFICER</p>
-<p class="sig-sub">Signature over Printed Name</p>
-<p class="sig-date">Date: <span id="printDateReceived">---</span></p>
-</div>
-</div>
-</div>
-</div>
-<div class="modal-footer">
-<button class="btn btn-secondary" id="dismissPrintBtn" type="button">Close</button>
-<button class="btn btn-primary" onclick="window.print()" type="button">
-<i data-lucide="printer"></i> Print Now
+      </div>
+
+      <div class="modal-body">
+        <div class="detail-grid-layout">
+          <article class="detail-card main-spec-card">
+            <div class="spec-header">
+              <span class="detail-badge" id="modalArticleBadge">Article</span>
+              <span class="detail-code font-mono" id="modalAccountCode">Acct: ---</span>
+            </div>
+
+            <h3 class="detail-description-text" id="modalDescription">
+              Item Description
+            </h3>
+
+            <div class="detail-inline-specs">
+              <div class="spec-item">
+                <span class="spec-label">Serial Number</span>
+                <strong class="font-mono" id="modalSerialNo">---</strong>
+              </div>
+
+              <div class="spec-item">
+                <span class="spec-label">ICS Number</span>
+                <strong class="font-mono" id="modalIcsNo">---</strong>
+              </div>
+
+              <div class="spec-item">
+                <span class="spec-label">Entry Number</span>
+                <strong id="modalEntryNo">---</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="detail-card">
+            <h4 class="card-subtitle">
+              <i data-lucide="coins"></i>
+              Quantity & Financial Valuation
+            </h4>
+
+            <div class="detail-keyvalue-list">
+              <div class="kv-row">
+                <span>Quantity Issued</span>
+                <strong id="modalQty">0</strong>
+              </div>
+
+              <div class="kv-row">
+                <span>Unit of Measure</span>
+                <strong id="modalUnit">unit</strong>
+              </div>
+
+              <div class="kv-row">
+                <span>Unit Cost</span>
+                <strong id="modalUnitVal">₱0.00</strong>
+              </div>
+
+              <div class="kv-row highlight">
+                <span>Total Value</span>
+                <strong id="modalTotalVal">₱0.00</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="detail-card">
+            <h4 class="card-subtitle">
+              <i data-lucide="calendar"></i>
+              Acquisition & Procurement
+            </h4>
+
+            <div class="detail-keyvalue-list">
+              <div class="kv-row">
+                <span>Date Acquired</span>
+                <strong class="font-mono" id="modalDateAcquired">---</strong>
+              </div>
+
+              <div class="kv-row">
+                <span>Purchase Request No.</span>
+                <strong class="font-mono" id="modalPrNo">---</strong>
+              </div>
+
+              <div class="kv-row">
+                <span>P.R. Date</span>
+                <strong class="font-mono" id="modalPrDate">---</strong>
+              </div>
+            </div>
+          </article>
+
+          <article class="detail-card full-width">
+            <h4 class="card-subtitle">
+              <i data-lucide="user-check"></i>
+              Accountability & Whereabout
+            </h4>
+
+            <div class="custodian-box">
+              <span class="spec-label">Person Accountable</span>
+              <p class="custodian-name" id="modalAccountable">---</p>
+            </div>
+
+            <div class="remarks-box">
+              <span class="spec-label">Historical / Remarks</span>
+              <p id="modalRemarks">No additional remarks noted.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="primary-action" id="modalPrintSlipBtn" type="button">
+          <i data-lucide="printer"></i>
+          <span>Print Official ICS Slip</span>
         </button>
-</div>
-</div>
-</div>
-<!-- SCRIPT -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js"></script>
-<script src="../shared/settings-runtime.js?v=20260913"></script>
-<script src="../user-javascript/ICS.js"></script>
-<script src="../shared/pgenro-global.js?v=20260912"></script>
-<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
-<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
+
+        <button class="secondary-action" id="modalCloseBtn" type="button">
+          Close
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section class="modal-backdrop"
+           id="printSheetModal"
+           role="dialog"
+           aria-modal="true"
+           aria-labelledby="printPreviewTitle"
+           aria-hidden="true">
+    <div class="modal-container print-modal">
+      <div class="modal-header">
+        <div class="modal-title-group">
+          <span class="modal-header-icon">
+            <i data-lucide="printer"></i>
+          </span>
+
+          <div>
+            <span class="modal-kicker">Appendix 59</span>
+            <h2 id="printPreviewTitle">Print Preview: Inventory Custodian Slip</h2>
+            <p>Commission on Audit format</p>
+          </div>
+        </div>
+
+        <button class="modal-close-btn"
+                id="closePrintSheetBtn"
+                type="button"
+                aria-label="Close print preview">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+
+      <div class="modal-body print-area-wrapper">
+        <div class="coa-print-sheet" id="printableSheet">
+          <div class="coa-header">
+            <span class="appendix-ref">Appendix 59</span>
+            <h2>INVENTORY CUSTODIAN SLIP</h2>
+            <p class="agency-title">
+              PROVINCIAL GOVERNMENT ENVIRONMENT & NATURAL RESOURCES OFFICE (PGENRO)
+            </p>
+            <p class="agency-sub">Republic of the Philippines</p>
+          </div>
+
+          <div class="coa-meta-grid">
+            <div><strong>Entity Name:</strong> Provincial Government</div>
+            <div><strong>Fund Cluster:</strong> General Fund (01)</div>
+            <div><strong>ICS No.:</strong> <span id="printIcsNo">---</span></div>
+            <div><strong>Control No.:</strong> <span id="printControlNo">---</span></div>
+          </div>
+
+          <table class="coa-table">
+            <thead>
+              <tr>
+                <th>Quantity</th>
+                <th>Unit</th>
+                <th>Unit Cost</th>
+                <th>Total Cost</th>
+                <th>Description</th>
+                <th>Item / Inventory No.</th>
+                <th>Est. Useful Life</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr>
+                <td class="text-center" id="printQty">1</td>
+                <td class="text-center" id="printUnit">unit</td>
+                <td class="text-right" id="printUnitVal">₱0.00</td>
+                <td class="text-right" id="printTotalVal">₱0.00</td>
+                <td>
+                  <strong id="printArticle">Article</strong><br>
+                  <span id="printDesc">Description</span><br>
+                  <small class="font-mono" id="printSerial">SN: ---</small>
+                </td>
+                <td class="font-mono" id="printItemNo">---</td>
+                <td class="text-center">Semi-Expendable</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="coa-signature-section">
+            <div class="sig-block">
+              <p>Received from:</p>
+              <div class="sig-line"></div>
+              <p class="sig-name">PGENRO PROPERTY CUSTODIAN</p>
+              <p class="sig-sub">Supply & Property Management Unit</p>
+              <p class="sig-date">Date: <span id="printDateIssued">---</span></p>
+            </div>
+
+            <div class="sig-block">
+              <p>Received by:</p>
+              <div class="sig-line"></div>
+              <p class="sig-name" id="printAccountablePerson">
+                END-USER ACCOUNTABLE OFFICER
+              </p>
+              <p class="sig-sub">Signature over Printed Name</p>
+              <p class="sig-date">Date: <span id="printDateReceived">---</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="secondary-action" id="dismissPrintBtn" type="button">
+          Close
+        </button>
+
+        <button class="primary-action" id="printNowBtn" type="button">
+          <i data-lucide="printer"></i>
+          <span>Print Now</span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="toast-container"
+       id="toastContainer"
+       aria-live="polite"
+       aria-atomic="true"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="ics.js?v=20260916-role-routing"></script>
 </body>
 </html>

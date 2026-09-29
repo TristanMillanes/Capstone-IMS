@@ -1,8 +1,0 @@
-{
-  "name": "PGENRO IMS",
-  "description": "Provincial Government Environment and Natural Resources Office Information Management System for Quezon Province",
-  "permissions": [],
-  "capabilities": [
-    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
-  ]
-}

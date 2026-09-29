@@ -2,7 +2,7 @@
 
 /* PGENRO IMS Login — module-only styles
 
-   Shared shell, responsive, accessibility, and theme rules are in /shared. */
+   Layout, responsive behavior, accessibility, and theme rules are self-contained. */
 
 /* ========================================================================== */
 
@@ -919,6 +919,98 @@ html, body {
     padding: 0 12px;
 }
 
+/* Public Visitors Log CTA */
+.visitor-access-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    margin-bottom: 9px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #f7fffa 100%);
+    border: 1.5px solid #a7f3d0;
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    transition: var(--anim-transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.visitor-access-btn::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(110deg, transparent 0%, rgba(255,255,255,.75) 45%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform .55s ease;
+    pointer-events: none;
+}
+
+.visitor-access-btn:hover::before {
+    transform: translateX(120%);
+}
+
+.visitor-access-btn:hover {
+    background: #ecfdf5;
+    border-color: #6ee7a0;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 20px rgba(21, 107, 57, 0.11);
+}
+
+.visitor-access-btn:focus-visible {
+    outline: none;
+    border-color: var(--forest-emerald);
+    box-shadow: 0 0 0 3px rgba(21, 107, 57, 0.14);
+}
+
+.visitor-icon-box {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+    background: var(--forest-emerald);
+    color: #ffffff;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    box-shadow: 0 5px 12px rgba(21, 107, 57, 0.18);
+}
+
+.visitor-icon-box svg {
+    width: 18px;
+    height: 18px;
+}
+
+.visitor-caption {
+    flex: 1;
+    min-width: 0;
+}
+
+.visitor-caption strong {
+    display: block;
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--forest-pine);
+}
+
+.visitor-caption span {
+    display: block;
+    margin-top: 1px;
+    font-size: 10.5px;
+    line-height: 1.35;
+    color: var(--text-muted);
+}
+
+.visitor-chevron {
+    width: 16px;
+    height: 16px;
+    color: var(--forest-emerald);
+    transition: var(--anim-transition);
+    flex-shrink: 0;
+}
+
+.visitor-access-btn:hover .visitor-chevron {
+    transform: translateX(3px);
+}
+
 /* Access Request CTA */
 .request-access-btn {
     display: flex;
@@ -1177,6 +1269,7 @@ html, body {
 @media (prefers-reduced-motion: reduce) {
     .primary-sign-btn::before,
     .request-access-btn,
+    .visitor-access-btn,
     .spinner-track {
         animation: none !important;
         transition: none !important;
