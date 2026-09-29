@@ -1,358 +1,164 @@
 <!DOCTYPE html>
-<html data-css-scope="user-officememo" data-theme="light" lang="en">
+
+<html data-theme="light" lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>PGENRO IMS | Office Memorandum</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Office Memorandum (Viewer)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="officememo.css?v=20260913-clean">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="officememo.css?v=20260915-logout-dialog" rel="stylesheet">
+
+
+<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
 </head>
-
-<body class="pgenro-user"
-      data-css-scope="user-officememo"
-      data-requires-auth="user"
-      data-login-url="login.html">
-
-  <div class="overlay" id="overlay" aria-hidden="true"></div>
-
-  <button class="hamburger-menu"
-          id="hamburgerMenu"
-          type="button"
-          aria-label="Open module menu"
-          aria-controls="sidebar"
-          aria-expanded="false">
-    <span></span>
-    <span></span>
-    <span></span>
-  </button>
-
-  <div class="app-container">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-brand">
-        <div class="sidebar-logo">
-          <img class="logo-image" src="../logo/enro.png" alt="PGENRO Logo">
-        </div>
-
-        <div class="sidebar-brand-copy">
-          <strong>PGENRO IMS</strong>
-          <span>Quezon Province</span>
-        </div>
-      </div>
-
-      <div class="sidebar-header">
-        <h2>Office Modules</h2>
-        <p>Information Management System</p>
-      </div>
-
-      <nav class="sidebar-nav" aria-label="Office modules">
-        <ul class="modules-list">
-          <li>
-            <a href="homepage.html">
-              <i data-lucide="layout-dashboard"></i>
-              <span>Dashboard</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="communication.html">
-              <i data-lucide="mail"></i>
-              <span>Communications</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="travelOR.html">
-              <i data-lucide="navigation"></i>
-              <span>Travel Orders</span>
-            </a>
-          </li>
-
-          <li>
-            <a class="active" aria-current="page" href="officememo.html">
-              <i data-lucide="file-text"></i>
-              <span>Office Memos</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="employee.html">
-              <i data-lucide="users-round"></i>
-              <span>Employee Records</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="inventory.html">
-              <i data-lucide="package"></i>
-              <span>Inventory</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="visitorsView.html">
-              <i data-lucide="clipboard-signature"></i>
-              <span>Visitor Log</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="service.html">
-              <i data-lucide="wrench"></i>
-              <span>Service Requests</span>
-            </a>
-          </li>
-
-          <li>
-            <a href="ics.html">
-              <i data-lucide="layers"></i>
-              <span>ICS / Property</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="system-status" role="status">
-          <span class="status-indicator standby" id="dbStatusIndicator"></span>
-          <span class="status-text" id="dbStatusText">Connecting to office memos…</span>
-        </div>
-
-        <div class="profile-menu" id="profileMenu">
-          <button class="profile-btn"
-                  id="profileBtn"
-                  type="button"
-                  aria-haspopup="true"
-                  aria-expanded="false">
-            <span class="profile-avatar">
-              <i data-lucide="user"></i>
-            </span>
-
-            <span class="profile-text">
-              <strong>PGENRO User</strong>
-              <small>Authorized account</small>
-            </span>
-
-            <i class="profile-chevron" data-lucide="chevron-up"></i>
+<body class="pgenro-user" data-requires-auth="user">
+<div class="overlay" id="overlay"></div>
+<header class="navbar">
+<div class="nav-left-container">
+<button aria-label="Toggle Navigation Menu" class="hamburger-menu" id="hamburgerMenu" type="button">
+<span></span><span></span><span></span>
+</button>
+<a class="logo-area" href="homepage.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.style.opacity='0';" src="../logo/enro.png"/>
+</div>
+<div class="logo-text">
+<h2>Provincial Government</h2>
+<span>Environment &amp; Natural Resources Office</span>
+</div>
+</a>
+</div>
+<div class="nav-right-container">
+<div class="system-badge">
+<span class="badge-pulse"></span>
+<span class="badge-text">Viewer Access</span>
+</div>
+</div>
+</header>
+<div class="app-container">
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>IMS Workspace</h3>
+<p class="sidebar-subtext">User Modules</p>
+</div>
+<nav class="modules-nav">
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a href="travelor.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a class="active" aria-current="page" href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
+<li><a href="visitorsview.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+</ul>
+</nav>
+</aside>
+<main class="main-content" id="mainContent">
+<section class="module-header">
+<div class="module-title">
+<div class="title-badge">
+<i data-lucide="eye"></i> Directives Archive
+          </div>
+<h1>Office Memorandum Logs</h1>
+<p>Official repository of memorandums, circulars, and executive issuances.</p>
+</div>
+<div class="header-actions">
+<button class="btn-secondary-modal" onclick="window.print()" type="button">
+<i data-lucide="printer"></i> Print Registry Log
           </button>
-
-          <div class="profile-dropdown"
-               id="profileDropdown"
-               role="menu"
-               aria-hidden="true">
-            <div class="profile-dropdown-header">
-              <span class="profile-avatar big">
-                <i data-lucide="user"></i>
-              </span>
-
-              <div>
-                <h3>PGENRO User</h3>
-                <p>Office account</p>
-              </div>
-            </div>
-
-            <a href="homepage.html" role="menuitem">
-              <i data-lucide="layout-dashboard"></i>
-              <span>Dashboard</span>
-            </a>
-
-            <a href="../SettingIMS/Settings.html?from=user" role="menuitem">
-              <i data-lucide="settings"></i>
-              <span>Settings</span>
-            </a>
-
-            <button class="logout-btn"
-                    id="logoutBtn"
-                    role="menuitem"
-                    type="button">
-              <i data-lucide="log-out"></i>
-              <span>Logout</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <main class="main-content" id="mainContent">
-      <div class="content-shell">
-        <section class="page-header reveal">
-          <div class="header-copy">
-            <div class="eyebrow">
-              <i data-lucide="file-stack"></i>
-              <span>Directives Archive</span>
-            </div>
-
-            <h1>Office Memorandum Logs</h1>
-            <p>
-              Official repository of memorandums, circulars, and executive
-              issuances recorded in the PGENRO Information Management System.
-            </p>
-          </div>
-
-          <div class="header-meta">
-            <span class="access-pill">
-              <span class="status-dot"></span>
-              Viewer access
-            </span>
-
-            <button class="secondary-action" id="printRegistryBtn" type="button">
-              <i data-lucide="printer"></i>
-              <span>Print Registry</span>
-            </button>
-          </div>
-        </section>
-
-        <section class="stats-grid reveal" aria-label="Memorandum summary">
-          <article class="stat-card">
-            <div class="stat-icon green">
-              <i data-lucide="files"></i>
-            </div>
-
-            <div class="stat-copy">
-              <p>Total Memos</p>
-              <h2 id="kpiTotal">0</h2>
-              <span>Available memorandum records</span>
-            </div>
-          </article>
-
-          <article class="stat-card">
-            <div class="stat-icon yellow">
-              <i data-lucide="pin"></i>
-            </div>
-
-            <div class="stat-copy">
-              <p>Pinned Directives</p>
-              <h2 id="kpiPinned">0</h2>
-              <span>Priority or highlighted records</span>
-            </div>
-          </article>
-        </section>
-
-        <section class="records-card reveal" aria-labelledby="registryTitle">
-          <div class="records-header">
-            <div>
-              <span class="section-kicker">Official Records</span>
-              <h2 id="registryTitle">Memorandum Registry</h2>
-              <p>
-                Search control numbers, recipients, subjects, and remarks.
-                Open the document viewer to inspect available attachments.
-              </p>
-            </div>
-
-            <button class="secondary-action" id="refreshRecordsBtn" type="button">
-              <i data-lucide="refresh-cw"></i>
-              <span>Refresh</span>
-            </button>
-          </div>
-
-          <div class="filter-bar">
-            <label class="search-field" for="searchInput">
-              <i data-lucide="search"></i>
-              <input id="searchInput"
-                     type="search"
-                     autocomplete="off"
-                     placeholder="Search control no., subject, recipient, or remarks…">
-            </label>
-
-            <span class="result-count" id="resultCount">0 records</span>
-          </div>
-
-          <div class="table-wrapper">
-            <table class="memo-table">
-              <thead>
-                <tr>
-                  <th>Control No.</th>
-                  <th>Date</th>
-                  <th>Addressed To</th>
-                  <th>Subject Matter</th>
-                  <th>Remarks</th>
-                  <th class="action-column">View</th>
-                </tr>
-              </thead>
-
-              <tbody id="memoTableBody">
-                <tr>
-                  <td class="empty" colspan="6">Loading memorandum records…</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <footer class="footer">
-          <div>
-            <strong>PGENRO IMS</strong>
-            <span>Provincial Government Environment and Natural Resources Office</span>
-          </div>
-          <p>© 2026 Province of Quezon. Internal information management system.</p>
-        </footer>
-      </div>
-    </main>
-  </div>
-
-  <section class="viewer-modal"
-           id="viewMemoModal"
-           role="dialog"
-           aria-modal="true"
-           aria-labelledby="viewModalHeaderTitle"
-           aria-hidden="true">
-    <div class="viewer-panel">
-      <div class="modal-header">
-        <div class="modal-heading">
-          <span class="modal-icon">
-            <i data-lucide="file-text"></i>
-          </span>
-
-          <div>
-            <span class="modal-kicker">Digital Attachment</span>
-            <h2 id="viewModalHeaderTitle">Document Viewer</h2>
-          </div>
-        </div>
-
-        <button class="modal-close"
-                id="closeViewModalBtn"
-                type="button"
-                aria-label="Close document viewer">
-          <i data-lucide="x"></i>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        <div class="pdf-viewer-box">
-          <iframe class="pdf-iframe"
-                  id="pdfFrame"
-                  src=""
-                  title="Office memorandum document"></iframe>
-
-          <div class="no-pdf-placeholder hidden" id="noPdfMessage">
-            <span class="no-pdf-icon">
-              <i data-lucide="file-x-2"></i>
-            </span>
-            <h3>No PDF Document Attached</h3>
-            <p>This memorandum record does not have a digital attachment.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="secondary-action" id="cancelViewModalBtn" type="button">
-          Close
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <div class="toast-container"
-       id="toastContainer"
-       aria-live="polite"
-       aria-atomic="true"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="officememo.js?v=20260916-role-routing"></script>
+</div>
+</section>
+<!-- KPI METRIC CARDS -->
+<section class="memo-kpi-grid">
+<div class="kpi-card">
+<div class="kpi-icon green"><i data-lucide="files"></i></div>
+<div class="kpi-info">
+<h3 id="kpiTotal">0</h3>
+<p>Total Memos</p>
+</div>
+</div>
+<div class="kpi-card">
+<div class="kpi-icon warning"><i data-lucide="pin"></i></div>
+<div class="kpi-info">
+<h3 id="kpiPinned">0</h3>
+<p>Pinned Directives</p>
+</div>
+</div>
+</section>
+<!-- SEARCH & FILTER -->
+<section class="toolbar-card">
+<div class="search-box">
+<i data-lucide="search"></i>
+<input id="searchInput" placeholder="Search control no., subject, or recipient..." type="text"/>
+</div>
+</section>
+<!-- DATA TABLE -->
+<section class="table-card">
+<div class="table-header-info">
+<h3><i data-lucide="list-filter"></i> Memorandum Registry</h3>
+<span class="table-subtext">Click the eye icon to preview attachments.</span>
+</div>
+<div class="table-wrapper">
+<table class="memo-table">
+<thead>
+<tr>
+<th style="width: 130px;">Control No.</th>
+<th style="width: 110px;">Date</th>
+<th style="width: 220px;">Addressed To</th>
+<th>Subject Matter</th>
+<th style="width: 200px;">Remarks</th>
+<th style="width: 90px; text-align: center;">View</th>
+</tr>
+</thead>
+<tbody id="memoTableBody"></tbody>
+</table>
+</div>
+</section>
+</main>
+</div>
+<!-- PDF VIEWER MODAL -->
+<div class="modal-backdrop" id="viewMemoModal">
+<div class="modal-container large">
+<div class="modal-header">
+<div class="modal-title-group">
+<div class="modal-header-icon blue"><i data-lucide="file-text"></i></div>
+<div>
+<h2 id="viewModalHeaderTitle">Document Viewer</h2>
+<p>Digital Attachment</p>
+</div>
+</div>
+<button class="modal-close-btn" id="closeViewModalBtn" type="button">
+<i data-lucide="x"></i>
+</button>
+</div>
+<div class="modal-body">
+<div class="pdf-viewer-box" id="pdfViewerContainer">
+<iframe class="pdf-iframe" id="pdfFrame" src="" title="Document PDF"></iframe>
+<div class="no-pdf-placeholder hidden" id="noPdfMessage">
+<div class="no-pdf-icon-wrap"><i data-lucide="file-x-2"></i></div>
+<h3>No PDF Document Attached</h3>
+<p>This memorandum record does not have a digital attachment.</p>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn-secondary-modal" id="cancelViewModalBtn" type="button">Close</button>
+</div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../user-javascript/officememo.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
 </body>
 </html>

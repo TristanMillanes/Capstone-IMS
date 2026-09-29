@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Admin Travel Orders</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="travelOR-admin.css?v=20260913-clean">
+
+
+
+</link>
+
+<link rel="stylesheet" href="../shared/admin.css?v=20260913-clean2">
+</head>
+<body class="pgenro-admin" data-admin-page="travelOR-admin.html" data-requires-auth="admin">
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="app-layout">
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<a aria-label="PGENRO IMS Dashboard" class="logo-area" href="../admin/admin.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" onerror="this.style.display='none';this.nextElementSibling.style.display='block';" src="../logo/enro.png"/>
+<i data-lucide="shield-check" style="display:none"></i>
+</div>
+<div class="logo-text">
+<h2>PGENRO IMS</h2>
+<span>Admin Control Center</span>
+</div>
+</a>
+<button class="icon-btn sidebar-toggle" id="sidebarCollapseBtn" title="Close Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+</button>
+</div>
+<nav aria-label="Administrator navigation" class="sidebar-nav">
+<div class="nav-group">
+<span class="nav-label">Main Panel</span>
+<ul>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Operations &amp; Records</span>
+<ul>
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+<li><a aria-current="page" class="nav-item active" href="travelOR-admin.html"><i data-lucide="briefcase-business"></i><span>Travel Orders</span></a></li>
+<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span><span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">User &amp; Access</span>
+<ul>
+<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
+<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">System Control</span>
+<ul>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
+<li><a class="nav-item" href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account &amp; System Settings</span></a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-footer">
+<div class="system-status-indicator">
+<span class="status-dot" id="statusDot"></span>
+<div>
+<span class="status-title">Supabase Database</span>
+<span class="status-sub" id="statusText">Checking connection...</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- MAIN WRAPPER -->
+<div class="main-wrapper">
+<!-- TOPBAR -->
+<header class="topbar">
+<div class="topbar-left">
+<button aria-label="Toggle Navigation" class="mobile-menu-btn icon-btn" id="mobileMenuBtn" type="button">
+<i data-lucide="menu"></i>
+</button>
+<div class="global-search">
+<i data-lucide="search"></i>
+<input autocomplete="off" id="globalSearch" placeholder="Search by TOR No., personnel name, destination, or purpose... (Ctrl + K)" type="search"/>
+<kbd>Ctrl K</kbd>
+</div>
+</div>
+<div class="topbar-right">
+<button class="icon-btn" id="refreshBtn" title="Refresh Travel Orders" type="button">
+<i data-lucide="refresh-cw"></i>
+</button>
+<div class="profile profile-menu admin-profile-menu" data-shared-profile-handler="true" id="profileMenu"><button aria-label="Open administrator profile" class="profile-btn profile-icon-only" id="profileBtn" title="Administrator profile" type="button"><div class="profile-avatar"><i data-lucide="user-round"></i></div></button>
+
+
+<div class="profile-dropdown" id="profileDropdown">
+<div class="profile-dropdown-header">
+<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+<div class="profile-dropdown-copy">
+<h3 id="dropdownUserName">PGENRO Admin</h3>
+<p id="dropdownUserEmail">Administrator Session</p>
+<span class="role-badge" id="dropdownUserRole">Administrator</span>
+</div>
+</div>
+<div class="dropdown-links">
+<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
+<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
+<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
+<a href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account Settings</span></a>
+</div>
+<div class="dropdown-footer">
+<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+</div>
+</div><span aria-hidden="true" class="admin-profile-data" id="adminName">Admin User</span></div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="main-content">
+<!-- HERO HEADER -->
+<section class="page-header">
+<div>
+<div class="breadcrumb">
+<span>Admin Console</span>
+<i data-lucide="chevron-right"></i>
+<span>Official Travel &amp; Field Operations</span>
+</div>
+<div class="eyebrow">
+<i data-lucide="map-pin"></i>
+            ADMIN TRAVEL ORDER CONTROL
+          </div>
+<h1>Official Travel Orders &amp; Itinerary</h1>
+<p>Review filed travel authorizations, approve provincial field itineraries, monitor vehicle assignments, and generate official LGU Travel Order forms.</p>
+</div>
+<div class="page-header-actions">
+<button class="secondary-btn light" id="exportBtn" type="button">
+<i data-lucide="download"></i>
+            Export CSV
+          </button>
+<button class="primary-btn large" id="addOrderBtn" type="button">
+<i data-lucide="plus-circle"></i>
+            Create Travel Order
+          </button>
+</div>
+</section>
+<!-- KPI METRICS GRID -->
+<section aria-label="Travel order summary" class="metrics-grid">
+<div class="metric-card">
+<div class="metric-icon blue"><i data-lucide="file-text"></i></div>
+<div class="metric-info">
+<span class="metric-label">Total Travel Orders</span>
+<h3 id="metricTotal">0</h3>
+<span class="metric-sub">Official Requests Filed</span>
+</div>
+</div>
+<div class="metric-card warning-state">
+<div class="metric-icon yellow"><i data-lucide="clock"></i></div>
+<div class="metric-info">
+<span class="metric-label">Pending Approval</span>
+<h3 id="metricPending">0</h3>
+<span class="metric-sub">Awaiting Admin Signature</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon green"><i data-lucide="check-circle-2"></i></div>
+<div class="metric-info">
+<span class="metric-label">Approved / Active</span>
+<h3 id="metricApproved">0</h3>
+<span class="metric-sub">Ready / In-Transit Trips</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon purple"><i data-lucide="flag"></i></div>
+<div class="metric-info">
+<span class="metric-label">Completed Trips</span>
+<h3 id="metricCompleted">0</h3>
+<span class="metric-sub">Returned with Accomplishment</span>
+</div>
+</div>
+</section>
+<!-- FILTER & TOOLBAR PANEL -->
+<div class="toolbar-container">
+<div class="toolbar-search-filters">
+<div class="search-box">
+<i class="search-icon" data-lucide="search"></i>
+<input autocomplete="off" id="searchInput" placeholder="Search traveler name, TOR #, destination, vehicle, or division..." type="text"/>
+</div>
+<div class="filter-group">
+<div class="select-wrapper">
+<i class="select-icon" data-lucide="activity"></i>
+<select class="filter-select" id="filterStatus">
+<option value="">All Statuses</option>
+<option value="Pending">Pending Review</option>
+<option value="Approved">Approved</option>
+<option value="Completed">Completed</option>
+<option value="Disapproved">Disapproved</option>
+</select>
+</div>
+<div class="select-wrapper">
+<i class="select-icon" data-lucide="tag"></i>
+<select class="filter-select" id="filterType">
+<option value="">All Travel Types</option>
+<option value="Official Business">Official Business (OB)</option>
+<option value="Field Inspection">Field Inspection / Monitoring</option>
+<option value="Seminar / Workshop">Seminar / Training</option>
+<option value="Emergency Response">Emergency Response</option>
+<option value="Official Time">Official Time Only</option>
+</select>
+</div>
+<div class="select-wrapper">
+<i class="select-icon" data-lucide="arrow-up-down"></i>
+<select class="filter-select" id="filterSort">
+<option value="newest">Newest Filed</option>
+<option value="date-asc">Departure Date (Earliest)</option>
+<option value="date-desc">Departure Date (Latest)</option>
+<option value="traveler">Traveler Name (A–Z)</option>
+</select>
+</div>
+</div>
+</div>
+</div>
+<!-- MAIN TABLE SECTION -->
+<section class="panel">
+<div class="panel-header">
+<div>
+<h2>Travel Orders Registry</h2>
+<p>Official provincial mission orders, field itineraries, and approval tracking.</p>
+</div>
+<span class="row-counter" id="recordCounter">Showing 0 Orders</span>
+</div>
+<div class="table-wrap">
+<table id="travelOrdersTable">
+<thead>
+<tr>
+<th style="width: 130px;">TOR No.</th>
+<th>Traveler(s) &amp; Office</th>
+<th>Destination &amp; Purpose</th>
+<th>Travel Schedule</th>
+<th>Travel Type</th>
+<th>Transportation</th>
+<th>Status</th>
+<th style="text-align: right; width: 160px;">Actions</th>
+</tr>
+</thead>
+<tbody id="travelOrderBody">
+<tr><td class="empty" colspan="8">Loading official travel registry...</td></tr>
+</tbody>
+</table>
+</div>
+</section>
+<footer>
+        © 2026 Provincial Government Environment and Natural Resources Office (PGENRO). Operations &amp; Travel Administration.
+      </footer>
+</main>
+</div>
+</div>
+<!-- CREATE / EDIT TRAVEL ORDER MODAL -->
+<div class="modal-backdrop" id="orderModal">
+<div class="modal large-modal">
+<div class="modal-head">
+<div>
+<span class="modal-kicker">TRAVEL AUTHORIZATION</span>
+<h2 id="orderModalTitle">Create Travel Order</h2>
+</div>
+<button class="icon-btn close" data-close="orderModal" type="button"><i data-lucide="x"></i></button>
+</div>
+<form id="orderForm">
+<input id="orderDbId" type="hidden"/>
+<div class="form-section-title">
+<i data-lucide="user-check"></i> Traveler &amp; Basic Particulars
+      </div>
+<div class="form-grid three">
+<label>
+          Travel Order No. *
+          <input id="torNo" placeholder="e.g. TOR-2026-089" required=""/>
+</label>
+<label>
+          Traveler / Personnel Name(s) *
+          <input id="travelerName" placeholder="Juan Dela Cruz, Pedro Santos" required=""/>
+</label>
+<label>
+          Position / Designation *
+          <input id="travelerPosition" placeholder="e.g. Forest Ranger / EMS II" required=""/>
+</label>
+<label>
+          Division / Operating Unit *
+          <input id="travelerDept" list="deptList" placeholder="Select or type unit" required=""/>
+<datalist id="deptList">
+<option value="Forest Management Unit">
+<option value="Coastal &amp; Marine Resources Division">
+<option value="Environmental Management &amp; Pollution Control">
+<option value="Mines &amp; Geosciences Development">
+<option value="Administrative &amp; Support Services">
+<option value="Office of the Provincial ENR Officer">
+</option></option></option></option></option></option></datalist>
+</label>
+<label>
+          Travel Classification *
+          <select id="travelType" required="">
+<option value="Official Business">Official Business (OB)</option>
+<option value="Field Inspection">Field Inspection / Monitoring</option>
+<option value="Seminar / Workshop">Seminar / Training</option>
+<option value="Emergency Response">Emergency Response</option>
+<option value="Official Time">Official Time Only</option>
+</select>
+</label>
+<label>
+          Approval Status *
+          <select id="travelStatus" required="">
+<option value="Pending">Pending Review</option>
+<option value="Approved">Approved</option>
+<option value="Completed">Completed / Returned</option>
+<option value="Disapproved">Disapproved</option>
+</select>
+</label>
+</div>
+<div class="form-section-title" style="margin-top: 18px;">
+<i data-lucide="map-pin"></i> Itinerary &amp; Destination Details
+      </div>
+<div class="form-grid three">
+<label class="full">
+          Destination / Station *
+          <input id="destination" placeholder="e.g. Municipality of Narra, Southern Palawan (Brgy. Antipolo &amp; Poblacion)" required=""/>
+</label>
+<label>
+          Departure Date *
+          <input id="departureDate" required="" type="date"/>
+</label>
+<label>
+          Return Date *
+          <input id="returnDate" required="" type="date"/>
+</label>
+<label>
+          Transportation / Vehicle *
+          <input id="transportation" placeholder="e.g. Official Vehicle (SJD-401), Public Van, Sea Vessel" required=""/>
+</label>
+<label class="full">
+          Specific Purpose of Travel *
+          <textarea id="purpose" placeholder="Describe the official objectives, monitoring targets, field investigations, or project assignments..." required=""></textarea>
+</label>
+</div>
+<div class="form-section-title" style="margin-top: 18px;">
+<i data-lucide="receipt"></i> Allowances &amp; Approving Authority
+      </div>
+<div class="form-grid three">
+<label>
+          Per Diems / Expenses Allowed
+          <input id="perDiem" placeholder="e.g. Actual expenses / Per Diem per EO 77"/>
+</label>
+<label>
+          Labor / Source of Funds
+          <input id="fundSource" placeholder="e.g. ENRO General Fund - MOOE"/>
+</label>
+<label>
+          Approving Official
+          <input id="approverName" placeholder="e.g. Provincial Governor / Provincial ENR Officer" value="Provincial Environment &amp; Natural Resources Officer"/>
+</label>
+<label class="full">
+          Special Instructions / Admin Remarks
+          <textarea id="remarks" placeholder="Enter special handling notes, accompanying drivers, or contingency procedures..."></textarea>
+</label>
+</div>
+<div class="modal-actions">
+<button class="secondary-btn" data-close="orderModal" type="button">Cancel</button>
+<button class="primary-btn" id="saveOrderBtn" type="submit">
+<i data-lucide="save"></i>Save Travel Order
+        </button>
+</div>
+</form>
+</div>
+</div>
+<!-- PRINT OFFICIAL TRAVEL ORDER MODAL -->
+<div class="modal-backdrop" id="printModal">
+<div class="modal large-modal">
+<div class="modal-head">
+<div>
+<span class="modal-kicker">OFFICIAL LGU DOCUMENT</span>
+<h2>Travel Order Form Preview</h2>
+</div>
+<div class="header-action-buttons">
+<button class="primary-btn" id="printDocBtn" type="button">
+<i data-lucide="printer"></i>Print Official Form
+        </button>
+<button class="icon-btn close" data-close="printModal" type="button">
+<i data-lucide="x"></i>
+</button>
+</div>
+</div>
+<div class="modal-body-pad">
+<!-- OFFICIAL LGU PRINTABLE SHEET -->
+<div class="official-tor-sheet" id="officialTorSheet">
+<div class="tor-gov-header">
+<img alt="Provincial Logo" class="tor-seal" onerror="this.style.display='none'" src="../logo/enro.png"/>
+<div class="tor-header-text">
+<h4>Republic of the Philippines</h4>
+<h3>PROVINCE OF PALAWAN</h3>
+<h2>PROVINCIAL ENVIRONMENT AND NATURAL RESOURCES OFFICE</h2>
+<p>Provincial Capitol Complex, Puerto Princesa City</p>
+</div>
+</div>
+<div class="tor-title-bar">
+<h1>TRAVEL ORDER</h1>
+<span class="tor-number-display" id="p_torNo">TOR-2026-000</span>
+</div>
+<div class="tor-date-line">
+          Date Filed: <span id="p_dateFiled">September 4, 2026</span>
+</div>
+<table class="tor-info-table">
+<tbody>
+<tr>
+<td class="tor-lbl">1. NAME OF PERSONNEL:</td>
+<td class="tor-val" id="p_traveler">--</td>
+</tr>
+<tr>
+<td class="tor-lbl">2. PLANTILLA POSITION / TITLE:</td>
+<td class="tor-val" id="p_position">--</td>
+</tr>
+<tr>
+<td class="tor-lbl">3. DIVISION / OPERATING UNIT:</td>
+<td class="tor-val" id="p_dept">--</td>
+</tr>
+<tr>
+<td class="tor-lbl">4. OFFICIAL STATION:</td>
+<td class="tor-val">PGENRO Headquarters, Puerto Princesa City</td>
+</tr>
+<tr>
+<td class="tor-lbl">5. DESTINATION / ITINERARY:</td>
+<td class="tor-val" id="p_destination">--</td>
+</tr>
+<tr>
+<td class="tor-lbl">6. PERIOD COVERED:</td>
+<td class="tor-val" id="p_dates">--</td>
+</tr>
+<tr>
+<td class="tor-lbl">7. SPECIFIC PURPOSE OF MISSION:</td>
+<td class="tor-val" id="p_purpose">--</td>
+</tr>
+<tr>
+<td class="tor-lbl">8. EXPENSES / PER DIEMS ALLOWED:</td>
+<td class="tor-val" id="p_perDiem">Per Diem pursuant to existing auditing rules and regulations</td>
+</tr>
+<tr>
+<td class="tor-lbl">9. TRANSPORTATION CHARGES:</td>
+<td class="tor-val" id="p_transport">--</td>
+</tr>
+<tr>
+<td class="tor-lbl">10. APPROPRIATION TO BE CHARGED:</td>
+<td class="tor-val" id="p_funds">PGENRO Operating Budget / MOOE</td>
+</tr>
+<tr>
+<td class="tor-lbl">11. SPECIAL INSTRUCTIONS:</td>
+<td class="tor-val" id="p_remarks">Submit Certificate of Appearance and Travel Accomplishment Report upon return.</td>
+</tr>
+</tbody>
+</table>
+<div class="tor-signatures-grid">
+<div class="tor-sig-block">
+<p>Recommending Approval:</p>
+<div class="sig-space"></div>
+<b id="p_recommender">DIVISION CHIEF / HEAD</b>
+<small>Unit Head / Supervisor</small>
+</div>
+<div class="tor-sig-block">
+<p>APPROVED BY AUTHORITY OF THE PROVINCIAL GOVERNOR:</p>
+<div class="sig-space"></div>
+<b id="p_approver">PROVINCIAL ENR OFFICER</b>
+<small>Provincial Government Department Head</small>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toastContainer"></div>
+<!-- SCRIPT -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../admin-javascript/supabase-compat.js"></script>
+<script src="../admin-javascript/travelOR-admin.js" type="module"></script>
+<script src="../admin-javascript/admin-ui.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
+</body>
+</html>

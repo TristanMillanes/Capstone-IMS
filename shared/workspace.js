@@ -1,64 +1,107 @@
-/* PGENRO IMS — shared workspace accessibility helpers.
-   Navigation/profile interactions are intentionally owned by pgenro-user.js
-   (User side) and admin-ui.js (Admin side) to prevent double toggles/glitches. */
-(() => {
+/* ==========================================================================
+   PGENRO IMS — Shared Workspace Controls & Responsive UI
+   ========================================================================== */
+(function () {
   'use strict';
 
-  function init() {
-    const body = document.body;
-    if (!body || body.dataset.workspaceReady === 'true') return;
-    body.dataset.workspaceReady = 'true';
+  function initSidebar() {
+    const hamburgerMenu = document.getElementById('hamburgerMenu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    const mainContent = document.querySelector('.main-content') || document.querySelector('.main-panel') || document.querySelector('main');
 
-    const main = document.querySelector('main');
-    if (main && !document.querySelector('.admin-ui-skip-link,.ws-skip-link')) {
-      main.id ||= 'workspaceMain';
-      main.setAttribute('tabindex', '-1');
-      const skip = document.createElement('a');
-      skip.className = 'ws-skip-link';
-      skip.href = `#${main.id}`;
-      skip.textContent = 'Skip to content';
-      body.prepend(skip);
+    if (hamburgerMenu && sidebar) {
+      hamburgerMenu.addEventListener('click', () => {
+        sidebar.classList.toggle('open');
+        sidebar.classList.toggle('active');
+        hamburgerMenu.classList.toggle('active');
+        if (overlay) overlay.classList.toggle('active');
+        if (mainContent) mainContent.classList.toggle('blur');
+      });
+
+      if (overlay) {
+        overlay.addEventListener('click', () => {
+          sidebar.classList.remove('open');
+          sidebar.classList.remove('active');
+          hamburgerMenu.classList.remove('active');
+          overlay.classList.remove('active');
+          if (mainContent) mainContent.classList.remove('blur');
+        });
+      }
     }
 
-    document.querySelectorAll('table').forEach(table => {
-      if (!table.closest('.table-responsive,.table-wrapper,.table-container,.records-table-wrapper,.ics-table-wrapper,.ws-table-scroll')) {
-        const wrap = document.createElement('div');
-        wrap.className = 'ws-table-scroll';
-        table.before(wrap);
-        wrap.append(table);
-      }
+    const collapseBtn = document.getElementById('sidebarCollapseBtn');
+    if (collapseBtn && sidebar) {
+      collapseBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('collapsed');
+      });
+    }
+  }
 
-      const wrap = table.parentElement;
-      if (!wrap) return;
-      const overflowX = getComputedStyle(wrap).overflowX;
-      if (overflowX === 'auto' || overflowX === 'scroll') {
-        wrap.setAttribute('tabindex', '0');
-        wrap.setAttribute('role', 'region');
-        if (!wrap.getAttribute('aria-label')) {
-          wrap.setAttribute(
-            'aria-label',
-            `${document.querySelector('h1')?.textContent.trim() || 'Records'} table, scroll horizontally for more columns`
-          );
+  function initProfileMenu() {
+    const profileBtn = document.getElementById('profileBtn') || document.querySelector('.pgenro-profile-trigger');
+    const profileMenu = document.getElementById('profileMenu') || document.querySelector('.pgenro-profile-dropdown') || document.querySelector('.profile-dropdown');
+
+    if (profileBtn && profileMenu) {
+      profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = profileMenu.classList.toggle('open');
+        profileBtn.setAttribute('aria-expanded', String(isOpen));
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!profileMenu.contains(e.target) && !profileBtn.contains(e.target)) {
+          profileMenu.classList.remove('open');
+          profileBtn.setAttribute('aria-expanded', 'false');
         }
-      }
-    });
+      });
+    }
+  }
 
-    document.querySelectorAll('.pgenro-global-toast,[id$="Toast"]').forEach(el => {
-      el.setAttribute('role', 'status');
-      el.setAttribute('aria-live', 'polite');
-    });
-
-    document.querySelectorAll('a[target="_blank"]').forEach(link => {
-      const rel = new Set((link.getAttribute('rel') || '').split(/\s+/).filter(Boolean));
-      rel.add('noopener');
-      rel.add('noreferrer');
-      link.setAttribute('rel', [...rel].join(' '));
+  function initLogout() {
+    const logoutButtons = document.querySelectorAll('[data-pgenro-logout], .logout-btn, #logoutBtn');
+    logoutButtons.forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+          if (window.pgenroSupabase?.auth) {
+            await window.pgenroSupabase.auth.signOut();
+          }
+        } catch (err) {
+          console.warn('Sign out warning:', err);
+        }
+        try {
+          localStorage.removeItem('pgenro_current_user');
+          localStorage.removeItem('pgenro_session');
+        } catch (err) {}
+        const isUserFolder = window.location.pathname.toLowerCase().includes('/user/');
+        window.location.href = isUserFolder ? 'login.html' : '../User/login.html';
+      });
     });
   }
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init, { once: true });
-  } else {
-    init();
+  function initResponsiveTables() {
+    const tables = document.querySelectorAll('table:not(.no-wrap)');
+    tables.forEach(table => {
+      const parent = table.parentElement;
+      if (parent && !parent.classList.contains('table-responsive') && !parent.classList.contains('table-container')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-responsive';
+        parent.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
+    });
+  }
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initSidebar();
+      initProfileMenu();
+      initLogout();
+      initResponsiveTables();
+      if (window.lucide && typeof window.lucide.createIcons === 'function') {
+        window.lucide.createIcons();
+      }
+    });
   }
 })();

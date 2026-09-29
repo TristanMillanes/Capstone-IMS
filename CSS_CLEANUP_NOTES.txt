@@ -1,0 +1,37 @@
+PGENRO IMS - CSS / FILE ORGANIZATION CLEANUP
+Date: 2026-09-13
+
+The repeated shared CSS copied into every module stylesheet has been removed.
+Each application page now loads:
+
+1. One small module stylesheet for page-specific components.
+2. One cached category stylesheet for shared layout, theme, responsiveness,
+   accessibility, and final compatibility rules.
+
+Shared category stylesheets:
+- shared/admin.css
+- shared/user.css
+- shared/public.css
+- shared/diagnostic.css
+
+Removed obsolete/repeated source layers:
+- USER-CSS/pgenro-global.css
+- USER-CSS/pgenro-user.css
+- shared/pgenro-global.css
+- shared/workspace.css
+- shared/repaired-ui.css
+- shared/ui-overrides.css
+- admin/admin-modern.css
+- admin/admin-ui.css
+- admin/visitors-admin-enhanced.css
+
+Result:
+- CSS size before cleanup: 3,458,097 bytes
+- CSS size after cleanup: 943,964 bytes
+- Reduction: 72.7%
+
+The Supabase and application JavaScript logic was not changed by this cleanup.
+Run both checks from the project root before deployment:
+
+  python3 tests/audit.py
+  node tests/regression.cjs

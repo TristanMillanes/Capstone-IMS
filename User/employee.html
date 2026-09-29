@@ -1,279 +1,239 @@
 <!DOCTYPE html>
-<html data-css-scope="user-employee" data-theme="light" lang="en">
+
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="color-scheme" content="light">
-  <title>PGENRO IMS | Employee Directory</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="employee.css?v=20260915-logout-dialog" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Employee Records (Viewer)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="employee.css?v=20260913-clean">
+
+
+
+
+<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
 </head>
-<body class="pgenro-user" data-css-scope="user-employee" data-requires-auth="user">
-  <div class="overlay" id="overlay" aria-hidden="true"></div>
-
-  <button class="hamburger-menu" id="hamburgerMenu" type="button"
-          aria-label="Open module menu" aria-controls="sidebar" aria-expanded="false">
-    <span></span><span></span><span></span>
-  </button>
-
-  <div class="app-container">
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-brand">
-        <div class="sidebar-logo">
-          <img class="logo-image" src="../logo/enro.png" alt="PGENRO Logo">
-        </div>
-        <div class="sidebar-brand-copy">
-          <strong>PGENRO IMS</strong>
-          <span>Quezon Province</span>
-        </div>
-      </div>
-
-      <div class="sidebar-header">
-        <h2>Office Modules</h2>
-        <p>Information Management System</p>
-      </div>
-
-      <nav class="sidebar-nav" aria-label="Office modules">
-        <ul class="modules-list">
-          <li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-          <li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
-          <li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
-          <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-          <li><a class="active" aria-current="page" href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
-          <li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
-          <li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
-          <li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-          <li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
-        </ul>
-      </nav>
-
-      <div class="sidebar-footer">
-        <div class="system-status" role="status">
-          <span class="status-indicator standby" id="dbStatusIndicator"></span>
-          <span class="status-text" id="dbStatusText">Connecting to personnel records…</span>
-        </div>
-
-        <div class="profile-menu" id="profileMenu">
-          <button class="profile-btn" id="profileBtn" type="button"
-                  aria-haspopup="true" aria-expanded="false">
-            <span class="profile-avatar"><i data-lucide="user"></i></span>
-            <span class="profile-text">
-              <strong>PGENRO User</strong>
-              <small>Authorized account</small>
-            </span>
-            <i class="profile-chevron" data-lucide="chevron-up"></i>
-          </button>
-
-          <div class="profile-dropdown" id="profileDropdown" role="menu" aria-hidden="true">
-            <div class="profile-dropdown-header">
-              <span class="profile-avatar big"><i data-lucide="user"></i></span>
-              <div>
-                <h3>PGENRO User</h3>
-                <p>Office account</p>
-              </div>
-            </div>
-            <a href="homepage.html" role="menuitem"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
-            <a href="../SettingIMS/Settings.html?from=user" role="menuitem"><i data-lucide="settings"></i><span>Settings</span></a>
-            <button class="logout-btn" id="logoutBtn" role="menuitem" type="button">
-              <i data-lucide="log-out"></i><span>Logout</span>
-            </button>
-          </div>
-        </div>
-      </div>
-    </aside>
-
-    <main class="main-content" id="mainContent">
-      <div class="content-shell">
-        <section class="page-header reveal">
-          <div class="header-copy">
-            <div class="eyebrow"><i data-lucide="contact-round"></i><span>Personnel Information</span></div>
-            <h1>Employee Directory</h1>
-            <p>Review registered personnel profiles, designations, employment classifications, and assigned office units.</p>
-          </div>
-          <div class="header-meta">
-            <span class="access-pill"><span class="status-dot"></span>Viewer access</span>
-            <span class="last-updated" id="lastUpdated">Waiting for records</span>
-          </div>
-        </section>
-
-        <section class="stats-grid reveal" aria-label="Employee summary">
-          <article class="stat-card">
-            <div class="stat-icon blue"><i data-lucide="users"></i></div>
-            <div class="stat-copy"><p>Total Personnel</p><h2 id="metricTotal">0</h2><span>Registered employees</span></div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-icon green"><i data-lucide="user-check"></i></div>
-            <div class="stat-copy"><p>Active Duty</p><h2 id="metricActive">0</h2><span id="metricActivePct">0% of workforce</span></div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-icon yellow"><i data-lucide="calendar-off"></i></div>
-            <div class="stat-copy"><p>On Leave</p><h2 id="metricLeave">0</h2><span>Temporarily away</span></div>
-          </article>
-          <article class="stat-card">
-            <div class="stat-icon purple"><i data-lucide="network"></i></div>
-            <div class="stat-copy"><p>Office Units</p><h2 id="metricDepts">0</h2><span>Active departments</span></div>
-          </article>
-        </section>
-
-        <section class="records-card reveal" aria-labelledby="registryTitle">
-          <div class="records-header">
-            <div>
-              <span class="section-kicker">Personnel Registry</span>
-              <h2 id="registryTitle">Staff Records</h2>
-              <p>Search the directory and select a record to inspect its complete personnel profile.</p>
-            </div>
-            <div class="header-actions">
-              <span class="record-counter" id="recordCounter">0 records</span>
-              <button class="secondary-action" id="refreshRecordsBtn" type="button">
-                <i data-lucide="refresh-cw"></i><span>Refresh</span>
-              </button>
-              <button class="primary-action" id="exportBtn" type="button">
-                <i data-lucide="download"></i><span>Export CSV</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="filter-bar">
-            <label class="search-field" for="searchInput">
-              <i data-lucide="search"></i>
-              <input id="searchInput" type="search" autocomplete="off"
-                     placeholder="Search name, employee ID, or designation…">
-            </label>
-
-            <div class="filter-group">
-              <select id="filterEmploymentType" aria-label="Filter by employment type">
-                <option value="">All employment types</option>
-              </select>
-              <select id="filterDepartment" aria-label="Filter by department">
-                <option value="">All departments</option>
-              </select>
-              <select id="filterStatus" aria-label="Filter by duty status">
-                <option value="">All statuses</option>
-                <option value="Active">Active</option>
-                <option value="On Leave">On Leave</option>
-                <option value="Inactive">Inactive</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="table-wrapper">
-            <table id="employeeDirectoryTable">
-              <thead>
-                <tr>
-                  <th>Employee ID</th>
-                  <th>Name</th>
-                  <th>Designation</th>
-                  <th>Employment Type</th>
-                  <th>Department</th>
-                  <th>Contact</th>
-                  <th>Status</th>
-                  <th class="action-column">Details</th>
-                </tr>
-              </thead>
-              <tbody id="employeeTable">
-                <tr><td class="empty" colspan="8">Loading employee records…</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <footer class="footer">
-          <div>
-            <strong>PGENRO IMS</strong>
-            <span>Provincial Government Environment and Natural Resources Office</span>
-          </div>
-          <p>© 2026 Province of Quezon. Internal information management system.</p>
-        </footer>
-      </div>
-    </main>
-  </div>
-
-  <section class="profile-modal" id="profileModal" role="dialog" aria-modal="true"
-           aria-labelledby="viewHeadingName" aria-hidden="true">
-    <div class="modal-panel">
-      <div class="modal-header">
-        <div class="employee-identity">
-          <div class="employee-avatar large" id="viewAvatar">EE</div>
-          <div>
-            <span class="modal-kicker">Employee Profile</span>
-            <h2 id="viewHeadingName">Personnel Information</h2>
-            <div class="identity-meta">
-              <span id="viewHeadingDesignation">—</span>
-              <span class="status-badge" id="viewPillStatus">Active</span>
-            </div>
-          </div>
-        </div>
-        <button class="modal-close" id="profileModalClose" type="button" aria-label="Close employee profile">
-          <i data-lucide="x"></i>
+<body class="pgenro-user" data-requires-auth="user">
+<header class="navbar">
+<a class="logo-area" href="homepage.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'" src="../logo/enro.png"/>
+</div>
+<div>
+<h2>Provincial Government</h2>
+<span>Environment &amp; Natural Resources Office</span>
+</div>
+</a>
+<div class="hamburger-menu" id="hamburgerMenu">
+<span></span>
+<span></span>
+<span></span>
+</div>
+</header>
+<div class="overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>IMS Workspace</h3>
+<p class="sidebar-subtext">User Modules</p>
+</div>
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a href="travelor.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a class="active" aria-current="page" href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
+<li><a href="visitorsview.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+</ul>
+</aside>
+<main class="main-content">
+<section class="page-header">
+<div class="header-overlay-glow"></div>
+<span class="page-badge">
+<i data-lucide="eye"></i>
+        VIEWER ACCESS
+      </span>
+<h1>Employee Directory</h1>
+<p>Access registered personnel profiles, job designations, and division units.</p>
+</section>
+<!-- METRICS -->
+<section class="metrics-grid">
+<div class="metric-card">
+<div class="metric-icon total-icon"><i data-lucide="users"></i></div>
+<div class="metric-info">
+<span class="metric-label">Total Strength</span>
+<h3 id="metricTotal">0</h3>
+<span class="metric-sub">Registered Staff</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon active-icon"><i data-lucide="user-check"></i></div>
+<div class="metric-info">
+<span class="metric-label">Active Duty</span>
+<h3 id="metricActive">0</h3>
+<span class="metric-sub" id="metricActivePct">0% of workforce</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon leave-icon"><i data-lucide="plane"></i></div>
+<div class="metric-info">
+<span class="metric-label">On Leave</span>
+<h3 id="metricLeave">0</h3>
+<span class="metric-sub">Temporarily Away</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon dept-icon"><i data-lucide="git-branch"></i></div>
+<div class="metric-info">
+<span class="metric-label">Departments</span>
+<h3 id="metricDepts">0</h3>
+<span class="metric-sub">Active Units</span>
+</div>
+</div>
+</section>
+<!-- CONTROLS -->
+<div class="toolbar-container">
+<div class="toolbar-search-filters">
+<div class="search-box">
+<i class="search-icon" data-lucide="search"></i>
+<input id="searchInput" placeholder="Search by name, ID, or designation..." type="text"/>
+</div>
+<div class="filter-group">
+<div class="select-wrapper">
+<i class="select-icon" data-lucide="filter"></i>
+<select class="filter-select" id="filterEmploymentType">
+<option value="">All Employment Statuses</option>
+<option value="01 PERMANENT">Permanent</option>
+<option value="CASUAL">Casual</option>
+<option value="JOB ORDER">Job Order</option>
+<option value="CONTRACTUAL">Contractual</option>
+<option value="CO-TERMINUS">Co-Terminus</option>
+</select>
+</div>
+<div class="select-wrapper">
+<i class="select-icon" data-lucide="building"></i>
+<select class="filter-select" id="filterDepartment">
+<option value="">All Departments</option>
+</select>
+</div>
+<div class="select-wrapper">
+<i class="select-icon" data-lucide="activity"></i>
+<select class="filter-select" id="filterStatus">
+<option value="">All Statuses</option>
+<option value="Active">Active</option>
+<option value="Inactive">Inactive</option>
+<option value="On Leave">On Leave</option>
+</select>
+</div>
+</div>
+</div>
+<div class="toolbar-actions">
+<button class="secondary-btn" id="exportBtn" type="button">
+<i data-lucide="download"></i> Export CSV
         </button>
-      </div>
-
-      <div class="modal-body" id="printArea">
-        <section class="detail-section">
-          <div class="detail-section-title"><i data-lucide="user-round"></i><h3>Personal Details</h3></div>
-          <dl class="detail-grid three-columns">
-            <div><dt>Employee ID</dt><dd id="v_id">—</dd></div>
-            <div><dt>Date of Birth</dt><dd id="v_dob">—</dd></div>
-            <div><dt>Place of Birth</dt><dd id="v_pob">—</dd></div>
-            <div><dt>Sex / Gender</dt><dd id="v_gender">—</dd></div>
-            <div><dt>Civil Status</dt><dd id="v_civil">—</dd></div>
-            <div><dt>Blood Type</dt><dd id="v_blood">—</dd></div>
-          </dl>
-        </section>
-
-        <section class="detail-section">
-          <div class="detail-section-title"><i data-lucide="briefcase-business"></i><h3>Work Information</h3></div>
-          <dl class="detail-grid three-columns">
-            <div><dt>Designation</dt><dd id="v_desig">—</dd></div>
-            <div><dt>Employment Type</dt><dd id="v_emp_status">—</dd></div>
-            <div><dt>Department / Unit</dt><dd id="v_dept">—</dd></div>
-            <div><dt>Item Code</dt><dd id="v_item">—</dd></div>
-            <div><dt>Date Employed</dt><dd id="v_date_employed">—</dd></div>
-            <div><dt>Salary Grade / Step</dt><dd id="v_salary_gradestep">—</dd></div>
-          </dl>
-        </section>
-
-        <section class="detail-section">
-          <div class="detail-section-title"><i data-lucide="contact"></i><h3>Contact Information</h3></div>
-          <dl class="detail-grid">
-            <div><dt>Mobile Number</dt><dd id="v_mobile">—</dd></div>
-            <div><dt>Official Email</dt><dd id="v_email">—</dd></div>
-          </dl>
-        </section>
-
-        <section class="detail-section">
-          <div class="detail-section-title"><i data-lucide="map-pin"></i><h3>Residential Address</h3></div>
-          <div class="long-value" id="v_address">—</div>
-        </section>
-
-        <section class="detail-section record-section">
-          <div class="detail-section-title"><i data-lucide="history"></i><h3>Record Information</h3></div>
-          <dl class="detail-grid">
-            <div><dt>Created</dt><dd id="v_created">—</dd></div>
-            <div><dt>Last Updated</dt><dd id="v_updated">—</dd></div>
-          </dl>
-        </section>
-      </div>
-
-      <div class="modal-footer">
-        <button class="secondary-action" id="printProfileBtn" type="button">
-          <i data-lucide="printer"></i><span>Print Profile</span>
-        </button>
-        <button class="primary-action" id="profileDoneBtn" type="button">Done</button>
-      </div>
-    </div>
-  </section>
-
-  <button class="scroll-to-top-btn" id="scrollToTopBtn" type="button" aria-label="Scroll back to top">
-    <i data-lucide="chevron-up"></i>
-  </button>
-
-  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="employee.js?v=20260916-role-routing"></script>
+</div>
+</div>
+<!-- DIRECTORY TABLE -->
+<section class="table-card records-card">
+<div class="table-header-row">
+<div>
+<h3>Staff Records</h3>
+<p class="table-subtitle">Select any staff row to inspect the complete profile folder.</p>
+</div>
+<span class="row-counter" id="recordCounter">Showing 0 Records</span>
+</div>
+<div class="table-wrapper">
+<table id="employeeDirectoryTable">
+<thead>
+<tr>
+<th style="width: 100px;">Employee ID</th>
+<th>Name</th>
+<th>Designation</th>
+<th>Employment Status</th>
+<th>Department</th>
+<th>Contact Details</th>
+<th>Status</th>
+<th class="text-center" style="width: 100px;">Action</th>
+</tr>
+</thead>
+<tbody id="employeeTable"></tbody>
+</table>
+</div>
+</section>
+<!-- READ-ONLY PROFILE DOSSIER MODAL -->
+<div class="modal-wrapper" id="profileModal">
+<div class="modal-backdrop" onclick="closeProfileModal()"></div>
+<div class="modal-content-box">
+<div class="modal-header-row">
+<div class="profile-title-card">
+<div class="profile-avatar" id="viewAvatar">--</div>
+<div>
+<h2 id="viewHeadingName">Employee Profile</h2>
+<span class="view-status-pill" id="viewPillStatus">Active</span>
+</div>
+</div>
+<div class="modal-header-actions">
+<button class="icon-btn" onclick="window.print()" title="Print Dossier" type="button">
+<i data-lucide="printer"></i>
+</button>
+<button class="icon-btn close-modal-btn" onclick="closeProfileModal()" type="button">
+<i data-lucide="x"></i>
+</button>
+</div>
+</div>
+<div class="modal-body-scrollable" id="printArea">
+<div class="profile-dossier-grid">
+<div class="dossier-card">
+<div class="dossier-card-header"><i data-lucide="user"></i> Personal Details</div>
+<div class="dossier-grid-items">
+<div class="d-item"><span class="d-lbl">ID No.</span><span class="d-val" id="v_id">—</span></div>
+<div class="d-item"><span class="d-lbl">Birth Date</span><span class="d-val" id="v_dob">—</span></div>
+<div class="d-item"><span class="d-lbl">Birth Place</span><span class="d-val" id="v_pob">—</span></div>
+<div class="d-item"><span class="d-lbl">Gender</span><span class="d-val" id="v_gender">—</span></div>
+<div class="d-item"><span class="d-lbl">Civil Status</span><span class="d-val" id="v_civil">—</span></div>
+<div class="d-item"><span class="d-lbl">Blood Type</span><span class="d-val" id="v_blood">—</span></div>
+</div>
+</div>
+<div class="dossier-card">
+<div class="dossier-card-header"><i data-lucide="briefcase"></i> Work Information</div>
+<div class="dossier-grid-items">
+<div class="d-item"><span class="d-lbl">Designation</span><span class="d-val" id="v_desig">—</span></div>
+<div class="d-item"><span class="d-lbl">Employment Type</span><span class="d-val" id="v_emp_status">—</span></div>
+<div class="d-item"><span class="d-lbl">Department</span><span class="d-val" id="v_dept">—</span></div>
+<div class="d-item"><span class="d-lbl">Item Code</span><span class="d-val" id="v_item">—</span></div>
+<div class="d-item"><span class="d-lbl">Date Employed</span><span class="d-val" id="v_date_employed">—</span></div>
+<div class="d-item"><span class="d-lbl">Salary Grade</span><span class="d-val" id="v_salary_gradestep">—</span></div>
+</div>
+</div>
+<div class="dossier-card">
+<div class="dossier-card-header"><i data-lucide="phone-call"></i> Contact Information</div>
+<div class="dossier-grid-items">
+<div class="d-item"><span class="d-lbl">Mobile</span><span class="d-val" id="v_mobile">—</span></div>
+<div class="d-item"><span class="d-lbl">Official Email</span><span class="d-val" id="v_email">—</span></div>
+</div>
+</div>
+<div class="dossier-card">
+<div class="dossier-card-header"><i data-lucide="map-pin"></i> Station / Address</div>
+<div class="dossier-grid-items">
+<div class="d-item span-d-2"><span class="d-lbl">Address</span><span class="d-val" id="v_address">—</span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../user-javascript/employee.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
 </body>
 </html>

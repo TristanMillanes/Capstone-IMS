@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Travel Order (Viewer)</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://unpkg.com/lucide@latest"></script>
+<link rel="stylesheet" href="travelor.css?v=20260913-clean">
+
+
+
+
+
+<link rel="stylesheet" href="../shared/user.css?v=20260913-clean2">
+</head>
+<body class="pgenro-user" data-requires-auth="user">
+<header class="navbar">
+<a class="logo-area" href="homepage.html">
+<div class="logo-icon">
+<img alt="PGENRO Logo" class="logo-image" onerror="this.style.display='none'" src="../logo/enro.png"/>
+</div>
+<div>
+<h2>Provincial Government</h2>
+<span>Environment &amp; Natural Resources Office</span>
+</div>
+</a>
+<div class="hamburger-menu" id="hamburgerMenu">
+<span></span>
+<span></span>
+<span></span>
+</div>
+</header>
+<div class="overlay" id="overlay"></div>
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<h3>IMS Workspace</h3>
+<p class="sidebar-subtext">User Modules</p>
+</div>
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a class="active" aria-current="page" href="travelor.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
+<li><a href="visitorsview.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+<li><a href="service.html"><i data-lucide="shield-alert"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+</ul>
+</aside>
+<main class="main-content">
+<section class="page-header">
+<div class="header-overlay-glow"></div>
+<span class="page-badge">
+<i data-lucide="eye"></i>
+        VIEWER ACCESS
+      </span>
+<h1>Travel Order Tracking</h1>
+<p>Database logs of official staff travel orders, destinations, and trip approvals.</p>
+</section>
+<!-- METRICS -->
+<section class="metrics-grid">
+<div class="metric-card">
+<div class="metric-icon total-icon"><i data-lucide="file-text"></i></div>
+<div class="metric-info">
+<span class="metric-label">Total Orders</span>
+<h3 id="metricTotal">0</h3>
+<span class="metric-sub">Submitted Trips</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon active-icon"><i data-lucide="clock"></i></div>
+<div class="metric-info">
+<span class="metric-label">Pending</span>
+<h3 id="metricPending">0</h3>
+<span class="metric-sub">Under Review</span>
+</div>
+</div>
+<div class="metric-card">
+<div class="metric-icon leave-icon"><i data-lucide="check-circle"></i></div>
+<div class="metric-info">
+<span class="metric-label">Approved</span>
+<h3 id="metricApproved">0</h3>
+<span class="metric-sub">Confirmed Trips</span>
+</div>
+</div>
+</section>
+<!-- TABLE CARD -->
+<section class="table-card records-card">
+<div class="table-header-row">
+<div>
+<h3>Travel Requests Registry</h3>
+<p class="table-subtitle">Official provincial travel schedules and destinations.</p>
+</div>
+</div>
+<div class="table-wrapper">
+<table>
+<thead>
+<tr>
+<th style="width: 140px;">TOR No.</th>
+<th>Traveler</th>
+<th>Destination</th>
+<th>Dates</th>
+<th>Type</th>
+<th style="width: 120px;">Status</th>
+</tr>
+</thead>
+<tbody id="travelOrderTable"></tbody>
+</table>
+</div>
+</section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../shared/supabase.js"></script>
+<script src="../shared/settings-runtime.js?v=20260913"></script>
+<script src="../user-javascript/travelOR.js"></script>
+<script src="../shared/pgenro-global.js?v=20260912"></script>
+<script src="../user-javascript/pgenro-user.js?v=20260912"></script><script src="../shared/workspace.js?v=20260913"></script>
+<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
+</body>
+</html>
