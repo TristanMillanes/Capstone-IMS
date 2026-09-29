@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html lang="en">
+<html data-css-scope="admin-services" lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -11,39 +11,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <!-- Lucide Icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
-<!-- Supabase SDKs (Realtime Database v10 Compat Mode) -->
+<!-- Supabase JavaScript SDK -->
 <!-- Stylesheet -->
-<link rel="stylesheet" href="serviceAdmin.css?v=20260913-clean">
-
-
-
-
-<link rel="stylesheet" href="../shared/admin.css?v=20260913-clean2">
+<link href="serviceAdmin.css?v=20260923-admin-final" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin" data-admin-page="serviceAdmin.html" data-requires-auth="admin">
+<body class="pgenro-admin layout-v2" data-admin-page="serviceAdmin.html" data-css-scope="admin-services" data-requires-auth="admin">
 <!-- Mobile Sidebar Backdrop -->
 <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="app-layout">
 <!-- ============================================================ -->
 <!-- SIDEBAR NAVIGATION                                           -->
 <!-- ============================================================ -->
-<aside class="sidebar" id="sidebar">
-<!-- SIDEBAR HEADER -->
+<aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
 <div class="sidebar-header">
 <a class="logo-area" href="admin.html">
-<div class="logo-circle-wrap">
-<img alt="PG ENRO Quezon" class="logo-image" onerror="this.style.display='none';" src="../logo/enro.png"/>
+<div class="logo-icon">
+<img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
 </div>
 <div class="logo-text">
 <h2>PGENRO IMS</h2>
-<span>ADMIN CONTROL CENTER</span>
+<span>Admin Control Center</span>
 </div>
 </a>
-<button aria-label="Collapse Sidebar" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Sidebar" type="button">
+<button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
 <i data-lucide="panel-left-close"></i>
 </button>
 </div>
-<!-- SIDEBAR NAV ITEMS -->
 <nav aria-label="Administrator navigation" class="sidebar-nav">
 <div class="nav-group">
 <span class="nav-label">Main Panel</span>
@@ -55,7 +48,7 @@
 <span class="nav-label">Operations &amp; Records</span>
 <ul>
 <li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
-<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase-business"></i><span>Travel Orders</span></a></li>
+<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
 <li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
 <li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
 <li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
@@ -74,19 +67,18 @@
 <div class="nav-group">
 <span class="nav-label">System Control</span>
 <ul>
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
-<li><a class="nav-item" href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account &amp; System Settings</span></a></li>
+<li><a class="nav-item" href="#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+<li><a class="nav-item" href="#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
+<li><a class="nav-item" href="#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
 </ul>
 </div>
 </nav>
-<!-- SIDEBAR FOOTER (DATABASE SYNC CARD) -->
 <div class="sidebar-footer">
 <div class="system-status-indicator">
 <span class="status-dot online" id="dbStatusDot"></span>
 <div class="status-info">
-<span class="status-title">Database Sync</span>
-<span class="status-sub" id="dbStatusText">Live Synchronized</span>
+<span class="status-title">System Sync</span>
+<span class="status-sub" id="dbStatusText">Connecting...</span>
 </div>
 </div>
 </div>
@@ -98,10 +90,10 @@
 <!-- TOPBAR -->
 <header class="topbar">
 <div class="topbar-left">
-<button aria-label="Toggle Menu" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Menu" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 <i data-lucide="menu"></i>
 </button>
-<div class="global-search">
+<div class="global-search" role="search">
 <i class="search-icon" data-lucide="search"></i>
 <input id="quickSearchInput" placeholder="Quick find Service No. or Client Name..." type="text"/>
 <kbd class="search-shortcut">Ctrl K</kbd>
@@ -114,7 +106,7 @@
 </div>
 <div class="v-divider"></div>
 <div class="profile-menu admin-profile-menu" data-shared-profile-handler="true" id="profileMenu">
-<button aria-label="Open administrator profile" class="profile-btn profile-icon-only" id="profileBtn" title="Administrator profile" type="button"><div class="profile-avatar"><i data-lucide="user-round"></i></div></button>
+<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn profile-icon-only" id="profileBtn" title="Administrator profile" type="button"><div class="profile-avatar"><i data-lucide="user-round"></i></div></button>
 <div class="profile-dropdown" id="profileDropdown">
 <div class="profile-dropdown-header">
 <div class="profile-avatar big"><i data-lucide="user-round"></i></div>
@@ -128,7 +120,7 @@
 <a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
 <a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
 <a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
-<a href="../SettingIMS/Settings.html?from=admin"><i data-lucide="settings"></i><span>Account Settings</span></a>
+<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
 </div>
 <div class="dropdown-footer">
 <button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
@@ -685,13 +677,7 @@
 <div class="toast-container" id="toastContainer"></div>
 <!-- SCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js"></script>
-<script src="../shared/settings-runtime.js?v=20260913"></script>
-<script src="../admin-javascript/supabase-compat.js"></script>
-<script src="../admin-javascript/admin-ui.js"></script>
-<script src="../shared/pgenro-global.js?v=20260912"></script>
-<script src="../admin-javascript/serviceAdmin.js?v=20260912-service-fix"></script>
-<script src="../shared/workspace.js?v=20260913"></script>
-<script src="../shared/ui-fixes.js?v=20260913-ui2"></script>
+<script src="../shared/supabase.js?v=20260923-bundled"></script>
+<script src="serviceAdmin.js?v=20260923-admin-final"></script>
 </body>
 </html>

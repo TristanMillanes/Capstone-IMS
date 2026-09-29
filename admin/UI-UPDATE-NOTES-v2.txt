@@ -1,0 +1,27 @@
+PGENRO IMS — Aligned Admin Interface v2
+Date: 2026-09-23
+
+What was improved
+- Standardized sidebar width, navigation spacing, active states, and footer across all admin modules.
+- Standardized sticky topbar height and page padding.
+- Aligned all page headers, titles, descriptions, breadcrumbs, and header action buttons.
+- Unified KPI/stat/metric cards across Dashboard, Visitors, ICS, Inventory, Travel, Users, Memos, Communications, and Requests.
+- Standardized card/panel borders, radius, shadows, section headers, and vertical spacing.
+- Improved toolbar/filter/search alignment and wrapping behavior.
+- Improved table cell spacing, header hierarchy, horizontal scrolling, and footer/pagination alignment.
+- Standardized form control heights, labels, focus states, textareas, and button sizes.
+- Improved the long Service Request workflow form and responsive tab layout.
+- Brought custom ICS, Inventory, and Travel Order page structures into the same admin visual system without changing data IDs or database logic.
+- Improved responsive behavior at 1180px, 900px, 680px, and 440px breakpoints.
+- Kept one independent CSS file and one independent JS file for every admin page.
+- Bumped local CSS/JS cache versions so browsers load the updated UI instead of stale files.
+
+Validation performed
+- 11 HTML pages checked.
+- 11 JavaScript files passed `node --check` syntax validation.
+- No duplicate HTML IDs found.
+- Every page still references its own CSS and JS file.
+- All final CSS files have balanced braces and exactly one v2 layout layer.
+
+Note
+- Links to ../SettingIMS/Settings.html were already part of the project navigation but that external folder/file is not included in this admin-only ZIP. The links were preserved because they may resolve correctly in the full project structure.

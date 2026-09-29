@@ -1,0 +1,51 @@
+PGENRO IMS — INTERFACE/CSS CLEANUP REPORT
+Date: 2026-09-14
+
+WHAT WAS FIXED
+- Standardized the authenticated user-side shell across:
+  Dashboard, Communications, Travel Orders, Office Memos, Employee Records,
+  Inventory, Visitor Log, Service Requests, and ICS / Property.
+- Removed the top navigation header from those user pages.
+- Added one consistent fixed desktop sidebar and responsive mobile menu.
+- Standardized profile/logout area and module navigation.
+- Corrected homepage.css, which contained Communications styling in the supplied build.
+- Restored the missing shared runtime files from the project's own Git history:
+  shared/supabase.js
+  shared/settings-runtime.js
+  shared/pgenro-global.js
+  shared/workspace.js
+- Removed references to the missing/nonexistent shared/ui-fixes.js file.
+- Fixed case-sensitive route/file mismatches (homepage, communication, ICS,
+  login, request access, and admin memo/request pages).
+- Removed unused duplicate user CSS files.
+- Trimmed user.css so it only contains module styles for pages that actually use it.
+- Added User/user-shell.css as the single shared authenticated-user layout stylesheet.
+
+USER CSS AFTER CLEANUP
+- User/homepage.css
+- User/Communication.css
+- User/user.css
+- User/user-shell.css
+- User/auth.css
+
+REMOVED UNUSED USER CSS
+- User/ICS.css
+- User/employee.css
+- User/inventory.css
+- User/login.css
+- User/officememo.css
+- User/requestACC.css
+- User/service.css
+- User/travelOR.css
+- User/visitorsView.css
+
+VALIDATION RESULTS
+- JavaScript syntax errors: 0
+- CSS parser errors: 0
+- Missing local href/src references: 0
+- Duplicate IDs in standardized user pages: 0
+- Standardized user pages still containing old top navbar: 0
+
+IMPORTANT
+Run the project through a web server such as VS Code Live Server, not file://,
+because Supabase authentication and browser modules expect a normal web origin.
