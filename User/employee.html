@@ -9,9 +9,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="employee.css?v=20260915-logout-dialog" rel="stylesheet">
+  <link href="employee.css?v=20261002-fixed" rel="stylesheet">
 </head>
-<body class="pgenro-user" data-css-scope="user-employee" data-requires-auth="user">
+<body class="pgenro-user" data-css-scope="user-employee" data-requires-auth="user" data-page-data-owner="module">
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
   <button class="hamburger-menu" id="hamburgerMenu" type="button"
@@ -42,11 +42,11 @@
           <li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
           <li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
           <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-          <li><a class="active" aria-current="page" href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li>
-          <li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li>
-          <li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li>
+          <li><a class="active" aria-current="page" href="employee.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+          <li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
+          <li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitors Log</span></a></li>
           <li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-          <li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li>
+          <li><a href="ics.html"><i data-lucide="layers"></i><span>ICS Property Slips</span></a></li>
         </ul>
       </nav>
 
@@ -274,6 +274,7 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="employee.js?v=20260916-role-routing"></script>
+  <script defer src="../shared/supabase.js?v=20261002-fixed"></script>
+<script defer src="employee.js?v=20261002-fixed"></script>
 </body>
 </html>

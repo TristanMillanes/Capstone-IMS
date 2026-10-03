@@ -1,0 +1,23 @@
+{
+  "method": "Production forms, real HTTP Flask OCR service and local Tesseract; Supabase simulated",
+  "passed": true,
+  "findings": [
+    {
+      "scenario": "Stop unlocks the mobile form, keeps manual edits and cancels the server request",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real scan autofills sender, issue date, control number and type after Stop/Retry; manual subject survives",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real scanned memorandum autofills the existing mobile memo form through the local reader",
+      "result": "PASS"
+    },
+    {
+      "scenario": "The memorandum remains editable and saves after scanned autofill",
+      "result": "PASS"
+    }
+  ],
+  "uncaughtErrors": []
+}

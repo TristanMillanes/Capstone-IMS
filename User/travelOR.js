@@ -308,6 +308,9 @@ document.addEventListener("DOMContentLoaded", () => {
   function renderTable() {
     if (!tableBody) return;
     tableBody.innerHTML = "";
+    document.getElementById("metricTotal").textContent = travelOrders.length;
+    document.getElementById("metricPending").textContent = travelOrders.filter(t => String(t.status).toLowerCase() === "pending").length;
+    document.getElementById("metricApproved").textContent = travelOrders.filter(t => ["approved", "active"].includes(String(t.status).toLowerCase())).length;
 
     if (travelOrders.length === 0) {
       tableBody.innerHTML = `
@@ -336,11 +339,6 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     });
 
-    // Update Counters
-    document.getElementById("metricTotal").textContent = travelOrders.length;
-    document.getElementById("metricPending").textContent = travelOrders.filter(t => t.status === "Pending").length;
-    document.getElementById("metricApproved").textContent = travelOrders.filter(t => t.status === "Approved").length;
-
     if (window.lucide) lucide.createIcons();
   }
 
@@ -350,26 +348,22 @@ document.addEventListener("DOMContentLoaded", () => {
     renderTable();
   };
 
-  const normalizeTravelOrder = (row) => ({
-    id: row.id,
-    toNumber: row.tor_no,
-    travelerName: row.traveler_name,
-    travelerPosition: row.traveler_position,
-    department: row.department,
-    travelType: row.travel_type,
-    status: row.status,
-    destination: row.destination,
-    startDate: row.departure_date,
-    endDate: row.return_date,
-    transportation: row.transportation,
-    purpose: row.purpose,
-    perDiem: row.per_diem,
-    fundSource: row.fund_source,
-    approver: row.approver,
-    remarks: row.remarks,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at
-  });
+  const normalizeTravelOrder = (row) => {
+    const record = row.data && typeof row.data === "object" ? {...row.data, id:row.id} : row;
+    return {
+      ...record,
+      toNumber: record.toNumber || record.torNo || record.tor_no || record.controlNo || record.control_no || "",
+      travelerName: record.travelerName || record.traveler_name || record.employeeName || record.traveler || "",
+      travelerPosition: record.travelerPosition || record.traveler_position || "",
+      travelType: record.travelType || record.travel_type || record.type || "Local",
+      startDate: record.startDate || record.departure_date || record.dateFrom || "",
+      endDate: record.endDate || record.return_date || record.dateTo || "",
+      perDiem: record.perDiem ?? record.per_diem,
+      fundSource: record.fundSource || record.fund_source || "",
+      createdAt: row.created_at || record.createdAt,
+      updatedAt: row.updated_at || record.updatedAt
+    };
+  };
 
   async function loadTravelOrders() {
     if (!window.PGENRO_SUPABASE?.configured || !supabase) return;
@@ -378,7 +372,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const { data, error } = await supabase
         .from("travel_orders")
         .select("*")
-        .order("departure_date", { ascending: false });
+        .order("id", { ascending: false });
 
       if (error) throw error;
       window.loadDatabaseTravelOrders((data || []).map(normalizeTravelOrder));

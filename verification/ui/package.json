@@ -1,0 +1,14 @@
+{
+  "name": "pgenro-ui-verification",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node browser-audit.cjs current && node functional-browser.cjs",
+    "test:ocr": "node ocr-ui.cjs",
+    "test:upload": "node communication-upload-browser.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "lucide": "1.8.0"
+  }
+}

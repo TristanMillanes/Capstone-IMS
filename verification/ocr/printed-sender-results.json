@@ -1,0 +1,33 @@
+{
+  "method": "Actual full-document Communications sender detector",
+  "scenarios": [
+    {
+      "scenario": "Missing dots in OCR initials are formatted without changing the name letters",
+      "result": "PASS"
+    },
+    {
+      "scenario": "The printed author fills Received From while TO stays separate",
+      "result": "PASS"
+    },
+    {
+      "scenario": "The closing block may continue on page two",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An annex author cannot replace the covering letter sender",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An annex signer cannot create a sender missing from the letter",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Equal printed signatories require the reviewer to choose",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Body FROM labels cannot become a header sender",
+      "result": "PASS"
+    }
+  ]
+}

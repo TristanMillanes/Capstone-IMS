@@ -1,0 +1,1690 @@
+{
+  "javascriptFiles": 29,
+  "stylesheets": 24,
+  "syntax": "PASS",
+  "activeHtml": [
+    {
+      "page": "admin/Usermanagement.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "userForm"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshUsersBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportUsersBtn",
+          "type": "button"
+        },
+        {
+          "id": "openAddUserModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "bulkDeleteBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "closeUserModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "saveUserBtn",
+          "type": "submit"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/admin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportAnalyticsBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportCsvBtn",
+          "type": "button"
+        },
+        {
+          "id": "downloadLocalBackupBtn",
+          "type": "button"
+        },
+        {
+          "id": "resetAdminPrefsBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeAuditModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeAuditModalBtn2",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/admincommunication.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "communicationForm"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportCommunicationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "syncCommunicationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "openEncodingModalBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "bulkArchiveBtn",
+          "type": "button"
+        },
+        {
+          "id": "bulkDeleteBtn",
+          "type": "button"
+        },
+        {
+          "id": "clearSelectionBtn",
+          "type": "button"
+        },
+        {
+          "id": "commPrevPage",
+          "type": "button"
+        },
+        {
+          "id": "commNextPage",
+          "type": "button"
+        },
+        {
+          "id": "closeEncodingModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelOcrBtn",
+          "type": "button"
+        },
+        {
+          "id": "browseDocumentBtn",
+          "type": "button"
+        },
+        {
+          "id": "removeDocumentBtn",
+          "type": "button"
+        },
+        {
+          "id": "runOcrBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelEncodingBtn",
+          "type": "button"
+        },
+        {
+          "id": "saveRecordBtn",
+          "type": "submit"
+        },
+        {
+          "id": "closeViewOcrModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeDocViewerBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/employee-admin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "employeeForm"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshBtn",
+          "type": "button"
+        },
+        {
+          "id": "addEmployeeBtn",
+          "type": "button"
+        },
+        {
+          "id": "quickAddBtn",
+          "type": "button"
+        },
+        {
+          "id": "quickExportBtn",
+          "type": "button"
+        },
+        {
+          "id": "quickPrintBtn",
+          "type": "button"
+        },
+        {
+          "id": "quickFilterPermanent",
+          "type": "button"
+        },
+        {
+          "id": "quickFilterCasual",
+          "type": "button"
+        },
+        {
+          "id": "quickFilterLeave",
+          "type": "button"
+        },
+        {
+          "id": "resetFiltersBtn",
+          "type": "button"
+        },
+        {
+          "id": "batchExportBtn",
+          "type": "button"
+        },
+        {
+          "id": "batchDeleteBtn",
+          "type": "button"
+        },
+        {
+          "id": "batchClearBtn",
+          "type": "button"
+        },
+        {
+          "id": "prevPageBtn",
+          "type": "button"
+        },
+        {
+          "id": "nextPageBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "saveEmployeeBtn",
+          "type": "submit"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "printDossierBtn",
+          "type": "button"
+        },
+        {
+          "id": "dossierEditBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/ics-admin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "icsForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshIcsBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportCsvBtn",
+          "type": "button"
+        },
+        {
+          "id": "addIcsBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "clearFiltersBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeEditorBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "cancelEditorBtn",
+          "type": "button"
+        },
+        {
+          "id": "saveIcsBtn",
+          "type": "submit"
+        },
+        {
+          "id": "closeViewBtn",
+          "type": "button"
+        },
+        {
+          "id": "deleteViewBtn",
+          "type": "button"
+        },
+        {
+          "id": "printViewBtn",
+          "type": "button"
+        },
+        {
+          "id": "editViewBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/invetoryadmin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "itemForm"
+        },
+        {
+          "id": "movementForm"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshBtn",
+          "type": "button"
+        },
+        {
+          "id": "openReportBtn",
+          "type": "button"
+        },
+        {
+          "id": "addItemBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportBtn",
+          "type": "button"
+        },
+        {
+          "id": "movementBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "saveItemBtn",
+          "type": "submit"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "submit"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "confirmPrintBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/officememo-admin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "memoForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshMemosBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportCsvBtn",
+          "type": "button"
+        },
+        {
+          "id": "printRegistryBtn",
+          "type": "button"
+        },
+        {
+          "id": "openCreateModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "clearMemoFiltersBtn",
+          "type": "button"
+        },
+        {
+          "id": "clearMemoSelectionBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "closeFormModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelMemoOcrBtn",
+          "type": "button"
+        },
+        {
+          "id": "previewSelectedPdfBtn",
+          "type": "button"
+        },
+        {
+          "id": "removeAttachmentBtn",
+          "type": "button"
+        },
+        {
+          "id": "runMemoOcrBtn",
+          "type": "button"
+        },
+        {
+          "id": "recheckMemoFieldsBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelFormModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "saveMemoSubmitBtn",
+          "type": "submit"
+        },
+        {
+          "id": "closeViewPdfBtn",
+          "type": "button"
+        },
+        {
+          "id": "dismissViewPdfBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeDeleteModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelDeleteBtn",
+          "type": "button"
+        },
+        {
+          "id": "confirmDeleteBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/requestacc.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshRequestsBtn",
+          "type": "button"
+        },
+        {
+          "id": "bulkApproveBtn",
+          "type": "button"
+        },
+        {
+          "id": "bulkRejectBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeReviewModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "declineModalActionBtn",
+          "type": "button"
+        },
+        {
+          "id": "approveModalActionBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeDeclineModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelDeclineModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "confirmDeclineBtn",
+          "type": "button"
+        },
+        {
+          "id": "confirmModalCancelBtn",
+          "type": "button"
+        },
+        {
+          "id": "confirmModalActionBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/serviceAdmin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "autocomplete": "off",
+          "id": "serviceRequestForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshServicesBtn",
+          "type": "button"
+        },
+        {
+          "id": "btnOpenSummaryModal",
+          "type": "button"
+        },
+        {
+          "id": "btnOpenSearchModal",
+          "type": "button"
+        },
+        {
+          "id": "btnNewRecord",
+          "type": "button"
+        },
+        {
+          "id": "exportServicesBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeSearchModal",
+          "type": "button"
+        },
+        {
+          "id": "btnExportSummaryCsv",
+          "type": "button"
+        },
+        {
+          "id": "closeSummaryModal",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "tabBtn1",
+          "type": "button"
+        },
+        {
+          "id": "tabBtn2",
+          "type": "button"
+        },
+        {
+          "id": "tabBtn3",
+          "type": "button"
+        },
+        {
+          "id": "btnClearAction",
+          "type": "button"
+        },
+        {
+          "id": "btnPrevTab",
+          "type": "button"
+        },
+        {
+          "id": "btnNextTab",
+          "type": "button"
+        },
+        {
+          "id": "btnSaveAction",
+          "type": "submit"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/travelOR-admin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "orderForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportBtn",
+          "type": "button"
+        },
+        {
+          "id": "addOrderBtn",
+          "type": "button"
+        },
+        {
+          "id": "clearFiltersBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "saveOrderBtn",
+          "type": "submit"
+        },
+        {
+          "id": "printDocBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "admin/visitors-admin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "autocomplete": "off",
+          "id": "visitorAdminForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "id": "sidebarCollapseBtn",
+          "type": "button"
+        },
+        {
+          "id": "mobileMenuBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpBtn"
+        },
+        {
+          "id": "notificationsBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportCsvBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshBtn",
+          "type": "button"
+        },
+        {
+          "id": "addVisitorBtn",
+          "type": "button"
+        },
+        {
+          "id": "resetFiltersBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "prevPageBtn",
+          "type": "button"
+        },
+        {
+          "id": "nextPageBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeVisitorModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelVisitorModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "saveVisitorSubmitBtn",
+          "type": "submit"
+        },
+        {
+          "id": "closeDrawerBtn",
+          "type": "button"
+        },
+        {
+          "id": "printPassBtn",
+          "type": "button"
+        },
+        {
+          "id": "editVisitorBtn",
+          "type": "button"
+        },
+        {
+          "id": "toggleCheckoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "deleteVisitorBtn",
+          "type": "button"
+        },
+        {
+          "type": "button",
+          "id": "workspaceJumpClose"
+        }
+      ]
+    },
+    {
+      "page": "User/communication.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshRecordsBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "viewModalClose",
+          "type": "button"
+        },
+        {
+          "id": "copyControlBtn",
+          "type": "button"
+        },
+        {
+          "id": "modalDoneBtn",
+          "type": "button"
+        },
+        {
+          "id": "scrollToTopBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/employee.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshRecordsBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileModalClose",
+          "type": "button"
+        },
+        {
+          "id": "printProfileBtn",
+          "type": "button"
+        },
+        {
+          "id": "profileDoneBtn",
+          "type": "button"
+        },
+        {
+          "id": "scrollToTopBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/homepage.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshDashboardBtn",
+          "type": "button"
+        },
+        {
+          "id": "scrollToTopBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/ics.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "printRegistryBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshRecordsBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeDetailsModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "modalPrintSlipBtn",
+          "type": "button"
+        },
+        {
+          "id": "modalCloseBtn",
+          "type": "button"
+        },
+        {
+          "id": "closePrintSheetBtn",
+          "type": "button"
+        },
+        {
+          "id": "dismissPrintBtn",
+          "type": "button"
+        },
+        {
+          "id": "printNowBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/inventory.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "inventoryForm"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshRecordsBtn",
+          "type": "button"
+        },
+        {
+          "id": "generateReportBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "formModalClose",
+          "type": "button"
+        },
+        {
+          "id": "clearFormBtn",
+          "type": "button"
+        },
+        {
+          "id": "submitBtn",
+          "type": "submit"
+        },
+        {
+          "id": "reportModalClose",
+          "type": "button"
+        },
+        {
+          "id": "cancelReportBtn",
+          "type": "button"
+        },
+        {
+          "id": "confirmPrintBtn",
+          "type": "button"
+        },
+        {
+          "id": "scrollToTopBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/login.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "autocomplete": "on",
+          "id": "loginForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "id": "dismissAlert",
+          "type": "button"
+        },
+        {
+          "id": "clearEmailBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "togglePassword",
+          "type": "button"
+        },
+        {
+          "id": "loginBtn",
+          "type": "submit"
+        }
+      ]
+    },
+    {
+      "page": "User/officememo.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "printRegistryBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshRecordsBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeViewModalBtn",
+          "type": "button"
+        },
+        {
+          "id": "cancelViewModalBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/requestacc.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "autocomplete": "off",
+          "class": "form-content",
+          "id": "accessForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "restoreDraftBtn",
+          "type": "button"
+        },
+        {
+          "id": "discardDraftBtn",
+          "type": "button"
+        },
+        {
+          "id": "togglePasswordBtn",
+          "type": "button"
+        },
+        {
+          "id": "toggleConfirmPasswordBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "openPrivacyBtn",
+          "type": "button"
+        },
+        {
+          "id": "backBtn",
+          "type": "button"
+        },
+        {
+          "id": "nextBtn",
+          "type": "button"
+        },
+        {
+          "id": "submitBtn",
+          "type": "submit"
+        },
+        {
+          "id": "closePrivacyBtn",
+          "type": "button"
+        },
+        {
+          "id": "acceptPrivacyBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/service.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "viewOnlyForm",
+          "onsubmit": "return false;"
+        }
+      ],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshRecordsBtn",
+          "type": "button"
+        },
+        {
+          "id": "btnTrack",
+          "type": "button"
+        },
+        {
+          "id": "dismissModalIcon",
+          "type": "button"
+        },
+        {
+          "id": "tabBtn1",
+          "type": "button"
+        },
+        {
+          "id": "tabBtn2",
+          "type": "button"
+        },
+        {
+          "id": "tabBtn3",
+          "type": "button"
+        },
+        {
+          "id": "arrowNextTo2",
+          "type": "button"
+        },
+        {
+          "id": "arrowBackTo1",
+          "type": "button"
+        },
+        {
+          "id": "arrowNextTo3",
+          "type": "button"
+        },
+        {
+          "id": "arrowBackTo2",
+          "type": "button"
+        },
+        {
+          "id": "printRecordBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeInspectModalBottom",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/travelOR.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "User/visitorsView.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [],
+      "buttons": [
+        {
+          "id": "hamburgerMenu",
+          "type": "button"
+        },
+        {
+          "id": "profileBtn",
+          "type": "button"
+        },
+        {
+          "id": "logoutBtn",
+          "type": "button"
+        },
+        {
+          "id": "exportCsvBtn",
+          "type": "button"
+        },
+        {
+          "id": "refreshBtn",
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "id": "prevPageBtn",
+          "type": "button"
+        },
+        {
+          "id": "nextPageBtn",
+          "type": "button"
+        },
+        {
+          "id": "closeDrawerBtn",
+          "type": "button"
+        },
+        {
+          "id": "printPassBtn",
+          "type": "button"
+        }
+      ]
+    },
+    {
+      "page": "SettingIMS/Settings.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "class": "settings-form",
+          "id": "profileForm"
+        },
+        {
+          "class": "settings-form narrow-form",
+          "id": "passwordForm"
+        },
+        {
+          "class": "settings-form",
+          "id": "preferencesForm"
+        },
+        {
+          "class": "settings-form",
+          "id": "systemSettingsForm"
+        }
+      ],
+      "buttons": [
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "button"
+        },
+        {
+          "type": "submit"
+        },
+        {
+          "type": "submit"
+        },
+        {
+          "type": "submit"
+        },
+        {
+          "type": "submit"
+        }
+      ]
+    },
+    {
+      "page": "VisitorsLog/visitorsLogin.html",
+      "broken_refs": [],
+      "duplicate_ids": [],
+      "forms": [
+        {
+          "id": "visitorForm",
+          "novalidate": ""
+        }
+      ],
+      "buttons": [
+        {
+          "id": "submitBtn",
+          "type": "submit"
+        },
+        {
+          "id": "closeModalBtn",
+          "type": "button"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,86 @@
+{
+  "method": "Chromium with simulated Supabase; real PDF.js, Mammoth and Tesseract reader assets served locally at their pinned versions",
+  "scenarios": [
+    {
+      "scenario": "Dashboard aggregates, accessible six-month chart and consistent admin navigation",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Pagination survives refresh and selection drives selected CSV export",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real memo-fixture.txt extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real memo.pdf extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real memo.docx extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real memo.png extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real scanned-memo.pdf extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real memo-deflate.tiff extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real memo.gif extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Real memo-scan.docx extraction produces the same five fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Manual number, date, recipient and issuer survive OCR",
+      "result": "PASS"
+    },
+    {
+      "scenario": "OCR preserves manual edits and incomplete/ambiguous fields need review",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Attachment replacement clears old auto-fill without erasing manual subject",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Whitespace-only required values and duplicate numbers cannot save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Denied save preserves form and controls recover; preview returns to draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Saved raw text stays available after editing while remarks remain usable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "320px, 390px and tablet layouts have usable centered scrollable forms",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Busy form cannot be reset by create action",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Communications OCR saves and redirects with original attachment (flat)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Communications OCR saves and redirects with original attachment (JSON envelope)",
+      "result": "PASS"
+    }
+  ],
+  "uncaughtErrors": []
+}

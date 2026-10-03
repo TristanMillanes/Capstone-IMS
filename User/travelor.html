@@ -12,14 +12,14 @@
 
 <link href="travelOR.css" rel="stylesheet"/>
 </head>
-<body class="pgenro-user" data-css-scope="user-travelor" data-requires-auth="user"><div class="overlay" id="overlay"></div><button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button"><span></span><span></span><span></span></button>
+<body class="pgenro-user" data-css-scope="user-travelor" data-requires-auth="user" data-page-data-owner="module"><div class="overlay" id="overlay"></div><button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button"><span></span><span></span><span></span></button>
 <div class="app-container"><aside class="sidebar" id="sidebar">
 <div class="sidebar-brand">
 <div class="sidebar-logo"><img alt="PGENRO Logo" class="logo-image" src="../logo/enro.png"/></div>
 <div class="sidebar-brand-copy"><strong>PGENRO IMS</strong><span>Quezon Province</span></div>
 </div>
 <div class="sidebar-header"><h3>Office Modules</h3><p class="sidebar-subtext">Information Management System</p></div>
-<ul class="modules-list"><li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li><li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li><li><a aria-current="page" class="active" href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li><li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li><li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Records</span></a></li><li><a href="inventory.html"><i data-lucide="package"></i><span>Inventory</span></a></li><li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitor Log</span></a></li><li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li><li><a href="ics.html"><i data-lucide="layers"></i><span>ICS / Property</span></a></li></ul>
+<ul class="modules-list"><li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li><li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li><li><a aria-current="page" class="active" href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li><li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li><li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li><li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li><li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitors Log</span></a></li><li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li><li><a href="ics.html"><i data-lucide="layers"></i><span>ICS Property Slips</span></a></li></ul>
 <div class="sidebar-footer">
 <div class="system-status"><span class="status-indicator standby"></span><span class="status-text">System ready</span></div>
 <div class="profile-menu" id="profileMenu">
@@ -36,7 +36,7 @@
 </div>
 </div>
 </div>
-</aside><main class="main-content" id="mainContent">
+</aside><main class="main-content" id="mainContent"><div class="content-shell">
 <section class="page-header">
 <div class="header-overlay-glow"></div>
 <span class="page-badge">
@@ -97,8 +97,9 @@
 </table>
 </div>
 </section>
-</main></div>
+<footer class="footer"><div><strong>PGENRO IMS</strong><span>Provincial Government Environment and Natural Resources Office</span></div><p>© 2026 Province of Quezon.</p></footer></div></main></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="travelOR.js?v=20260916-role-routing"></script>
+<script defer src="../shared/supabase.js?v=20261002-fixed"></script>
+<script defer src="travelOR.js?v=20261002-fixed"></script>
 </body>
 </html>

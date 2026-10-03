@@ -800,7 +800,7 @@ using ((select public.is_pgenro_admin()));
 
 -- --------------------------------------------------------------------------
 -- Operational tables:
--- Active users can work with records; admins retain full control including
+-- Approved users can view records; admins retain all encoding, updates, and
 -- deletion. Suspending a profile immediately blocks future Data API access.
 -- --------------------------------------------------------------------------
 do $$
@@ -825,8 +825,8 @@ begin
     execute format('drop policy if exists active_user_update on public.%I', t);
 
     execute format('create policy active_user_select on public.%I for select to authenticated using ((select public.is_pgenro_active_user()))', t);
-    execute format('create policy active_user_insert on public.%I for insert to authenticated with check ((select public.is_pgenro_active_user()))', t);
-    execute format('create policy active_user_update on public.%I for update to authenticated using ((select public.is_pgenro_active_user())) with check ((select public.is_pgenro_active_user()))', t);
+    execute format('create policy admin_insert on public.%I for insert to authenticated with check ((select public.is_pgenro_admin()))', t);
+    execute format('create policy admin_update on public.%I for update to authenticated using ((select public.is_pgenro_admin())) with check ((select public.is_pgenro_admin()))', t);
     execute format('create policy admin_delete on public.%I for delete to authenticated using ((select public.is_pgenro_admin()))', t);
   end loop;
 end $$;

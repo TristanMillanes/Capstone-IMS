@@ -1,0 +1,121 @@
+{
+  "method": "Production Flask app and real local Tesseract; no external database",
+  "passed": true,
+  "testMethods": 9,
+  "scenarios": [
+    {
+      "scenario": "Annex names are excluded and equal signatories require a choice",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Stop racing with upload releases the reader and allows another read",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Printed sender, issue/registry dates and body memo reference stay separate",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Identical bytes reuse the read after renaming",
+      "result": "PASS",
+      "processingMs": 0,
+      "readingStats": {
+        "ocrPasses": 0
+      },
+      "cacheHit": true
+    },
+    {
+      "scenario": "Empty, corrupt, unsupported and blank files return clear errors",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Password-protected PDF asks for an unlocked copy",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Native incoming.csv",
+      "result": "PASS",
+      "processingMs": 1,
+      "readingStats": {
+        "ocrPasses": 0
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Native incoming-utf16.txt",
+      "result": "PASS",
+      "processingMs": 1,
+      "readingStats": {
+        "ocrPasses": 0
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Native incoming.xlsx",
+      "result": "PASS",
+      "processingMs": 2,
+      "readingStats": {
+        "ocrPasses": 0
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Native incoming.pptx",
+      "result": "PASS",
+      "processingMs": 1,
+      "readingStats": {
+        "ocrPasses": 0
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Native incoming.docx",
+      "result": "PASS",
+      "processingMs": 2,
+      "readingStats": {
+        "ocrPasses": 0
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Native incoming.pdf",
+      "result": "PASS",
+      "processingMs": 8,
+      "readingStats": {
+        "ocrPasses": 0
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Printed scan rotated 90",
+      "result": "PASS",
+      "processingMs": 998,
+      "readingStats": {
+        "ocrPasses": 2
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Printed scan rotated 180",
+      "result": "PASS",
+      "processingMs": 874,
+      "readingStats": {
+        "ocrPasses": 2
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "Printed scan rotated 270",
+      "result": "PASS",
+      "processingMs": 502,
+      "readingStats": {
+        "ocrPasses": 1
+      },
+      "cacheHit": false
+    },
+    {
+      "scenario": "A letter without a heading suggests its purpose and marks inferred fields for review",
+      "result": "PASS"
+    }
+  ]
+}

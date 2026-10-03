@@ -18,8 +18,7 @@
     }
   });
 
-  const client =
-    typeof window.supabase?.createClient === "function"
+  const client = window.pgenroSupabase || (typeof window.supabase?.createClient === "function"
       ? window.supabase.createClient(
           CONFIG.url,
           CONFIG.publishableKey,
@@ -32,7 +31,7 @@
             }
           }
         )
-      : null;
+      : null);
 
   window.pgenroSupabase = client;
 

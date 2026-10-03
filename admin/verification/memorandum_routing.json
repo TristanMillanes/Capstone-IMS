@@ -1,0 +1,105 @@
+{
+  "method": "Node VM event-driven DOM harness with actual module database runtime and simulated Supabase/IndexedDB/FileReader",
+  "scenarios": [
+    {
+      "scenario": "Detected memo routes with full attachment and fields (flat columns)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Detected memo routes with full attachment and fields (JSON envelope)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Memo printed signature becomes issuer and routes to Office Memos (flat)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Memo printed signature becomes issuer and routes to Office Memos (JSON)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "First-line TO saved as Incoming sender is corrected (flat)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "First-line TO saved as Incoming sender is corrected (JSON)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Body references and filename do not classify a letter as a memo",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Duplicate memo number keeps attachment and form without inserting",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Permission-denied insert keeps source communication and form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unknown insert result retries without duplicate (flat)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unknown insert result retries without duplicate (JSON)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Delete denial retains source; retry finishes move using saved memo",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unknown delete result can finish an already completed move",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Missing original attachment prevents move and source deletion",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Oversized memo attachment is rejected without a database write",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Double submit inserts only one memo",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Manual document-type correction routes to Communications",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Replacing a detected file clears stale classification and OCR",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Offline memo upload remains unsaved with an actionable error",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Heading variants and impossible dates are handled safely",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Replacing extracted text clears an obsolete automatic memo classification",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Reopening a pending move restores its saved destination and prevents another record",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Manual memorandum selection validates recipient and saves without an attachment",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unavailable retry storage blocks upload before a database mutation",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Office Memo preview accepts transferred MIME types and rejects HTML/JavaScript",
+      "result": "PASS"
+    }
+  ]
+}

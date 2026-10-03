@@ -1,3 +1,175 @@
+/* Module-owned runtime. Kept inside each module; no extra shared file required. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const storage = {
+    get(key, fallback = null) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
+  };
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uuid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+  function toast(message, type = 'success') {
+    let root = $('toastContainer');
+    if (!root) { root = document.createElement('div'); root.id = 'toastContainer'; root.className = 'toast-container'; root.setAttribute('aria-live','polite'); document.body.append(root); }
+    const limit = innerWidth <= 600 ? 1 : 3;
+    while (root.children.length >= limit) root.firstElementChild.remove();
+    const item = document.createElement('div'); item.className = `toast show ${type}`; item.textContent = message; root.append(item); setTimeout(() => item.remove(), 5500);
+  }
+  function csv(rows, filename) {
+    const cell = v => { let s = String(v ?? ''); if (/^[\s]*[=+@-]/.test(s)) s = "'"+s; return `"${s.replaceAll('"','""')}"`; };
+    const blob = new Blob(['\ufeff', rows.map(row => row.map(cell).join(',')).join('\r\n')], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  const modalTriggers = new Map();
+  let pageScrollLock = null;
+  function lockPageScroll() {
+    if (pageScrollLock) return;
+    pageScrollLock = { x:window.scrollX, y:window.scrollY, position:document.body.style.position, top:document.body.style.top, left:document.body.style.left, width:document.body.style.width, overflow:document.documentElement.style.overflow };
+    document.body.style.position = 'fixed'; document.body.style.top = `-${pageScrollLock.y}px`;
+    document.body.style.left = '0'; document.body.style.width = '100%'; document.documentElement.style.overflow = 'hidden';
+  }
+  function unlockPageScroll() {
+    if (!pageScrollLock) return;
+    const previous = pageScrollLock; pageScrollLock = null;
+    for (const key of ['position','top','left','width']) document.body.style[key] = previous[key];
+    document.documentElement.style.overflow = previous.overflow;
+    window.scrollTo({left:previous.x, top:previous.y, behavior:'instant'});
+  }
+  function openModal(id) {
+    const modal = $(id); if (!modal) return;
+    if([...document.querySelectorAll('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')].some(other=>other.dataset.busy==='true'))return false;
+    document.querySelectorAll('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open').forEach(other => { if (other !== modal) closeModal(other.id); });
+    lockPageScroll(); modalTriggers.set(id, document.activeElement); modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('admin-modal-open');
+    const wrapper = document.querySelector('.app-layout'); if (wrapper) wrapper.inert = true;
+    const dialog = modal.querySelector('[role=dialog]') || modal; dialog.setAttribute('tabindex','-1');
+    modal.querySelectorAll('.modal-body,.admin-modal-body').forEach(body => {body.scrollTop = 0;});
+    (modal.querySelector('input:not([type=hidden]):not(:disabled),select:not(:disabled),textarea:not(:disabled),button:not(:disabled)') || dialog).focus({preventScroll:true});
+  }
+  function closeModal(id) {
+    const modal = $(id); if (!modal || !modal.classList.contains('open') || modal.dataset.busy === 'true') return;
+    modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
+    if (!document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')) {
+      document.body.classList.remove('admin-modal-open'); unlockPageScroll(); const wrapper = document.querySelector('.app-layout'); if (wrapper) wrapper.inert = false;
+    }
+    const trigger=modalTriggers.get(id);modalTriggers.delete(id);
+    if(trigger?.isConnected&&trigger.getClientRects?.().length&&!trigger.closest?.('[inert]')&&!trigger.disabled)trigger.focus({preventScroll:true});
+    else if(!document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open'))(document.querySelector('.header-actions .btn-primary')||document.querySelector('main'))?.focus({preventScroll:true});
+    modal.dispatchEvent(new Event('pgenro:modal-close'));
+  }
+  let currentIds = new Map(); const unread = [];
+  function observeRecords(key, rows) {
+    const ids = rows.map(r => String(r.id)).filter(Boolean); const prior = currentIds.get(key);
+    if (prior) {
+      const added = ids.filter(id => !prior.has(id));
+      if (added.length) { unread.unshift(`${added.length} new ${key.replaceAll('_',' ')} record${added.length === 1 ? '' : 's'} added.`); renderNotifications(); }
+    }
+    currentIds.set(key, new Set(ids));
+  }
+  function renderNotifications() {
+    if ($('notificationList')) $('notificationList').innerHTML = unread.length ? unread.slice(0,20).map(t => `<div class="notification-item"><strong>New record</strong><span>${escape(t)}</span></div>`).join('') : '<div class="empty-notif-state">No new notifications</div>';
+    if ($('notifBadgeCount')) $('notifBadgeCount').textContent = `${unread.length} Unread`;
+    if ($('notifPing')) $('notifPing').style.display = unread.length ? 'block' : 'none';
+  }
+  const wrapped = new Map();
+  const client = () => window.pgenroSupabase || window.PGENRO_DB?.client || null;
+  const unwrap = row => row.data && typeof row.data === 'object' && !Array.isArray(row.data) ? {...row.data,id:row.id,created_at:row.created_at ?? row.data.created_at,updated_at:row.updated_at ?? row.data.updated_at} : row;
+  async function read(table) {
+    const sb = client(); if (!sb) throw new Error('Database client is unavailable. Refresh the page and try again.');
+    if (!wrapped.has(table)) {
+      const probe = await sb.from(table).select('data').limit(1);
+      if (probe.error && !['42703','PGRST204'].includes(probe.error.code)) throw probe.error;
+      wrapped.set(table, !probe.error);
+    }
+    const rows = []; let offset = 0;
+    while (true) {
+      const response = await sb.from(table).select('*',{count:'exact'}).order('id',{ascending:true}).range(offset,offset+499);
+      if (response.error) throw response.error;
+      const batch = response.data || []; rows.push(...batch); offset += batch.length;
+      if (batch.length < 500 || (response.count !== null && response.count !== undefined && offset >= response.count)) break;
+    }
+    return rows.map(unwrap);
+  }
+  async function write(table, payload, id = null) {
+    await window.PGENRO_API?.requireAdmin?.();
+    const sb = client(); if (!sb) throw new Error('Database client is unavailable.');
+    let body = wrapped.get(table) ? {data:payload} : payload;
+    if (id && wrapped.get(table)) {
+      const existing = await sb.from(table).select('data').eq('id',id).limit(1);
+      if (existing.error) throw existing.error;
+      if (!existing.data?.length) throw new Error('This record is no longer available. Refresh before saving.');
+      body = {data:{...(existing.data[0].data || {}), ...payload}};
+    }
+    if (!id && wrapped.get(table)) body = {id:uuid(), ...body};
+    const response = await (id ? sb.from(table).update(body).eq('id',id) : sb.from(table).insert(body)).select('*');
+    if (response.error) throw response.error;
+    if (!response.data?.length) throw new Error('The record was not saved or is not accessible. Check your database permissions.');
+    return unwrap(response.data[0]);
+  }
+  async function remove(table, ids) {
+    await window.PGENRO_API?.requireAdmin?.();
+    const response = await client().from(table).delete().in('id',ids).select('id');
+    if (response.error) throw response.error;
+    if (response.data?.length !== ids.length) throw new Error('Some records could not be deleted. Refresh and check your database permissions.');
+  }
+  async function audit(action, details) {
+    const event = {id:uuid(),action,details,module:document.title.split('|')[1]?.trim(),timestamp:new Date().toISOString(),created_at:new Date().toISOString()};
+    const cached = storage.get('pgenro_audit_log_fallback',[]); storage.set('pgenro_audit_log_fallback',[event,...(Array.isArray(cached) ? cached : [])].slice(0,500));
+    // Keep the page usable if the optional audit table is unavailable.
+    if (client()) { try { await readAuditShape(); const result = await client().from('audit_logs').insert(wrapped.get('audit_logs') ? {id:event.id,data:event} : event); if (result.error) console.warn('Audit retained locally:',result.error.message); } catch {} }
+  }
+  async function readAuditShape() { if (!wrapped.has('audit_logs')) { const r = await client().from('audit_logs').select('data').limit(1); wrapped.set('audit_logs',!r.error); } }
+  function initShell() {
+    renderIcons(); renderNotifications();
+    const sidebar = $('sidebar'); const mobile = $('mobileMenuBtn'); const collapse = $('sidebarCollapseBtn'); const backdrop = $('sidebarBackdrop');
+    function closeMobile() { sidebar?.classList.remove('mobile-open'); backdrop?.classList.remove('active'); backdrop?.setAttribute('aria-hidden','true'); document.body.classList.remove('mobile-nav-open'); mobile?.setAttribute('aria-expanded','false'); if (innerWidth <= 900 && sidebar) sidebar.inert = true; }
+    function sync() {
+      let pref = 'expanded'; try { pref = localStorage.getItem('pgenro_admin_sidebar') || pref; } catch {}
+      const collapsed = innerWidth > 900 && pref === 'collapsed'; sidebar?.classList.toggle('collapsed',collapsed); document.body.classList.toggle('sidebar-collapsed',collapsed);
+      collapse?.setAttribute('aria-expanded',String(!collapsed)); collapse?.setAttribute('aria-label',collapsed ? 'Expand administrator menu' : 'Collapse administrator menu'); if (collapse) collapse.title = collapsed ? 'Expand Menu' : 'Collapse Menu';
+      if (innerWidth > 900) closeMobile(); if (sidebar) sidebar.inert = innerWidth <= 900 && !sidebar.classList.contains('mobile-open');
+    }
+    collapse?.addEventListener('click',() => { if (innerWidth <= 900) { closeMobile(); mobile?.focus(); return; } try { localStorage.setItem('pgenro_admin_sidebar',sidebar.classList.contains('collapsed') ? 'expanded' : 'collapsed'); } catch {} sync(); });
+    mobile?.addEventListener('click',() => { const open = !sidebar.classList.contains('mobile-open'); if (!open) return closeMobile(); sidebar.inert = false; sidebar.classList.add('mobile-open'); backdrop?.classList.add('active'); backdrop?.setAttribute('aria-hidden','false'); document.body.classList.add('mobile-nav-open'); mobile.setAttribute('aria-expanded','true'); sidebar.querySelector('a')?.focus(); });
+    backdrop?.addEventListener('click',() => {closeMobile();mobile?.focus();});
+    sidebar?.querySelectorAll('a').forEach(a => { a.title = a.textContent.trim(); a.addEventListener('click',closeMobile); });
+    let wasMobile = innerWidth <= 900; window.addEventListener('resize',() => {const next = innerWidth <= 900; if(next !== wasMobile){wasMobile = next; sync();}}); window.addEventListener('storage',event => {if(event.key === 'pgenro_admin_sidebar') sync();}); sync();
+    const pairs = [['profileBtn','profileDropdown'],['notificationsBtn','notificationDropdown']];
+    function closeMenus() { pairs.forEach(([button,menu])=>{$(button)?.setAttribute('aria-expanded','false');$(menu)?.classList.remove('open');}); }
+    pairs.forEach(([button,menu]) => $(button)?.addEventListener('click',() => { const open = !$(menu)?.classList.contains('open'); closeMenus(); if(open){$(menu)?.classList.add('open');$(button).setAttribute('aria-expanded','true'); if(button==='profileBtn')$(menu)?.querySelector('a,button')?.focus();if(button==='notificationsBtn'){unread.length=0; if($('notifBadgeCount'))$('notifBadgeCount').textContent='0 Unread'; if($('notifPing'))$('notifPing').style.display='none';}} }));
+    document.addEventListener('click',e => { if (!e.target.closest('.profile-menu,.notification-wrapper')) closeMenus(); });
+    document.addEventListener('keydown',e => {
+      if ((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k') {e.preventDefault();$('globalSearchInput')?.focus();}
+      const modal = document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open');
+      const surface = modal || (sidebar?.classList.contains('mobile-open') ? sidebar : null);
+      if (e.key === 'Escape') {const menuTrigger=pairs.find(([,menu])=>$(menu)?.classList.contains('open'))?.[0];const wasOpen=sidebar?.classList.contains('mobile-open');closeMenus();if(modal)closeModal(modal.id);closeMobile();if(wasOpen)mobile?.focus();else if(menuTrigger)$(menuTrigger)?.focus();}
+      if (e.key === 'Tab' && surface) {const elements = [...surface.querySelectorAll('button,a[href],input:not([type=hidden]),select,textarea,[tabindex="0"]')].filter(el=>!el.disabled && !el.closest('[inert]') && el.getClientRects().length); if (!elements.length) return; const first=elements[0],last=elements.at(-1);if(!surface.contains(document.activeElement)){e.preventDefault();(e.shiftKey?last:first).focus();}else if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+    });
+    document.querySelectorAll('.modal-overlay,.modal-backdrop').forEach(m => m.addEventListener('click',e => { if(e.target===m)closeModal(m.id); }));
+    const user = storage.get('pgenro_current_user',{}); if($('dropdownUserName'))$('dropdownUserName').textContent=user.fullName||user.full_name||user.name||'PGENRO Admin'; if($('dropdownUserEmail'))$('dropdownUserEmail').textContent=user.email||'Administrator Session';
+    if(document.body.dataset.adminPage !== 'admin.html') $('logoutBtn')?.addEventListener('click',async () => {
+      try { if(client()){const result=await client().auth.signOut();if(result?.error)throw result.error;} try{localStorage.removeItem('pgenro_current_user');sessionStorage.removeItem('pgenro_current_user');}catch{} location.href='../User/login.html'; }catch{toast('Sign out failed. Please try again.','error');}
+    });
+  }
+  // ICON_MAP is inserted while packaging, from the existing local Lucide subset.
+  const icons = {"panel-left-close":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m16 15-3-3 3-3"}]],"layout-dashboard":[["rect",{"width":"7","height":"9","x":"3","y":"3","rx":"1"}],["rect",{"width":"7","height":"5","x":"14","y":"3","rx":"1"}],["rect",{"width":"7","height":"9","x":"14","y":"12","rx":"1"}],["rect",{"width":"7","height":"5","x":"3","y":"16","rx":"1"}]],"arrow-left-right":[["path",{"d":"M8 3 4 7l4 4"}],["path",{"d":"M4 7h16"}],["path",{"d":"m16 21 4-4-4-4"}],["path",{"d":"M20 17H4"}]],"briefcase":[["path",{"d":"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"}],["rect",{"width":"20","height":"14","x":"2","y":"6","rx":"2"}]],"file-text":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],"users-round":[["path",{"d":"M18 21a8 8 0 0 0-16 0"}],["circle",{"cx":"10","cy":"8","r":"5"}],["path",{"d":"M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"}]],"boxes":[["path",{"d":"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"}],["path",{"d":"m7 16.5-4.74-2.85"}],["path",{"d":"m7 16.5 5-3"}],["path",{"d":"M7 16.5v5.17"}],["path",{"d":"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"}],["path",{"d":"m17 16.5-5-3"}],["path",{"d":"m17 16.5 4.74-2.85"}],["path",{"d":"M17 16.5v5.17"}],["path",{"d":"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"}],["path",{"d":"M12 8 7.26 5.15"}],["path",{"d":"m12 8 4.74-2.85"}],["path",{"d":"M12 13.5V8"}]],"clipboard-check":[["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1","ry":"1"}],["path",{"d":"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"}],["path",{"d":"m9 14 2 2 4-4"}]],"wrench":[["path",{"d":"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"}]],"file-check-2":[["path",{"d":"M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m14 20 2 2 4-4"}]],"user-cog":[["path",{"d":"M10 15H6a4 4 0 0 0-4 4v2"}],["path",{"d":"m14.305 16.53.923-.382"}],["path",{"d":"m15.228 13.852-.923-.383"}],["path",{"d":"m16.852 12.228-.383-.923"}],["path",{"d":"m16.852 17.772-.383.924"}],["path",{"d":"m19.148 12.228.383-.923"}],["path",{"d":"m19.53 18.696-.382-.924"}],["path",{"d":"m20.772 13.852.924-.383"}],["path",{"d":"m20.772 16.148.924.383"}],["circle",{"cx":"18","cy":"15","r":"3"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-plus":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}],["line",{"x1":"19","x2":"19","y1":"8","y2":"14"}],["line",{"x1":"22","x2":"16","y1":"11","y2":"11"}]],"shield-alert":[["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"M12 8v4"}],["path",{"d":"M12 16h.01"}]],"database-backup":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 12a9 3 0 0 0 5 2.69"}],["path",{"d":"M21 9.3V5"}],["path",{"d":"M3 5v14a9 3 0 0 0 6.47 2.88"}],["path",{"d":"M12 12v4h4"}],["path",{"d":"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"}]],"settings":[["path",{"d":"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"menu":[["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],"search":[["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],"bell":[["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"}],["path",{"d":"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"}]],"user-round":[["circle",{"cx":"12","cy":"8","r":"5"}],["path",{"d":"M20 21a8 8 0 0 0-16 0"}]],"users":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["path",{"d":"M16 3.128a4 4 0 0 1 0 7.744"}],["path",{"d":"M22 21v-2a4 4 0 0 0-3-3.87"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-check":[["path",{"d":"m16 11 2 2 4-4"}],["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"log-out":[["path",{"d":"m16 17 5-5-5-5"}],["path",{"d":"M21 12H9"}],["path",{"d":"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"}]],"chevron-right":[["path",{"d":"m9 18 6-6-6-6"}]],"trending-up":[["path",{"d":"M16 7h6v6"}],["path",{"d":"m22 7-8.5 8.5-5-5L2 17"}]],"alert-circle":[["circle",{"cx":"12","cy":"12","r":"10"}],["line",{"x1":"12","x2":"12","y1":"8","y2":"12"}],["line",{"x1":"12","x2":"12.01","y1":"16","y2":"16"}]],"check-circle-2":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"alert-triangle":[["path",{"d":"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"}],["path",{"d":"M12 9v4"}],["path",{"d":"M12 17h.01"}]],"chart-no-axes-combined":[["path",{"d":"M12 16v5"}],["path",{"d":"M16 14v7"}],["path",{"d":"M20 10v11"}],["path",{"d":"m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"}],["path",{"d":"M4 18v3"}],["path",{"d":"M8 14v7"}]],"download":[["path",{"d":"M12 15V3"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}],["path",{"d":"m7 10 5 5 5-5"}]],"activity":[["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],"circle-check":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"clock-3":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6h4"}]],"package-search":[["path",{"d":"M12 22V12"}],["path",{"d":"M20.27 18.27 22 20"}],["path",{"d":"M21 10.498V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l.98-.559"}],["path",{"d":"M3.29 7 12 12l8.71-5"}],["path",{"d":"m7.5 4.27 8.997 5.148"}],["circle",{"cx":"18.5","cy":"16.5","r":"2.5"}]],"lightbulb":[["path",{"d":"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"}],["path",{"d":"M9 18h6"}],["path",{"d":"M10 22h4"}]],"upload":[["path",{"d":"M12 3v12"}],["path",{"d":"m17 8-5-5-5 5"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}]],"file-up":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M12 12v6"}],["path",{"d":"m15 15-3-3-3 3"}]],"info":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 16v-4"}],["path",{"d":"M12 8h.01"}]],"rotate-ccw":[["path",{"d":"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}],["path",{"d":"M3 3v5h5"}]],"x":[["path",{"d":"M18 6 6 18"}],["path",{"d":"m6 6 12 12"}]],"external-link":[["path",{"d":"M15 3h6v6"}],["path",{"d":"M10 14 21 3"}],["path",{"d":"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"}]]};
+  const aliases = {'eye':'search','pencil':'file-text','save':'file-check-2','cloud-upload':'file-up','plus-circle':'user-plus','database':'database-backup','hash':'file-text','files':'file-text','folder-open':'briefcase','file-search':'search','scan-text':'file-text','paperclip':'file-text','trash':'trash-2','shield-check':'shield-alert','calendar-days':'calendar','clock-3':'clock','contact':'user-round','building-2':'briefcase','printer':'file-text','file-spreadsheet':'file-text'};
+  Object.assign(icons,{'trash-2':[['path',{d:'M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7'}]],'calendar':[['rect',{x:3,y:5,width:18,height:16,rx:2}],['path',{d:'M16 3v4M8 3v4M3 11h18'}]],'clock':[['circle',{cx:12,cy:12,r:9}],['path',{d:'M12 7v5l3 2'}]],'refresh-cw':[['path',{d:'M20 7v5h-5M4 17v-5h5M6 6a8 8 0 0 1 13 2M18 18A8 8 0 0 1 5 16'}]],'pencil':[['path',{d:'m16 3 5 5-12 12-6 1 1-6ZM14 5l5 5'}]],'eye':[['path',{d:'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z'}],['circle',{cx:12,cy:12,r:3}]],'printer':[['path',{d:'M7 8V3h10v5M7 17H4V8h16v9h-3M7 13h10v8H7Z'}]],'arrow-down-left':[['path',{d:'M17 7 7 17M7 7v10h10'}]],'arrow-up-right':[['path',{d:'M7 17 17 7M7 7h10v10'}]]});
+  function renderIcons() { document.querySelectorAll('i[data-lucide]').forEach(el => { const name=el.dataset.lucide; const nodes=icons[name]||icons[aliases[name]]||icons['file-text']; const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');for(const [k,v] of Object.entries({viewBox:'0 0 24 24',width:20,height:20,fill:'none',stroke:'currentColor','stroke-width':1.8,'stroke-linecap':'round','stroke-linejoin':'round','aria-hidden':'true'}))svg.setAttribute(k,v);svg.setAttribute('class',`lucide lucide-${name} ${el.className}`);for(const [tag,attrs]of nodes){const node=document.createElementNS(svg.namespaceURI,tag);for(const[k,v]of Object.entries(attrs))node.setAttribute(k,v);svg.append(node);}el.replaceWith(svg); }); }
+  Object.assign(icons, {
+    'id-card': [['rect',{x:3,y:5,width:18,height:14,rx:2}],['circle',{cx:8,cy:10,r:2}],['path',{d:'M5 16c0-3 6-3 6 0M14 9h4M14 13h4'}]],
+    'flag': [['path',{d:'M4 22V3M4 4c5-4 10 4 16 0v10c-6 4-11-4-16 0'}]],
+    'shirt': [['path',{d:'m16 3 6 4-3 5-3-2v12H8V10l-3 2-3-5 6-4a4 4 0 0 0 8 0Z'}]],
+    'award': [['circle',{cx:12,cy:8,r:5}],['path',{d:'m8 12-2 10 6-3 6 3-2-10'}]]
+  });
+  const canStartAction = () => !document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]');
+  window.PGENRO_Module = {canStartAction,storage,escape,uuid,today,toast,csv,openModal,closeModal,observeRecords,renderIcons,read,write,remove,audit,client,unwrap};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initShell,{once:true});else initShell();
+})();
+
+(() => {
+
+
 /* ==========================================================================
    PGENRO IMS — EMPLOYEE MASTERFILE ADMIN CONTROLLER
    Full alignment with admin.html: Quick Actions, Batch Operations, Live
@@ -26,7 +198,7 @@
 
     function refreshIcons() {
       try {
-        window.lucide?.createIcons?.();
+        window.PGENRO_Module.renderIcons();
       } catch (err) {
         console.warn("Lucide notice:", err);
       }
@@ -113,8 +285,42 @@
     const empDateEmployed = $("#empDateEmployed");
     const empSalaryGrade = $("#empSalaryGrade");
     const empDutyStatus = $("#empDutyStatus");
+    const empReligion = $("#empReligion");
+    const empHeightCm = $("#empHeightCm");
+    const empWeightKg = $("#empWeightKg");
+    const empDateAssumption = $("#empDateAssumption");
+    const empStepNo = $("#empStepNo");
+    const empNosaDate = $("#empNosaDate");
+    const empBasicSalary = $("#empBasicSalary");
+    const empEligibility = $("#empEligibility");
+    const empTinNo = $("#empTinNo");
+    const empGsisBpNo = $("#empGsisBpNo");
+    const empPagibigNo = $("#empPagibigNo");
+    const empPhilhealthNo = $("#empPhilhealthNo");
+    const empHouseStreetPurok = $("#empHouseStreetPurok");
+    const empBarangay = $("#empBarangay");
+    const empCityMunicipality = $("#empCityMunicipality");
+    const empProvince = $("#empProvince");
+    const empZipCode = $("#empZipCode");
+    const empSpouseLastName = $("#empSpouseLastName");
+    const empSpouseFirstName = $("#empSpouseFirstName");
+    const empSpouseMiddleName = $("#empSpouseMiddleName");
+    const empSpouseExtension = $("#empSpouseExtension");
+    const empSpouseOccupation = $("#empSpouseOccupation");
+    const empSpouseEmployer = $("#empSpouseEmployer");
+    const empSpouseContact = $("#empSpouseContact");
+    const empSpouseEmail = $("#empSpouseEmail");
+    const empLandline = $("#empLandline");
     const empMobile = $("#empMobile");
+    const empMobile2 = $("#empMobile2");
     const empEmail = $("#empEmail");
+    const empFacebook = $("#empFacebook");
+    const empInstagram = $("#empInstagram");
+    const empTwitter = $("#empTwitter");
+    const empEducationLevel = $("#empEducationLevel");
+    const empCourse = $("#empCourse");
+    const empLastSchool = $("#empLastSchool");
+    const empYearGraduated = $("#empYearGraduated");
     const empAddress = $("#empAddress");
 
     // Shell Controls
@@ -128,50 +334,6 @@
     const notificationDropdown = $("#notificationDropdown");
     const logoutBtn = $("#logoutBtn");
 
-    /* ---------------- 3. SHELL TOPBAR & NAVIGATION ---------------- */
-    function closeProfileDropdown() {
-      if (!profileDropdown) return;
-      profileDropdown.classList.remove("open");
-      profileMenu?.classList.remove("open");
-      profileBtn?.setAttribute("aria-expanded", "false");
-    }
-
-    function openProfileDropdown() {
-      if (!profileDropdown) return;
-      if (notificationDropdown) {
-        notificationDropdown.classList.remove("open");
-        notificationsBtn?.setAttribute("aria-expanded", "false");
-      }
-      profileDropdown.classList.add("open");
-      profileMenu?.classList.add("open");
-      profileBtn?.setAttribute("aria-expanded", "true");
-    }
-
-    profileBtn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (profileDropdown?.classList.contains("open")) closeProfileDropdown();
-      else openProfileDropdown();
-    });
-
-    notificationsBtn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      if (!notificationDropdown) return;
-      const isOpen = notificationDropdown.classList.contains("open");
-      closeProfileDropdown();
-      notificationDropdown.classList.toggle("open", !isOpen);
-      notificationsBtn.setAttribute("aria-expanded", String(!isOpen));
-    });
-
-    document.addEventListener("click", (e) => {
-      if (!profileMenu?.contains(e.target)) closeProfileDropdown();
-      if (notificationDropdown && !notificationDropdown.contains(e.target) && e.target !== notificationsBtn) {
-        notificationDropdown.classList.remove("open");
-        notificationsBtn?.setAttribute("aria-expanded", "false");
-      }
-    });
-
     /* ---------------- 4. STATE & DEMO DATA ---------------- */
     let employees = [];
     let selectedIds = new Set();
@@ -184,155 +346,49 @@
     let currentPage = 1;
     const pageSize = 10;
 
-    const DEMO_EMPLOYEES = [
-      {
-        id: "emp_001",
-        employee_id: "EMP-2026-001",
-        first_name: "Maria",
-        middle_name: "Santos",
-        last_name: "Dela Cruz",
-        name_extension: "",
-        gender: "Female",
-        dob: "1988-04-12",
-        pob: "Puerto Princesa City, Palawan",
-        civil_status: "Married",
-        blood_type: "O+",
-        designation: "Provincial Environment & Natural Resources Officer",
-        department: "Office of the Provincial ENR Officer",
-        employment_type: "PERMANENT",
-        item_code: "PENRO-1-001",
-        date_employed: "2015-06-01",
-        salary_grade: "SG 26 - Step 4",
-        duty_status: "Active",
-        mobile: "0917-555-0101",
-        email: "maria.delacruz@pgenro.gov.ph",
-        address: "Bgy. San Pedro, Puerto Princesa City, Palawan",
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: "emp_002",
-        employee_id: "EMP-2026-002",
-        first_name: "Roberto",
-        middle_name: "Alcantara",
-        last_name: "Reyes",
-        name_extension: "Jr.",
-        gender: "Male",
-        dob: "1992-09-23",
-        pob: "Roxas, Palawan",
-        civil_status: "Single",
-        blood_type: "A+",
-        designation: "Senior Environmental Management Specialist",
-        department: "Environmental Management & Pollution Control",
-        employment_type: "PERMANENT",
-        item_code: "SEMS-2-005",
-        date_employed: "2018-03-15",
-        salary_grade: "SG 18 - Step 2",
-        duty_status: "Active",
-        mobile: "0920-555-0188",
-        email: "roberto.reyes@pgenro.gov.ph",
-        address: "Bgy. Santa Monica, Puerto Princesa City, Palawan",
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: "emp_003",
-        employee_id: "EMP-2026-003",
-        first_name: "Aileen",
-        middle_name: "Villanueva",
-        last_name: "Castro",
-        name_extension: "",
-        gender: "Female",
-        dob: "1995-11-04",
-        pob: "Brooke's Point, Palawan",
-        civil_status: "Single",
-        blood_type: "B+",
-        designation: "Forest Ranger / Field Inspector",
-        department: "Forest Management Unit",
-        employment_type: "CASUAL",
-        item_code: "FR-CAS-012",
-        date_employed: "2021-08-10",
-        salary_grade: "SG 8 - Step 1",
-        duty_status: "On Leave",
-        mobile: "0998-555-0142",
-        email: "aileen.castro@pgenro.gov.ph",
-        address: "Poblacion, Brooke's Point, Palawan",
-        updated_at: new Date().toISOString()
-      },
-      {
-        id: "emp_004",
-        employee_id: "EMP-2026-004",
-        first_name: "Michael",
-        middle_name: "Tan",
-        last_name: "Lim",
-        name_extension: "",
-        gender: "Male",
-        dob: "1997-02-18",
-        pob: "Coron, Palawan",
-        civil_status: "Single",
-        blood_type: "AB+",
-        designation: "GIS & Mapping Technician",
-        department: "Coastal & Marine Resources Division",
-        employment_type: "JOB ORDER",
-        item_code: "JO-GIS-009",
-        date_employed: "2023-01-16",
-        salary_grade: "SG 11 - Flat",
-        duty_status: "Active",
-        mobile: "0919-555-0163",
-        email: "michael.lim@pgenro.gov.ph",
-        address: "Bgy. Bancao-Bancao, Puerto Princesa City",
-        updated_at: new Date().toISOString()
-      }
-    ];
-
-    /* ---------------- 5. MODAL DISMISSAL SAFETY ---------------- */
-    [employeeFormModal, profileModal].forEach((modal) => {
-      if (!modal) return;
-      const card = modal.querySelector(".modal-card");
-
-      card?.addEventListener("mousedown", () => {
-        isMouseDownInsideModal = true;
-      });
-
-      modal.addEventListener("mousedown", (e) => {
-        if (e.target === modal) isMouseDownInsideModal = false;
-      });
-
-      modal.addEventListener("click", (e) => {
-        if (e.target === modal && !isMouseDownInsideModal) {
-          if (modal === employeeFormModal && empFirstName?.value.trim()) {
-            if (confirm("Discard unsaved changes?")) closeModal(modal.id);
-          } else {
-            closeModal(modal.id);
-          }
-        }
-        isMouseDownInsideModal = false;
-      });
-    });
-
-    function openModal(id) {
-      const modal = $(`#${id}`);
-      if (!modal) return;
-      modal.classList.add("open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.classList.add("admin-modal-open");
-      refreshIcons();
+    const M = window.PGENRO_Module;
+    const openModal = M.openModal;
+    const closeModal = M.closeModal;
+    document.querySelectorAll("[data-close]").forEach(btn => btn.addEventListener("click", () => closeModal(btn.dataset.close)));
+    let loadVersion = 0;
+    function requireWritable() {
+      const session = M.storage.get("pgenro_current_user", {});
+      if (/^(user|viewer|read[- ]only)$/i.test(session?.role || session?.user_role || "")) throw new Error("This account can view records only.");
+      if (databaseMode === "unavailable" || (supabase && databaseMode !== "supabase")) throw new Error("Refresh successfully before changing records.");
     }
-
-    function closeModal(id) {
-      const modal = $(`#${id}`);
-      if (!modal) return;
-      modal.classList.remove("open");
-      modal.setAttribute("aria-hidden", "true");
-      if (!$$(".modal-backdrop.open").length) {
-        document.body.classList.remove("admin-modal-open");
-      }
-    }
-
-    document.querySelectorAll("[data-close]").forEach((btn) => {
-      btn.addEventListener("click", () => closeModal(btn.dataset.close));
-    });
 
     /* ---------------- 6. SUPABASE & LOCAL DATA ---------------- */
     const supabase = window.pgenroSupabase || window.PGENRO_DB?.client || null;
+
+    const pick = (obj, ...keys) => {
+      for (const key of keys) {
+        const value = obj?.[key];
+        if (value !== undefined && value !== null && String(value).trim() !== "") return value;
+      }
+      return "";
+    };
+    const asNumberOrNull = (input) => {
+      const raw = input?.value?.trim?.() ?? String(input?.value ?? "").trim();
+      if (!raw) return null;
+      const value = Number(raw);
+      return Number.isFinite(value) ? value : null;
+    };
+    const employeeStructuredAddress = (emp) => [
+      pick(emp, "house_street_purok", "house_number", "house_no_street_purok"),
+      pick(emp, "barangay"),
+      pick(emp, "city_municipality", "municipality", "city"),
+      pick(emp, "province"),
+      pick(emp, "zip_code", "zipcode")
+    ].filter(Boolean).join(", ");
+    const formStructuredAddress = () => [
+      empHouseStreetPurok?.value.trim(), empBarangay?.value.trim(), empCityMunicipality?.value.trim(),
+      empProvince?.value.trim(), empZipCode?.value.trim()
+    ].filter(Boolean).join(", ");
+    const formatMoney = (value) => {
+      if (value === undefined || value === null || String(value).trim() === "") return "—";
+      const n = Number(value);
+      return Number.isFinite(n) ? new Intl.NumberFormat("en-PH", {style:"currency", currency:"PHP"}).format(n) : String(value);
+    };
 
     function setStatus(online, text) {
       if (statusDot) {
@@ -344,52 +400,36 @@
     }
 
     async function loadEmployees() {
-      if (!supabase) {
-        databaseMode = "offline";
-        setStatus(false, "Offline / Local Mode");
-        loadLocalEmployees();
-        return;
-      }
-
-      setStatus(true, "Loading System...");
-
+      const version = ++loadVersion;
       try {
-        const { data, error } = await supabase
-          .from("employees")
-          .select("*")
-          .order("last_name", { ascending: true });
-
-        if (error) throw error;
-
-        employees = Array.isArray(data) && data.length ? data : [];
-        databaseMode = "supabase";
-        saveLocalEmployees();
-        setStatus(true, `Online Mode (${employees.length} Staff)`);
+        if (!supabase) {
+          databaseMode = "offline";
+          const cached = M.storage.get("pgenro_admin_employees", []);
+          employees = Array.isArray(cached) ? cached : [];
+        } else {
+          const rows = await M.read("employees");
+          if (version !== loadVersion) return false;
+          employees = rows;
+          databaseMode = "supabase";
+          saveLocalEmployees();
+        }
+        M.observeRecords("employees", employees);
         render();
-      } catch (err) {
-        console.warn("Supabase load fallback:", err);
-        databaseMode = "offline";
-        setStatus(false, "Local Mode");
-        loadLocalEmployees();
+        return true;
+      } catch (error) {
+        if (version !== loadVersion) return false;
+        databaseMode = "unavailable";
+        const cached = M.storage.get("pgenro_admin_employees", []);
+        employees = Array.isArray(cached) ? cached : [];
+        render();
+        showToast("Directory could not refresh. Cached records are available; saving requires a database connection.", "error");
+        return false;
       }
     }
-
-    function loadLocalEmployees() {
-      try {
-        const cached = JSON.parse(localStorage.getItem("pgenro_admin_employees") || "null");
-        employees = Array.isArray(cached) && cached.length ? cached : [...DEMO_EMPLOYEES];
-      } catch {
-        employees = [...DEMO_EMPLOYEES];
-      }
-      render();
-    }
-
     function saveLocalEmployees() {
-      try {
-        localStorage.setItem("pgenro_admin_employees", JSON.stringify(employees));
-      } catch (e) {
-        console.warn("Local storage write warning:", e);
-      }
+      const ok = M.storage.set("pgenro_admin_employees", employees);
+      if (!ok && databaseMode !== "supabase") throw new Error("Browser storage is full or unavailable. Changes were not saved.");
+      return ok;
     }
 
     /* ---------------- 7. RENDER & METRICS ---------------- */
@@ -401,14 +441,21 @@
 
       return employees.filter((emp) => {
         const fullName =
-          `${emp.first_name || ""} ${emp.middle_name || ""} ${emp.last_name || ""} ${emp.name_extension || ""}`.toLowerCase();
+          [emp.first_name, emp.middle_name, emp.last_name, emp.name_extension].filter(Boolean).join(" ").toLowerCase();
 
-        const searchable =
-          `${fullName} ${emp.employee_id || ""} ${emp.designation || ""} ${emp.department || ""} ${emp.item_code || ""} ${emp.email || ""}`.toLowerCase();
+        const searchable = [
+          fullName, emp.employee_id, emp.designation, emp.department, emp.item_code, emp.email,
+          pick(emp,"mobile","mobile_1","mobile_number_1"), pick(emp,"mobile_2","mobile_number_2"), emp.landline,
+          emp.employment_type, emp.duty_status, emp.eligibility, emp.tin_no, emp.gsis_bp_no, emp.pagibig_no, emp.philhealth_no,
+          employeeStructuredAddress(emp), emp.address, emp.spouse_last_name, emp.spouse_first_name, emp.spouse_occupation, emp.spouse_employer_business,
+          emp.education_level, emp.course, emp.last_school_attended, emp.facebook, emp.instagram, emp.twitter,
+          ...monitorRecords(emp, "ceremony").flatMap(row => [row.control_number, row.date, row.status, row.activity, row.remarks]),
+          ...monitorRecords(emp, "uniform").flatMap(row => [row.control_number, row.date, row.compliant, row.remarks])
+        ].filter(Boolean).join(" ").toLowerCase();
 
         return (
           (!search || searchable.includes(search)) &&
-          (!filterType || emp.employment_type === filterType) &&
+          (!filterType || (filterType === "CASUAL_OR_JO" ? ["CASUAL", "JOB ORDER"].includes(emp.employment_type) : emp.employment_type === filterType)) &&
           (!filterDept || emp.department === filterDept) &&
           (!filterStat || emp.duty_status === filterStat)
         );
@@ -418,6 +465,7 @@
     function render() {
       if (!employeeTableBody) return;
 
+      selectedIds = new Set([...selectedIds].filter(id => employees.some(e => String(e.id) === id)));
       const filtered = getFilteredEmployees();
 
       // Pagination calculations
@@ -481,7 +529,7 @@
       if (countCOS) countCOS.textContent = cos.toLocaleString();
 
       // Populate Department Filter options
-      if (filterDepartment && filterDepartment.options.length <= 1 && departments.length > 0) {
+      if (filterDepartment && true) {
         const cur = filterDepartment.value || "";
         filterDepartment.innerHTML =
           `<option value="">All Divisions</option>` +
@@ -489,6 +537,12 @@
         if (departments.includes(cur)) filterDepartment.value = cur;
       }
 
+      if (profileModal?.classList.contains("open")) {
+        if (!employees.some(emp => String(emp.id) === String(currentViewingId))) {
+          closeModal("profileModal");
+          showToast("This employee record is no longer available.", "warning");
+        } else renderEmployeeMonitoring();
+      }
       // Sync Checkboxes & Batch Bar
       syncSelectionUI();
       refreshIcons();
@@ -524,7 +578,7 @@
           <td><span class="type-pill">${escapeHtml(emp.employment_type || "N/A")}</span></td>
           <td>${escapeHtml(emp.department || "—")}</td>
           <td>
-            <strong style="color:var(--slate-800);">${escapeHtml(emp.mobile || "—")}</strong>
+            <strong style="color:var(--slate-800);">${escapeHtml(pick(emp, "mobile", "mobile_1", "mobile_number_1") || "—")}</strong>
             <span class="employee-sub">${escapeHtml(emp.email || "No email on file")}</span>
           </td>
           <td>
@@ -538,6 +592,8 @@
               <button type="button" class="btn-action" data-action="view" data-id="${escapeHtml(emp.id)}" title="View 201 Dossier">
                 <i data-lucide="eye"></i>
               </button>
+              <button type="button" class="btn-action" data-action="ceremony" data-id="${escapeHtml(emp.id)}" title="Flag Ceremony Monitoring" aria-label="Flag ceremony records for ${escapeHtml(fullName)}"><i data-lucide="flag"></i></button>
+              <button type="button" class="btn-action" data-action="uniform" data-id="${escapeHtml(emp.id)}" title="Prescribed Uniform Monitoring" aria-label="Uniform records for ${escapeHtml(fullName)}"><i data-lucide="shirt"></i></button>
               <button type="button" class="btn-action" data-action="edit" data-id="${escapeHtml(emp.id)}" title="Edit Profile">
                 <i data-lucide="pencil"></i>
               </button>
@@ -567,7 +623,7 @@
     function syncSelectionUI() {
       const checkboxes = $$(".row-checkbox", employeeTableBody);
       const allChecked = checkboxes.length > 0 && checkboxes.every(cb => cb.checked);
-      if (selectAllRows) selectAllRows.checked = allChecked;
+      if (selectAllRows) {selectAllRows.checked = allChecked; selectAllRows.indeterminate = checkboxes.some(cb => cb.checked) && !allChecked;}
 
       const count = selectedIds.size;
       if (batchActionsBar) {
@@ -614,22 +670,19 @@
       if (!count) return;
       if (!confirm(`Are you sure you want to delete ${count} selected employee record(s)?`)) return;
 
+      if (batchDeleteBtn.disabled) return;
+      batchDeleteBtn.disabled = true;
+      const ids = [...selectedIds];
+      const previousEmployees = employees;
       try {
-        if (databaseMode === "supabase" && supabase) {
-          const { error } = await supabase.from("employees").delete().in("id", Array.from(selectedIds));
-          if (error) throw error;
-          await loadEmployees();
-        } else {
-          employees = employees.filter(e => !selectedIds.has(String(e.id)));
-          saveLocalEmployees();
-          render();
-        }
-        selectedIds.clear();
-        showToast(`Deleted ${count} personnel records.`, "success");
-      } catch (err) {
-        console.error("Batch delete error:", err);
-        showToast(err?.message || "Failed to delete selected records.", "error");
-      }
+        requireWritable();
+        if (databaseMode === "supabase") await M.remove("employees", ids);
+        employees = employees.filter(e => !ids.includes(String(e.id)));
+        saveLocalEmployees(); selectedIds.clear(); render();
+        M.audit("DELETE_RECORD", `${ids.length} employee records deleted`);
+        showToast(`Deleted ${ids.length} personnel records.`, "success");
+      } catch (err) { employees = previousEmployees; showToast(err.message || "Failed to delete selected records.", "error"); }
+      finally { batchDeleteBtn.disabled = false; }
     });
 
     /* ---------------- 9. PAGINATION EVENTS ---------------- */
@@ -663,12 +716,15 @@
       if (!id) return;
 
       if (btn.dataset.action === "view") openProfileModal(id);
+      if (btn.dataset.action === "ceremony") openProfileModal(id, "ceremonyPanel");
+      if (btn.dataset.action === "uniform") openProfileModal(id, "uniformPanel");
       if (btn.dataset.action === "edit") openEmployeeModal(id);
       if (btn.dataset.action === "delete") deleteEmployee(id);
     });
 
     /* ---------------- 10. ADD & EDIT EMPLOYEE ---------------- */
     function openEmployeeModal(id = null) {
+      if (!M.canStartAction()) return;
       editingId = id;
       employeeForm?.reset();
 
@@ -687,19 +743,55 @@
         if (empPob) empPob.value = emp.pob || "";
         if (empCivilStatus) empCivilStatus.value = emp.civil_status || "Single";
         if (empBloodType) empBloodType.value = emp.blood_type || "";
+        if (empReligion) empReligion.value = pick(emp, "religion");
+        if (empHeightCm) empHeightCm.value = pick(emp, "height_cm", "height");
+        if (empWeightKg) empWeightKg.value = pick(emp, "weight_kg", "weight");
         if (empDesignation) empDesignation.value = emp.designation || "";
         if (empDepartment) empDepartment.value = emp.department || "";
         if (empStatusType) empStatusType.value = emp.employment_type || "PERMANENT";
         if (empItemCode) empItemCode.value = emp.item_code || "";
         if (empDateEmployed) empDateEmployed.value = emp.date_employed || "";
+        if (empDateAssumption) empDateAssumption.value = pick(emp, "date_assumption", "date_of_assumption");
         if (empSalaryGrade) empSalaryGrade.value = emp.salary_grade || "";
+        if (empStepNo) empStepNo.value = pick(emp, "step_no", "salary_step");
+        if (empNosaDate) empNosaDate.value = pick(emp, "nosa_date", "nosa");
+        if (empBasicSalary) empBasicSalary.value = pick(emp, "basic_salary");
+        if (empEligibility) empEligibility.value = pick(emp, "eligibility");
         if (empDutyStatus) empDutyStatus.value = emp.duty_status || "Active";
-        if (empMobile) empMobile.value = emp.mobile || "";
+        if (empTinNo) empTinNo.value = pick(emp, "tin_no", "tin");
+        if (empGsisBpNo) empGsisBpNo.value = pick(emp, "gsis_bp_no", "gsis_no");
+        if (empPagibigNo) empPagibigNo.value = pick(emp, "pagibig_no", "pag_ibig_no");
+        if (empPhilhealthNo) empPhilhealthNo.value = pick(emp, "philhealth_no", "phil_health_no");
+        if (empHouseStreetPurok) empHouseStreetPurok.value = pick(emp, "house_street_purok", "house_number", "house_no_street_purok");
+        if (empBarangay) empBarangay.value = pick(emp, "barangay");
+        if (empCityMunicipality) empCityMunicipality.value = pick(emp, "city_municipality", "municipality", "city");
+        if (empProvince) empProvince.value = pick(emp, "province");
+        if (empZipCode) empZipCode.value = pick(emp, "zip_code", "zipcode");
+        if (empSpouseLastName) empSpouseLastName.value = pick(emp, "spouse_last_name");
+        if (empSpouseFirstName) empSpouseFirstName.value = pick(emp, "spouse_first_name");
+        if (empSpouseMiddleName) empSpouseMiddleName.value = pick(emp, "spouse_middle_name");
+        if (empSpouseExtension) empSpouseExtension.value = pick(emp, "spouse_extension", "spouse_extension_name");
+        if (empSpouseOccupation) empSpouseOccupation.value = pick(emp, "spouse_occupation");
+        if (empSpouseEmployer) empSpouseEmployer.value = pick(emp, "spouse_employer_business", "spouse_employer");
+        if (empSpouseContact) empSpouseContact.value = pick(emp, "spouse_contact_no", "spouse_contact");
+        if (empSpouseEmail) empSpouseEmail.value = pick(emp, "spouse_email");
+        if (empLandline) empLandline.value = pick(emp, "landline", "landline_no");
+        if (empMobile) empMobile.value = pick(emp, "mobile", "mobile_1", "mobile_number_1");
+        if (empMobile2) empMobile2.value = pick(emp, "mobile_2", "mobile_number_2");
         if (empEmail) empEmail.value = emp.email || "";
-        if (empAddress) empAddress.value = emp.address || "";
+        if (empFacebook) empFacebook.value = pick(emp, "facebook");
+        if (empInstagram) empInstagram.value = pick(emp, "instagram");
+        if (empTwitter) empTwitter.value = pick(emp, "twitter", "x_handle");
+        if (empEducationLevel) empEducationLevel.value = pick(emp, "education_level");
+        if (empCourse) empCourse.value = pick(emp, "course");
+        if (empLastSchool) empLastSchool.value = pick(emp, "last_school_attended", "last_school");
+        if (empYearGraduated) empYearGraduated.value = pick(emp, "year_graduated");
+        if (empAddress) empAddress.value = emp.address || employeeStructuredAddress(emp) || "";
       } else {
         if (employeeModalTitle) employeeModalTitle.textContent = "Add New Employee";
-        if (empId) empId.value = `EMP-2026-${String(employees.length + 1).padStart(3, "0")}`;
+        const prefix = `EMP-${new Date().getFullYear()}-`;
+        const highest = Math.max(0, ...employees.map(e => String(e.employee_id || "").startsWith(prefix) ? Number(String(e.employee_id).slice(prefix.length)) || 0 : 0));
+        if (empId) empId.value = prefix + String(highest + 1).padStart(3, "0");
       }
 
       openModal("employeeFormModal");
@@ -708,6 +800,7 @@
     async function saveEmployee(e) {
       e.preventDefault();
 
+      const structuredAddress = formStructuredAddress();
       const payload = {
         employee_id: empId?.value.trim() || "",
         first_name: empFirstName?.value.trim() || "",
@@ -718,17 +811,51 @@
         dob: empDob?.value || null,
         pob: empPob?.value.trim() || "",
         civil_status: empCivilStatus?.value || "Single",
+        religion: empReligion?.value.trim() || "",
+        height_cm: asNumberOrNull(empHeightCm),
+        weight_kg: asNumberOrNull(empWeightKg),
         blood_type: empBloodType?.value.trim() || "",
         designation: empDesignation?.value.trim() || "",
         department: empDepartment?.value.trim() || "",
         employment_type: empStatusType?.value || "PERMANENT",
         item_code: empItemCode?.value.trim() || "",
         date_employed: empDateEmployed?.value || null,
+        date_assumption: empDateAssumption?.value || null,
         salary_grade: empSalaryGrade?.value.trim() || "",
+        step_no: empStepNo?.value.trim() || "",
+        nosa_date: empNosaDate?.value || null,
+        basic_salary: asNumberOrNull(empBasicSalary),
+        eligibility: empEligibility?.value.trim() || "",
         duty_status: empDutyStatus?.value || "Active",
+        tin_no: empTinNo?.value.trim() || "",
+        gsis_bp_no: empGsisBpNo?.value.trim() || "",
+        pagibig_no: empPagibigNo?.value.trim() || "",
+        philhealth_no: empPhilhealthNo?.value.trim() || "",
+        house_street_purok: empHouseStreetPurok?.value.trim() || "",
+        barangay: empBarangay?.value.trim() || "",
+        city_municipality: empCityMunicipality?.value.trim() || "",
+        province: empProvince?.value.trim() || "",
+        zip_code: empZipCode?.value.trim() || "",
+        spouse_last_name: empSpouseLastName?.value.trim() || "",
+        spouse_first_name: empSpouseFirstName?.value.trim() || "",
+        spouse_middle_name: empSpouseMiddleName?.value.trim() || "",
+        spouse_extension: empSpouseExtension?.value.trim() || "",
+        spouse_occupation: empSpouseOccupation?.value.trim() || "",
+        spouse_employer_business: empSpouseEmployer?.value.trim() || "",
+        spouse_contact_no: empSpouseContact?.value.trim() || "",
+        spouse_email: empSpouseEmail?.value.trim() || "",
+        landline: empLandline?.value.trim() || "",
         mobile: empMobile?.value.trim() || "",
+        mobile_2: empMobile2?.value.trim() || "",
         email: empEmail?.value.trim() || "",
-        address: empAddress?.value.trim() || "",
+        facebook: empFacebook?.value.trim() || "",
+        instagram: empInstagram?.value.trim() || "",
+        twitter: empTwitter?.value.trim() || "",
+        education_level: empEducationLevel?.value.trim() || "",
+        course: empCourse?.value.trim() || "",
+        last_school_attended: empLastSchool?.value.trim() || "",
+        year_graduated: empYearGraduated?.value.trim() || "",
+        address: structuredAddress || empAddress?.value.trim() || "",
         updated_at: new Date().toISOString()
       };
 
@@ -737,40 +864,47 @@
         return;
       }
 
+      if (!employeeForm.reportValidity()) return;
+      if (employees.some(emp => String(emp.id) !== String(editingId) && String(emp.employee_id || "").toLowerCase() === payload.employee_id.toLowerCase())) { showToast("Employee ID already exists. Use a unique ID.", "warning"); return; }
+      if (saveEmployeeBtn?.disabled) return;
+      const previousEmployees = employees.map(emp => ({...emp}));
+      const wasEditing = editingId;
+      employeeFormModal.dataset.busy = "true";
       if (saveEmployeeBtn) saveEmployeeBtn.disabled = true;
 
       try {
-        if (databaseMode === "supabase" && supabase) {
-          const res = editingId
-            ? await supabase.from("employees").update(payload).eq("id", editingId)
-            : await supabase.from("employees").insert([payload]);
-
-          if (res.error) throw res.error;
-          await loadEmployees();
+        requireWritable();
+        if (databaseMode === "supabase") {
+          const saved = await M.write("employees", payload, editingId);
+          employees = editingId ? employees.map(emp => String(emp.id) === String(editingId) ? saved : emp) : [saved, ...employees];
+        } else if (editingId) {
+          employees = employees.map(emp => String(emp.id) === String(editingId) ? {...emp, ...payload} : emp);
         } else {
-          if (editingId) {
-            const idx = employees.findIndex(i => String(i.id) === String(editingId));
-            if (idx !== -1) employees[idx] = { ...employees[idx], ...payload };
-          } else {
-            payload.id = `emp_${Date.now()}`;
-            employees.unshift(payload);
-          }
-          saveLocalEmployees();
-          render();
+          employees.unshift({...payload, id:M.uuid()});
         }
+        saveLocalEmployees();
+        M.observeRecords("employees", employees);
+        render();
+        employeeFormModal.dataset.busy = "false";
+        M.audit(wasEditing ? "EDIT_RECORD" : "ADD_RECORD", `Employee ${payload.employee_id}`);
 
         closeModal("employeeFormModal");
         showToast(editingId ? "Profile updated successfully." : "Employee added successfully.", "success");
       } catch (err) {
+        employees = previousEmployees;
         console.error("Save error:", err);
-        showToast(err?.message || "Failed to save employee profile.", "error");
+        const message = err?.message || "Failed to save employee profile.";
+        const schemaHint = /column|schema cache|PGRST204|42703/i.test(message) ? " Run employee-record-supabase-migration.sql in Supabase, then refresh." : "";
+        showToast(message + schemaHint, "error");
       } finally {
+        employeeFormModal.dataset.busy = "false";
         if (saveEmployeeBtn) saveEmployeeBtn.disabled = false;
       }
     }
 
     /* ---------------- 11. 201 DOSSIER MODAL ---------------- */
-    function openProfileModal(id) {
+    function openProfileModal(id, tab = "employeeDetailsPanel") {
+      if (!M.canStartAction()) return;
       currentViewingId = id;
       const emp = employees.find(e => String(e.id) === String(id));
       if (!emp) return;
@@ -793,82 +927,106 @@
       if ($("#v_pob")) $("#v_pob").textContent = emp.pob || "—";
       if ($("#v_gender")) $("#v_gender").textContent = emp.gender || "—";
       if ($("#v_civil")) $("#v_civil").textContent = emp.civil_status || "—";
+      if ($("#v_religion")) $("#v_religion").textContent = pick(emp,"religion") || "—";
+      if ($("#v_height")) $("#v_height").textContent = pick(emp,"height_cm","height") ? `${pick(emp,"height_cm","height")} cm` : "—";
+      if ($("#v_weight")) $("#v_weight").textContent = pick(emp,"weight_kg","weight") ? `${pick(emp,"weight_kg","weight")} kg` : "—";
       if ($("#v_blood")) $("#v_blood").textContent = emp.blood_type || "—";
 
       if ($("#v_desig")) $("#v_desig").textContent = emp.designation || "—";
       if ($("#v_emp_status")) $("#v_emp_status").textContent = emp.employment_type || "—";
+      if ($("#v_duty_status")) $("#v_duty_status").textContent = duty || "—";
       if ($("#v_dept")) $("#v_dept").textContent = emp.department || "—";
       if ($("#v_item")) $("#v_item").textContent = emp.item_code || "—";
       if ($("#v_date_employed")) $("#v_date_employed").textContent = formatLongDate(emp.date_employed);
-      if ($("#v_salary_gradestep")) $("#v_salary_gradestep").textContent = emp.salary_grade || "—";
+      if ($("#v_date_assumption")) $("#v_date_assumption").textContent = formatLongDate(pick(emp,"date_assumption","date_of_assumption"));
+      if ($("#v_salary_grade")) $("#v_salary_grade").textContent = emp.salary_grade || "—";
+      if ($("#v_step_no")) $("#v_step_no").textContent = pick(emp,"step_no","salary_step") || "—";
+      if ($("#v_nosa_date")) $("#v_nosa_date").textContent = formatLongDate(pick(emp,"nosa_date","nosa"));
+      if ($("#v_basic_salary")) $("#v_basic_salary").textContent = formatMoney(pick(emp,"basic_salary"));
+      if ($("#v_eligibility")) $("#v_eligibility").textContent = pick(emp,"eligibility") || "—";
 
-      if ($("#v_mobile")) $("#v_mobile").textContent = emp.mobile || "—";
+      if ($("#v_tin")) $("#v_tin").textContent = pick(emp,"tin_no","tin") || "—";
+      if ($("#v_gsis")) $("#v_gsis").textContent = pick(emp,"gsis_bp_no","gsis_no") || "—";
+      if ($("#v_pagibig")) $("#v_pagibig").textContent = pick(emp,"pagibig_no","pag_ibig_no") || "—";
+      if ($("#v_philhealth")) $("#v_philhealth").textContent = pick(emp,"philhealth_no","phil_health_no") || "—";
+
+      if ($("#v_house")) $("#v_house").textContent = pick(emp,"house_street_purok","house_number","house_no_street_purok") || "—";
+      if ($("#v_barangay")) $("#v_barangay").textContent = pick(emp,"barangay") || "—";
+      if ($("#v_city")) $("#v_city").textContent = pick(emp,"city_municipality","municipality","city") || "—";
+      if ($("#v_province")) $("#v_province").textContent = pick(emp,"province") || "—";
+      if ($("#v_zip")) $("#v_zip").textContent = pick(emp,"zip_code","zipcode") || "—";
+      if ($("#v_address")) $("#v_address").textContent = employeeStructuredAddress(emp) || emp.address || "—";
+
+      const spouseName = [pick(emp,"spouse_first_name"), pick(emp,"spouse_middle_name"), pick(emp,"spouse_last_name"), pick(emp,"spouse_extension","spouse_extension_name")].filter(Boolean).join(" ");
+      if ($("#v_spouse_name")) $("#v_spouse_name").textContent = spouseName || "—";
+      if ($("#v_spouse_occupation")) $("#v_spouse_occupation").textContent = pick(emp,"spouse_occupation") || "—";
+      if ($("#v_spouse_employer")) $("#v_spouse_employer").textContent = pick(emp,"spouse_employer_business","spouse_employer") || "—";
+      if ($("#v_spouse_contact")) $("#v_spouse_contact").textContent = pick(emp,"spouse_contact_no","spouse_contact") || "—";
+      if ($("#v_spouse_email")) $("#v_spouse_email").textContent = pick(emp,"spouse_email") || "—";
+
+      if ($("#v_landline")) $("#v_landline").textContent = pick(emp,"landline","landline_no") || "—";
+      if ($("#v_mobile")) $("#v_mobile").textContent = pick(emp,"mobile","mobile_1","mobile_number_1") || "—";
+      if ($("#v_mobile2")) $("#v_mobile2").textContent = pick(emp,"mobile_2","mobile_number_2") || "—";
       if ($("#v_email")) $("#v_email").textContent = emp.email || "—";
-      if ($("#v_address")) $("#v_address").textContent = emp.address || "—";
+      if ($("#v_facebook")) $("#v_facebook").textContent = pick(emp,"facebook") || "—";
+      if ($("#v_instagram")) $("#v_instagram").textContent = pick(emp,"instagram") || "—";
+      if ($("#v_twitter")) $("#v_twitter").textContent = pick(emp,"twitter","x_handle") || "—";
 
+      if ($("#v_education_level")) $("#v_education_level").textContent = pick(emp,"education_level") || "—";
+      if ($("#v_course")) $("#v_course").textContent = pick(emp,"course") || "—";
+      if ($("#v_last_school")) $("#v_last_school").textContent = pick(emp,"last_school_attended","last_school") || "—";
+      if ($("#v_year_graduated")) $("#v_year_graduated").textContent = pick(emp,"year_graduated") || "—";
+
+      initializeEmployeeMonitoring(emp, tab);
+      M.audit("VIEW_RECORD", `Employee ${emp.employee_id} profile viewed`);
       openModal("profileModal");
     }
 
     function formatLongDate(val) {
       if (!val) return "—";
-      const d = new Date(val);
+      const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(val)) ? `${val}T12:00:00` : val);
       if (Number.isNaN(d.getTime())) return "—";
       return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
     }
 
     /* ---------------- 12. DELETE RECORD ---------------- */
+    let deleting = false;
     async function deleteEmployee(id) {
-      const emp = employees.find(e => String(e.id) === String(id));
-      if (!emp) return;
-
-      if (!confirm(`Are you sure you want to delete ${emp.first_name || ""} ${emp.last_name || ""}?`)) {
-        return;
-      }
-
+      if (deleting || !confirm("Delete this employee record?")) return;
+      deleting = true; const previousEmployees = employees;
       try {
-        if (databaseMode === "supabase" && supabase) {
-          const { error } = await supabase.from("employees").delete().eq("id", id);
-          if (error) throw error;
-          await loadEmployees();
-        } else {
-          employees = employees.filter(e => String(e.id) !== String(id));
-          saveLocalEmployees();
-          render();
-        }
-        showToast("Employee record removed.", "success");
-      } catch (err) {
-        console.error("Delete error:", err);
-        showToast(err?.message || "Failed to delete record.", "error");
-      }
+        requireWritable();
+        if (databaseMode === "supabase") await M.remove("employees", [id]);
+        employees = employees.filter(emp => String(emp.id) !== String(id));
+        saveLocalEmployees(); selectedIds.delete(String(id)); render();
+        M.audit("DELETE_RECORD", `Employee record ${id} deleted`); showToast("Employee deleted.");
+      } catch (error) { employees = previousEmployees; showToast(error.message, "error"); }
+      finally { deleting = false; }
     }
 
-    /* ---------------- 13. EXPORT CSV ---------------- */
     function exportToCSV(list, filename) {
       const headers = [
-        "Employee ID", "Last Name", "First Name", "Middle Name", "Extension",
-        "Gender", "DOB", "Designation", "Department", "Employment Type",
-        "Item No", "Duty Status", "Mobile", "Email"
+        "Employee ID","Last Name","First Name","Middle Name","Extension","Gender","DOB","Birth Place","Civil Status","Religion","Height (cm)","Weight (kg)","Blood Type",
+        "Employment Status","Designation","Department","Item No.","Date Employed","Date of Assumption","Salary Grade","Step No.","N.O.S.A. Date","Basic Salary","Eligibility","Duty Status",
+        "TIN No.","GSIS B.P. No.","PAG-IBIG No.","PHILHEALTH No.",
+        "House No./Street/Purok","Barangay","City/Municipality","Province","Zip Code","Complete Address",
+        "Spouse Last Name","Spouse First Name","Spouse Middle Name","Spouse Extension","Spouse Occupation","Spouse Employer/Business","Spouse Contact No.","Spouse Email",
+        "Landline No.","Mobile No. 1","Mobile No. 2","Email Address","Facebook","Instagram","Twitter/X",
+        "Education Level","Course","Last School Attended","Year Graduated","Flag Ceremony Records (JSON)","Uniform Records (JSON)"
       ];
 
       const rows = list.map(e => [
-        e.employee_id, e.last_name, e.first_name, e.middle_name, e.name_extension,
-        e.gender, e.dob, e.designation, e.department, e.employment_type,
-        e.item_code, e.duty_status, e.mobile, e.email
+        e.employee_id,e.last_name,e.first_name,e.middle_name,e.name_extension,e.gender,e.dob,e.pob,e.civil_status,pick(e,"religion"),pick(e,"height_cm","height"),pick(e,"weight_kg","weight"),e.blood_type,
+        e.employment_type,e.designation,e.department,e.item_code,e.date_employed,pick(e,"date_assumption","date_of_assumption"),e.salary_grade,pick(e,"step_no","salary_step"),pick(e,"nosa_date","nosa"),pick(e,"basic_salary"),pick(e,"eligibility"),e.duty_status,
+        pick(e,"tin_no","tin"),pick(e,"gsis_bp_no","gsis_no"),pick(e,"pagibig_no","pag_ibig_no"),pick(e,"philhealth_no","phil_health_no"),
+        pick(e,"house_street_purok","house_number","house_no_street_purok"),pick(e,"barangay"),pick(e,"city_municipality","municipality","city"),pick(e,"province"),pick(e,"zip_code","zipcode"),employeeStructuredAddress(e)||e.address,
+        pick(e,"spouse_last_name"),pick(e,"spouse_first_name"),pick(e,"spouse_middle_name"),pick(e,"spouse_extension","spouse_extension_name"),pick(e,"spouse_occupation"),pick(e,"spouse_employer_business","spouse_employer"),pick(e,"spouse_contact_no","spouse_contact"),pick(e,"spouse_email"),
+        pick(e,"landline","landline_no"),pick(e,"mobile","mobile_1","mobile_number_1"),pick(e,"mobile_2","mobile_number_2"),e.email,pick(e,"facebook"),pick(e,"instagram"),pick(e,"twitter","x_handle"),
+        pick(e,"education_level"),pick(e,"course"),pick(e,"last_school_attended","last_school"),pick(e,"year_graduated"), JSON.stringify(monitorRecords(e, "ceremony")), JSON.stringify(monitorRecords(e, "uniform"))
       ]);
 
-      const csvContent = [headers, ...rows]
-        .map(row => row.map(cell => `"${String(cell ?? "").replaceAll('"', '""')}"`).join(","))
-        .join("\n");
-
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
+      M.csv([headers, ...rows], filename);
+      M.audit("EXPORT_RECORDS", `${list.length} employee records exported`);
     }
 
     function exportMasterlist() {
@@ -876,7 +1034,7 @@
         showToast("No employee records to export.", "warning");
         return;
       }
-      exportToCSV(employees, `pgenro_employee_masterfile_${new Date().toISOString().slice(0, 10)}.csv`);
+      exportToCSV(getFilteredEmployees(), `pgenro_employee_masterfile_${new Date().toISOString().slice(0, 10)}.csv`);
       showToast("Employee masterfile exported as CSV.", "success");
     }
 
@@ -886,12 +1044,16 @@
     exportBtn?.addEventListener("click", exportMasterlist);
     quickExportBtn?.addEventListener("click", exportMasterlist);
 
-    quickPrintBtn?.addEventListener("click", () => window.print());
-    printDossierBtn?.addEventListener("click", () => window.print());
+    quickPrintBtn?.addEventListener("click", printEmployeeDirectory);
+    printDossierBtn?.addEventListener("click", () => {
+      M.audit("PRINT_RECORD", `Employee ${currentViewingId}: ${activeEmployeeTab}`);
+      window.print();
+    });
+    $("#clearEmployeeFormBtn")?.addEventListener("click", () => { if (M.canStartAction()) openEmployeeModal(editingId); });
 
     refreshBtn?.addEventListener("click", async () => {
-      await loadEmployees();
-      showToast("Directory synchronized.", "success");
+      refreshBtn.disabled = true;
+      try { if (await loadEmployees()) showToast(supabase ? "Directory refreshed." : "Local directory refreshed."); } finally { refreshBtn.disabled = false; }
     });
 
     dossierEditBtn?.addEventListener("click", () => {
@@ -907,7 +1069,7 @@
     });
 
     quickFilterCasual?.addEventListener("click", () => {
-      if (filterEmploymentType) filterEmploymentType.value = "CASUAL";
+      if (filterEmploymentType) filterEmploymentType.value = "CASUAL_OR_JO";
       currentPage = 1;
       render();
     });
@@ -932,6 +1094,7 @@
     employeeForm?.addEventListener("submit", saveEmployee);
 
     searchInput?.addEventListener("input", () => {
+      if (globalSearchInput) globalSearchInput.value = searchInput.value;
       currentPage = 1;
       render();
     });
@@ -969,97 +1132,365 @@
       }
       if (e.key === "Escape") {
         $$(".modal-backdrop.open").forEach(m => closeModal(m.id));
-        closeProfileDropdown();
+
       }
     });
 
     /* ---------------- 16. TOAST MESSAGES ---------------- */
-    function showToast(message, type = "success", timeout = 3000) {
-      if (window.AdminUI?.toast) {
-        window.AdminUI.toast(message, type, timeout);
-        return;
-      }
+    function showToast(message, type = "success") { M.toast(message,type); }
 
-      let stack = $(".admin-ui-toast-stack") || $("#toastContainer");
-      if (!stack) {
-        stack = document.createElement("div");
-        stack.className = "toast-container";
-        document.body.appendChild(stack);
-      }
-
-      const toast = document.createElement("div");
-      toast.className = `admin-ui-toast toast ${type}`;
-      const icon = type === "error" ? "alert-circle" : (type === "warning" ? "alert-triangle" : "check-circle-2");
-      toast.innerHTML = `<i data-lucide="${icon}"></i><span>${escapeHtml(message)}</span>`;
-      stack.appendChild(toast);
-      refreshIcons();
-
-      setTimeout(() => {
-        toast.style.opacity = "0";
-        toast.style.transform = "translateY(8px)";
-        setTimeout(() => toast.remove(), 200);
-      }, timeout);
-    }
-
-    /* ---------------- 17. SHELL CONTROLS ---------------- */
-    sidebarCollapseBtn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      const isCollapsed = !sidebar?.classList.contains("collapsed");
-      sidebar?.classList.toggle("collapsed", isCollapsed);
-      $(".main-wrapper")?.classList.toggle("sidebar-collapsed", isCollapsed);
-      document.body.classList.toggle("sidebar-collapsed", isCollapsed);
-      try {
-        localStorage.setItem("pgenro_admin_sidebar", isCollapsed ? "collapsed" : "expanded");
-      } catch {}
-    });
-
-    let sidebarBackdrop = $(".admin-sidebar-backdrop");
-    if (!sidebarBackdrop) {
-      sidebarBackdrop = document.createElement("div");
-      sidebarBackdrop.className = "admin-sidebar-backdrop";
-      sidebarBackdrop.setAttribute("aria-hidden", "true");
-      document.body.appendChild(sidebarBackdrop);
-    }
-
-    const isMobileViewport = () => window.matchMedia("(max-width: 900px)").matches;
-    const setMobileSidebar = (open) => {
-      sidebar?.classList.toggle("mobile-open", Boolean(open));
-      sidebarBackdrop?.classList.toggle("active", Boolean(open));
-      sidebarBackdrop?.setAttribute("aria-hidden", String(!open));
-      mobileMenuBtn?.setAttribute("aria-expanded", String(Boolean(open)));
+    /* Legacy Employee Record: flag ceremony and prescribed uniform monitoring. */
+    const monitoringKinds = ["ceremony", "uniform"];
+    const monitoringFields = { ceremony: "ceremony_records", uniform: "uniform_records" };
+    const activityLabels = { "FLAG CEREMONY": "Flag Ceremony", "FLAG RETREAT": "Flag Retreat", "HOLIDAY CELEBRATION": "Holiday Celebration", "OTHERS": "Others" };
+    const statusLabels = { PRESENT: "Present", ABSENT: "Absent", "OFFICIAL BUSINESS": "Official Business", LEAVE: "Leave", LATE: "Late" };
+    const monitorEditing = { ceremony: null, uniform: null };
+    const monitoringDraft = { ceremony: null, uniform: null };
+    let activeEmployeeTab = "employeeDetailsPanel";
+    let monitorSaving = false;
+    const monitorEl = (kind, suffix) => document.getElementById(kind + suffix);
+    const selectedEmployee = () => employees.find(emp => String(emp.id) === String(currentViewingId));
+    const parsedArray = value => {
+      if (Array.isArray(value)) return value;
+      if (typeof value === "string") { try { const result = JSON.parse(value); return Array.isArray(result) ? result : []; } catch {} }
+      return [];
     };
+    const monitorRecords = (emp, kind) => parsedArray(emp?.[monitoringFields[kind]]).filter(row => row && typeof row === "object" && !Array.isArray(row));
+    const statusValue = row => {
+      const raw = String(row?.status || "").trim().toUpperCase();
+      return ["OB", "O.B.", "O.B", "OFFICIAL BUSINESS (O.B.)"].includes(raw) ? "OFFICIAL BUSINESS" : raw;
+    };
+    const complianceValue = row => typeof row?.compliant === "boolean" ? (row.compliant ? "YES" : "NO") : String(row?.compliant || "").trim().toUpperCase();
+    const activityValue = row => String(row?.activity || "").trim().toUpperCase().replace(/^0[1-4][.\s]+/, "");
+    const monitorRowKey = (row, index) => String(row.id ?? `legacy-${index}`);
+    const rowFingerprint = row => JSON.stringify(row);
 
-    mobileMenuBtn?.setAttribute("aria-expanded", "false");
-    mobileMenuBtn?.addEventListener("click", (e) => {
-      e.preventDefault();
-      setMobileSidebar(!sidebar?.classList.contains("mobile-open"));
-    });
+    function resetMonitorEditor(kind) {
+      monitorEditing[kind] = null;
+      monitoringDraft[kind] = null;
+      monitorEl(kind, "Form")?.reset();
+      monitorEl(kind, "Date").value = M.today();
+      monitorEl(kind, "EditorTitle").textContent = "Add Record";
+      monitorEl(kind, "EditTag").hidden = true;
+      monitorEl(kind, "Save").querySelector("span").textContent = "Save Record";
+      monitorEl(kind, "Clear").textContent = "Clear";
+      monitorEl(kind, "Form").querySelectorAll("[aria-invalid]").forEach(input => input.removeAttribute("aria-invalid"));
+      monitorEl(kind, "Control").setCustomValidity("");
+      monitorEl(kind, "Date").setCustomValidity("");
+    }
 
-    sidebarBackdrop?.addEventListener("click", () => setMobileSidebar(false));
-    sidebar?.querySelectorAll("a.nav-item").forEach(link => {
-      link.addEventListener("click", () => {
-        if (isMobileViewport()) setMobileSidebar(false);
+    function selectEmployeeTab(panelId, focus = false) {
+      if (monitorSaving) return;
+      const tabs = $$(".employee-record-tab", profileModal);
+      const active = tabs.find(tab => tab.getAttribute("aria-controls") === panelId) || tabs[0];
+      activeEmployeeTab = active.getAttribute("aria-controls");
+      tabs.forEach(tab => {
+        const selected = tab === active;
+        tab.classList.toggle("active", selected);
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !selected;
+      });
+      $("#employeePrintLabel").textContent = activeEmployeeTab === "ceremonyPanel" ? "Print Flag Ceremony" : activeEmployeeTab === "uniformPanel" ? "Print Uniform Report" : "Print Employee Record";
+      profileModal.dataset.printTab = activeEmployeeTab;
+      if (focus) active.focus();
+    }
+
+    function initializeEmployeeMonitoring(emp, tab) {
+      for (const kind of monitoringKinds) {
+        resetMonitorEditor(kind);
+        monitorEl(kind, "Filters").reset();
+        monitorEl(kind, "From").value = "";
+        monitorEl(kind, "To").value = "";
+      }
+      selectEmployeeTab(tab);
+      renderEmployeeMonitoring();
+    }
+
+    function filteredMonitorRecords(kind, emp = selectedEmployee()) {
+      const from = monitorEl(kind, "From").value;
+      const to = monitorEl(kind, "To").value;
+      const filterStatusValue = monitorEl(kind, "FilterStatus").value;
+      const activity = kind === "ceremony" ? monitorEl(kind, "FilterActivity").value : "";
+      const search = monitorEl(kind, "Search").value.trim().toLowerCase();
+      const error = monitorEl(kind, "FilterError");
+      const invalid = from && to && from > to;
+      error.hidden = !invalid;
+      error.textContent = invalid ? "From date must be on or before To date." : "";
+      if (invalid) return [];
+      return monitorRecords(emp, kind).map((row, index) => ({row, key: monitorRowKey(row, index)})).filter(({row}) => {
+        const date = String(row.date || "").slice(0, 10);
+        const recordStatus = kind === "ceremony" ? statusValue(row) : complianceValue(row);
+        const recordActivity = kind === "ceremony" ? activityValue(row) : "";
+        const searchable = [row.control_number, date, formatLongDate(date), recordStatus, statusLabels[recordStatus], recordActivity, row.remarks].filter(Boolean).join(" ").toLowerCase();
+        return (!from || date >= from) && (!to || date <= to) && (!filterStatusValue || recordStatus === filterStatusValue) && (!activity || recordActivity === activity) && (!search || searchable.includes(search));
+      }).sort((a, b) => String(b.row.date || "").localeCompare(String(a.row.date || "")) || String(b.row.control_number || "").localeCompare(String(a.row.control_number || ""), undefined, {numeric: true}));
+    }
+
+    function renderEmployeeMonitoring() {
+      const emp = selectedEmployee();
+      if (!emp) return;
+      for (const kind of monitoringKinds) {
+        monitorEl(kind, "TabCount").textContent = monitorRecords(emp, kind).length;
+        const entries = filteredMonitorRecords(kind, emp);
+        const counts = {};
+        for (const {row} of entries) {
+          const value = kind === "ceremony" ? statusValue(row) : complianceValue(row);
+          counts[value] = (counts[value] || 0) + 1;
+        }
+        const values = kind === "ceremony" ? [counts.PRESENT || 0, counts.ABSENT || 0, counts["OFFICIAL BUSINESS"] || 0, counts.LEAVE || 0, counts.LATE || 0,
+          `${(counts.PRESENT || 0) + (counts["OFFICIAL BUSINESS"] || 0) + (counts.LEAVE || 0) + (counts.LATE || 0)} of ${entries.length}`]
+          : [counts.YES || 0, counts.NO || 0, entries.length, entries.length ? `${Math.round((counts.YES || 0) / entries.length * 100)}%` : "—"];
+        values.forEach((value, index) => { monitorEl(kind, `Summary${index}`).textContent = value; });
+        const from = monitorEl(kind, "From").value;
+        const to = monitorEl(kind, "To").value;
+        const criteria = [from || to ? `Dates: ${from ? formatLongDate(from) : "Beginning"} to ${to ? formatLongDate(to) : "Latest"}` : "All dates"];
+        if (kind === "ceremony") criteria.push(`Activity: ${activityLabels[monitorEl(kind, "FilterActivity").value] || "All activities"}`);
+        const filter = monitorEl(kind, "FilterStatus").value;
+        criteria.push(`Status: ${kind === "ceremony" ? statusLabels[filter] || "All statuses" : filter || "All records"}`);
+        if (monitorEl(kind, "Search").value.trim()) criteria.push(`Search: ${monitorEl(kind, "Search").value.trim()}`);
+        monitorEl(kind, "PrintScope").textContent = criteria.join(" · ");
+        monitorEl(kind, "RecordCount").textContent = `${entries.length} matching record${entries.length === 1 ? "" : "s"} / ${monitorRecords(emp, kind).length} total`;
+        monitorEl(kind, "TableBody").innerHTML = entries.length ? entries.map(({row, key}) => {
+          const status = kind === "ceremony" ? statusValue(row) : complianceValue(row);
+          const success = ["PRESENT", "YES"].includes(status);
+          const danger = ["ABSENT", "NO"].includes(status);
+          return `<tr data-monitor-key="${escapeHtml(key)}"><td><span class="id-badge">${escapeHtml(row.control_number || "—")}</span></td><td class="monitor-date-cell">${escapeHtml(formatLongDate(row.date))}</td><td><span class="badge-status ${success ? "success" : danger ? "urgent" : "info"}">${escapeHtml(kind === "ceremony" ? statusLabels[status] || status || "—" : status === "YES" ? "Yes" : status === "NO" ? "No" : "—")}</span></td>${kind === "ceremony" ? `<td>${escapeHtml(activityLabels[activityValue(row)] || row.activity || "—")}</td>` : ""}<td class="monitor-remarks">${escapeHtml(row.remarks || "—")}</td><td><div class="actions"><button class="btn-action" type="button" data-monitor-action="edit" data-key="${escapeHtml(key)}" title="Edit record" aria-label="Edit ${escapeHtml(row.control_number || "record")}"><i data-lucide="pencil"></i></button><button class="btn-action delete" type="button" data-monitor-action="delete" data-key="${escapeHtml(key)}" title="Delete record" aria-label="Delete ${escapeHtml(row.control_number || "record")}"><i data-lucide="trash-2"></i></button></div></td></tr>`;
+        }).join("") : `<tr><td colspan="${kind === "ceremony" ? 6 : 5}" class="monitor-empty">${monitorRecords(emp, kind).length ? "No records match the current filters." : `No ${kind === "ceremony" ? "ceremony attendance" : "uniform monitoring"} records yet. Add the first record using the form.`}</td></tr>`;
+      }
+      refreshIcons();
+    }
+
+    function editMonitoringRecord(kind, key) {
+      if (monitorSaving) return;
+      const rows = monitorRecords(selectedEmployee(), kind);
+      const index = rows.findIndex((row, i) => monitorRowKey(row, i) === key);
+      if (index < 0) { showToast("This record is no longer available. Refresh the directory.", "warning"); return; }
+      const row = rows[index];
+      resetMonitorEditor(kind);
+      monitorEditing[kind] = key;
+      monitoringDraft[kind] = {fingerprint: rowFingerprint(row), record: structuredClone(row)};
+      monitorEl(kind, "Control").value = row.control_number || "";
+      monitorEl(kind, "Date").value = String(row.date || "").slice(0, 10);
+      const selectOption = (element, value) => {
+        if (value && ![...element.options].some(option => option.value === value)) element.add(new Option(value, value));
+        element.value = value;
+      };
+      selectOption(monitorEl(kind, "Status"), kind === "ceremony" ? statusValue(row) : complianceValue(row));
+      if (kind === "ceremony") selectOption(monitorEl(kind, "Activity"), activityValue(row));
+      monitorEl(kind, "Remarks").value = row.remarks || "";
+      monitorEl(kind, "EditorTitle").textContent = "Edit Record";
+      monitorEl(kind, "EditTag").hidden = false;
+      monitorEl(kind, "Save").querySelector("span").textContent = "Update Record";
+      monitorEl(kind, "Clear").textContent = "Cancel Edit";
+      monitorEl(kind, "Form").scrollIntoView({block: "nearest", behavior: "auto"});
+      monitorEl(kind, "Date").focus();
+    }
+
+    function setMonitoringBusy(busy) {
+      monitorSaving = busy;
+      profileModal.dataset.busy = String(busy);
+      profileModal.setAttribute("aria-busy", String(busy));
+      // Preserve controls already disabled by the shared authentication layer.
+      profileModal.querySelectorAll("button, input, select, textarea").forEach(control => {
+        if (busy && !control.disabled) { control.dataset.monitorDisabled = "true"; control.disabled = true; }
+        else if (!busy && control.dataset.monitorDisabled) { control.disabled = false; delete control.dataset.monitorDisabled; }
+      });
+    }
+
+    async function latestEmployeeForMonitoring(id) {
+      if (databaseMode !== "supabase") return employees.find(emp => String(emp.id) === String(id));
+      const response = await supabase.from("employees").select("*").eq("id", id).limit(1);
+      if (response.error) throw response.error;
+      if (!response.data?.length) throw new Error("This employee record is no longer available. Refresh the directory.");
+      return M.unwrap(response.data[0]);
+    }
+
+    // Read the latest employee before patching only the relevant history column.
+    // Conditional update prevents another administrator's concurrent edits being lost.
+    async function persistMonitoringHistory(latest, kind, rows) {
+      const field = monitoringFields[kind];
+      let updated = new Date().toISOString();
+      const id = latest.id;
+      if (databaseMode === "supabase") {
+        const shape = await supabase.from("employees").select("data").eq("id", id).limit(1);
+        const wrapped = !shape.error;
+        if (shape.error && !["42703", "PGRST204"].includes(shape.error.code)) throw shape.error;
+        await window.PGENRO_API?.requireAdmin?.();
+        const data = wrapped ? shape.data?.[0]?.data : latest;
+        if (wrapped && !shape.data?.length) throw new Error("This employee record is no longer available.");
+        if (wrapped && rowFingerprint(parsedArray(data?.[field])) !== rowFingerprint(monitorRecords(latest, kind))) throw new Error("This history changed in another session. Refresh before saving.");
+        const revision = wrapped ? data?.updated_at : latest.updated_at;
+        updated = new Date(Math.max(Date.now(), (Date.parse(revision) || 0) + 1)).toISOString();
+        const body = wrapped ? {data: {...(data || {}), [field]: rows, updated_at: updated}} : {[field]: rows, updated_at: updated};
+        let request = supabase.from("employees").update(body).eq("id", id);
+        const revisionColumn = wrapped ? "data->>updated_at" : "updated_at";
+        request = revision == null ? request.is(revisionColumn, null) : request.eq(revisionColumn, revision);
+        const result = await request.select("*");
+        if (result.error) throw result.error;
+        if (!result.data?.length) throw new Error("This record changed in another session or cannot be updated. Refresh before saving.");
+        employees = employees.map(emp => String(emp.id) === String(id) ? M.unwrap(result.data[0]) : emp);
+      } else {
+        employees = employees.map(emp => String(emp.id) === String(id) ? {...emp, [field]: rows, updated_at: updated} : emp);
+      }
+      saveLocalEmployees();
+    }
+
+    function nextMonitoringControl(rows, kind, date) {
+      const prefix = `${kind === "ceremony" ? "FC" : "UM"}-${date.slice(0, 4)}-`;
+      const numbers = rows.map(row => String(row.control_number || "").startsWith(prefix) ? Number(String(row.control_number).slice(prefix.length)) || 0 : 0);
+      return prefix + String(Math.max(0, ...numbers) + 1).padStart(4, "0");
+    }
+
+    async function saveMonitoringRecord(kind, event) {
+      event.preventDefault();
+      if (monitorSaving) return;
+      const emp = selectedEmployee();
+      if (!emp) return;
+      const form = monitorEl(kind, "Form");
+      monitorEl(kind, "Control").setCustomValidity("");
+      monitorEl(kind, "Date").setCustomValidity("");
+      if (!form.reportValidity()) return;
+      const employeeId = emp.id;
+      const editKey = monitorEditing[kind];
+      const draft = monitoringDraft[kind];
+      const date = monitorEl(kind, "Date").value;
+      const control = monitorEl(kind, "Control").value.trim();
+      const recordStatus = monitorEl(kind, "Status").value;
+      const activity = kind === "ceremony" ? monitorEl(kind, "Activity").value : "";
+      const remarks = monitorEl(kind, "Remarks").value.trim();
+      const previousEmployees = employees;
+      setMonitoringBusy(true);
+      let saved = false;
+      try {
+        requireWritable();
+        const latest = await latestEmployeeForMonitoring(employeeId);
+        if (!latest) throw new Error("This employee record is no longer available.");
+        const rows = monitorRecords(latest, kind).map(row => ({...row}));
+        const index = editKey == null ? -1 : rows.findIndex((row, i) => monitorRowKey(row, i) === editKey);
+        if (editKey != null && (index < 0 || rowFingerprint(rows[index]) !== draft?.fingerprint)) throw new Error("This monitoring record changed in another session. Cancel the edit and select it again.");
+        const controlNumber = control || nextMonitoringControl(rows, kind, date);
+        if (rows.some((row, i) => i !== index && String(row.control_number || "").toLowerCase() === controlNumber.toLowerCase())) throw new Error("This control number already exists for this employee. Use a unique control number.");
+        if (rows.some((row, i) => i !== index && String(row.date || "").slice(0, 10) === date && (kind === "uniform" || activityValue(row) === activity))) throw new Error(kind === "uniform" ? "A uniform record already exists for this employee on this date. Edit that record instead." : "This employee already has a record for this activity on this date. Edit that record instead.");
+        const timestamp = new Date().toISOString();
+        const entry = {...(index >= 0 ? rows[index] : {}), id: index >= 0 ? rows[index].id || M.uuid() : M.uuid(), control_number: controlNumber, date, remarks, updated_at: timestamp};
+        if (kind === "ceremony") { entry.status = recordStatus; entry.activity = activity; }
+        else entry.compliant = recordStatus;
+        if (index >= 0) rows[index] = entry;
+        else { entry.created_at = timestamp; rows.unshift(entry); }
+        await persistMonitoringHistory(latest, kind, rows);
+        saved = true;
+        resetMonitorEditor(kind);
+        render();
+        M.audit(editKey == null ? "ADD_RECORD" : "EDIT_RECORD", `${kind === "ceremony" ? "Flag ceremony" : "Uniform"}: employee ${latest.employee_id}, control ${controlNumber}`);
+        showToast(editKey == null ? "Monitoring record saved." : "Monitoring record updated.");
+      } catch (error) {
+        employees = previousEmployees;
+        const message = error?.message || "Monitoring record could not be saved.";
+        const schemaHint = /column|schema cache|PGRST204|42703/i.test(message) ? " Run employee-record-supabase-migration.sql, then refresh." : "";
+        showToast(message + schemaHint, "error");
+      } finally {
+        setMonitoringBusy(false);
+        if (saved) monitorEl(kind, "Date").focus();
+      }
+    }
+
+    async function deleteMonitoringRecord(kind, key) {
+      if (monitorSaving) return;
+      const emp = selectedEmployee();
+      const before = monitorRecords(emp, kind);
+      const beforeIndex = before.findIndex((row, i) => monitorRowKey(row, i) === key);
+      if (!emp || beforeIndex < 0) return;
+      const target = before[beforeIndex];
+      if (!confirm(`Delete ${kind === "ceremony" ? "ceremony" : "uniform"} record ${target.control_number || ""} for ${emp.employee_id}?`)) return;
+      const previousEmployees = employees;
+      setMonitoringBusy(true);
+      try {
+        requireWritable();
+        const latest = await latestEmployeeForMonitoring(emp.id);
+        const rows = monitorRecords(latest, kind);
+        const index = rows.findIndex((row, i) => monitorRowKey(row, i) === key);
+        if (index < 0 || rowFingerprint(rows[index]) !== rowFingerprint(target)) throw new Error("This record changed in another session. Refresh before deleting.");
+        await persistMonitoringHistory(latest, kind, rows.filter((_, i) => i !== index));
+        if (monitorEditing[kind] === key) resetMonitorEditor(kind);
+        render();
+        M.audit("DELETE_RECORD", `${kind === "ceremony" ? "Flag ceremony" : "Uniform"}: employee ${latest.employee_id}, control ${target.control_number}`);
+        showToast("Monitoring record deleted.");
+      } catch (error) { employees = previousEmployees; showToast(error?.message || "Record could not be deleted.", "error"); }
+      finally { setMonitoringBusy(false); }
+    }
+
+    function exportMonitoringRecords(kind) {
+      const emp = selectedEmployee();
+      const entries = filteredMonitorRecords(kind, emp);
+      if (!emp || !entries.length) { showToast("No matching monitoring records to export.", "warning"); return; }
+      const name = [emp.last_name, emp.first_name, emp.middle_name, emp.name_extension].filter(Boolean).join(" ");
+      const header = ["Employee ID", "Employee Name", "Control Number", "Date", kind === "ceremony" ? "Status" : "Compliant"];
+      if (kind === "ceremony") header.push("Activity");
+      header.push("Remarks");
+      const rows = entries.map(({row}) => {
+        const values = [emp.employee_id, name, row.control_number, row.date, kind === "ceremony" ? statusValue(row) : complianceValue(row)];
+        if (kind === "ceremony") values.push(row.activity);
+        values.push(row.remarks);
+        return values;
+      });
+      const safeId = String(emp.employee_id || "employee").replace(/[^a-z0-9_-]/ig, "_");
+      M.csv([header, ...rows], `pgenro_${safeId}_${kind}_${M.today()}.csv`);
+      M.audit("EXPORT_RECORDS", `${entries.length} ${kind} records for employee ${emp.employee_id}`);
+      showToast(`${entries.length} monitoring record${entries.length === 1 ? "" : "s"} exported.`);
+    }
+
+    const recordTabs = $$(".employee-record-tab", profileModal);
+    recordTabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => selectEmployeeTab(tab.getAttribute("aria-controls")));
+      tab.addEventListener("keydown", event => {
+        let next;
+        if (event.key === "ArrowRight") next = (index + 1) % recordTabs.length;
+        else if (event.key === "ArrowLeft") next = (index + recordTabs.length - 1) % recordTabs.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = recordTabs.length - 1;
+        else return;
+        event.preventDefault();
+        selectEmployeeTab(recordTabs[next].getAttribute("aria-controls"), true);
       });
     });
+    for (const kind of monitoringKinds) {
+      monitorEl(kind, "Form").addEventListener("submit", event => saveMonitoringRecord(kind, event));
+      monitorEl(kind, "Clear").addEventListener("click", () => { if (!monitorSaving) resetMonitorEditor(kind); });
+      monitorEl(kind, "Control").addEventListener("input", () => monitorEl(kind, "Control").setCustomValidity(""));
+      monitorEl(kind, "Filters").addEventListener("submit", event => { event.preventDefault(); renderEmployeeMonitoring(); });
+      monitorEl(kind, "Filters").addEventListener("input", () => { if (!monitorSaving) renderEmployeeMonitoring(); });
+      monitorEl(kind, "Filters").addEventListener("change", () => { if (!monitorSaving) renderEmployeeMonitoring(); });
+      monitorEl(kind, "Filters").addEventListener("reset", event => {
+        event.preventDefault();
+        monitorEl(kind, "Filters").querySelectorAll("input, select").forEach(input => { input.value = ""; });
+        renderEmployeeMonitoring();
+      });
+      monitorEl(kind, "Export").addEventListener("click", () => exportMonitoringRecords(kind));
+      monitorEl(kind, "TableBody").addEventListener("click", event => {
+        const button = event.target.closest("[data-monitor-action]");
+        if (!button) return;
+        if (button.dataset.monitorAction === "edit") editMonitoringRecord(kind, button.dataset.key);
+        if (button.dataset.monitorAction === "delete") deleteMonitoringRecord(kind, button.dataset.key);
+      });
+    }
 
-    window.addEventListener("resize", () => {
-      if (!isMobileViewport()) setMobileSidebar(false);
-    });
-
-    try {
-      if (!isMobileViewport() && localStorage.getItem("pgenro_admin_sidebar") === "collapsed") {
-        sidebar?.classList.add("collapsed");
-        $(".main-wrapper")?.classList.add("sidebar-collapsed");
-        document.body.classList.add("sidebar-collapsed");
-      }
-    } catch {}
-
-    logoutBtn?.addEventListener("click", async (e) => {
-      e.preventDefault();
-      try {
-        await supabase?.auth?.signOut?.();
-      } catch {}
-      window.location.href = "../User/login.html";
+    function printEmployeeDirectory() {
+      if (!M.canStartAction()) return;
+      const list = getFilteredEmployees();
+      if (!list.length) { showToast("No matching employee records to print.", "warning"); return; }
+      const printRoot = document.getElementById("employeePrintArea");
+      const fullName = emp => [emp.last_name, emp.first_name, emp.middle_name, emp.name_extension].filter(Boolean).join(" ");
+      printRoot.innerHTML = `<h1>PGENRO IMS · Employee Masterlist</h1><p>${list.length} matching employee record${list.length === 1 ? "" : "s"} · Generated ${escapeHtml(formatLongDate(M.today()))}</p><table><thead><tr><th>Employee ID</th><th>Employee Name</th><th>Designation</th><th>Employment Status</th><th>Division / Department</th><th>Duty Status</th><th>Contact</th></tr></thead><tbody>${list.map(emp => `<tr><td>${escapeHtml(emp.employee_id)}</td><td>${escapeHtml(fullName(emp))}</td><td>${escapeHtml(emp.designation)}</td><td>${escapeHtml(emp.employment_type)}</td><td>${escapeHtml(emp.department)}</td><td>${escapeHtml(emp.duty_status)}</td><td>${escapeHtml([emp.mobile, emp.email].filter(Boolean).join(" / "))}</td></tr>`).join("")}</tbody></table>`;
+      document.body.classList.add("employee-directory-print");
+      printRoot.setAttribute("aria-hidden", "false");
+      M.audit("PRINT_RECORD", `${list.length} employee records printed`);
+      window.print();
+    }
+    window.addEventListener("afterprint", () => {
+      document.body.classList.remove("employee-directory-print");
+      document.getElementById("employeePrintArea").setAttribute("aria-hidden", "true");
+      document.getElementById("employeePrintArea").replaceChildren();
     });
 
     /* ---------------- 18. INITIALIZE ---------------- */
@@ -1067,12 +1498,13 @@
 
     if (supabase) {
       try {
-        supabase
-          .channel("public:employees")
+        const channel = supabase
+          .channel("admin-employees")
           .on("postgres_changes", { event: "*", schema: "public", table: "employees" }, () => {
             loadEmployees();
           })
           .subscribe();
+        window.addEventListener("pagehide",(event)=>{if(event.persisted)return; loadVersion++; supabase.removeChannel(channel); });
       } catch (e) {
         console.warn("Realtime channel notice:", e);
       }
@@ -1127,7 +1559,7 @@
         }
       });
       changes.observe(main, { childList: true, subtree: true });
-      window.addEventListener('pagehide', () => { changes.disconnect(); observer.disconnect(); }, { once: true });
+      window.addEventListener('pagehide',(event)=>{if(event.persisted)return; changes.disconnect(); observer.disconnect(); });
     }
     motionQuery?.addEventListener?.('change', event => {
       if (!event.matches) return;
@@ -1141,33 +1573,121 @@
 })();
 
 
-/* ===================== MODULE NOTIFICATION ENGINE V3 =====================
- * Only alerts when this module receives new visible records.
- */
-(function(){
-  const moduleName=document.body?.dataset?.adminPage || location.pathname.split('/').pop();
-  const key='pgenro_module_seen_'+moduleName;
-  function addNotification(text){
-    const list=document.querySelector('#notificationList');
-    const badge=document.querySelector('#notifBadgeCount');
-    if(!list)return;
-    const empty=list.querySelector('.empty-notif-state'); if(empty) empty.remove();
-    const item=document.createElement('div');
-    item.className='notification-item';
-    item.innerHTML='<strong>New update</strong><br><span>'+text.replace(/[<>]/g,'')+'</span>';
-    list.prepend(item);
-    let count=parseInt((badge?.textContent||'0').match(/\d+/)?.[0]||0)+1;
-    if(badge) badge.textContent=count+' Unread';
-    const ping=document.querySelector('#notifPing'); if(ping) ping.style.display='block';
+
+})();
+
+/* Page-owned workspace interactions. No additional shared application file. */
+(() => {
+  'use strict';
+  function init() {
+    const M = window.PGENRO_Module;
+    if (!M) return;
+    const $ = id => document.getElementById(id);
+    const modal = $('workspaceJumpModal'), input = $('workspaceJumpSearch'), results = $('workspaceJumpResults');
+    const links = [...document.querySelectorAll('.sidebar-nav a[href]')].map(a => ({
+      name: a.textContent.trim(), href: a.getAttribute('href'), icon: a.querySelector('svg')?.outerHTML || '',
+      group: a.closest('.nav-group')?.querySelector('.nav-label')?.textContent || 'Workspace'
+    }));
+    const isBusy = () => Boolean(document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]'));
+    let active = -1;
+    function render() {
+      const query = input.value.trim().toLowerCase(), words = query.split(/\s+/).filter(Boolean);
+      const matches = links.filter(a => words.every(word => `${a.name} ${a.group} ${a.href}`.toLowerCase().includes(word)));
+      active = -1;
+      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">↗</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try “memo”, “inventory”, or “users”.</p>';
+      $('workspaceJumpCount').textContent = `${matches.length} destination${matches.length === 1 ? '' : 's'}`;
+    }
+    function open() {
+      if (isBusy()) return;
+      // Keep a record draft open; the module switcher is intended for the workspace.
+      if (document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')) return;
+      input.value = ''; render(); M.openModal('workspaceJumpModal'); input.focus();
+    }
+    $('workspaceJumpBtn')?.addEventListener('click', open);
+    $('workspaceJumpClose')?.addEventListener('click', () => M.closeModal('workspaceJumpModal'));
+    input?.addEventListener('input', render);
+    modal?.addEventListener('keydown', event => {
+      const items = [...results.querySelectorAll('a')];
+      if (['ArrowDown','ArrowUp','Home','End'].includes(event.key) && items.length) {
+        event.preventDefault();
+        active = event.key === 'Home' ? 0 : event.key === 'End' ? items.length-1 : active < 0 ? (event.key === 'ArrowUp' ? items.length-1 : 0) : (active + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        items.forEach((a,i) => a.classList.toggle('is-active', i === active));
+        items[active].focus(); items[active].scrollIntoView({block:'nearest'});
+      } else if (event.key === 'Enter' && event.target === input && items.length) {
+        event.preventDefault(); items[Math.max(0,active)].click();
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault(); event.stopImmediatePropagation();
+        if (modal.classList.contains('open')) input.focus(); else open();
+      }
+    }, true);
+    // Programmatic clicks must respect the same busy boundary as native inert content.
+    document.addEventListener('click', event => {
+      const busy = document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]');
+      if (busy && !busy.contains(event.target)) { event.preventDefault(); event.stopImmediatePropagation(); }
+    }, true);
+    const busyObservers = [];
+    document.querySelectorAll('.modal-overlay,.modal-backdrop,.admin-modal').forEach(surface => {
+      const dialog = surface.querySelector('[role="dialog"]'), form = surface.querySelector('form');
+      if (!dialog || !surface.querySelector('.modal-header')) return;
+      const status = document.createElement('p'); status.className = 'workspace-busy-message'; status.hidden = true; status.setAttribute('role','status');
+      surface.querySelector('.modal-header').after(status);
+      let locked = false, wasInert = false, focus = null;
+      const update = () => {
+        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Working… Please wait before making more changes.' : '';
+        if (busy && !locked && form) { locked = true; wasInert = form.inert; focus = document.activeElement; form.inert = true; }
+        if (!busy && locked) { locked = false; form.inert = wasInert; if (surface.classList.contains('open') && focus?.isConnected && !focus.disabled) focus.focus({preventScroll:true}); }
+      };
+      const observer = new MutationObserver(update); observer.observe(surface,{attributes:true,attributeFilter:['data-busy']}); busyObservers.push(observer); update();
+    });
+    window.addEventListener('pagehide', event => {if(!event.persisted)busyObservers.forEach(o => o.disconnect());});
+    window.addEventListener('pageshow',event => {
+      if(!event.persisted||document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open'))return;
+      const refresh=document.querySelector('#refreshBtn,#refreshMemosBtn,#syncCommunicationsBtn,#refreshUsersBtn,#refreshRequestsBtn,#refreshServicesBtn,#refreshIcsBtn');
+      if(refresh&&!refresh.disabled)refresh.click();
+    });
+    const date = $('workspaceToday');
+    if (date) {
+      const updateDate = () => { const d = new Date(); date.dateTime = M.today(); date.textContent = d.toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric',year:'numeric'}); };
+      updateDate(); document.addEventListener('visibilitychange', () => { if (!document.hidden) updateDate(); });
+    }
+    // Surface native validation messages beside the field, including after scrolling.
+    document.addEventListener('invalid', event => {
+      const field = event.target, group = field.closest('.form-group,.field-group');
+      if (!group) return;
+      field.setAttribute('aria-invalid','true');
+      let message = group.querySelector('.workspace-field-error');
+      if (!message) { message = document.createElement('span'); message.className = 'workspace-field-error'; message.id = `workspace-error-${M.uuid()}`; group.append(message); }
+      message.textContent = field.validationMessage;
+      const descriptions = new Set((field.getAttribute('aria-describedby') || '').split(' ').filter(Boolean)); descriptions.add(message.id); field.setAttribute('aria-describedby',[...descriptions].join(' '));
+    }, true);
+    document.addEventListener('input', event => {
+      const field = event.target, group = field.closest?.('.form-group,.field-group'), message = group?.querySelector('.workspace-field-error');
+      if (message && field.validity?.valid) { field.removeAttribute('aria-invalid'); field.setAttribute('aria-describedby',(field.getAttribute('aria-describedby') || '').split(' ').filter(id => id !== message.id).join(' ')); message.remove(); }
+    });
+    document.addEventListener('reset', event => {
+      event.target.querySelectorAll('[aria-invalid="true"]').forEach(field => { field.removeAttribute('aria-invalid'); const message = field.closest('.form-group,.field-group')?.querySelector('.workspace-field-error'); if(message) { field.setAttribute('aria-describedby',(field.getAttribute('aria-describedby') || '').split(' ').filter(id => id !== message.id).join(' ')); message.remove(); } });
+    });
+    // Horizontal controls make wide registries usable on touch and keyboard screens.
+    const observers = [];
+    document.querySelectorAll('.table-responsive,.analytics-table-scroll,.table-scroll').forEach((region,index) => {
+      if (!region.querySelector('table')) return;
+      if (!region.id) region.id = `workspace-table-${index}`;
+      region.setAttribute('tabindex','0'); region.setAttribute('role','region');
+      if (!region.hasAttribute('aria-label')) region.setAttribute('aria-label','Registry table; scroll horizontally to see all columns');
+      const controls = document.createElement('div'); controls.className = 'workspace-table-controls'; controls.hidden = true;
+      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">←</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">→</button></div>`;
+      region.after(controls); const [left,right] = controls.querySelectorAll('button');
+      const update = () => { const overflow = region.scrollWidth > region.clientWidth+2; controls.hidden = !overflow; left.disabled = region.scrollLeft <= 2; right.disabled = region.scrollLeft + region.clientWidth >= region.scrollWidth-2; };
+      const motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      left.onclick = () => region.scrollBy({left:-region.clientWidth*.75,behavior:motion}); right.onclick = () => region.scrollBy({left:region.clientWidth*.75,behavior:motion});
+      region.addEventListener('scroll',update,{passive:true});
+      if ('ResizeObserver' in window) { const resize = new ResizeObserver(update); resize.observe(region); resize.observe(region.querySelector('table')); observers.push(resize); }
+      const changes = new MutationObserver(update); changes.observe(region,{childList:true,subtree:true}); observers.push(changes); update();
+    });
+    window.addEventListener('pagehide', event => {if(!event.persisted)observers.forEach(o => o.disconnect());});
   }
-  function scan(){
-    const rows=document.querySelectorAll('tbody tr');
-    const count=rows.length;
-    const old=parseInt(localStorage.getItem(key)||count);
-    if(count>old) addNotification((count-old)+' new record(s) added in this module.');
-    localStorage.setItem(key,String(count));
-  }
-  window.addEventListener('load',()=>setTimeout(scan,1500));
-  const observer=new MutationObserver(()=>scan());
-  observer.observe(document.body,{childList:true,subtree:true});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
 })();

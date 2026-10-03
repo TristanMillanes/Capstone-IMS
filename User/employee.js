@@ -86,6 +86,7 @@
   }
 
   function createDatabaseClient() {
+    if (window.pgenroSupabase) return window.pgenroSupabase;
     if (typeof window.supabase?.createClient !== "function") {
       setConnectionStatus("offline", "Offline records mode");
       return null;

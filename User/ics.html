@@ -12,12 +12,12 @@
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="ics.css?v=20260915-logout-dialog" rel="stylesheet">
+  <link href="ics.css?v=20261002-fixed" rel="stylesheet">
 </head>
 
 <body class="pgenro-user"
       data-css-scope="user-ics"
-      data-requires-auth="user"
+      data-requires-auth="user" data-page-data-owner="module"
       data-login-url="login.html">
 
   <div class="overlay" id="overlay" aria-hidden="true"></div>
@@ -80,19 +80,19 @@
           <li>
             <a href="employee.html">
               <i data-lucide="users-round"></i>
-              <span>Employee Records</span>
+              <span>Employee Profiles</span>
             </a>
           </li>
           <li>
             <a href="inventory.html">
               <i data-lucide="package"></i>
-              <span>Inventory</span>
+              <span>Supplies Inventory</span>
             </a>
           </li>
           <li>
             <a href="visitorsView.html">
               <i data-lucide="clipboard-signature"></i>
-              <span>Visitor Log</span>
+              <span>Visitors Log</span>
             </a>
           </li>
           <li>
@@ -104,7 +104,7 @@
           <li>
             <a class="active" aria-current="page" href="ics.html">
               <i data-lucide="layers"></i>
-              <span>ICS / Property</span>
+              <span>ICS Property Slips</span>
             </a>
           </li>
         </ul>
@@ -577,6 +577,7 @@
        aria-atomic="true"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="ics.js?v=20260916-role-routing"></script>
+  <script defer src="../shared/supabase.js?v=20261002-fixed"></script>
+<script defer src="ics.js?v=20261002-fixed"></script>
 </body>
 </html>

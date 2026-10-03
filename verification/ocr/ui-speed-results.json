@@ -1,0 +1,15 @@
+{
+  "method": "Real browser production readers; identical local pinned OCR assets; simulated database; baseline is the three supplied Communications files. Times depend on device, file and connection.",
+  "measurements": [],
+  "checks": [
+    "Stop reading unlocks controls promptly and keeps the draft",
+    "A stopped scan can be retried with accurate sender fields",
+    "Drag and drop runs the same validation and printed sender extraction",
+    "The form and visible Save control fit 320, 390, 768 and 1440 px viewports",
+    "CSV, UTF-16 text, Excel and PowerPoint retain native text and fill the form",
+    "Ambiguous names require a choice and update the sender and review card together",
+    "Communications memorandum fields save and redirect to Office Memos (flat database mock)",
+    "Communications memorandum fields save and redirect to Office Memos (JSON database mock)"
+  ],
+  "uncaughtErrors": []
+}

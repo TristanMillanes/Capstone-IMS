@@ -8,7 +8,7 @@
     profileTable: "profiles"
   });
 
-  const client = typeof window.supabase?.createClient === "function"
+  const client = window.pgenroSupabase || (typeof window.supabase?.createClient === "function"
     ? window.supabase.createClient(CONFIG.url, CONFIG.publishableKey, {
         auth: {
           persistSession: true,
@@ -17,7 +17,7 @@
           flowType: "pkce"
         }
       })
-    : null;
+    : null);
 
   window.pgenroSupabase = client;
 

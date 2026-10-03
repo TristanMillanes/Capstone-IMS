@@ -1,20 +1,21 @@
 <!DOCTYPE html>
-
 <html data-css-scope="admin-communication" lang="en">
 <head>
+<!-- Optional OCR service. Start OCR.py for full local extraction. Browser fallback is automatic. -->
+<meta name="pgenro-ocr-endpoint" content="http://127.0.0.1:5000/ocr"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Communications Log Admin</title>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <!-- Lucide Icons -->
 <!-- Icons are rendered locally by this module. -->
 <!-- External Stylesheets -->
-<link href="admincommunication.css?v=20260929-navigation-fit" rel="stylesheet"/>
+<link href="admincommunication.css?v=20261003-viewer-encoding" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin">
+<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin">
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
@@ -41,7 +42,7 @@
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">Operations &amp; Records</span>
+<span class="nav-label">Operations & Records</span>
 <ul>
 <li><a aria-current="page" class="nav-item active" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
 <li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
@@ -49,35 +50,26 @@
 <li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
 <li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
 <li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
-<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span><span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span></a></li>
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
 <li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">User &amp; Access</span>
+<span class="nav-label">User & Access</span>
 <ul>
 <li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span></a></li>
+<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
 <span class="nav-label">System Control</span>
 <ul>
-<li><a class="nav-item" href="#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
-<li><a class="nav-item" href="#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
-<li><a class="nav-item" href="#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
 </ul>
 </div>
 </nav>
-<div class="sidebar-footer">
-<div class="system-status-indicator">
-<span class="status-dot online" id="dbStatusDot"></span>
-<div class="status-info">
-<span class="status-title">System Sync</span>
-<span class="status-sub" id="dbStatusText">Connecting...</span>
-</div>
-</div>
-</div>
 </aside>
 <div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
 <!-- MAIN WRAPPER -->
@@ -90,14 +82,15 @@
 </button>
 <div class="global-search" role="search">
 <i class="search-icon" data-lucide="search"></i>
-<input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search control no, subject, document type, office..." spellcheck="false" type="text"/>
-<kbd class="search-shortcut">Ctrl K</kbd>
+<input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search communication records…" spellcheck="false" type="text"/>
+<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<!-- Search Quick Palette -->
 </div>
 </div>
 <div class="topbar-right">
-<!-- Notification Button -->
+<!-- Notification Button & Drawer -->
 <div class="notification-wrapper">
-<button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="Notifications" type="button">
+<button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
 <i data-lucide="bell"></i>
 <span class="notification-ping" id="notifPing" style="display: none;"></span>
 </button>
@@ -114,7 +107,7 @@
 <div class="v-divider"></div>
 <!-- Profile Menu -->
 <div class="profile-menu" id="profileMenu">
-<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator profile" type="button">
+<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
 </button>
 <div class="profile-dropdown" id="profileDropdown">
@@ -135,11 +128,13 @@
 <div class="dropdown-footer">
 <button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
 </div>
-</div></div>
+</div>
+</div>
 </div>
 </header>
 <!-- MAIN CONTENT -->
 <main class="main-content" id="adminMainContent" tabindex="-1">
+<div class="workspace-context"><span class="workspace-context-label">PGENRO / ADMIN WORKSPACE</span><time id="workspaceToday"></time></div>
 <!-- BREADCRUMB & HEADER -->
 <section class="page-header communication-page-header">
 <div class="header-title">
@@ -185,7 +180,7 @@
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiIncomingCount">0</h3>
-<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> External &amp; Internal</span>
+<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> External & Internal</span>
 </div>
 </div>
 <div class="kpi-card">
@@ -255,7 +250,7 @@
 <thead>
 <tr>
 <th width="40"><input aria-label="Select all visible records" id="selectAllRows" type="checkbox"/></th>
-<th>Control No. &amp; Type</th>
+<th>Control No. & Type</th>
 <th>Date</th>
 <th>Office</th>
 <th>Subject / Particulars</th>
@@ -273,7 +268,7 @@
 </div>
 <div class="table-footer">
 <span class="text-muted" id="tablePaginationInfo">Showing 0 entries</span>
-</div>
+<div class="pagination"><button aria-label="Previous page" class="page-btn" id="commPrevPage" type="button">Previous</button><span id="commPageLabel">Page 1 of 1</span><button aria-label="Next page" class="page-btn" id="commNextPage" type="button">Next</button></div></div>
 </section>
 <!-- FOOTER -->
 <footer class="admin-footer">
@@ -281,9 +276,9 @@
 <p>© 2026 Provincial Government Environment and Natural Resources Office (PGENRO).</p>
 </div>
 <div class="footer-links">
-<a href="admin.html#audit">Security &amp; Audit</a>
+<a href="admin.html#audit">Security & Audit</a>
 <a href="admin.html#settings">Workspace Preferences</a>
-<a href="admin.html#backup">Backup &amp; Recovery</a>
+<a href="admin.html#backup">Backup & Recovery</a>
 </div>
 </footer>
 </main>
@@ -299,14 +294,15 @@
 </div>
 <div class="communication-modal-copy">
 <h2 id="modalTitle">Encoding Communication Record</h2>
-<p>Fill out communication particulars and attach the document with instant OCR.</p>
+<p>Enter communication details and attach a document for text extraction.</p>
 </div>
 </div>
 <button aria-label="Close encoding form" class="modal-close-btn" id="closeEncodingModalBtn" type="button">
 <i data-lucide="x"></i>
 </button>
 </div>
-<form id="communicationForm" novalidate="">
+<div class="ocr-stop-controls" id="ocrStopControls" hidden><button class="btn btn-secondary" id="cancelOcrBtn" type="button">Stop reading</button></div>
+<form id="communicationForm">
 <div class="modal-body communication-modal-body" id="encodingModalBody">
 <input id="editIndex" type="hidden" value=""/>
 <section class="encoder-section encoder-details-section">
@@ -317,6 +313,8 @@
 </div>
 <span class="encoder-required-note"><span>*</span> Required fields</span>
 </div>
+<p class="document-destination" id="documentDestination" role="status" aria-live="polite">Save destination: Communications.</p>
+<p class="communication-memo-review" id="communicationMemoReview" role="status" aria-live="polite" hidden></p>
 <div class="form-grid encoder-meta-grid">
 <div class="form-group">
 <label for="typeSelect"><i data-lucide="arrow-left-right"></i> Communication Type <span class="required-mark">*</span></label>
@@ -369,7 +367,15 @@
 <div class="form-grid encoder-content-grid">
 <div class="form-group full-width">
 <label for="officeInput"><i data-lucide="building-2"></i> Received From / Recipient Office <span class="required-mark">*</span></label>
-<textarea class="form-control compact-textarea" id="officeInput" placeholder="e.g. ALL PERSONNEL, PG ENRO / Governor's Office" required=""></textarea>
+<textarea class="form-control compact-textarea" id="officeInput" placeholder="e.g. Juan Dela Cruz (sender/signatory) or recipient office" required=""></textarea>
+</div>
+<div class="form-group memo-routing-field" id="memoRecipientGroup" hidden>
+<label for="memoRecipientInput">Addressed To <span class="required-mark">*</span></label>
+<textarea class="form-control compact-textarea" id="memoRecipientInput" placeholder="Memo recipient or personnel"></textarea>
+</div>
+<div class="form-group memo-routing-field" id="memoIssuerGroup" hidden>
+<label for="memoIssuerInput">Issued By</label>
+<input class="form-control" id="memoIssuerInput" placeholder="Issuing office or signatory" type="text"/>
 </div>
 <div class="form-group">
 <label for="subjectInput"><i data-lucide="file-text"></i> Subject Matter / Particulars <span class="required-mark">*</span></label>
@@ -392,7 +398,7 @@
 <div class="encoder-upload-icon"><i data-lucide="paperclip"></i></div>
 <div>
 <h3 id="uploadPanelTitle">Attach Soft Copy Document</h3>
-<p>Attach scanned documents (PDF, Image, Word). OCR reads the subject and control number from the document header. Review both before saving.</p>
+<p>Extract document text, then review the detected fields. Memorandums save to Office Memos with their attachment.</p>
 </div>
 </div>
 <div class="gdrive-status-badge">
@@ -423,9 +429,9 @@
 <div class="encoder-ocr-action">
 <button class="btn-ocr" disabled="" id="runOcrBtn" type="button">
 <i data-lucide="scan-text"></i>
-<span>Run OCR Text Reader</span>
+<span>Read Full Document</span>
 </button>
-<p id="ocrActionSubtext">Select a document to extract OCR text.</p>
+<p id="ocrActionSubtext">Select a document to read all pages, body text, and the printed signatory.</p>
 </div>
 </div>
 <!-- DYNAMIC LIVE PREVIEW CONTAINER INSIDE ENCODING MODAL -->
@@ -454,6 +460,12 @@
 </div>
 </section>
 <!-- OCR RESULT AREA -->
+<p class="ocr-review-note" id="communicationOcrReview" role="status" aria-live="polite" hidden></p>
+<div class="form-group" id="ocrSignatoryGroup" hidden>
+ <label for="ocrSignatorySelect">Review detected signatories</label>
+ <select class="form-control" id="ocrSignatorySelect"><option value="">Choose the sender / signatory…</option></select>
+ <small>Select the person who sent or signed the letter to fill Received From.</small>
+</div>
 <section class="encoder-ocr-result">
 <div class="encoder-result-heading">
 <div>
@@ -463,19 +475,19 @@
 </div>
 <span>Review and edit before saving</span>
 </div>
-<textarea class="form-control ocr-result-textarea" id="ocrTextInput" placeholder="Extracted text from your document will appear here automatically after upload..."></textarea>
+<textarea class="form-control ocr-result-textarea" id="ocrTextInput" placeholder="Click Read Full Document to extract all readable text from the selected file..."></textarea>
 </section>
 </div>
 <div class="modal-actions communication-modal-actions">
 <div class="modal-action-note">
 <i data-lucide="shield-check"></i>
-<span>Records sync to Supabase; document attachments stay in this browser for local preview and download.</span>
+<span>Review required fields before saving. Attachments are available in the browser where they were uploaded.</span>
 </div>
 <div class="modal-action-buttons">
 <button class="btn btn-secondary" id="cancelEncodingBtn" type="button">Cancel</button>
 <button class="btn btn-primary" id="saveRecordBtn" type="submit">
 <i data-lucide="cloud-upload"></i>
-<span>Encode &amp; Save Record</span>
+<span>Save Record</span>
 </button>
 </div>
 </div>
@@ -501,35 +513,43 @@
 <div class="modal-header doc-viewer-header">
 <div class="doc-viewer-heading">
 <div class="doc-viewer-icon"><i data-lucide="file-text"></i></div>
-<div class="doc-viewer-titles">
-<h2 id="docViewerTitle">Document Viewer</h2>
-<span class="doc-viewer-sub" id="docViewerSubtitle">Loading file...</span>
+<div class="doc-viewer-titles"><h2 id="docViewerTitle">Document Viewer</h2><p class="doc-viewer-sub" id="docViewerSubtitle">Document attachment preview</p></div>
 </div>
-</div>
-<div class="doc-viewer-actions">
-<a class="btn btn-sm btn-primary" download="" href="#" id="docViewerDownloadBtn" title="Download Document">
-<i data-lucide="download"></i>
-<span>Download</span>
-</a>
-<a class="btn btn-sm btn-secondary" href="#" id="docViewerExternalBtn" rel="noopener noreferrer" target="_blank" title="Open in new window">
-<i data-lucide="external-link"></i>
-<span>Open New Tab</span>
-</a>
-<button aria-label="Close viewer" class="modal-close-btn" id="closeDocViewerBtn" type="button">
-<i data-lucide="x"></i>
-</button>
-</div>
+<button aria-label="Close document viewer" class="modal-close-btn" id="closeDocViewerBtn" type="button"><i data-lucide="x"></i></button>
 </div>
 <div class="modal-body doc-viewer-body" id="docViewerBody">
-<iframe class="doc-viewer-frame" id="docViewerIframe" style="display:none;" title="PDF Preview"></iframe>
-<img alt="Document preview" class="doc-viewer-img" id="docViewerImage" style="display:none;"/>
-<div class="doc-viewer-fallback" id="docViewerFallback" style="display:none;"></div>
+<div class="pdf-viewer-box">
+<div class="pdf-preview-toolbar" id="commPdfToolbar" hidden>
+<div class="pdf-page-controls"><button type="button" id="commPdfPrevPage" aria-label="Previous PDF page">←</button><span id="commPdfPageLabel" role="status" aria-live="polite">Page 1</span><button type="button" id="commPdfNextPage" aria-label="Next PDF page">→</button></div>
+<label for="commPdfZoom">Zoom<select id="commPdfZoom"><option value="fit">Fit width</option><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option></select></label>
+<span class="pdf-preview-status" id="commPdfRenderStatus" role="status"></span>
+</div>
+<div class="pdf-preview-stage" id="commPdfStage" tabindex="0" aria-label="Document preview; scroll to view the page" hidden>
+<canvas id="commPdfCanvas" role="img" aria-label="PDF page" hidden></canvas>
+<img id="docViewerImage" alt="Communication attachment" hidden/>
+<pre id="docViewerText" hidden></pre>
+</div>
+<div class="doc-viewer-fallback" id="docViewerFallback"><i class="no-pdf-icon" data-lucide="file-text"></i><h3>Attachment preview</h3><p>Preparing the document preview.</p></div>
+</div>
+</div>
+<div class="modal-footer modal-actions">
+<a class="btn btn-secondary" download="document" id="docViewerDownloadBtn" hidden><i data-lucide="download"></i>Download Document</a>
+<a class="btn btn-secondary" id="docViewerExternalBtn" rel="noopener noreferrer" target="_blank" hidden><i data-lucide="external-link"></i>Open in new tab</a>
+<button class="btn btn-primary" id="dismissDocViewerBtn" type="button">Close</button>
 </div>
 </div>
 </div>
 <!-- Scripts -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js?v=20260923-bundled"></script>
-<script src="admincommunication.js?v=20260929-navigation-fit"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer="" src="../shared/supabase.js?v=20261002-fixed"></script>
+<script defer="" src="admincommunication.js?v=20261003-sql-compat"></script>
+<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
+  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
+    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
+    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
+    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
+    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+  </div>
+</div>
 </body>
 </html>

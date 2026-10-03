@@ -1,5 +1,5 @@
-# Visitors Log - Supabase
+# Visitors Log — Supabase
 
-The Visitors Log now uses the shared Supabase client in `../shared/supabase.js`. Anonymous kiosk submissions are limited by the Row Level Security policy created in `supabase/schema.sql`; authenticated active personnel can view/update records, while administrator permissions control deletion.
+The visitor kiosk retains its existing Supabase configuration and separate anonymous registration policy. Active personnel can view records; administrators encode records and record departures. Apply `../supabase/READONLY_USER_PATCH.sql` after other setup patches to enforce the current permissions.
 
-Do not add Firebase SDK scripts to this page.
+Use `visitorsLogin.html` for the kiosk, `../User/visitorsView.html` for viewing, and `../admin/visitors-admin.html` for administrator actions.

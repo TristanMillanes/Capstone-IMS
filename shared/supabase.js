@@ -19,7 +19,7 @@
   });
 
   // Must exactly match the deployed Supabase Edge Function name.
-  const ADMIN_FUNCTION = "admin-user";
+  const ADMIN_FUNCTION = window.PGENRO_ADMIN_FUNCTION || "admin-users";
 
   const keyLooksConfigured =
     Boolean(CONFIG.publishableKey) &&
@@ -104,42 +104,9 @@
       .replace(/\s+/g, " ");
 
   function isAdminProfile(profile) {
-    const metadata =
-      profile?.authUser?.user_metadata ||
-      profile?.user_metadata ||
-      {};
-
-    const appMetadata =
-      profile?.authUser?.app_metadata ||
-      profile?.app_metadata ||
-      {};
-
-    const roleCandidates = [
-      profile?.role,
-      profile?.assigned_role,
-      profile?.assignedRole,
-      metadata.role,
-      metadata.assigned_role,
-      appMetadata.role
-    ];
-
-    const accountTypeCandidates = [
-      profile?.account_type,
-      profile?.accountType,
-      metadata.account_type,
-      metadata.accountType,
-      appMetadata.account_type,
-      appMetadata.accountType
-    ];
-
-    return (
-      roleCandidates.some((role) =>
-        ADMIN_ROLES.has(normalizeRole(role))
-      ) ||
-      accountTypeCandidates.some((type) =>
-        normalizeRole(type) === "admin"
-      )
-    );
+    // Match the database's is_pgenro_admin() check. User-editable Auth
+    // metadata and cached account labels must never grant admin access.
+    return ADMIN_ROLES.has(normalizeRole(profile?.role));
   }
 
   const nowIso = () => new Date().toISOString();
@@ -294,6 +261,29 @@
    * - approve_request
    * - reject_request
    */
+  function functionError(payload, fallback, cause = null) {
+    const nested = payload?.error;
+    const detail = nested && typeof nested === "object"
+      ? nested
+      : payload;
+    const message = [
+      typeof nested === "string" ? nested : null,
+      detail?.message,
+      payload?.message,
+      typeof payload === "string" ? payload : null,
+      fallback
+    ].find((value) => typeof value === "string" && value.trim());
+    const error = new Error(message || "The Supabase request failed.");
+
+    if (cause) error.cause = cause;
+    for (const key of ["code", "details", "hint", "status"]) {
+      const value = detail?.[key] ?? payload?.[key] ?? cause?.[key];
+      if (value !== undefined) error[key] = value;
+    }
+
+    return error;
+  }
+
   async function invokeAdmin(action, payload = {}) {
     const sb = requireClient();
 
@@ -303,7 +293,7 @@
     } = await sb.auth.getSession();
 
     if (sessionError) {
-      throw new Error(sessionError.message);
+      throw sessionError;
     }
 
     const accessToken =
@@ -337,29 +327,30 @@
         error
       );
 
-      let message =
-        error.message ||
-        `Failed to call the ${ADMIN_FUNCTION} Edge Function.`;
+      let details = null;
 
       try {
         if (error.context instanceof Response) {
-          const details =
+          details =
             await error.context.clone().json();
-
-          message =
-            details?.error ||
-            details?.message ||
-            message;
         }
       } catch {
         // Preserve the original error message.
       }
 
-      throw new Error(message);
+      const failure = functionError(
+        details,
+        error.message || `Failed to call the ${ADMIN_FUNCTION} Edge Function.`,
+        error
+      );
+      if (failure.status === undefined && error.context instanceof Response) {
+        failure.status = error.context.status;
+      }
+      throw failure;
     }
 
     if (data?.error) {
-      throw new Error(data.error);
+      throw functionError(data, `The ${ADMIN_FUNCTION} Edge Function rejected the request.`);
     }
 
     return data;
@@ -692,6 +683,8 @@
   function showAuthorizationWarning(message) {
     document.documentElement.dataset.pgenroAuthState =
       "warning";
+    const workspace = document.querySelector('.app-layout,.app-container,.settings-shell');
+    if (workspace) workspace.inert = true;
 
     const existing =
       document.getElementById(
@@ -768,7 +761,7 @@
       "click",
       async () => {
         retry.disabled = true;
-        retry.textContent = "Checkingâ€¦";
+        retry.textContent = "Checking…";
 
         try {
           await applyRouteGuard();
@@ -790,6 +783,8 @@
   function clearAuthorizationWarning() {
     delete document.documentElement.dataset
       .pgenroAuthState;
+    const workspace = document.querySelector('.app-layout,.app-container,.settings-shell');
+    if (workspace && !document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')) workspace.inert = false;
 
     document
       .getElementById("pgenroAuthWarning")
@@ -1080,6 +1075,77 @@
   /*
    * Legacy Supabase adapter.
    */
+  const communicationDirectionKeys = [
+    "type", "communicationType", "communication_type", "direction",
+    "recordType", "record_type", "commType", "comm_type"
+  ];
+  const communicationDirectionFormats = new Map();
+
+  function communicationDirection(value) {
+    const direction = String(value ?? "").trim().toLowerCase();
+    return direction === "incoming" ? "Incoming"
+      : direction === "outgoing" ? "Outgoing" : "";
+  }
+
+  function directionFrom(data) {
+    return communicationDirectionKeys
+      .map((key) => communicationDirection(data?.[key]))
+      .find(Boolean) || "";
+  }
+
+  function rememberDirectionFormats(data, replace = false) {
+    for (const key of communicationDirectionKeys) {
+      if (!communicationDirection(data?.[key])) continue;
+      const value = String(data[key]).trim();
+      if (replace || !communicationDirectionFormats.has(key)) {
+        communicationDirectionFormats.set(key,
+          value === value.toLowerCase() ? "lower"
+            : value === value.toUpperCase() ? "upper" : "title");
+      }
+    }
+  }
+
+  function communicationForDisplay(data) {
+    rememberDirectionFormats(data);
+    const direction = directionFrom(data);
+    if (!direction) return data;
+    const normalized = { ...data, type: direction };
+    for (const key of communicationDirectionKeys) {
+      if (communicationDirection(data[key])) normalized[key] = direction;
+    }
+    return normalized;
+  }
+
+  function communicationForWrite(data, patch, format = null) {
+    const providedKeys = communicationDirectionKeys.filter((key) =>
+      Object.prototype.hasOwnProperty.call(patch || {}, key));
+    const direction = providedKeys.length ? directionFrom(patch) : directionFrom(data);
+    if (!direction) {
+      throw accessError("PGENRO_COMMUNICATION_TYPE_INVALID",
+        "Choose Incoming or Outgoing before saving the communication.");
+    }
+
+    const result = { ...data };
+    const preferred = communicationDirectionFormats.get("type") ||
+      communicationDirectionFormats.values().next().value || "title";
+    // Normalize existing direction fields only. Document categories, MIME types,
+    // attachment fields, and OCR content are not direction values.
+    for (const key of communicationDirectionKeys) {
+      if (!(key === "type" && result[key] == null) &&
+          !communicationDirection(result[key])) continue;
+      const casing = format || communicationDirectionFormats.get(key) || preferred;
+      result[key] = casing === "lower" ? direction.toLowerCase()
+        : casing === "upper" ? direction.toUpperCase() : direction;
+    }
+    return result;
+  }
+
+  function isDirectionValidationError(error) {
+    const detail = [error?.message, error?.details, error?.hint].filter(Boolean).join(" ");
+    return ["22P02", "23514", "P0001", "22023"].includes(error?.code) &&
+      /(?:communication[s]?|comm|record)[_\s-]*type|(?:communication[s]?[_\s-]*)?direction|invalid[^.]*incoming[^.]*outgoing/i.test(detail);
+  }
+
   async function listRows(table) {
     assertConfigured();
 
@@ -1126,19 +1192,23 @@
       throw error;
     }
 
-    return (data || []).map((row) => ({
-      id: String(row.id),
-      ...(clone(row.data) || {}),
-      createdAt:
-        row.data?.createdAt ??
-        row.created_at,
-      updatedAt:
-        row.data?.updatedAt ??
-        row.updated_at
-    }));
+    return (data || []).map((row) => {
+      if (table === "communications") rememberDirectionFormats(row.data);
+      const record = {
+        id: String(row.id),
+        ...(clone(row.data) || {}),
+        createdAt:
+          row.data?.createdAt ??
+          row.created_at,
+        updatedAt:
+          row.data?.updatedAt ??
+          row.updated_at
+      };
+      return table === "communications" ? communicationForDisplay(record) : record;
+    });
   }
 
-  async function getRow(table, id) {
+  async function getRow(table, id, normalizeDirection = true) {
     assertConfigured();
 
     table = resolveLegacyTable(table);
@@ -1186,7 +1256,8 @@
       return null;
     }
 
-    return {
+    if (table === "communications") rememberDirectionFormats(data.data);
+    const record = {
       id: String(data.id),
       ...(clone(data.data) || {}),
       createdAt:
@@ -1196,6 +1267,8 @@
         data.data?.updatedAt ??
         data.updated_at
     };
+    return table === "communications" && normalizeDirection
+      ? communicationForDisplay(record) : record;
   }
 
   async function upsertRow(
@@ -1245,7 +1318,7 @@
     );
 
     const previous = merge
-      ? await getRow(table, rowId)
+      ? await getRow(table, rowId, false)
       : null;
 
     const nextData = merge
@@ -1259,26 +1332,32 @@
     delete nextData.created_at;
     delete nextData.updated_at;
 
-    const {
-      error
-    } = await client
-      .from(table)
-      .upsert(
-        {
-          id: rowId,
-          data: nextData || {},
-          updated_at: nowIso()
-        },
-        {
-          onConflict: "id"
-        }
+    const updatedAt = nowIso();
+    const attempted = new Set();
+    let lastError;
+    const formats = table === "communications" ? [null, "lower", "title", "upper"] : [null];
+    for (const format of formats) {
+      const data = table === "communications"
+        ? communicationForWrite(nextData, payload, format)
+        : nextData || {};
+      const signature = JSON.stringify(communicationDirectionKeys.map((key) => data[key]));
+      if (attempted.has(signature)) continue;
+      attempted.add(signature);
+
+      const { error } = await client.from(table).upsert(
+        { id: rowId, data, updated_at: updatedAt },
+        { onConflict: "id" }
       );
-
-    if (error) {
-      throw error;
+      if (!error) {
+        if (table === "communications") rememberDirectionFormats(data, true);
+        return rowId;
+      }
+      // SQL validation failures roll back the write. Never retry a permission,
+      // connectivity, duplicate-number, or unrelated validation failure.
+      if (table !== "communications" || !isDirectionValidationError(error)) throw error;
+      lastError = error;
     }
-
-    return rowId;
+    throw lastError;
   }
 
   async function deleteRow(table, id) {
@@ -1567,6 +1646,11 @@
 
     const leaf =
       parts.at(-1);
+
+    if (table === "communications" && parts.length === 3 &&
+        communicationDirectionKeys.includes(leaf) && value !== null) {
+      return upsertRow(table, id, { [leaf]: value }, true);
+    }
 
     if (value === null) {
       delete cursor[leaf];
@@ -2308,6 +2392,8 @@
           row.updated_at
       }));
 
+  const unwrapCommunications = (rows) => unwrapJsonRows(rows).map(communicationForDisplay);
+
   const mapEmployeeForUser =
     (row) => ({
       id: row.id,
@@ -2445,7 +2531,7 @@
   }
 
   async function startPageDataBridge() {
-    if (!client || !configured) {
+    if (!client || !configured || document.body?.dataset.pageDataOwner === 'module') {
       return;
     }
 
@@ -2461,7 +2547,7 @@
       ) {
         const load = async () => {
           const rows =
-            unwrapJsonRows(
+            unwrapCommunications(
               await selectRows(
                 "communications",
                 "id,data,created_at,updated_at"
@@ -2587,7 +2673,7 @@
                 "communications",
                 "id,data,created_at,updated_at"
               ).then(
-                unwrapJsonRows
+                unwrapCommunications
               ),
 
               selectRows(

@@ -1,0 +1,49 @@
+{
+  "method": "Production parser functions from both module scripts",
+  "scenarios": [
+    {
+      "scenario": "Subject stops before unlabeled body prose",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Wrapped labels, recipients, subject and series remain exact",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Ambiguous numeric date stays blank",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unambiguous numeric, abbreviated and leap dates validate",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Dates in body text are never used as the issue date",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Letter references never classify as memorandum",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Later page references cannot replace first-page fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Full-width labels and common heading OCR errors parse safely",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Inline PDF columns split into their own labeled fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Missing fields remain empty instead of fabricated defaults",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Dashboard months handle year changes without timezone shifts",
+      "result": "PASS"
+    }
+  ]
+}

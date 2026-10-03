@@ -9,7 +9,7 @@
     rowsPerPage: 10
   });
 
-  const client = typeof window.supabase?.createClient === "function"
+  const client = window.pgenroSupabase || (typeof window.supabase?.createClient === "function"
     ? window.supabase.createClient(CONFIG.url, CONFIG.publishableKey, {
         auth: {
           persistSession: true,
@@ -18,7 +18,7 @@
           flowType: "pkce"
         }
       })
-    : null;
+    : null);
 
   window.pgenroSupabase = client;
   window.PGENRO_SUPABASE = Object.freeze({
@@ -1007,46 +1007,7 @@
     }
 
     async function toggleCheckout() {
-      const visitor = state.selectedVisitor;
-
-      if (!visitor || !client || !ui.toggleCheckout) return;
-
-      const inside = lower(visitor.status) === "inside";
-
-      const patch = {
-        status: inside ? "completed" : "inside",
-        time_out: inside ? new Date().toISOString() : null
-      };
-
-      ui.toggleCheckout.disabled = true;
-
-      try {
-        const { error } = await client
-          .from(CONFIG.visitorTable)
-          .update(patch)
-          .eq("id", visitor.id);
-
-        if (error) throw error;
-
-        showToast(
-          inside
-            ? "Visitor departure recorded."
-            : "Visitor visit re-opened."
-        );
-
-        await loadVisitors();
-      } catch (error) {
-        console.error("Unable to update visitor status:", error);
-
-        showToast(
-          error?.code === "42501"
-            ? "Your account does not have permission to update this visitor record."
-            : "Unable to update the visitor status.",
-          "error"
-        );
-      } finally {
-        ui.toggleCheckout.disabled = false;
-      }
+      showToast("Only administrators can update visitor records.", "warning");
     }
 
     function exportCsv() {

@@ -1,0 +1,21 @@
+{
+  "name": "pgenro-ocr-verification",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "test": "node header-fields.test.cjs && node printed-sender.test.cjs",
+    "test:browser": "node incoming-browser.cjs && node memo-browser.cjs && node docx-layout-browser.cjs && node ui-speed-browser.cjs",
+    "test:service": "node functional-service-browser.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "pdfjs-dist": "4.10.38",
+    "mammoth": "1.8.0",
+    "tesseract.js": "5.1.1",
+    "tesseract.js-core": "5.1.1",
+    "@tesseract.js-data/eng": "1.0.0",
+    "utif": "3.1.0",
+    "pako": "1.0.11",
+    "jszip": "3.10.1"
+  }
+}

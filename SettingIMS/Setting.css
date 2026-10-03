@@ -20,3 +20,5 @@ html[data-pgenro-theme="dark"]{--s-bg:#101915;--s-card:#17231e;--s-ink:#edf7f2;-
   .form-actions .primary-btn{width:auto;max-width:100%;min-width:0;flex:0 1 auto;white-space:normal}
   .settings-back,.settings-signout{width:auto;max-width:100%;flex:0 0 auto}
 }
+
+[hidden]{display:none!important;}html[data-pgenro-auth-state="warning"] .settings-shell{visibility:hidden;}button,input,select,textarea{font:inherit;}button{cursor:pointer;}:focus-visible{outline:3px solid #94cdb0;outline-offset:3px;}.settings-status{display:none;}.settings-panel,.settings-form,.field-grid,.field{min-width:0;}

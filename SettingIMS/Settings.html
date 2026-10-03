@@ -11,8 +11,7 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 
 
-<link href="Setting.css?v=20260915-css-organized" rel="stylesheet"/>
-<link href="../User/user-shell.css?v=20260915-css-organized" rel="stylesheet"/>
+<link href="Setting.css?v=20261002-fixed" rel="stylesheet"/>
 </head>
 <body class="pgenro-user pgenro-settings" data-css-scope="user-settings" data-requires-auth="user">
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
@@ -112,16 +111,16 @@
 <label class="toggle-row"><div><strong>Show system announcement</strong><span>Display the announcement across Admin and User pages.</span></div><input id="announcementEnabledToggle" type="checkbox"/></label>
 </div>
 <label class="field full"><span>System announcement</span><textarea id="announcementInput" maxlength="500" placeholder="Example: Scheduled maintenance on Friday at 5:00 PM." rows="4"></textarea></label>
-<div class="form-actions"><span class="form-note"><i data-lucide="database"></i> Saved in public.system_settings through an admin-only Supabase RPC.</span><button class="primary-btn" type="submit"><i data-lucide="database-zap"></i> Save system settings</button></div>
+<div class="form-actions"><span class="form-note">Changes apply to both workspaces.</span><button class="primary-btn" type="submit"><i data-lucide="database-zap"></i> Save system settings</button></div>
 </form>
 </article>
 </section>
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js?v=20260914-fixed"></script>
-<script src="../shared/settings-runtime.js?v=20260913"></script>
-<script src="Settings.js?v=20260914-organized"></script>
+<script src="../shared/supabase.js?v=20261002-fixed"></script>
+<script src="../shared/settings-runtime.js?v=20261002-fixed"></script>
+<script src="Settings.js?v=20261002-fixed"></script>
 
 </body>
 </html>

@@ -8,11 +8,9 @@
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link href="travelOR-admin.css?v=20260923-admin-final" rel="stylesheet"/>
+<link href="travelOR-admin.css?v=20261002-fixed" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2" data-admin-page="travelOR-admin.html" data-css-scope="admin-travelor" data-requires-auth="admin">
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="travelOR-admin.html" data-css-scope="admin-travelor" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -46,7 +44,7 @@
 <li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
 <li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
 <li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
-<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span><span class="nav-badge emerald" id="sidebarOpenServicesBadge">0 Open</span></a></li>
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
 <li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
 </ul>
 </div>
@@ -54,47 +52,57 @@
 <span class="nav-label">User &amp; Access</span>
 <ul>
 <li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span><span class="nav-badge pulse" id="sidebarPendingAccBadge">0 New</span></a></li>
+<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
 <span class="nav-label">System Control</span>
 <ul>
-<li><a class="nav-item" href="#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
-<li><a class="nav-item" href="#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
-<li><a class="nav-item" href="#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
 </ul>
 </div>
 </nav>
-<div class="sidebar-footer">
-<div class="system-status-indicator">
-<span class="status-dot online" id="dbStatusDot"></span>
-<div class="status-info">
-<span class="status-title">System Sync</span>
-<span class="status-sub" id="dbStatusText">Connecting...</span>
-</div>
-</div>
-</div>
-</aside>
+</aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
 <!-- MAIN WRAPPER -->
 <div class="main-wrapper">
 <!-- TOPBAR -->
 <header class="topbar">
 <div class="topbar-left">
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn icon-btn" id="mobileMenuBtn" type="button">
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 <i data-lucide="menu"></i>
 </button>
 <div class="global-search" role="search">
-<i data-lucide="search"></i>
-<input autocomplete="off" id="globalSearch" placeholder="Search by TOR No., personnel name, destination, or purpose... (Ctrl + K)" type="search"/>
-<kbd>Ctrl K</kbd>
+<i class="search-icon" data-lucide="search"></i>
+<input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search travel orders…" spellcheck="false" type="text"/>
+<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<!-- Search Quick Palette -->
 </div>
 </div>
 <div class="topbar-right">
-<button class="icon-btn" id="refreshBtn" title="Refresh Travel Orders" type="button">
-<i data-lucide="refresh-cw"></i>
+<!-- Notification Button & Drawer -->
+<div class="notification-wrapper">
+<button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
+<i data-lucide="bell"></i>
+<span class="notification-ping" id="notifPing" style="display: none;"></span>
 </button>
-<div class="profile profile-menu admin-profile-menu" data-shared-profile-handler="true" id="profileMenu"><button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn profile-icon-only" id="profileBtn" title="Administrator profile" type="button"><div class="profile-avatar"><i data-lucide="user-round"></i></div></button>
+<div class="notification-dropdown" id="notificationDropdown">
+<div class="notification-header">
+<h3>Notifications</h3>
+<span class="badge-count" id="notifBadgeCount">0 Unread</span>
+</div>
+<div class="notification-list" id="notificationList">
+<div class="empty-notif-state">No new notifications</div>
+</div>
+</div>
+</div>
+<div class="v-divider"></div>
+<!-- Profile Menu -->
+<div class="profile-menu" id="profileMenu">
+<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
+<div class="profile-avatar"><i data-lucide="user-round"></i></div>
+</button>
 <div class="profile-dropdown" id="profileDropdown">
 <div class="profile-dropdown-header">
 <div class="profile-avatar big"><i data-lucide="user-round"></i></div>
@@ -113,72 +121,39 @@
 <div class="dropdown-footer">
 <button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
 </div>
-</div><span aria-hidden="true" class="admin-profile-data" id="adminName">Admin User</span></div>
+</div>
+</div>
 </div>
 </header>
 <!-- MAIN CONTENT -->
-<main class="main-content" id="adminMainContent">
+<main class="main-content" id="adminMainContent" tabindex="-1">
+<div class="workspace-context"><span class="workspace-context-label">PGENRO / ADMIN WORKSPACE</span><time id="workspaceToday"></time></div>
 <!-- HERO HEADER -->
 <section class="page-header travel-page-header">
-<div class="travel-page-heading">
+<div class="header-title">
 <div class="breadcrumb">
 <span>Admin Console</span>
 <i data-lucide="chevron-right"></i>
 <span class="active">Official Travel &amp; Field Operations</span>
 </div>
 <div class="travel-heading-row">
-<div aria-hidden="true" class="travel-heading-icon"><i data-lucide="route"></i></div>
 <div>
-<div class="eyebrow"><i data-lucide="map-pin"></i> ADMIN TRAVEL ORDER CONTROL</div>
-<h1>Official Travel Orders &amp; Itinerary</h1>
-<p>Review filed travel authorizations, approve provincial field itineraries, monitor vehicle assignments, and generate official LGU Travel Order forms.</p>
+<h1>Travel Orders &amp; Itinerary</h1>
+<p>Manage travel authorizations, review field itineraries, and generate official travel order forms.</p>
 </div>
 </div>
 </div>
-<div class="page-header-actions">
-<button class="secondary-btn" id="exportBtn" type="button">
+<div class="header-actions"><button class="btn btn-secondary" id="refreshBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
+<button class="btn btn-secondary" id="exportBtn" type="button">
 <i data-lucide="download"></i><span>Export CSV</span>
 </button>
-<button class="primary-btn large" id="addOrderBtn" type="button">
+<button class="btn btn-primary" id="addOrderBtn" type="button">
 <i data-lucide="plus-circle"></i><span>Create Travel Order</span>
 </button>
 </div>
 </section>
 <!-- KPI METRICS GRID -->
-<section aria-label="Travel order summary" class="metrics-grid kpi-grid">
-<div class="metric-card">
-<div class="metric-icon blue"><i data-lucide="file-text"></i></div>
-<div class="metric-info">
-<span class="metric-label">Total Travel Orders</span>
-<h3 id="metricTotal">0</h3>
-<span class="metric-sub">Official Requests Filed</span>
-</div>
-</div>
-<div class="metric-card warning-state">
-<div class="metric-icon yellow"><i data-lucide="clock"></i></div>
-<div class="metric-info">
-<span class="metric-label">Pending Approval</span>
-<h3 id="metricPending">0</h3>
-<span class="metric-sub">Awaiting Admin Signature</span>
-</div>
-</div>
-<div class="metric-card">
-<div class="metric-icon green"><i data-lucide="check-circle-2"></i></div>
-<div class="metric-info">
-<span class="metric-label">Approved / Active</span>
-<h3 id="metricApproved">0</h3>
-<span class="metric-sub">Ready / In-Transit Trips</span>
-</div>
-</div>
-<div class="metric-card">
-<div class="metric-icon purple"><i data-lucide="flag"></i></div>
-<div class="metric-info">
-<span class="metric-label">Completed Trips</span>
-<h3 id="metricCompleted">0</h3>
-<span class="metric-sub">Returned with Accomplishment</span>
-</div>
-</div>
-</section>
+<section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Travel Orders</span><div class="kpi-icon blue"><i data-lucide="file-text"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricTotal">0</h3><span class="kpi-trend">Official requests filed</span></div><div class="kpi-footer"><span>Travel order registry</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Approval</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricPending">0</h3><span class="kpi-trend">Awaiting signature</span></div><div class="kpi-footer"><span>Requests for review</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Approved / Active</span><div class="kpi-icon emerald"><i data-lucide="check-circle-2"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricApproved">0</h3><span class="kpi-trend">Authorized field trips</span></div><div class="kpi-footer"><span>Approved travel itineraries</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Completed Trips</span><div class="kpi-icon purple"><i data-lucide="flag"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricCompleted">0</h3><span class="kpi-trend">Returned from travel</span></div><div class="kpi-footer"><span>Finished travel orders</span></div></div></section>
 <!-- FILTER & TOOLBAR PANEL -->
 <section aria-labelledby="travelFilterTitle" class="toolbar-container travel-filter-workspace">
 <div class="travel-filter-heading">
@@ -187,7 +162,7 @@
 <h2 id="travelFilterTitle">Find a travel order</h2>
 <p>Search the official registry or narrow records by workflow status, travel classification, and schedule.</p>
 </div>
-<button class="secondary-btn compact-btn" id="clearFiltersBtn" type="button"><i data-lucide="rotate-ccw"></i><span>Clear filters</span></button>
+<button class="btn btn-secondary" id="clearFiltersBtn" type="button"><i data-lucide="rotate-ccw"></i><span>Clear filters</span></button>
 </div>
 <div class="toolbar-search-filters">
 <div class="search-box travel-search-box">
@@ -230,7 +205,7 @@
 </div>
 <div aria-live="polite" class="filter-status-strip">
 <span class="filter-status-left"><i data-lucide="list-filter"></i><span id="activeFilterText">Showing all travel orders</span></span>
-<span class="filter-status-right"><span class="status-dot online"></span><span id="registrySyncText">Live registry ready</span></span>
+<span class="filter-status-right" hidden><span class="status-dot online"></span><span id="registrySyncText">Records updated</span></span>
 </div>
 </section>
 <!-- MAIN TABLE SECTION -->
@@ -243,7 +218,7 @@
 <span class="row-counter" id="recordCounter">Showing 0 Orders</span>
 </div>
 <div class="table-wrap">
-<table id="travelOrdersTable">
+<table class="data-table" id="travelOrdersTable">
 <thead>
 <tr>
 <th style="width: 130px;">TOR No.</th>
@@ -270,8 +245,8 @@
 </div>
 <!-- CREATE / EDIT TRAVEL ORDER MODAL -->
 <div aria-hidden="true" class="modal-backdrop" id="orderModal">
-<div aria-labelledby="orderModalTitle" aria-modal="true" class="modal large-modal travel-order-modal" role="dialog">
-<div class="modal-head travel-order-modal-head">
+<div aria-labelledby="orderModalTitle" aria-modal="true" class="modal large-modal travel-order-modal modal-card" role="dialog">
+<div class="modal-head travel-order-modal-head modal-header">
 <div class="modal-title-wrap">
 <div aria-hidden="true" class="modal-title-icon"><i data-lucide="briefcase-business"></i></div>
 <div>
@@ -287,7 +262,7 @@
 </div>
 <form id="orderForm" novalidate="">
 <input id="orderDbId" type="hidden"/>
-<div class="travel-order-modal-body">
+<div class="travel-order-modal-body modal-body">
 <div class="travel-form-main">
 <section class="travel-form-card">
 <div class="travel-form-section-head">
@@ -399,23 +374,23 @@
 <div class="modal-actions travel-order-modal-actions">
 <div class="modal-save-note"><i data-lucide="shield-check"></i><span>Changes are saved to the official travel orders registry.</span></div>
 <div class="modal-action-buttons">
-<button class="secondary-btn" data-close="orderModal" type="button">Cancel</button>
-<button class="primary-btn" id="saveOrderBtn" type="submit"><i data-lucide="save"></i><span>Save Travel Order</span></button>
+<button class="btn btn-secondary" data-close="orderModal" type="button">Cancel</button>
+<button class="btn btn-primary" id="saveOrderBtn" type="submit"><i data-lucide="save"></i><span>Save Travel Order</span></button>
 </div>
 </div>
 </form>
 </div>
 </div>
 <!-- PRINT OFFICIAL TRAVEL ORDER MODAL -->
-<div class="modal-backdrop" id="printModal">
-<div class="modal large-modal">
-<div class="modal-head">
+<div aria-hidden="true" class="modal-backdrop" id="printModal">
+<div aria-labelledby="printModalTitle" aria-modal="true" class="modal large-modal modal-card" role="dialog">
+<div class="modal-head modal-header">
 <div>
 <span class="modal-kicker">OFFICIAL LGU DOCUMENT</span>
-<h2>Travel Order Form Preview</h2>
+<h2 id="printModalTitle">Travel Order Form Preview</h2>
 </div>
 <div class="header-action-buttons">
-<button class="primary-btn" id="printDocBtn" type="button">
+<button class="btn btn-primary" id="printDocBtn" type="button">
 <i data-lucide="printer"></i>Print Official Form
         </button>
 <button class="icon-btn close" data-close="printModal" type="button">
@@ -442,7 +417,7 @@
 <div class="tor-date-line">
           Date Filed: <span id="p_dateFiled">September 4, 2026</span>
 </div>
-<table class="tor-info-table">
+<table class="tor-info-table data-table">
 <tbody>
 <tr>
 <td class="tor-lbl">1. NAME OF PERSONNEL:</td>
@@ -511,8 +486,18 @@
 <!-- TOAST CONTAINER -->
 <div class="toast-container" id="toastContainer"></div>
 <!-- SCRIPT -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js?v=20260923-bundled"></script>
-<script src="travelOR-admin.js?v=20260923-admin-final" type="module"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer="" src="../shared/supabase.js?v=20261002-fixed"></script>
+<script defer="" src="travelOR-admin.js?v=20261002-fixed"></script>
+
+<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
+  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
+    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
+    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
+    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
+    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+  </div>
+</div>
+
 </body>
 </html>
