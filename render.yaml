@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: pgenro-ims
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /health
+    autoDeployTrigger: commit
+    envVars:
+      - key: OCR_WORKERS
+        value: "1"
+      - key: OCR_DPI
+        value: "220"
+      - key: OCR_MAX_SIDE
+        value: "2800"
+      - key: OCR_TIMEOUT
+        value: "45"
+      - key: OCR_DOCUMENT_TIMEOUT
+        value: "180"

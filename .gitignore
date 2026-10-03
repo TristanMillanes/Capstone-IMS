@@ -1,0 +1,21 @@
+# Python/runtime
+.venv/
+venv/
+**/__pycache__/
+*.py[cod]
+*.log
+
+# Local OCR/runtime files
+User/uploads/*
+!User/uploads/.gitkeep
+
+# Local secrets
+.env
+.env.*
+!.env.example
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

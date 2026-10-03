@@ -1843,3 +1843,6 @@ html[data-pgenro-auth-state="warning"] :is(.app-layout,.app-container,.settings-
 @media print {
   .pgenro-user:not(.pgenro-settings) .main-content { width:100%; margin-left:0; padding:0; }
 }
+/* 2026-10-04: read-only employee parity fields */
+.detail-grid > .detail-span-full { grid-column: 1 / -1; }
+

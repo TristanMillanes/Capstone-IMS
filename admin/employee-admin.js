@@ -9,10 +9,19 @@
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const uuid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+  function placeToastContainer(root) {
+    if (!root) return;
+    const modal = document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open');
+    const header = modal?.querySelector('.modal-header');
+    root.classList.toggle('toast-in-dialog', !!header);
+    if (header) header.after(root);
+    else if (root.parentElement !== document.body) document.body.append(root);
+  }
   function toast(message, type = 'success') {
     let root = $('toastContainer');
     if (!root) { root = document.createElement('div'); root.id = 'toastContainer'; root.className = 'toast-container'; root.setAttribute('aria-live','polite'); document.body.append(root); }
-    const limit = innerWidth <= 600 ? 1 : 3;
+    placeToastContainer(root);
+    const limit = root.classList.contains('toast-in-dialog') || innerWidth <= 600 ? 1 : 3;
     while (root.children.length >= limit) root.firstElementChild.remove();
     const item = document.createElement('div'); item.className = `toast show ${type}`; item.textContent = message; root.append(item); setTimeout(() => item.remove(), 5500);
   }
@@ -40,7 +49,8 @@
     const modal = $(id); if (!modal) return;
     if([...document.querySelectorAll('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')].some(other=>other.dataset.busy==='true'))return false;
     document.querySelectorAll('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open').forEach(other => { if (other !== modal) closeModal(other.id); });
-    lockPageScroll(); modalTriggers.set(id, document.activeElement); modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('admin-modal-open');
+    lockPageScroll(); if (!modal.classList.contains('open')) modalTriggers.set(id, document.activeElement); modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('admin-modal-open');
+    placeToastContainer($('toastContainer'));
     const wrapper = document.querySelector('.app-layout'); if (wrapper) wrapper.inert = true;
     const dialog = modal.querySelector('[role=dialog]') || modal; dialog.setAttribute('tabindex','-1');
     modal.querySelectorAll('.modal-body,.admin-modal-body').forEach(body => {body.scrollTop = 0;});
@@ -49,6 +59,7 @@
   function closeModal(id) {
     const modal = $(id); if (!modal || !modal.classList.contains('open') || modal.dataset.busy === 'true') return;
     modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
+    placeToastContainer($('toastContainer'));
     if (!document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')) {
       document.body.classList.remove('admin-modal-open'); unlockPageScroll(); const wrapper = document.querySelector('.app-layout'); if (wrapper) wrapper.inert = false;
     }
@@ -588,16 +599,16 @@
             </span>
           </td>
           <td style="text-align:right;">
-            <div class="actions">
-              <button type="button" class="btn-action" data-action="view" data-id="${escapeHtml(emp.id)}" title="View 201 Dossier">
+            <div class="actions employee-row-actions" role="group" aria-label="Actions for ${escapeHtml(fullName)}">
+              <button type="button" class="btn-action" data-action="view" data-id="${escapeHtml(emp.id)}" title="View Employee Record" aria-label="View employee record for ${escapeHtml(fullName)}">
                 <i data-lucide="eye"></i>
               </button>
               <button type="button" class="btn-action" data-action="ceremony" data-id="${escapeHtml(emp.id)}" title="Flag Ceremony Monitoring" aria-label="Flag ceremony records for ${escapeHtml(fullName)}"><i data-lucide="flag"></i></button>
               <button type="button" class="btn-action" data-action="uniform" data-id="${escapeHtml(emp.id)}" title="Prescribed Uniform Monitoring" aria-label="Uniform records for ${escapeHtml(fullName)}"><i data-lucide="shirt"></i></button>
-              <button type="button" class="btn-action" data-action="edit" data-id="${escapeHtml(emp.id)}" title="Edit Profile">
+              <button type="button" class="btn-action" data-action="edit" data-id="${escapeHtml(emp.id)}" title="Edit Profile" aria-label="Edit profile for ${escapeHtml(fullName)}">
                 <i data-lucide="pencil"></i>
               </button>
-              <button type="button" class="btn-action delete" data-action="delete" data-id="${escapeHtml(emp.id)}" title="Delete Record">
+              <button type="button" class="btn-action delete" data-action="delete" data-id="${escapeHtml(emp.id)}" title="Delete Record" aria-label="Delete employee record for ${escapeHtml(fullName)}">
                 <i data-lucide="trash-2"></i>
               </button>
             </div>
@@ -722,6 +733,109 @@
       if (btn.dataset.action === "delete") deleteEmployee(id);
     });
 
+    /* Employee form navigation, required-field progress, and save feedback. */
+    const employeeFormBody = document.getElementById("employeeFormSections");
+    const formSectionLinks = Array.from(document.querySelectorAll("[data-form-section]"));
+    const employeeSections = Array.from(employeeForm.querySelectorAll(".form-section"));
+    let formScrollFrame = 0;
+    let formNavigationTarget = null;
+
+    function showFormFeedback(id, message = "", type = "error") {
+      const feedback = document.getElementById(id);
+      if (!feedback) return;
+      feedback.textContent = message;
+      feedback.hidden = !message;
+      feedback.className = `form-feedback ${type}`;
+    }
+
+    function setSaveButtonState(button, busy, idleLabel) {
+      if (!button) return;
+      button.toggleAttribute("data-saving", busy);
+      if (busy) button.dataset.saving = "true";
+      button.setAttribute("aria-busy", String(busy));
+      const label = button.querySelector("span");
+      if (label) label.textContent = busy ? "Saving…" : idleLabel;
+    }
+
+    function setEmployeeFormBusy(busy) {
+      employeeFormModal.dataset.busy = String(busy);
+      employeeFormModal.setAttribute("aria-busy", String(busy));
+      employeeForm.setAttribute("aria-busy", String(busy));
+      setSaveButtonState(saveEmployeeBtn, busy, editingId ? "Save Changes" : "Save Employee");
+      employeeFormModal.querySelectorAll("button, input, select, textarea").forEach(control => {
+        if (busy && !control.disabled) { control.dataset.employeeFormDisabled = "true"; control.disabled = true; }
+        else if (!busy && control.dataset.employeeFormDisabled) { control.disabled = false; delete control.dataset.employeeFormDisabled; }
+      });
+    }
+
+    function updateEmployeeFormCompletion() {
+      const required = Array.from(employeeForm.querySelectorAll("input[required],select[required],textarea[required]"));
+      const completed = required.filter(field => String(field.value).trim() && field.validity.valid).length;
+      const progress = document.getElementById("employeeFormCompletion");
+      progress.max = required.length;
+      progress.value = completed;
+      document.getElementById("employeeFormCompletionCount").textContent = `${completed} / ${required.length}`;
+      document.getElementById("employeeFormCompletionText").textContent = completed === required.length ? "Required fields are complete." : `${required.length - completed} required field${required.length - completed === 1 ? "" : "s"} remaining.`;
+      formSectionLinks.forEach(link => {
+        const section = document.getElementById(link.dataset.formSection);
+        link.classList.toggle("has-errors", !!section.querySelector('[aria-invalid="true"]'));
+      });
+    }
+
+    function updateActiveFormSection() {
+      if (!employeeFormModal.classList.contains("open")) return;
+      const top = employeeFormBody.getBoundingClientRect().top + 38;
+      let active = employeeSections[0];
+      for (const section of employeeSections) if (section.getBoundingClientRect().top <= top) active = section;
+      if (employeeFormBody.scrollTop + employeeFormBody.clientHeight >= employeeFormBody.scrollHeight - 3) active = employeeSections.at(-1);
+      if (formNavigationTarget && Math.abs(employeeFormBody.scrollTop - formNavigationTarget.scrollTop) <= 1) active = document.getElementById(formNavigationTarget.id);
+      else formNavigationTarget = null;
+      formSectionLinks.forEach(link => {
+        const selected = link.dataset.formSection === active.id;
+        link.classList.toggle("active", selected);
+        if (selected) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+      const rail = document.querySelector(".employee-form-section-links");
+      const currentLink = formSectionLinks.find(link => link.dataset.formSection === active.id);
+      if (rail.scrollWidth > rail.clientWidth + 1 && currentLink) {
+        const bounds = rail.getBoundingClientRect();
+        const linkBounds = currentLink.getBoundingClientRect();
+        if (linkBounds.left < bounds.left || linkBounds.right > bounds.right) {
+          rail.scrollTo({left: rail.scrollLeft + linkBounds.left - bounds.left - (rail.clientWidth - linkBounds.width) / 2, behavior: "auto"});
+        }
+      }
+    }
+
+    formSectionLinks.forEach(link => link.addEventListener("click", () => {
+      const section = document.getElementById(link.dataset.formSection);
+      const offset = section.getBoundingClientRect().top - employeeFormBody.getBoundingClientRect().top + employeeFormBody.scrollTop - 18;
+      employeeFormBody.scrollTo({top: Math.max(0, offset), behavior: "auto"});
+      formNavigationTarget = {id:section.id, scrollTop:employeeFormBody.scrollTop};
+      updateActiveFormSection();
+    }));
+    employeeFormBody.addEventListener("scroll", () => {
+      if (formScrollFrame) return;
+      formScrollFrame = requestAnimationFrame(() => { formScrollFrame = 0; updateActiveFormSection(); });
+    }, {passive:true});
+    employeeForm.addEventListener("input", () => { showFormFeedback("employeeFormFeedback"); updateEmployeeFormCompletion(); requestAnimationFrame(updateEmployeeFormCompletion); });
+    employeeForm.addEventListener("change", updateEmployeeFormCompletion);
+    employeeForm.addEventListener("invalid", () => {
+      showFormFeedback("employeeFormFeedback", "Please review the highlighted fields before saving.");
+      requestAnimationFrame(() => {updateEmployeeFormCompletion();updateActiveFormSection();});
+    }, true);
+    employeeForm.addEventListener("reset", () => {
+      formNavigationTarget = null;
+      showFormFeedback("employeeFormFeedback");
+      requestAnimationFrame(updateEmployeeFormCompletion);
+    });
+    for (const kind of ["ceremony", "uniform"]) {
+      const form = document.getElementById(kind + "Form");
+      form.addEventListener("invalid", () => showFormFeedback(kind + "Feedback", "Complete the highlighted fields before saving."), true);
+      form.addEventListener("input", () => showFormFeedback(kind + "Feedback"));
+      form.addEventListener("change", () => showFormFeedback(kind + "Feedback"));
+    }
+
     /* ---------------- 10. ADD & EDIT EMPLOYEE ---------------- */
     function openEmployeeModal(id = null) {
       if (!M.canStartAction()) return;
@@ -794,11 +908,16 @@
         if (empId) empId.value = prefix + String(highest + 1).padStart(3, "0");
       }
 
+      showFormFeedback("employeeFormFeedback");
+      setSaveButtonState(saveEmployeeBtn, false, editingId ? "Save Changes" : "Save Employee");
+      updateEmployeeFormCompletion();
       openModal("employeeFormModal");
+      updateActiveFormSection();
     }
 
     async function saveEmployee(e) {
       e.preventDefault();
+      showFormFeedback("employeeFormFeedback");
 
       const structuredAddress = formStructuredAddress();
       const payload = {
@@ -860,17 +979,18 @@
       };
 
       if (!payload.employee_id || !payload.first_name || !payload.last_name || !payload.designation || !payload.department) {
+        showFormFeedback("employeeFormFeedback", "Complete the required fields marked with *.");
+        employeeForm.reportValidity();
         showToast("Please fill in required fields marked with *.", "warning");
         return;
       }
 
       if (!employeeForm.reportValidity()) return;
-      if (employees.some(emp => String(emp.id) !== String(editingId) && String(emp.employee_id || "").toLowerCase() === payload.employee_id.toLowerCase())) { showToast("Employee ID already exists. Use a unique ID.", "warning"); return; }
+      if (employees.some(emp => String(emp.id) !== String(editingId) && String(emp.employee_id || "").toLowerCase() === payload.employee_id.toLowerCase())) { showFormFeedback("employeeFormFeedback", "Employee ID already exists. Use a unique ID."); showToast("Employee ID already exists. Use a unique ID.", "warning"); empId?.focus(); return; }
       if (saveEmployeeBtn?.disabled) return;
       const previousEmployees = employees.map(emp => ({...emp}));
       const wasEditing = editingId;
-      employeeFormModal.dataset.busy = "true";
-      if (saveEmployeeBtn) saveEmployeeBtn.disabled = true;
+      setEmployeeFormBusy(true);
 
       try {
         requireWritable();
@@ -895,10 +1015,10 @@
         console.error("Save error:", err);
         const message = err?.message || "Failed to save employee profile.";
         const schemaHint = /column|schema cache|PGRST204|42703/i.test(message) ? " Run employee-record-supabase-migration.sql in Supabase, then refresh." : "";
+        showFormFeedback("employeeFormFeedback", message + schemaHint);
         showToast(message + schemaHint, "error");
       } finally {
-        employeeFormModal.dataset.busy = "false";
-        if (saveEmployeeBtn) saveEmployeeBtn.disabled = false;
+        setEmployeeFormBusy(false);
       }
     }
 
@@ -1049,7 +1169,7 @@
       M.audit("PRINT_RECORD", `Employee ${currentViewingId}: ${activeEmployeeTab}`);
       window.print();
     });
-    $("#clearEmployeeFormBtn")?.addEventListener("click", () => { if (M.canStartAction()) openEmployeeModal(editingId); });
+    $("#clearEmployeeFormBtn")?.addEventListener("click", () => { if (M.canStartAction()) { employeeFormModal.querySelector("#toastContainer")?.replaceChildren(); openEmployeeModal(editingId); } });
 
     refreshBtn?.addEventListener("click", async () => {
       refreshBtn.disabled = true;
@@ -1148,6 +1268,7 @@
     const monitoringDraft = { ceremony: null, uniform: null };
     let activeEmployeeTab = "employeeDetailsPanel";
     let monitorSaving = false;
+    let pendingMonitoringKind = null;
     const monitorEl = (kind, suffix) => document.getElementById(kind + suffix);
     const selectedEmployee = () => employees.find(emp => String(emp.id) === String(currentViewingId));
     const parsedArray = value => {
@@ -1168,6 +1289,7 @@
     function resetMonitorEditor(kind) {
       monitorEditing[kind] = null;
       monitoringDraft[kind] = null;
+      showFormFeedback(kind + "Feedback");
       monitorEl(kind, "Form")?.reset();
       monitorEl(kind, "Date").value = M.today();
       monitorEl(kind, "EditorTitle").textContent = "Add Record";
@@ -1291,6 +1413,10 @@
       monitorSaving = busy;
       profileModal.dataset.busy = String(busy);
       profileModal.setAttribute("aria-busy", String(busy));
+      if (pendingMonitoringKind) {
+        setSaveButtonState(monitorEl(pendingMonitoringKind, "Save"), busy, monitorEditing[pendingMonitoringKind] == null ? "Save Record" : "Update Record");
+        if (!busy) pendingMonitoringKind = null;
+      }
       // Preserve controls already disabled by the shared authentication layer.
       profileModal.querySelectorAll("button, input, select, textarea").forEach(control => {
         if (busy && !control.disabled) { control.dataset.monitorDisabled = "true"; control.disabled = true; }
@@ -1348,6 +1474,7 @@
       const emp = selectedEmployee();
       if (!emp) return;
       const form = monitorEl(kind, "Form");
+      showFormFeedback(kind + "Feedback");
       monitorEl(kind, "Control").setCustomValidity("");
       monitorEl(kind, "Date").setCustomValidity("");
       if (!form.reportValidity()) return;
@@ -1360,6 +1487,7 @@
       const activity = kind === "ceremony" ? monitorEl(kind, "Activity").value : "";
       const remarks = monitorEl(kind, "Remarks").value.trim();
       const previousEmployees = employees;
+      pendingMonitoringKind = kind;
       setMonitoringBusy(true);
       let saved = false;
       try {
@@ -1388,6 +1516,7 @@
         employees = previousEmployees;
         const message = error?.message || "Monitoring record could not be saved.";
         const schemaHint = /column|schema cache|PGRST204|42703/i.test(message) ? " Run employee-record-supabase-migration.sql, then refresh." : "";
+        showFormFeedback(kind + "Feedback", message + schemaHint);
         showToast(message + schemaHint, "error");
       } finally {
         setMonitoringBusy(false);

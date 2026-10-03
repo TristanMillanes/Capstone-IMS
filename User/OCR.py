@@ -973,8 +973,9 @@ if app is not None:
 def main():
     if app is None:
         raise SystemExit('Flask dependencies are missing. Run START_OCR.bat, or install requirements-ocr.txt using this Python interpreter.')
-    host = os.getenv('OCR_HOST', '127.0.0.1')
-    port = int(os.getenv('OCR_PORT', '5000'))
+    # Render injects PORT. Bind publicly there; keep localhost defaults for local OCR use.
+    host = os.getenv('OCR_HOST') or ('0.0.0.0' if os.getenv('PORT') else '127.0.0.1')
+    port = int(os.getenv('PORT') or os.getenv('OCR_PORT', '5000'))
     print(f'[PGENRO FLASK OCR] http://{host}:{port}/ocr | Full document, subject, type, and sender detection', flush=True)
     print(f'[HEALTH CHECK] http://{host}:{port}/health', flush=True)
     if shutil.which(TESSERACT_CMD) or Path(TESSERACT_CMD).is_file():

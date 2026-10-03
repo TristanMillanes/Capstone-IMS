@@ -3339,3 +3339,200 @@ html[data-pgenro-auth-state="warning"] :is(.app-layout,.app-container,.settings-
   body.pgenro-admin { position:static!important; top:auto!important; left:auto!important; width:auto!important; }
   #profileModal .monitor-print-scope { display:block; margin:12px 0; font-size:10px; color:#334155; }
 }
+
+
+/* Employee buttons and forms — 2026-10-03. All styles remain in this module. */
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn {
+  min-height:44px; padding:10px 16px; border-radius:10px; gap:8px;
+  font-size:12px; font-weight:700; line-height:1.35; letter-spacing:0;
+  display:inline-flex; align-items:center; justify-content:center;
+  transition:background-color .15s ease,border-color .15s ease,box-shadow .15s ease;
+}
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn > svg { width:17px; height:17px; flex:0 0 17px; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-primary { background:#087d52; border:1px solid #087d52; color:white; box-shadow:0 2px 5px rgba(8,125,82,.12); }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-primary:hover:not(:disabled) { background:#066a45; border-color:#066a45; box-shadow:0 3px 9px rgba(8,125,82,.18); }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-secondary { background:white; border:1px solid #d5e1da; color:#335546; box-shadow:none; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-secondary:hover:not(:disabled) { background:#f3f8f5; border-color:#9fbead; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-ghost { color:#597064; background:transparent; border:1px solid transparent; box-shadow:none; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-ghost:hover:not(:disabled) { background:#edf4ef; border-color:#dbe7df; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn:disabled { cursor:wait; opacity:.65; transform:none; }
+.btn[data-saving="true"] > svg { display:none!important; }
+.btn[data-saving="true"]::before { content:""; width:16px; height:16px; flex:0 0 16px; border:2px solid currentColor; border-right-color:transparent; border-radius:50%; animation:employee-button-spin .7s linear infinite; }
+@keyframes employee-button-spin { to { transform:rotate(360deg); } }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .modal-close { width:40px; height:40px; border-radius:10px; color:#597064; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-action { width:38px; height:38px; min-width:38px; display:inline-flex; align-items:center; justify-content:center; border:1px solid #d9e5dd; border-radius:9px; background:white; color:#52695c; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-action > svg { width:16px; height:16px; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-action:hover { background:#edf7f1; border-color:#8eb79f; color:#076c43; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-action.delete { color:#c84444; border-color:#f0dddd; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .btn-action.delete:hover { background:#fff0f0; border-color:#e9a4a4; color:#b42323; }
+#employeeTableBody .employee-row-actions { display:flex; flex-wrap:nowrap; justify-content:flex-end; gap:6px; min-width:214px; }
+#employeeTableBody .employee-row-actions .btn-action { flex:0 0 38px; }
+#employeeTableBody tr > td:last-child { padding-left:16px; padding-right:16px; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .header-actions { gap:10px; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .quick-actions-strip .btn { min-height:38px; padding:8px 12px; font-size:11px; }
+
+body.pgenro-admin[data-admin-page="employee-admin.html"] #employeeFormModal .modal-card { width:min(1120px,calc(100vw - 32px))!important; max-width:1120px!important; height:min(900px,calc(100dvh - 48px)); max-height:calc(100dvh - 48px)!important; }
+#employeeFormModal .modal-header { padding:20px 24px; }
+#employeeFormModal .modal-header p { max-width:65ch; }
+#employeeForm .employee-form-workspace { display:grid; grid-template-columns:190px minmax(0,1fr); flex:1 1 auto; min-height:0; overflow:hidden; }
+.employee-form-navigation { padding:22px 14px; border-right:1px solid #dfe9e2; background:#f5f9f6; overflow-y:auto; }
+.employee-form-nav-heading { padding:0 10px 16px; }
+.employee-form-nav-heading > span { color:#63816f; font-size:9px; letter-spacing:1.1px; font-weight:800; }
+.employee-form-nav-heading p { margin-top:5px; font-size:12px; color:#253e30; font-weight:700; }
+.employee-form-section-links { display:flex; flex-direction:column; gap:6px; }
+.employee-section-link { display:flex; align-items:center; gap:10px; min-height:44px; padding:10px 12px; border:1px solid transparent; border-radius:9px; color:#607b69; font-size:12px; text-align:left; font-weight:600; width:100%; }
+.employee-section-link > svg { width:17px; height:17px; flex:0 0 17px; }
+.employee-section-link > span { flex:1; }
+.employee-section-link > small { color:#8aa091; font-size:9px; font-weight:700; }
+.employee-section-link:hover { background:#eaf3ed; }
+.employee-section-link.active { background:white; color:#076c43; border-color:#bddbc8; box-shadow:0 2px 5px rgba(27,75,46,.04); font-weight:800; }
+.employee-section-link.has-errors small { color:#cf3b3b; }
+.employee-form-completion { margin:24px 10px 0; padding-top:18px; border-top:1px solid #dce8e0; }
+.employee-form-completion > div { display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:10px; color:#567461; }
+.employee-form-completion > div > span { color:#087d52; font-weight:800; }
+.employee-form-completion progress { display:block; width:100%; height:6px; margin:10px 0; border:0; border-radius:10px; background:#dde9e1; color:#0a8557; accent-color:#0a8557; overflow:hidden; }
+.employee-form-completion progress::-webkit-progress-bar { background:#dde9e1; border-radius:10px; }
+.employee-form-completion progress::-webkit-progress-value { background:#0a8557; border-radius:10px; }
+.employee-form-completion progress::-moz-progress-bar { background:#0a8557; border-radius:10px; }
+.employee-form-completion p { font-size:10px; line-height:1.6; color:#6f8678; }
+#employeeFormSections { min-width:0; background:white; padding:22px 24px; gap:22px; scroll-padding:18px; }
+#employeeFormSections .form-section { padding:20px; background:white; border:1px solid #dfe9e2; border-radius:12px; scroll-margin-top:18px; }
+#employeeFormSections .form-section-title { align-items:flex-start; gap:10px; margin-bottom:20px; padding-bottom:16px; border-bottom:1px solid #edf2ee; }
+#employeeFormSections .form-section-title > svg { width:34px; height:34px; padding:8px; border:1px solid #d7e9dd; background:#f0f8f3; border-radius:9px; flex:0 0 34px; }
+#employeeFormSections .form-section-title h3 { font-size:14px; color:#233d2d; margin:0; line-height:1.5; }
+#employeeFormSections .form-section-title p { margin-top:3px; font-size:11px; color:#708174; line-height:1.55; }
+#employeeFormSections .form-grid { gap:18px 16px; align-items:start; }
+#employeeFormSections .form-group { gap:7px; }
+#employeeFormModal .form-group label, #profileModal .monitor-panel .form-group label { font-size:11.5px; font-weight:700; line-height:1.5; color:#395341; }
+#employeeFormModal .form-control, #profileModal .monitor-panel .form-control { min-height:44px; height:44px; padding:10px 12px; background:#fff; border:1px solid #cddcd1; border-radius:9px; font-size:12.5px; line-height:1.4; box-shadow:0 1px 2px rgba(20,50,30,.02); }
+#employeeFormModal select.form-control, #profileModal .monitor-panel select.form-control { padding-right:28px; }
+#employeeFormModal .form-control:hover:not(:disabled), #profileModal .monitor-panel .form-control:hover:not(:disabled) { border-color:#9ebaab; }
+#employeeFormModal .form-control:focus, #profileModal .monitor-panel .form-control:focus { border-color:#138754; box-shadow:0 0 0 3px rgba(19,135,84,.09); }
+#employeeFormModal textarea.form-control, #profileModal .monitor-panel textarea.form-control { min-height:88px; height:auto; resize:vertical; }
+#employeeFormModal .form-control::placeholder, #profileModal .monitor-panel .form-control::placeholder { color:#85978a; opacity:1; font-size:11.5px; }
+#employeeFormModal .form-control:disabled, #profileModal .monitor-panel .form-control:disabled { background:#f3f6f4; color:#708074; box-shadow:none; cursor:wait; }
+#employeeFormModal .form-control[aria-invalid="true"], #profileModal .monitor-panel .form-control[aria-invalid="true"] { border-color:#d66161; background:#fffafa; }
+#employeeFormModal .workspace-field-error, #profileModal .workspace-field-error { font-size:10.5px; line-height:1.5; color:#ba3636; }
+.field-help { font-size:10px; line-height:1.5; color:#75897a; }
+.form-feedback { border:1px solid #f0caca; background:#fff5f5; color:#ab3333; padding:11px 14px; border-radius:9px; font-size:11.5px; line-height:1.6; overflow-wrap:anywhere; flex:0 0 auto; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .toast-container.toast-in-dialog { position:static; flex:0 0 auto; width:auto; max-width:none; margin:10px 16px 0; padding:0; gap:0; z-index:auto; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .toast-container.toast-in-dialog:empty { display:none; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .toast-in-dialog .toast { padding:10px 13px; font-size:11.5px; line-height:1.6; box-shadow:none; border-radius:9px; background:#f4faf6; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .toast-in-dialog .toast.error { background:#fff6f6; }
+body.pgenro-admin[data-admin-page="employee-admin.html"] .toast-in-dialog .toast.warning { background:#fffaf0; }
+#employeeForm > .form-feedback { margin:12px 20px 0; }
+.monitor-editor > .form-feedback { margin-bottom:14px; }
+#employeeFormModal .employee-form-footer { display:flex; justify-content:space-between; align-items:center; flex-shrink:0; padding:16px 22px; background:#fbfdfb; border-top:1px solid #dfe9e2; gap:12px; }
+.employee-form-footer-note { color:#829184; font-size:10px; margin:0; }
+.required-mark { color:#c54545; font-weight:800; }
+.employee-form-footer-buttons { display:flex; align-items:center; gap:8px; }
+#saveEmployeeBtn { min-width:150px; }
+.employee-form-footer-buttons [data-close] { min-width:86px; }
+#employeeFormModal .employee-form-footer-buttons .btn { white-space:nowrap; }
+
+body.pgenro-admin[data-admin-page="employee-admin.html"] #profileModal .modal-card { width:min(1180px,calc(100vw - 32px))!important; max-width:1180px!important; max-height:min(920px,calc(100dvh - 40px))!important; }
+#profileModal .profile-hero { margin:0; padding:16px 18px; gap:14px; }
+#profileModal .profile-avatar-xl { width:56px; height:56px; flex:0 0 56px; border-radius:12px; font-size:22px; }
+#profileModal .profile-hero-copy h2 { font-size:20px; line-height:1.4; }
+#profileModal .profile-meta { margin-top:6px; }
+#profileModal .employee-record-tabs { margin:4px 0; border-radius:11px; gap:5px; padding:5px; }
+#profileModal .employee-record-tab { min-height:44px; padding:9px 12px; gap:8px; }
+#profileModal .employee-record-tab .employee-tab-label { flex:0 1 auto; }
+#profileModal .monitor-panel-heading { gap:12px; margin:2px 0 16px; }
+#profileModal .monitor-panel-heading h3 { font-size:16px; }
+#profileModal .monitor-panel-heading p { line-height:1.6; max-width:65ch; }
+#profileModal .monitor-stat { padding:11px 13px; }
+#profileModal .monitor-stat strong { margin-top:4px; font-size:21px; }
+#profileModal .monitor-stat:last-child strong { font-size:17px; white-space:normal; overflow-wrap:anywhere; }
+#profileModal .monitor-summary-note { margin:8px 0 16px; font-size:10px; }
+#profileModal .monitor-layout { grid-template-columns:minmax(260px,300px) minmax(0,1fr); gap:20px; }
+#profileModal .monitor-editor { padding:18px; background:white; border-color:#d6e5da; border-radius:12px; }
+#profileModal .monitor-editor-heading { margin-bottom:18px; }
+#profileModal .monitor-editor-heading h4 { font-size:14px; }
+#profileModal .monitor-editor-fields { gap:16px; }
+#profileModal .monitor-editor-actions { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); gap:8px; margin-top:18px; }
+#profileModal .monitor-editor-actions .btn { min-width:0; padding:10px; font-size:11.5px; }
+#profileModal .monitor-filters { padding:16px; gap:14px; background:#f7faf7; }
+#profileModal .monitor-filter-buttons { gap:8px; }
+#profileModal .monitor-filter-buttons .btn { min-height:40px; padding:8px 12px; font-size:11px; }
+#profileModal .monitor-table .actions { flex-wrap:nowrap; gap:6px; }
+#profileModal .monitor-table :is(th,td) { padding:12px; }
+#profileModal .modal-actions { background:#fbfdfb; padding:15px 22px; border-top:1px solid #dfe9e2; }
+#profileModal .modal-actions .btn { min-height:44px; }
+
+@media (max-width:1100px) {
+  #employeeForm .employee-form-workspace { grid-template-columns:164px minmax(0,1fr); }
+  .employee-form-navigation { padding:18px 10px; }
+  .employee-section-link { padding:10px; gap:8px; font-size:11.5px; }
+  #employeeFormSections { padding:20px; }
+  #employeeFormSections .form-section { padding:18px; }
+  #profileModal .monitor-layout { grid-template-columns:minmax(0,1fr); gap:16px; }
+  #profileModal .monitor-editor-fields { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  #profileModal .monitor-editor-actions { display:flex; }
+  #profileModal .monitor-editor-actions .btn { flex:0 1 auto; min-width:124px; }
+}
+@media (max-width:760px) {
+  #employeeForm .employee-form-workspace { grid-template-columns:minmax(0,1fr); grid-template-rows:auto minmax(0,1fr); }
+  .employee-form-navigation { padding:10px 12px; border-right:0; border-bottom:1px solid #dfe9e2; overflow:hidden; }
+  .employee-form-nav-heading { display:none; }
+  .employee-form-section-links { flex-direction:row; overflow-x:auto; padding:2px; gap:6px; scrollbar-width:thin; }
+  .employee-section-link { flex:0 0 auto; width:auto; min-height:40px; padding:8px 11px; gap:7px; font-size:11px; }
+  .employee-section-link > small { display:none; }
+  .employee-section-link > svg { width:15px; height:15px; flex-basis:15px; }
+  .employee-form-completion { display:flex; align-items:center; gap:12px; margin:8px 4px 0; padding:0; border:0; }
+  .employee-form-completion > div { flex:0 0 auto; gap:8px; font-size:9px; }
+  .employee-form-completion progress { flex:1; width:auto; margin:0; height:4px; }
+  .employee-form-completion p { display:none; }
+  #employeeFormSections { padding:14px; gap:16px; }
+  #employeeFormSections .form-section { padding:16px; }
+  #employeeFormSections .form-section-title { gap:9px; margin-bottom:16px; padding-bottom:13px; }
+  #employeeFormSections .form-section-title p { font-size:10.5px; }
+  #employeeFormSections .form-grid { grid-template-columns:minmax(0,1fr); gap:16px; }
+  #employeeFormSections .form-group.span-2 { grid-column:auto; }
+  #employeeFormModal .modal-header { padding:16px; }
+  #employeeFormModal .modal-header h2 { font-size:18px; }
+  #employeeFormModal .modal-header p { font-size:11px; }
+  #employeeFormModal .employee-form-footer { padding:12px 16px; }
+  .employee-form-footer-note { display:none; }
+  .employee-form-footer-buttons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; gap:8px; }
+  #saveEmployeeBtn { grid-column:1 / -1; }
+  #employeeFormModal .employee-form-footer-buttons .btn { min-width:0; width:100%; }
+  #employeeForm > .form-feedback { margin:10px 12px 0; padding:9px 12px; font-size:11px; }
+}
+@media (max-width:600px) {
+  body.pgenro-admin[data-admin-page="employee-admin.html"] #employeeFormModal .modal-card,
+  body.pgenro-admin[data-admin-page="employee-admin.html"] #profileModal .modal-card { width:calc(100vw - 20px)!important; max-width:calc(100vw - 20px)!important; max-height:calc(100dvh - 20px)!important; }
+  body.pgenro-admin[data-admin-page="employee-admin.html"] #employeeFormModal .modal-card { height:calc(100dvh - 20px); }
+  #employeeFormModal .form-control, #profileModal .monitor-panel .form-control { font-size:16px; min-height:46px; height:46px; }
+  #employeeFormModal textarea.form-control, #profileModal .monitor-panel textarea.form-control { height:auto; }
+  #employeeFormModal .form-control::placeholder, #profileModal .monitor-panel .form-control::placeholder { font-size:12px; }
+  #employeeTableBody .employee-row-actions { min-width:234px; }
+  #employeeTableBody .employee-row-actions .btn-action { width:42px; height:42px; flex-basis:42px; }
+  #profileModal .profile-body { padding:16px; gap:16px; }
+  #profileModal .profile-hero { padding:13px; }
+  #profileModal .profile-hero-copy h2 { font-size:17px; }
+  #profileModal .profile-avatar-xl { width:48px; height:48px; flex-basis:48px; font-size:20px; }
+  #profileModal .employee-record-tabs { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:4px; padding:4px; }
+  #profileModal .employee-record-tab { display:flex; flex-wrap:wrap; flex:initial; align-content:center; justify-content:center; gap:5px; min-height:72px; padding:8px 5px; font-size:10px; line-height:1.3; }
+  #profileModal .employee-record-tab > svg { width:15px; height:15px; }
+  #profileModal .employee-record-tab .employee-tab-label { width:100%; flex-basis:100%; order:2; text-align:center; }
+  #profileModal .employee-record-tab .employee-tab-count { margin:0; font-size:9px; min-width:18px; padding:1px 5px; }
+  #profileModal .monitor-editor { padding:16px; }
+  #profileModal .monitor-editor-fields { grid-template-columns:minmax(0,1fr); }
+  #profileModal .monitor-editor-actions { display:grid; grid-template-columns:minmax(0,1.2fr) minmax(0,1fr); }
+  #profileModal .monitor-editor-actions .btn { min-width:0; font-size:11px; }
+  #profileModal .monitor-filters { grid-template-columns:minmax(0,1fr); padding:14px; gap:12px; }
+  #profileModal .monitor-filter-buttons { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); width:100%; }
+  #profileModal .monitor-filter-buttons .btn { min-width:0; padding:9px 7px; gap:5px; font-size:10px; }
+  #profileModal .monitor-panel-heading h3 { font-size:15px; }
+  #profileModal .monitor-panel-heading p { font-size:10.5px; }
+  #profileModal .monitor-stat { padding:10px; }
+  #profileModal .modal-actions { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); padding:12px 16px; gap:8px; }
+  #profileModal .modal-actions .btn { width:100%; min-width:0; padding:9px 10px; font-size:11px; }
+}
+@media (prefers-reduced-motion:reduce) { .btn[data-saving="true"]::before { animation:none; } }
+@media print {
+  .employee-form-navigation, .form-feedback { display:none!important; }
+  body.pgenro-admin[data-admin-page="employee-admin.html"] #profileModal .modal-card { width:100%!important; max-width:none!important; max-height:none!important; height:auto!important; }
+  #profileModal .monitor-layout { display:block; }
+}

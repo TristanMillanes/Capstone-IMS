@@ -304,10 +304,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if(coverage)coverage.textContent=stats.total?`${Math.round(stats.attached/stats.total*100)}% of records have a document`:'No documents recorded yet';
     const chart=document.getElementById('memoMonthlyChart'),max=Math.max(1,...stats.months.map(m=>m.count));
     if(chart)chart.innerHTML=stats.months.map(m=>`<div class="memo-month-column" role="listitem"><button type="button" class="memo-month-button" data-memo-month="${escapeHtml(m.key)}" aria-label="Show ${m.count} memorandums issued in ${escapeHtml(m.label+' '+m.key.slice(0,4))}" aria-pressed="${document.getElementById('memoMonthFilter').value===m.key}"><span class="memo-month-count">${m.count}</span><span class="memo-month-track" aria-hidden="true"><span class="memo-month-fill" style="height:${Math.round(m.count/max*100)}%"></span></span><span class="memo-month-label">${m.label}</span></button></div>`).join('');
-    document.getElementById('memoChartPeriod').textContent=`${stats.months[0].label} ${stats.months[0].key.slice(0,4)} â€“ ${stats.months[5].label} ${stats.months[5].key.slice(0,4)} Â· all registry records`;
+    document.getElementById('memoChartPeriod').textContent=`${stats.months[0].label} ${stats.months[0].key.slice(0,4)} – ${stats.months[5].label} ${stats.months[5].key.slice(0,4)} · all registry records`;
     document.getElementById('memoChartSummary').textContent=`${stats.months.reduce((n,m)=>n+m.count,0)} memorandum(s) issued in this period.${stats.undated?` ${stats.undated} record(s) have no valid issue date.`:''}`;
     const quick=[...rawMemos].sort((a,b)=>Number(b.isPinned)-Number(a.isPinned)||String(b.date||'').localeCompare(String(a.date||''))||String(b.createdAt||'').localeCompare(String(a.createdAt||''))).slice(0,3);
-    document.getElementById('memoPriorityList').innerHTML=quick.length?quick.map(m=>`<button class="memo-quick-item" type="button" data-memo-open="${escapeHtml(m.id)}"><i data-lucide="${m.isPinned?'pin':'file-text'}"></i><span class="memo-quick-copy"><strong>${escapeHtml(m.memoNo||'Memorandum')}</strong><span>${escapeHtml(m.subject||m.title||'No subject recorded')}</span><small>${m.isPinned?'Pinned Â· ':''}${escapeHtml(m.date||'Date not recorded')}</small></span></button>`).join(''):'<p class="memo-dashboard-note">Your pinned and recent memorandums will appear here.</p>';
+    document.getElementById('memoPriorityList').innerHTML=quick.length?quick.map(m=>`<button class="memo-quick-item" type="button" data-memo-open="${escapeHtml(m.id)}"><i data-lucide="${m.isPinned?'pin':'file-text'}"></i><span class="memo-quick-copy"><strong>${escapeHtml(m.memoNo||'Memorandum')}</strong><span>${escapeHtml(m.subject||m.title||'No subject recorded')}</span><small>${m.isPinned?'Pinned · ':''}${escapeHtml(m.date||'Date not recorded')}</small></span></button>`).join(''):'<p class="memo-dashboard-note">Your pinned and recent memorandums will appear here.</p>';
     M.renderIcons();
   }
   document.getElementById('memoPriorityList').addEventListener('click',e=>{const button=e.target.closest('[data-memo-open]');if(!button||busy||ocrBusy||fileBusy)return;const memo=rawMemos.find(m=>m.id===button.dataset.memoOpen);if(memo)openEditModal(memo);});
@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if(pinnedFilter!=='all')activeFilters.push(pinnedFilter==='pinned'?'Pinned only':'Unpinned only');
     if(attachmentFilter!=='all')activeFilters.push(attachmentFilter==='with_pdf'?'With attachment':'Without attachment');
     if(monthFilter)activeFilters.push(`Issued: ${monthFilter}`);
-    document.getElementById('memoFilterSummary').textContent=`${filteredMemos.length} of ${rawMemos.length} memorandums${activeFilters.length?' Â· '+activeFilters.join(' Â· '):' Â· All registry records'}`;
+    document.getElementById('memoFilterSummary').textContent=`${filteredMemos.length} of ${rawMemos.length} memorandums${activeFilters.length?' · '+activeFilters.join(' · '):' · All registry records'}`;
     document.querySelectorAll('[data-memo-month]').forEach(button=>button.setAttribute('aria-pressed',String(button.dataset.memoMonth===monthFilter)));
     document.querySelectorAll('[data-memo-kpi]').forEach(card=>{const key=card.dataset.memoKpi;const selected=key==='all'? !activeFilters.length : key==='pinned'? pinnedFilter==='pinned' : key==='attached'? attachmentFilter==='with_pdf' : monthFilter===M.today().slice(0,7);card.setAttribute('aria-pressed',String(selected));});
 
@@ -394,13 +394,13 @@ document.addEventListener("DOMContentLoaded", () => {
           </td>
           <td class="text-muted font-mono">${escapeHtml(memo.date || "N/A")}</td>
           <td>
-            <div class="memo-recipient-cell">${escapeHtml(memo.addressedTo || "â€”")}</div>
+            <div class="memo-recipient-cell">${escapeHtml(memo.addressedTo || "—")}</div>
           </td>
           <td>
             <div class="memo-title-cell">${escapeHtml(memo.subject || memo.title || "No subject specified")}</div>
           </td>
           <td>
-            <span class="memo-remarks-preview">${escapeHtml(splitMemoNotes(memo.remarks).notes || "â€”")}</span>
+            <span class="memo-remarks-preview">${escapeHtml(splitMemoNotes(memo.remarks).notes || "—")}</span>
           </td>
           <td>
             ${
@@ -443,7 +443,7 @@ document.addEventListener("DOMContentLoaded", () => {
     let html = `<button class="page-btn" ${currentPage === 1 ? "disabled" : ""} data-page="${currentPage - 1}">&laquo;</button>`;
 
     const pages=[...new Set([1,currentPage-1,currentPage,currentPage+1,totalPages])].filter(p=>p>=1&&p<=totalPages).sort((a,b)=>a-b);
-    for(let i=0;i<pages.length;i++){if(i&&pages[i]-pages[i-1]>1)html+='<span aria-hidden="true">â€¦</span>';const p=pages[i];html+=`<button type="button" aria-label="Page ${p}" ${p===currentPage?'aria-current="page"':''} class="page-btn ${p===currentPage?'active':''}" data-page="${p}">${p}</button>`;}
+    for(let i=0;i<pages.length;i++){if(i&&pages[i]-pages[i-1]>1)html+='<span aria-hidden="true">…</span>';const p=pages[i];html+=`<button type="button" aria-label="Page ${p}" ${p===currentPage?'aria-current="page"':''} class="page-btn ${p===currentPage?'active':''}" data-page="${p}">${p}</button>`;}
 
     html += `<button class="page-btn" ${currentPage === totalPages ? "disabled" : ""} data-page="${currentPage + 1}">&raquo;</button>`;
     paginationBtns.innerHTML = html;
@@ -521,13 +521,13 @@ function parseCorrespondence(rawText='',signatureRegion=false) {
  }
  const closing=/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards|regards|cordially|lubos\s+na\s+gumagalang|sumasainyo|for\s+your\s+(?:compliance|information\s+and\s+compliance|guidance\s+and\s+compliance))\s*[,.:!]?$/i;
  const role=/\b(?:PGDH|PGENRO|ENRO|officer|director|chief|mayor|governor|administrator|supervisor|manager|secretary|head|president|chairperson|chairman|coordinator|principal|teacher|engineer|treasurer|representative|proprietor|owner|student|applicant|dean|professor|specialist|staff|assistant|councilor|punong\s+barangay)\b/i;
- const label=/^(?:signed(?:\s+by)?|signatory|submitted\s+by|prepared\s+by|approved\s+by|noted\s+by|certified\s+by|recommending\s+approval|respectfully\s+submitted\s+by|name\s+of\s+(?:sender|signatory))\s*[:ï¼š-]?\s*(.*)$/i;
+ const label=/^(?:signed(?:\s+by)?|signatory|submitted\s+by|prepared\s+by|approved\s+by|noted\s+by|certified\s+by|recommending\s+approval|respectfully\s+submitted\s+by|name\s+of\s+(?:sender|signatory))\s*[:：-]?\s*(.*)$/i;
  function name(value) {
   let s=tidy(value).replace(/^(?:\(\s*sgd\.?\s*\)|sgd\.?|\/s\/|by\s*:)\s*/i,'').replace(/^[|:_\-]+|[|:_\-]+$/g,'').trim();
-  s=s.split(/\s+[â€”â€“]\s+/)[0];
+  s=s.split(/\s+[—–]\s+/)[0];
   if(s.length<4||s.length>100||/[\d@:/;!?()]/.test(s)||/\b(?:republic|province|government|office|department|division|subject|memorandum|dear|thank|please|request|hereby|attached|enclosed|address|telephone|email|received|copy|cc|page|for|to|from)\b/i.test(s))return '';
   const base=s.replace(/^(?:(?:Mr|Mrs|Ms|Miss|Dr|Dra|Atty|Engr|EnP|Hon|Prof|Rev|Fr|Bro|Sis)\.?\s+)+/i,'').replace(/,?\s+(?:Ph\.?D\.?|M\.?D\.?|MBA|CPA|RN|LPT|CESO(?:\s+[IVX]+)?|EnP)(?:[,\s].*)?$/i,'');
-  const words=base.match(/[\p{L}][\p{L}.'â€™\-]*/gu)||[];
+  const words=base.match(/[\p{L}][\p{L}.'’\-]*/gu)||[];
   if(words.length<2||words.length>8||role.test(base))return '';
   // Names may contain lower-case particles (de la, del, van, etc.).
   if(words.some(w=>!(/^(?:de|del|dela|la|las|los|da|dos|di|du|van|von|bin|al|y|jr\.?|sr\.?|II|III|IV)$/i.test(w)||/^\p{Lu}/u.test(w))))return '';
@@ -561,8 +561,8 @@ function parseCorrespondence(rawText='',signatureRegion=false) {
    if(value)return {value,page:e.page,line:e.line};
   }return {value:'',page:null,line:null};
  }
- let sender=labeled(/^(?:from|sender|received\s+from|issued\s+by|issuing\s+office|originating\s+office)\s*[:ï¼š-]\s*(.*)$/i);
- let recipient=labeled(/^(?:to|t0|for|addressed\s+to|recipient(?:\s+office)?|memorandum\s+for)\s*[:ï¼š-]\s*(.*)$/i);
+ let sender=labeled(/^(?:from|sender|received\s+from|issued\s+by|issuing\s+office|originating\s+office)\s*[:：-]\s*(.*)$/i);
+ let recipient=labeled(/^(?:to|t0|for|addressed\s+to|recipient(?:\s+office)?|memorandum\s+for)\s*[:：-]\s*(.*)$/i);
  if(typeof parseDocumentHeader==='function'){const h=parseDocumentHeader(rawText);sender={value:h.sender===h.signatory?(signatory?.name||''):h.sender};recipient={value:h.addressedTo};}
  return {signatory:signatory?.name||'',signatoryRole:signatory?.role||'',signatoryCandidates:candidates,receivedFrom:signatory?.name||(!primary.length?sender.value:''),sender:sender.value,recipient:recipient.value,fieldEvidence:{receivedFrom:signatory?.evidence||sender.value},needsReview:primary.length>1?['receivedFrom']:[]};
 }
@@ -571,8 +571,8 @@ function parseCorrespondence(rawText='',signatureRegion=false) {
 /* Memo document parser: identical page-owned code in Communications and Office Memos. */
 function parseMemoDocument(rawText='') {
  const labels='SUBJECT MATTER|SUBJECT|SUBJ|RE|ADDRESSED TO|MEMORANDUM FOR|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE|REF|CONTROL NO\\.?|REMARKS';
- const normalize=s=>String(s||'').replace(/\u00a0/g,' ').replace(/[â€“â€”âˆ’]/g,'-').replace(/[ï¼š]/g,':').replace(/[ \t]+/g,' ').trim();
- const text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/[ï¼š]/g,':');
+ const normalize=s=>String(s||'').replace(/\u00a0/g,' ').replace(/[–—−]/g,'-').replace(/[：]/g,':').replace(/[ \t]+/g,' ').trim();
+ const text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/[：]/g,':');
  const lines=text.replace(new RegExp(`[ \\t]{2,}(?=(?:${labels})\\s*:)`,'gi'),'\n').split('\n').map(normalize);
  const labelPattern=new RegExp(`^(${labels})\\s*(?::|[-])\\s*(.*)$`,'i');
  const bodyLine=/^(?:dear\b|sir\b|madam\b|respectfully\b|please\b|kindly\b|you are\b|this (?:is|memo|memorandum)\b|pursuant\b|in (?:connection|view|compliance)\b|for your (?:information|compliance|guidance)\b|\d+\.\s)/i;
@@ -627,20 +627,20 @@ function parseMemoDate(value='') {
 }
 function parseDocumentHeader(rawText='') {
  const labels='SUBJECT MATTER|SUBJECT|SUBJ|RE|ADDRESSED TO|MEMORANDUM FOR|RECIPIENT OFFICE|RECEIVED FROM|SENDER|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|DATE RECEIVED|RECEIVED DATE|DATE RELEASED|RELEASED DATE|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE(?: NO\\.?| NUMBER)?|REF(?: NO\\.?)?|CONTROL (?:NO\\.?|NUMBER)|REMARKS';
- const labelRe=new RegExp(`^(${labels})\\s*(?::|[â€“â€”-])\\s*(.*)$`,'i'),bareRe=new RegExp(`^(?:${labels})\\s*$`,'i');
+ const labelRe=new RegExp(`^(${labels})\\s*(?::|[–—-])\\s*(.*)$`,'i'),bareRe=new RegExp(`^(?:${labels})\\s*$`,'i');
  const bodyRe=/^(?:dear\b|sir\b|madam\b|respectfully\b|sincerely\b|please\b|kindly\b|you are\b|this (?:is|memo|memorandum|office|letter)\b|pursuant\b|in (?:connection|view|compliance|light)\b|for your (?:information|compliance|guidance)\b|we (?:are|would|request)\b|I (?:am|would|respectfully)\b|attached (?:is|are)\b|relative to\b|\d+\.\s)/i;
  const dateLine=/^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4}|[A-Za-z]+\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}|\d{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\.?,?\s+\d{4})\s*$/i;
  const prefix='(?:(?:PG\\s*ENRO|PGENRO|PROVINCIAL ENRO)\\s+)?';
  const memoRe=new RegExp(`^${prefix}(?:OFFICE\\s+)?(?:MEMORANDUM(?:\\s+(?:ORDER|CIRCULAR))?|MEMO)(?:\\s+(?:N[O0]\\.?|NUMBER)\\s*[:#.-]?\\s*[A-Z0-9 /._,-]*|\\s+FOR\\s*:?.*|\\s*[:#.-]?\\s*\\d[\\d /._,-]*)?\\s*$`,'i');
  const types=['Office Order','Special Order','Travel Order','Request Letter','Endorsement Letter','Transmittal Letter','Response Letter','Notice of Meeting','Invitation','Report'];
- let text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/ï¼š/g,':');
+ let text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/：/g,':');
  const lines=[];
  text.split('\n').forEach((raw,index)=>{
   raw=raw.replace(/^(?:SUBJECI|SUB3ECT|SUBIECT)\s*(?=[:\-])/i,'SUBJECT').replace(new RegExp(`^(${labels})[ \\t]{2,}(?=\\S)`,'i'),'$1: ');
   raw.split(new RegExp(`[ \\t]{2,}(?=(?:${labels})\\s*:)`,'i')).forEach(line=>lines.push({text:line.replace(/[ \t]+/g,' ').trim(),number:index+1}));
  });
  let header=lines.slice(0,Math.min(100,lines.findIndex(x=>bodyRe.test(x.text))<0?lines.length:lines.findIndex(x=>bodyRe.test(x.text))));
- const subjectIndex=header.findIndex(x=>/^(?:SUBJECT(?: MATTER)?|SUBJ|RE)\s*(?::|[â€“â€”-]|$)/i.test(x.text));
+ const subjectIndex=header.findIndex(x=>/^(?:SUBJECT(?: MATTER)?|SUBJ|RE)\s*(?::|[–—-]|$)/i.test(x.text));
  if(subjectIndex>=0){
   let content=!!header[subjectIndex].text.match(labelRe)?.[2];
   for(let i=subjectIndex+1;i<header.length;i++){
@@ -722,9 +722,9 @@ function printedHeaderSignatory(rawText=''){
   if(!closing.test(lines[i]))continue;
   const block=[];for(const s of lines.slice(i+1,i+15)){if(stop.test(s))break;if(s)block.push(s);}
   for(let j=0;j<Math.min(6,block.length);j++){
-   const name=block[j].replace(/\.{2,}/g,'.').replace(/\b([A-Z])(?=\s)/g,'$1.').replace(/^[ |;:'â€˜â€™"â€œâ€]+|[ |;:'â€˜â€™"â€œâ€]+$/g,'');
+   const name=block[j].replace(/\.{2,}/g,'.').replace(/\b([A-Z])(?=\s)/g,'$1.').replace(/^[ |;:'‘’"“”]+|[ |;:'‘’"“”]+$/g,'');
    if(role.test(name)||name.length<7||name.length>110||/[\d:!?@/]/.test(name)||/\b(?:REPUBLIC|PROVINCE|GOVERNMENT|OFFICE|DEPARTMENT|DIVISION|PERSONNEL|SUBJECT|ORDER|COMPLIANCE|DIRECTOR|MAYOR|CHIEF|GOVERNOR|SECRETARY|MANAGER|PLEASE|THANK|SHOULD|MUST|REQUEST)\b/i.test(name))continue;
-   const words=name.match(/[\p{L}][\p{L}.'â€™\-]*/gu)||[],designation=block[j+1]||'';
+   const words=name.match(/[\p{L}][\p{L}.'’\-]*/gu)||[],designation=block[j+1]||'';
    if(words.length<2||words.length>12||words.filter(w=>w.replace(/[^\p{L}]/gu,'').length>=2).length<2)continue;
    if(name!==name.toUpperCase()&&!(words.every(w=>/^\p{Lu}/u.test(w)||/^(?:de|del|dela|la|van|von)$/i.test(w))&&role.test(designation)))continue;
    if(!candidates.includes(name))candidates.push(name);
@@ -840,7 +840,7 @@ window.addEventListener('pagehide',()=>{cancelDocumentRead();stopReaderWorker();
 async function extractDocument(source,progress=()=>{}){
  const operation=readerRuntime.operation,checkRead=()=>{if(operation?.cancelled)throw Error('Reading stopped. Your draft is kept; you can retry.');};
  const started=performance.now(),previous=readerResults.get(source);
- if(previous){progress('Using the document already readâ€¦',98);return {...previous,cacheHit:true,durationMs:Math.round(performance.now()-started)};}
+ if(previous){progress('Using the document already read…',98);return {...previous,cacheHit:true,durationMs:Math.round(performance.now()-started)};}
  const remember=result=>{checkRead();const finished={...result,durationMs:Math.round(performance.now()-started)};readerResults.set(source,finished);return finished;};
  const extension=source.name.split('.').pop().toLowerCase();
  if(/^(txt|csv)$/.test(extension)){
@@ -851,7 +851,7 @@ async function extractDocument(source,progress=()=>{}){
  if(endpoint){
   let health=null;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),2000);if(operation)operation.controller=controller;
   try{
-   progress('Checking the local document readerâ€¦',3);
+   progress('Checking the local document reader…',3);
    const healthUrl=new URL(endpoint,location.href);healthUrl.pathname=healthUrl.pathname.replace(/\/ocr\/?$/,'/health');
    const response=await fetch(healthUrl.href,{signal:controller.signal,cache:'no-store'});
    if(response.ok)health=await response.json();
@@ -861,7 +861,7 @@ async function extractDocument(source,progress=()=>{}){
    const controller=new AbortController(),waitMs=Math.max(45000,Math.min(900000,(Number(health.documentTimeoutSeconds)||120)*1000+15000)),timer=setTimeout(()=>controller.abort(),waitMs);
    try{
     if(operation){operation.controller=controller;operation.endpoint=endpoint;operation.requestId=crypto.randomUUID();controller.signal.addEventListener('abort',()=>notifyReaderCancel(operation),{once:true});}
-    progress('Reading all pages with the local OCR readerâ€¦',8);const body=new FormData();body.append('file',source);
+    progress('Reading all pages with the local OCR reader…',8);const body=new FormData();body.append('file',source);
     const response=await fetch(endpoint,{method:'POST',body,headers:operation?{'X-OCR-Request-ID':operation.requestId}:{},signal:controller.signal});let result;
     try{result=await response.json();}catch{throw Error('The document reader returned an invalid response. Restart the OCR server.');}
     if(!response.ok||result.success===false){
@@ -879,7 +879,7 @@ async function extractDocument(source,progress=()=>{}){
    }finally{clearTimeout(timer);}
   }else warnings.push('The local OCR reader is not running; the browser reader was used. Start START_OCR.bat for local reading.');
  }
- let worker=null,pdf=null,stage='Reading scanned textâ€¦',floor=0,span=90;
+ let worker=null,pdf=null,stage='Reading scanned text…',floor=0,span=90;
  async function recognize(input,psm='3'){
   checkRead();clearTimeout(readerRuntime.idle);
   readerRuntime.logger=info=>{if(info.status==='recognizing text')progress(stage,Math.min(98,Math.round(floor+info.progress*span)));};
@@ -974,7 +974,7 @@ async function extractDocument(source,progress=()=>{}){
   else if(extension==='pdf'){
    const lib=await import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs');lib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';pdf=await lib.getDocument({data:await source.arrayBuffer(),isEvalSupported:false}).promise;const pages=[];
    for(let number=1;number<=pdf.numPages;number++){
-    stage=`Reading page ${number} of ${pdf.numPages}, including the body and signatureâ€¦`;floor=(number-1)/pdf.numPages*90;span=90/pdf.numPages;progress(stage,Math.round(floor));
+    stage=`Reading page ${number} of ${pdf.numPages}, including the body and signature…`;floor=(number-1)/pdf.numPages*90;span=90/pdf.numPages;progress(stage,Math.round(floor));
     const page=await pdf.getPage(number),content=await page.getTextContent(),native=pdfTextLines(content.items),ops=await page.getOperatorList();
     let pageText=native;
     if(pdfNeedsOcr(lib,ops,content.items,native,page)){
@@ -990,7 +990,7 @@ async function extractDocument(source,progress=()=>{}){
    text=pages.join('\n\f\n');
   }else if(/^(tif|tiff)$/.test(extension)){
    await loadReaderScript('https://cdn.jsdelivr.net/npm/pako@1.0.11/dist/pako.min.js');await loadReaderScript('https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js');const bytes=await source.arrayBuffer(),frames=UTIF.decode(bytes),pages=[];
-   for(let i=0;i<frames.length;i++){const frame=frames[i];UTIF.decodeImage(bytes,frame);const canvas=document.createElement('canvas');canvas.width=frame.width;canvas.height=frame.height;canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(UTIF.toRGBA8(frame)),frame.width,frame.height),0,0);stage=`Reading image page ${i+1} of ${frames.length}â€¦`;floor=i/frames.length*90;span=90/frames.length;try{pages.push(await readPage(canvas));}finally{canvas.width=canvas.height=0;}}
+   for(let i=0;i<frames.length;i++){const frame=frames[i];UTIF.decodeImage(bytes,frame);const canvas=document.createElement('canvas');canvas.width=frame.width;canvas.height=frame.height;canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(UTIF.toRGBA8(frame)),frame.width,frame.height),0,0);stage=`Reading image page ${i+1} of ${frames.length}…`;floor=i/frames.length*90;span=90/frames.length;try{pages.push(await readPage(canvas));}finally{canvas.width=canvas.height=0;}}
    text=pages.join('\n\f\n');
   }else if(/^(png|jpe?g|webp|bmp)$/.test(extension)){const canvas=await imageCanvas(source);try{text=await readPage(canvas);}finally{canvas.width=canvas.height=0;}}
   else throw Error('This file type is not supported by the document reader.');
@@ -1003,11 +1003,11 @@ async function extractDocument(source,progress=()=>{}){
   async function runMemoOcr(file){
     if(!file||busy||fileBusy||ocrBusy)return;ocrBusy=true;setMemoFieldsBusy(true);const token=++memoOcrToken;memoFormModal.dataset.busy='true';document.getElementById('memoOcrStopControls').hidden=false;runMemoOcrBtn.disabled=true;saveMemoSubmitBtn.disabled=true;formPdfFile.disabled=true;removeAttachmentBtn.disabled=true;
     try{
-      setMemoOcrStatus('Reading the documentâ€¦','working');
+      setMemoOcrStatus('Reading the document…','working');
       const result=await readWithCancellation(file,(message,pct)=>{setMemoOcrStatus(message,'working');setMemoUploadProgress(pct,message,true);}),text=String(result.text||'').trim();
       if(token!==memoOcrToken)return;if(!text)throw Error('No readable text detected. Enter the fields manually.');
       memoOcrText.value=text;applyMemoFields(text);
-      setMemoOcrStatus(`Extraction complete â€” ${text.length.toLocaleString()} characters. Review the detected fields.`,'success');showToast('Document text extracted. Review the fields before saving.');
+      setMemoOcrStatus(`Extraction complete — ${text.length.toLocaleString()} characters. Review the detected fields.`,'success');showToast('Document text extracted. Review the fields before saving.');
     }catch(error){setMemoOcrStatus(error.message,'error');showToast(error.message,'error');}
     finally{document.getElementById('memoOcrStopControls').hidden=true;ocrBusy=false;setMemoFieldsBusy(false);memoFormModal.dataset.busy='false';runMemoOcrBtn.disabled=!selectedMemoFile;saveMemoSubmitBtn.disabled=false;formPdfFile.disabled=false;removeAttachmentBtn.disabled=false;setMemoUploadProgress(0,'',false);M.renderIcons();}
   }
@@ -1156,7 +1156,7 @@ async function extractDocument(source,progress=()=>{}){
       clearMemoDetection();formExistingPdfBase64.value = dataUrl;
       refreshMemoFileCard({
         name: file.name,
-        meta: `${formatMemoFileSize(file.size)} â€¢ ${file.name.split(".").pop().toUpperCase()} document`
+        meta: `${formatMemoFileSize(file.size)} • ${file.name.split(".").pop().toUpperCase()} document`
       });
 
       setMemoUploadProgress(100, "Document ready", true);
@@ -1476,7 +1476,7 @@ async function extractDocument(source,progress=()=>{}){
     const previous=memoPreview.renderPromise;
     memoPdfPageLabel.textContent=`Page ${pageNumber} of ${documentPdf.numPages}`;
     memoPdfPrevPage.disabled=pageNumber<=1;memoPdfNextPage.disabled=pageNumber>=documentPdf.numPages;
-    memoPdfRenderStatus.textContent='Rendering pageâ€¦';memoPdfStage.setAttribute('aria-busy','true');
+    memoPdfRenderStatus.textContent='Rendering page…';memoPdfStage.setAttribute('aria-busy','true');
     memoPreview.renderPromise=(async()=>{
       await previous.catch(()=>{});
       if(!memoPreviewIsCurrent(generation)||version!==memoPreview.renderVersion)return;
@@ -1571,7 +1571,7 @@ async function extractDocument(source,progress=()=>{}){
     const filename=String(memo.pdfFileName||'Memorandum.pdf').replace(/[\\/\u0000-\u001f\u007f]/g,'_');
     viewPdfTitle.textContent=memo.memoNo?`Directive ${memo.memoNo}`:'Directive Viewer';
     viewPdfSubtitle.textContent=memo.subject||memo.title||'Office Directive';
-    showMemoPreviewState(url?'Loading attachmentâ€¦':'No attachment',url?'Preparing the document preview.':'No electronic attachment on this memorandum.');
+    showMemoPreviewState(url?'Loading attachment…':'No attachment',url?'Preparing the document preview.':'No electronic attachment on this memorandum.');
     M.openModal('viewPdfModal');
     if(!url)return;
     // A remote link remains usable if its server disallows cross-origin preview requests.
@@ -1666,7 +1666,7 @@ async function extractDocument(source,progress=()=>{}){
       const query = input.value.trim().toLowerCase(), words = query.split(/\s+/).filter(Boolean);
       const matches = links.filter(a => words.every(word => `${a.name} ${a.group} ${a.href}`.toLowerCase().includes(word)));
       active = -1;
-      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">â†—</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try â€œmemoâ€, â€œinventoryâ€, or â€œusersâ€.</p>';
+      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">↗</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try “memo”, “inventory”, or “users”.</p>';
       $('workspaceJumpCount').textContent = `${matches.length} destination${matches.length === 1 ? '' : 's'}`;
     }
     function open() {
@@ -1708,7 +1708,7 @@ async function extractDocument(source,progress=()=>{}){
       surface.querySelector('.modal-header').after(status);
       let locked = false, wasInert = false, focus = null;
       const update = () => {
-        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Workingâ€¦ Please wait before making more changes.' : '';
+        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Working… Please wait before making more changes.' : '';
         if (busy && !locked && form) { locked = true; wasInert = form.inert; focus = document.activeElement; form.inert = true; }
         if (!busy && locked) { locked = false; form.inert = wasInert; if (surface.classList.contains('open') && focus?.isConnected && !focus.disabled) focus.focus({preventScroll:true}); }
       };
@@ -1750,7 +1750,7 @@ async function extractDocument(source,progress=()=>{}){
       region.setAttribute('tabindex','0'); region.setAttribute('role','region');
       if (!region.hasAttribute('aria-label')) region.setAttribute('aria-label','Registry table; scroll horizontally to see all columns');
       const controls = document.createElement('div'); controls.className = 'workspace-table-controls'; controls.hidden = true;
-      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">â†</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">â†’</button></div>`;
+      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">←</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">→</button></div>`;
       region.after(controls); const [left,right] = controls.querySelectorAll('button');
       const update = () => { const overflow = region.scrollWidth > region.clientWidth+2; controls.hidden = !overflow; left.disabled = region.scrollLeft <= 2; right.disabled = region.scrollLeft + region.clientWidth >= region.scrollWidth-2; };
       const motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';

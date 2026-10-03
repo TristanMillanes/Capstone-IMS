@@ -2,6 +2,15 @@
 
 Updated 2 October 2026.
 
+
+## Render / Docker deployment
+
+This revision can now run as **one Docker Web Service**: the Flask application serves the existing HTML/CSS/JS and the same Python/Tesseract OCR service. The existing Supabase project remains the database, authentication and storage backend.
+
+For deployment, use the repository-root `Dockerfile`, `requirements.txt` and optional `render.yaml`. On Render choose **Web Service → Docker**. The deployed site opens `/User/login.html`; OCR is available on the same origin at `/ocr`, with `/health` as the health-check endpoint. See `docs/DEPLOYMENT_RENDER.md`.
+
+Local OCR startup with `User/START_OCR.bat` remains supported.
+
 ## Start the application
 
 1. Extract this ZIP into a fresh folder. Use the complete `Capstone-IMS` folder so that the corrected lowercase filenames and module scripts stay together.

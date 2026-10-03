@@ -26,7 +26,7 @@
 
 <!-- Core Admin Stylesheets Matching admin.html -->
 
-<link href="employee-admin.css?v=20261003-complete-monitoring" rel="stylesheet"/>
+<link href="employee-admin.css?v=20261003-polished-forms" rel="stylesheet"/>
 
 </head>
 
@@ -700,7 +700,7 @@
 
 <th>Duty Status</th>
 
-<th style="text-align: right; width: 120px;">Actions</th>
+<th style="text-align: right; width: 220px;">Actions</th>
 
 </tr>
 
@@ -796,7 +796,7 @@
 
 <h2 id="employeeModalTitle">Add New Employee</h2>
 
-<p>Complete the official employee masterfile data record below.</p>
+<p>Complete the employee details. Fields marked * are required.</p>
 
 </div>
 
@@ -804,19 +804,25 @@
 
 </div>
 
-<form id="employeeForm">
+<form id="employeeForm" autocomplete="off">
+<div id="employeeFormFeedback" class="form-feedback" role="status" aria-live="polite" hidden></div>
+<div class="employee-form-workspace">
+<aside class="employee-form-navigation" aria-label="Employee form sections">
+  <div class="employee-form-nav-heading"><span>EMPLOYEE DETAILS</span><p>Jump to a section</p></div>
+  <nav class="employee-form-section-links" aria-label="Sections"><button type="button" class="employee-section-link active" data-form-section="employee-section-personal" aria-controls="employee-section-personal" aria-current="location" title="Personal Information"><i data-lucide="id-card"></i><span>Personal</span><small>01</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-work" aria-controls="employee-section-work" title="Work Information"><i data-lucide="briefcase"></i><span>Work</span><small>02</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-benefits" aria-controls="employee-section-benefits" title="Government & Benefit Numbers"><i data-lucide="file-check-2"></i><span>Benefits</span><small>03</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-address" aria-controls="employee-section-address" title="Complete Address"><i data-lucide="building-2"></i><span>Address</span><small>04</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-family" aria-controls="employee-section-family" title="Family Background"><i data-lucide="users-round"></i><span>Family</span><small>05</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-contact" aria-controls="employee-section-contact" title="Contact Information"><i data-lucide="contact"></i><span>Contact</span><small>06</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-education" aria-controls="employee-section-education" title="Educational Background"><i data-lucide="award"></i><span>Education</span><small>07</small></button></nav><div class="employee-form-completion"><div><strong>Required fields</strong><span id="employeeFormCompletionCount">0 / 5</span></div><progress id="employeeFormCompletion" max="5" value="0" aria-label="Required fields completed"></progress><p id="employeeFormCompletionText">Complete the required fields to save.</p></div>
+</aside>
 
-<div class="modal-body employee-record-form-body">
+<div class="modal-body employee-record-form-body" id="employeeFormSections" tabindex="-1">
 
 <!-- PERSONAL -->
 
-<div class="form-section">
+<section class="form-section" id="employee-section-personal" aria-label="Personal Information">
 
   <div class="form-section-title">
 
     <i data-lucide="id-card"></i>
 
-    <div><h3>Personal Information</h3><p>Legacy Employee Record demographic and civil registry fields.</p></div>
+    <div><h3>Personal Information</h3><p>Name, birth details, and personal information.</p></div>
 
   </div>
 
@@ -849,18 +855,17 @@
     <div class="form-group"><label for="empWeightKg">Weight (kg)</label><input class="form-control" id="empWeightKg" min="0" step="0.1" placeholder="e.g. 60" type="number"/></div>
 
   </div>
-
-</div>
+</section>
 
 <!-- EMPLOYMENT -->
 
-<div class="form-section">
+<section class="form-section" id="employee-section-work" aria-label="Work Information">
 
   <div class="form-section-title">
 
     <i data-lucide="briefcase"></i>
 
-    <div><h3>Work Information</h3><p>Appointment, designation, compensation, eligibility, and service identifiers.</p></div>
+    <div><h3>Work Information</h3><p>Appointment, position, division, and compensation.</p></div>
 
   </div>
 
@@ -891,18 +896,17 @@
     <div class="form-group span-2"><label for="empEligibility">Eligibility</label><input class="form-control" id="empEligibility" placeholder="Civil Service / board / professional eligibility" type="text"/></div>
 
   </div>
-
-</div>
+</section>
 
 <!-- GOVERNMENT NUMBERS -->
 
-<div class="form-section">
+<section class="form-section" id="employee-section-benefits" aria-label="Government & Benefit Numbers">
 
   <div class="form-section-title">
 
     <i data-lucide="file-check-2"></i>
 
-    <div><h3>Government & Benefit Numbers</h3><p>Personnel numbers shown in the legacy Employee Record form.</p></div>
+    <div><h3>Government & Benefit Numbers</h3><p>Government identification and benefit membership numbers.</p></div>
 
   </div>
 
@@ -917,18 +921,17 @@
     <div class="form-group"><label for="empPhilhealthNo">PHILHEALTH No.</label><input class="form-control" id="empPhilhealthNo" autocomplete="off" type="text"/></div>
 
   </div>
-
-</div>
+</section>
 
 <!-- ADDRESS -->
 
-<div class="form-section">
+<section class="form-section" id="employee-section-address" aria-label="Complete Address">
 
   <div class="form-section-title">
 
     <i data-lucide="building-2"></i>
 
-    <div><h3>Complete Address</h3><p>Structured residential address for accurate personnel records and searching.</p></div>
+    <div><h3>Complete Address</h3><p>House or street, barangay, municipality, and province.</p></div>
 
   </div>
 
@@ -944,21 +947,20 @@
 
     <div class="form-group"><label for="empZipCode">Zip Code</label><input class="form-control" id="empZipCode" inputmode="numeric" type="text"/></div>
 
-    <div class="form-group full"><label for="empAddress">Legacy / Additional Complete Address</label><textarea class="form-control" id="empAddress" placeholder="Used as fallback for older records when structured address fields are blank." rows="2"></textarea></div>
+    <div class="form-group full"><label for="empAddress">Additional / Complete Address</label><textarea class="form-control" id="empAddress" placeholder="Enter a complete address if the fields above are blank." rows="2"></textarea></div>
 
   </div>
-
-</div>
+</section>
 
 <!-- FAMILY -->
 
-<div class="form-section">
+<section class="form-section" id="employee-section-family" aria-label="Family Background">
 
   <div class="form-section-title">
 
     <i data-lucide="users-round"></i>
 
-    <div><h3>Family Background</h3><p>Spouse information included in the original Employee Record.</p></div>
+    <div><h3>Family Background</h3><p>Spouse details, occupation, and contact information.</p></div>
 
   </div>
 
@@ -981,18 +983,17 @@
     <div class="form-group full"><label for="empSpouseEmail">Email Address</label><input class="form-control" id="empSpouseEmail" type="email"/></div>
 
   </div>
-
-</div>
+</section>
 
 <!-- CONTACT -->
 
-<div class="form-section">
+<section class="form-section" id="employee-section-contact" aria-label="Contact Information">
 
   <div class="form-section-title">
 
     <i data-lucide="contact"></i>
 
-    <div><h3>Contact Information</h3><p>Landline, two mobile numbers, email, and social profiles from the legacy record.</p></div>
+    <div><h3>Contact Information</h3><p>Phone numbers, email address, and social profiles.</p></div>
 
   </div>
 
@@ -1013,12 +1014,11 @@
     <div class="form-group"><label for="empTwitter">Twitter / X</label><input class="form-control" id="empTwitter" type="text"/></div>
 
   </div>
-
-</div>
+</section>
 
 <!-- EDUCATION -->
 
-<div class="form-section">
+<section class="form-section" id="employee-section-education" aria-label="Educational Background">
 
   <div class="form-section-title">
 
@@ -1039,25 +1039,18 @@
     <div class="form-group"><label for="empYearGraduated">Year Graduated</label><input class="form-control" id="empYearGraduated" inputmode="numeric" maxlength="4" placeholder="e.g. 2010" type="text"/></div>
 
   </div>
+</section>
 
 </div>
 
 </div>
-
-<div class="modal-actions">
-
-<button class="btn btn-secondary" data-close="employeeFormModal" type="button">Cancel</button>
-
-<button class="btn btn-secondary" id="clearEmployeeFormBtn" type="button">Reset Form</button>
-
-<button class="btn btn-primary" id="saveEmployeeBtn" type="submit">
-
-<i data-lucide="save"></i>
-
-<span>Save Employee</span>
-
-</button>
-
+<div class="modal-actions employee-form-footer">
+  <p class="employee-form-footer-note"><span class="required-mark">*</span> Required fields</p>
+  <div class="employee-form-footer-buttons">
+    <button class="btn btn-ghost" id="clearEmployeeFormBtn" type="button"><i data-lucide="rotate-ccw"></i><span>Reset Form</span></button>
+    <button class="btn btn-secondary" data-close="employeeFormModal" type="button">Cancel</button>
+    <button class="btn btn-primary" id="saveEmployeeBtn" type="submit"><i data-lucide="save"></i><span>Save Employee</span></button>
+  </div>
 </div>
 
 </form>
@@ -1113,10 +1106,15 @@
 </div>
 
 <div class="employee-record-tabs" role="tablist" aria-label="Employee record sections">
-  <button id="employeeRecordTab" class="employee-record-tab active" role="tab" aria-selected="true" aria-controls="employeeDetailsPanel" tabindex="0" type="button"><i data-lucide="id-card"></i>Employee Record</button>
-  <button id="ceremonyTab" class="employee-record-tab" role="tab" aria-selected="false" aria-controls="ceremonyPanel" tabindex="-1" type="button"><i data-lucide="flag"></i>Flag Ceremony <span id="ceremonyTabCount" class="employee-tab-count">0</span></button>
-  <button id="uniformTab" class="employee-record-tab" role="tab" aria-selected="false" aria-controls="uniformPanel" tabindex="-1" type="button"><i data-lucide="shirt"></i>Uniform Monitoring <span id="uniformTabCount" class="employee-tab-count">0</span></button>
+
+  <button id="employeeRecordTab" class="employee-record-tab active" role="tab" aria-selected="true" aria-controls="employeeDetailsPanel" tabindex="0" type="button"><i data-lucide="id-card"></i><span class="employee-tab-label">Employee Record</span></button>
+
+  <button id="ceremonyTab" class="employee-record-tab" role="tab" aria-selected="false" aria-controls="ceremonyPanel" tabindex="-1" type="button"><i data-lucide="flag"></i><span class="employee-tab-label">Flag Ceremony</span> <span id="ceremonyTabCount" class="employee-tab-count">0</span></button>
+
+  <button id="uniformTab" class="employee-record-tab" role="tab" aria-selected="false" aria-controls="uniformPanel" tabindex="-1" type="button"><i data-lucide="shirt"></i><span class="employee-tab-label">Uniform Monitoring</span> <span id="uniformTabCount" class="employee-tab-count">0</span></button>
+
 </div>
+
 <div class="profile-sections employee-tab-panel" id="employeeDetailsPanel" role="tabpanel" aria-labelledby="employeeRecordTab">
 
 <section class="profile-section">
@@ -1286,43 +1284,83 @@
 </div>
 
 <section id="ceremonyPanel" class="employee-tab-panel monitor-panel" role="tabpanel" aria-labelledby="ceremonyTab" hidden>
+
   <div class="monitor-panel-heading"><div><h3>Flag Ceremony Monitoring</h3><p>Records for the employee shown above. Summary counts match the current filters.</p></div><button class="btn btn-secondary monitor-export" id="ceremonyExport" type="button"><i data-lucide="download"></i>Export CSV</button></div>
+
   <div class="monitor-summary ceremony-summary" aria-live="polite"><div class="monitor-stat"><span>Present</span><strong id="ceremonySummary0">0</strong></div><div class="monitor-stat"><span>Absent</span><strong id="ceremonySummary1">0</strong></div><div class="monitor-stat"><span>O.B.</span><strong id="ceremonySummary2">0</strong></div><div class="monitor-stat"><span>Leave</span><strong id="ceremonySummary3">0</strong></div><div class="monitor-stat"><span>Late</span><strong id="ceremonySummary4">0</strong></div><div class="monitor-stat"><span>Total Counted</span><strong id="ceremonySummary5">0</strong></div></div>
+
   <p class="monitor-summary-note">Total Counted = Present + O.B. + Leave + Late; absent records remain in the total records.</p>
+
   <p id="ceremonyPrintScope" class="monitor-print-scope"></p>
+
   <div class="monitor-layout">
+
     <form id="ceremonyForm" class="monitor-editor">
+
       <div class="monitor-editor-heading"><h4 id="ceremonyEditorTitle">Add Record</h4><span class="monitor-edit-tag" id="ceremonyEditTag" hidden>Editing</span></div>
-      <div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number</label><input class="form-control" id="ceremonyControl" type="text"  placeholder="Automatically generated if blank" maxlength="80"/></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" type="date" required /></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" rows="3" maxlength="2000" placeholder="Optional notes"></textarea></div></div>
-      <div class="monitor-editor-actions"><button class="btn btn-primary" id="ceremonySave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-secondary" id="ceremonyClear" type="button">Clear</button></div>
+
+      <div id="ceremonyFeedback" class="form-feedback" role="status" aria-live="polite" hidden></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number</label><input class="form-control" id="ceremonyControl" type="text" placeholder="e.g. FC-2026-0001" maxlength="80" aria-describedby="ceremonyControlHelp"/><small class="field-help" id="ceremonyControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" type="date" required /></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" rows="3" maxlength="2000" placeholder="Optional notes"></textarea></div></div>
+
+      <div class="monitor-editor-actions"><button class="btn btn-primary" id="ceremonySave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="ceremonyClear" type="button">Clear</button></div>
+
     </form>
+
     <div class="monitor-report">
-      <form id="ceremonyFilters" class="monitor-filters"><div class="form-group"><label for="ceremonyFrom">From</label><input class="form-control" id="ceremonyFrom" type="date"  /></div><div class="form-group"><label for="ceremonyTo">To</label><input class="form-control" id="ceremonyTo" type="date"  /></div><div class="form-group"><label for="ceremonyFilterActivity">Activity</label><select class="form-control" id="ceremonyFilterActivity" ><option value="">05. All activities</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group"><label for="ceremonyFilterStatus">Status</label><select class="form-control" id="ceremonyFilterStatus" ><option value="">All statuses</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group full"><label for="ceremonySearch">Search</label><input class="form-control" id="ceremonySearch" type="search"  placeholder="Control number, date, activity, or remarks" maxlength="200"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit">Show Results</button><button class="btn btn-ghost" type="reset">Reset Filters</button></div></form>
+
+      <form id="ceremonyFilters" class="monitor-filters"><div class="form-group"><label for="ceremonyFrom">From</label><input class="form-control" id="ceremonyFrom" type="date"  /></div><div class="form-group"><label for="ceremonyTo">To</label><input class="form-control" id="ceremonyTo" type="date"  /></div><div class="form-group"><label for="ceremonyFilterActivity">Activity</label><select class="form-control" id="ceremonyFilterActivity" ><option value="">05. All activities</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group"><label for="ceremonyFilterStatus">Status</label><select class="form-control" id="ceremonyFilterStatus" ><option value="">All statuses</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group full"><label for="ceremonySearch">Search</label><input class="form-control" id="ceremonySearch" type="search"  placeholder="Control number, date, activity, or remarks" maxlength="200"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
+
       <p class="monitor-filter-error" id="ceremonyFilterError" role="status" hidden></p>
+
       <div class="monitor-report-heading"><strong id="ceremonyRecordCount">0 records</strong><span>Newest date first</span></div>
+
       <div class="monitor-table-scroll table-responsive" id="ceremonyTableRegion" role="region" aria-label="Flag Ceremony Monitoring records" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Status</th><th>Activity</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="ceremonyTableBody"></tbody></table></div>
+
     </div>
+
   </div>
+
 </section>
+
 <section id="uniformPanel" class="employee-tab-panel monitor-panel" role="tabpanel" aria-labelledby="uniformTab" hidden>
+
   <div class="monitor-panel-heading"><div><h3>Prescribed Uniform Monitoring</h3><p>Records for the employee shown above. Summary counts match the current filters.</p></div><button class="btn btn-secondary monitor-export" id="uniformExport" type="button"><i data-lucide="download"></i>Export CSV</button></div>
+
   <div class="monitor-summary uniform-summary" aria-live="polite"><div class="monitor-stat"><span>Yes — Compliant</span><strong id="uniformSummary0">0</strong></div><div class="monitor-stat"><span>No — Noncompliant</span><strong id="uniformSummary1">0</strong></div><div class="monitor-stat"><span>Total Records</span><strong id="uniformSummary2">0</strong></div><div class="monitor-stat"><span>Compliance Rate</span><strong id="uniformSummary3">0</strong></div></div>
+
   <p class="monitor-summary-note">Compliance rate = Yes ÷ total matching records. All dates include both endpoints.</p>
+
   <p id="uniformPrintScope" class="monitor-print-scope"></p>
+
   <div class="monitor-layout">
+
     <form id="uniformForm" class="monitor-editor">
+
       <div class="monitor-editor-heading"><h4 id="uniformEditorTitle">Add Record</h4><span class="monitor-edit-tag" id="uniformEditTag" hidden>Editing</span></div>
-      <div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number</label><input class="form-control" id="uniformControl" type="text"  placeholder="Automatically generated if blank" maxlength="80"/></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" type="date" required /></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" rows="3" maxlength="2000" placeholder="Optional notes"></textarea></div></div>
-      <div class="monitor-editor-actions"><button class="btn btn-primary" id="uniformSave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-secondary" id="uniformClear" type="button">Clear</button></div>
+
+      <div id="uniformFeedback" class="form-feedback" role="status" aria-live="polite" hidden></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number</label><input class="form-control" id="uniformControl" type="text" placeholder="e.g. UM-2026-0001" maxlength="80" aria-describedby="uniformControlHelp"/><small class="field-help" id="uniformControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" type="date" required /></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" rows="3" maxlength="2000" placeholder="Optional notes"></textarea></div></div>
+
+      <div class="monitor-editor-actions"><button class="btn btn-primary" id="uniformSave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="uniformClear" type="button">Clear</button></div>
+
     </form>
+
     <div class="monitor-report">
-      <form id="uniformFilters" class="monitor-filters"><div class="form-group"><label for="uniformFrom">From</label><input class="form-control" id="uniformFrom" type="date"  /></div><div class="form-group"><label for="uniformTo">To</label><input class="form-control" id="uniformTo" type="date"  /></div><div class="form-group"><label for="uniformFilterStatus">Compliance</label><select class="form-control" id="uniformFilterStatus" ><option value="">All records</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformSearch">Search</label><input class="form-control" id="uniformSearch" type="search"  placeholder="Control number, date, activity, or remarks" maxlength="200"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit">Show Results</button><button class="btn btn-ghost" type="reset">Reset Filters</button></div></form>
+
+      <form id="uniformFilters" class="monitor-filters"><div class="form-group"><label for="uniformFrom">From</label><input class="form-control" id="uniformFrom" type="date"  /></div><div class="form-group"><label for="uniformTo">To</label><input class="form-control" id="uniformTo" type="date"  /></div><div class="form-group"><label for="uniformFilterStatus">Compliance</label><select class="form-control" id="uniformFilterStatus" ><option value="">All records</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformSearch">Search</label><input class="form-control" id="uniformSearch" type="search" placeholder="Control number, date, or remarks" maxlength="200"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
+
       <p class="monitor-filter-error" id="uniformFilterError" role="status" hidden></p>
+
       <div class="monitor-report-heading"><strong id="uniformRecordCount">0 records</strong><span>Newest date first</span></div>
+
       <div class="monitor-table-scroll table-responsive" id="uniformTableRegion" role="region" aria-label="Prescribed Uniform Monitoring records" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Compliant</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="uniformTableBody"></tbody></table></div>
+
     </div>
+
   </div>
+
 </section>
+
 </div>
 
 <div class="modal-actions">
@@ -1346,13 +1384,14 @@
 </div>
 
 <div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div>
+
 <div id="employeePrintArea" aria-hidden="true"></div>
 
 <!-- Shared System Scripts -->
 
 <script defer="" src="../shared/supabase.js?v=20261002-fixed"></script>
 
-<script defer="" src="employee-admin.js?v=20261003-complete-monitoring"></script>
+<script defer="" src="employee-admin.js?v=20261003-polished-forms"></script>
 
 <div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
 

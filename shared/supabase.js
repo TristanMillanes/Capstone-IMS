@@ -2732,7 +2732,7 @@
                 status: {
                   type: "online",
                   message:
-                    "Supabase Live â€¢ All Modules Synced"
+                    "Supabase Live • All Modules Synced"
                 }
               });
           };
