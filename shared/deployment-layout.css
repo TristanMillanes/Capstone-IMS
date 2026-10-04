@@ -1,0 +1,53 @@
+/*
+ * Render deployment layout guard
+ * Keeps the existing PGENRO design dimensions intact while preventing a
+ * single oversized child from widening the whole page after deployment.
+ * Page-specific CSS remains the source of truth for the visual design.
+ */
+html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.app-container,
+.app-layout,
+.main-content,
+.page-content,
+.content-wrapper,
+.dashboard-container,
+main {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.table-wrapper,
+.table-container,
+.responsive-table,
+.ws-table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+}
+
+.modal-panel,
+.modal-content,
+.modal-dialog {
+  max-width: calc(100vw - 24px);
+}
+
+/* Keep explicit component dimensions from their own CSS. Only cap raster
+   media that can otherwise force the document wider than the viewport. */
+img,
+video {
+  max-width: 100%;
+}

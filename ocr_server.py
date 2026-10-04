@@ -151,6 +151,21 @@ def pgenro_security_headers(response):
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     response.headers.setdefault("Permissions-Policy", "camera=(), microphone=(), geolocation=()")
+
+    # Render redeploys can otherwise leave an older HTML/CSS/JS combination in
+    # the browser cache. That can make the interface look enlarged or create
+    # page-level overflow even though the deployed files are correct. Force
+    # browser revalidation so every redeploy uses one matching UI build.
+    content_type = (response.content_type or "").lower()
+    if (
+        "text/html" in content_type
+        or "text/css" in content_type
+        or "javascript" in content_type
+        or "application/json" in content_type
+    ):
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
     return response
 
 
