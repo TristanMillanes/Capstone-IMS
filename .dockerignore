@@ -15,3 +15,6 @@ docs
 *.log
 .env
 .env.*
+REDEPLOY_AUDIT.md
+FIXES_AND_SETUP.md
+README*.md

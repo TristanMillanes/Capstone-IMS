@@ -951,7 +951,7 @@
           ui.body
             .dataset
             .loginUrl ||
-          "../index.html"
+          "/User/login.html"
         );
     }
 
