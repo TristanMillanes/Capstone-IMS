@@ -1,0 +1,36 @@
+{
+  "passed": true,
+  "testsRun": 7,
+  "method": "Production Flask app, real Tesseract, local fixtures; no hosted database",
+  "results": [
+    {
+      "test": "test_all_pages_and_cross_document_page_reuse",
+      "completed": true
+    },
+    {
+      "test": "test_business_address_and_inferred_purpose",
+      "completed": true
+    },
+    {
+      "test": "test_cancel_queued_request_and_retry",
+      "completed": true
+    },
+    {
+      "test": "test_date_semantics_and_memo_number",
+      "completed": true
+    },
+    {
+      "test": "test_deployment_pages_assets_and_access_boundary",
+      "completed": true
+    },
+    {
+      "test": "test_header_images_in_word_documents",
+      "completed": true
+    },
+    {
+      "test": "test_inline_and_continued_signatures",
+      "completed": true
+    }
+  ],
+  "failures": []
+}

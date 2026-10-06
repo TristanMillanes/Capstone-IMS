@@ -11,8 +11,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="officememo.css?v=20261002-fixed" rel="stylesheet">
-<link href="../shared/deployment-layout.css?v=20261004-ui-preserve" rel="stylesheet"/>
+  <link href="officememo.css?v=20261004-ocr-ui-v8" rel="stylesheet">
+<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
 </head>
 
 <body class="pgenro-user"
@@ -325,10 +325,17 @@
 
       <div class="modal-body">
         <div class="pdf-viewer-box">
-          <iframe class="pdf-iframe"
-                  id="pdfFrame"
-                  src=""
-                  title="Office memorandum document"></iframe>
+          <div class="memo-document-toolbar" id="memoDocumentToolbar" hidden>
+            <button type="button" id="memoUserPrevPage" aria-label="Previous document page">Previous</button>
+            <span id="memoUserPageLabel" aria-live="polite">Page 1</span>
+            <button type="button" id="memoUserNextPage" aria-label="Next document page">Next</button>
+            <a id="memoUserDownload" target="_blank" rel="noopener noreferrer">Download document</a>
+          </div>
+          <div class="memo-document-stage" id="pdfFrame" aria-label="Office memorandum document" aria-busy="false" hidden>
+            <canvas id="memoUserPdfCanvas" hidden></canvas>
+            <img id="memoUserDocumentImage" alt="Attached memorandum" hidden>
+            <pre id="memoUserDocumentText" hidden></pre>
+          </div>
 
           <div class="no-pdf-placeholder hidden" id="noPdfMessage">
             <span class="no-pdf-icon">
@@ -354,7 +361,7 @@
        aria-atomic="true"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="../shared/supabase.js?v=20261002-fixed"></script>
-<script defer src="officememo.js?v=20261002-fixed"></script>
+  <script defer src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
+<script defer src="officememo.js?v=20261004-ocr-ui-v8"></script>
 </body>
 </html>

@@ -7,7 +7,7 @@
       "result": "PASS"
     },
     {
-      "scenario": "Real scan autofills sender, issue date, control number and type after Stop/Retry; manual subject survives",
+      "scenario": "Real scan autofills sender, received date, control number and type after Stop/Retry; manual subject survives",
       "result": "PASS"
     },
     {

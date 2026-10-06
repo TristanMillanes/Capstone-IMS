@@ -1,68 +1,50 @@
-# Capstone IMS — corrected UI and workflows
+# PGENRO IMS — OCR and UI update
 
-Updated 2 October 2026.
+Updated 4 October 2026. Use the complete application folder from this archive.
 
+## Start or update the system
 
-## Render / Docker deployment
+1. Extract into a fresh folder, then use the contents of `Capstone-IMS` as your project root. Keep the existing Supabase project configuration in `shared/supabase.js`.
+2. Run `supabase/DOCUMENT_STORAGE_PATCH.sql` once in your existing Supabase SQL Editor. It creates the private `pgenro-documents` bucket with approved-user read access and administrator upload/change/delete access. It requires the existing `is_pgenro_admin()` and `is_pgenro_active_user()` helpers from your supplied setup. It is safe to rerun and does not delete records. The patch has not been applied to your hosted project.
+3. Redeploy the complete folder using the included `Dockerfile` and `render.yaml`, or start the combined local server as shown below.
+4. Refresh the browser after deployment. Sign in with an approved account. Use Communications or Office Memos to attach a document, read it, review the detected fields, and save.
 
-This revision can now run as **one Docker Web Service**: the Flask application serves the existing HTML/CSS/JS and the same Python/Tesseract OCR service. The existing Supabase project remains the database, authentication and storage backend.
-
-For deployment, use the repository-root `Dockerfile`, `requirements.txt` and optional `render.yaml`. On Render choose **Web Service → Docker**. The deployed site opens `/User/login.html`; OCR is available on the same origin at `/ocr`, with `/health` as the health-check endpoint. See `docs/DEPLOYMENT_RENDER.md`.
-
-Local OCR startup with `User/START_OCR.bat` remains supported.
-
-## Start the application
-
-1. Extract this ZIP into a fresh folder. Use the complete `Capstone-IMS` folder so that the corrected lowercase filenames and module scripts stay together.
-2. From that folder, run `python -m http.server 8000` (on Windows, `py -3 -m http.server 8000` also works).
-3. Open `http://localhost:8000/User/login.html`. Sign in with your existing approved account. Administrator accounts open the admin workspace; ordinary accounts open the viewer workspace.
-
-The existing Supabase project configuration is retained. No live records or account credentials were changed during this update.
-
-## Communications upload/save correction
-
-This revision addresses the screenshot error **“Invalid communication type. Use Incoming or Outgoing.”** The form now sends the selected direction consistently through the legacy JSON field names, including `type`, `communicationType` and `communication_type`. Document Type and the attachment MIME type remain separate. Existing flat-column tables retain their own columns.
-
-Replace the complete application folder with this version, then restart Live Server and press **Ctrl+F5** on the Communications page. If you are copying only this correction into the previously corrected project, replace **both** `admin/admincommunication.html` and `admin/admincommunication.js`. The HTML includes a new script version to avoid using a cached copy.
-
-Attach the document, review the required fields, and click **Save Record**. A failed save keeps the draft and selected file available for retry. Saved Communications attachments remain in the browser where they were attached; **View file** opens/downloads the retained document there.
-
-The same error was reproduced with a strict simulated database validator before the correction. This revision passed the supported JSON direction variants, flat-column saves, attachment recovery and browser checks. The hosted validator definition was not available, so these results do not establish that the live database has been tested. This correction does not require a new SQL patch or removal of the existing validation.
-
-## Apply the database access patch
-
-For your existing database, run **`supabase/READONLY_USER_PATCH.sql`** in the Supabase SQL Editor after any other setup patches. It requires the existing `is_pgenro_admin()` and `is_pgenro_active_user()` functions from your supplied setup scripts.
-
-The patch reserves operational record insert/update/delete permissions for administrators. Active user accounts retain viewing access. It preserves separate account settings and anonymous visitor kiosk policies and does not delete records. The patch is included in the ZIP; it has **not** been applied to your hosted database.
-
-Account management calls the supplied `admin-users` Edge Function, matching `supabase/functions/admin-users/index.ts`. Deploy that existing function if it is not already deployed. Use `shared/supabase.js` for frontend configuration; server secrets belong in Supabase function settings.
-
-## Start OCR
-
-On Windows, run **`User/START_OCR.bat`**. It creates a local Python environment and installs `User/requirements-ocr.txt` on the first run. Keep its terminal open while reading documents.
-
-On another system:
+For local use, install Python and Tesseract, then run from the project root:
 
 ```bash
-python -m pip install -r User/requirements-ocr.txt
-python User/OCR.py
+python -m pip install -r requirements.txt
+python ocr_server.py
 ```
 
-Install a local Tesseract executable for scanned documents. `TESSERACT_CMD` can specify its executable path. The reader listens on `http://127.0.0.1:5000`; editable document text remains readable without Tesseract. Communications and Office Memos use this local service when available and retain their browser reader fallback. Their **Stop reading** controls cancel the request and preserve the draft.
+Open `http://127.0.0.1:5000/User/login.html`. On Windows, `py -3` can replace `python`. Set `TESSERACT_CMD` if Tesseract is installed outside PATH. The existing `User/START_OCR.bat` remains available for a separate local OCR service. Serving the combined application through `ocr_server.py` gives the frontend direct access to `/ocr`, live progress and cancellation.
 
-## What changed
+Keep your existing database/Edge Function setup. If the supplied operational read-only policies have not yet been applied, use `supabase/READONLY_USER_PATCH.sql` after the original setup. Account management continues to use the supplied `admin-users` Edge Function.
 
-- Consistent sidebar, navigation icons, topbar, page spacing, cards, filters and centered forms. Phone/tablet layouts wrap controls and scroll wide tables within their cards.
-- Fixed broken case-sensitive HTML/CSS links and the missing Settings stylesheet reference. User modules reuse the shared authenticated client and have one data loader per page.
-- Fixed Travel Orders field aliases for both flat records and JSON `data` envelopes, plus counters after an empty result.
-- User Inventory and Visitors Log show records without encoding/departure controls. Administrator writes require the profile-based admin guard; editable Auth metadata cannot grant admin access.
-- Account management uses the correct Edge Function name. Failed saves retain the form and display an error. Supabase integration, existing record schemas and per-module files are retained.
-- Communications uploads keep Incoming/Outgoing direction fields synchronized across legacy JSON formats. Direction edits preserve attachments and unrelated record data. Older document categories, such as `Letter`, remain selected when editing their records. A direct module write also checks administrator permission.
-- OCR preserves Word table labels and page breaks, reads rotated scans, separates issue/received/released dates, and ignores annex/CC authors. Memo number and registry control number remain separate. Printed signatures can continue on another page. Manual corrections survive extraction and cancellation.
-- Memo routing handles flat and JSON record storage, duplicate/interrupted saves, attachment limits and failed source removal.
+## OCR changes
 
-Duplicate old application copies under `VisitorsLog` are replaced with small forwarding pages to the corrected modules. The ZIP contains source and verification files; Python environments, Git internals and caches are omitted. Application data stays in your existing Supabase project.
+- Direct same-origin OCR avoids the previous health-check delay and unnecessary browser fallback. An interrupted backend read keeps the draft available for retry.
+- Editable PDF, Word, spreadsheet, presentation and text content uses native extraction. Scans use blank-margin trimming, adaptive recognition, orientation recovery and a signature retry when needed. Word header/footer text and embedded scans are included.
+- Every page is counted and read. Identical processed scan pages can reuse the page cache, even across differently packaged documents. Whole-document caching remains content-based.
+- Live page progress, elapsed time and Stop Reading work with queued and active requests. Manual corrections survive reading and cancellation.
+- Letter parsing handles printed signatures on the closing line, separate designations, honorifics, signatures continued on another page and conventional recipient address blocks. Issue, received and released dates remain separate. Annex/CC authors and body memorandum references do not replace the covering letter fields.
+- Missing subjects and document types can be suggested from the letter opening; inferred values are flagged for review. A detected memorandum without a printed number receives a generated registry number before routing to Office Memos.
 
-## Verification
+Review uncertain fields against the attachment. Poor scans, handwriting and ambiguous printed information can still require manual correction.
 
-See `verification/CURRENT_VERIFICATION.md`. All 24 active pages were checked at **320, 390, 768, 1024 and 1440 px** without page/control overflow, local missing assets or uncaught browser errors. Nine administrator forms saved against simulated Supabase responses. OCR integration used the production forms, a real HTTP Flask server and local Tesseract. These checks did not modify or verify the hosted database.
+## Attachments and user access
+
+New attachments are stored privately in Supabase. The records retain stable object addresses; opening a document generates a temporary authorized link. Approved ordinary users can open the attachment from another browser/device and retain read-only operational access. Office Memo attachments retain their 10 MB limit; the general OCR/storage limit is 50 MB.
+
+Legacy inline memo documents remain readable. An older Communications attachment that exists only in one browser must be reattached from that browser and saved with this build to make it available elsewhere. There is no automatic recovery of a file that was never uploaded to shared storage.
+
+A failed upload preserves the form and selected file. Memo routing retains its retry journal and checks for an already-saved destination after an interrupted response. Uncertain save results retain uploaded files rather than deleting a potentially saved record's attachment.
+
+## UI changes
+
+Mobile KPI labels and counts now align without splitting long words into stray letters. Forms, buttons, icons, modal heights and long filenames wrap within their cards. The existing layout, palette, per-module CSS/JavaScript and Supabase configuration are retained.
+
+The user Office Memo viewer renders PDF pages directly with Previous, Next and Download controls. It supports short mobile screens, image/text previews, rendering cancellation and cleanup when closed.
+
+## Validation
+
+See `verification/CURRENT_VERIFICATION.md` for current browser, OCR, parser, upload and routing reports. Testing used real Chromium, Flask and Tesseract with simulated Supabase responses. No hosted database records, SQL policies or deployment were changed during this work.

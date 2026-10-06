@@ -17,3 +17,7 @@ services:
         value: "45"
       - key: OCR_DOCUMENT_TIMEOUT
         value: "180"
+      - key: OCR_DOCUMENT_WORKERS
+        value: "1"
+      - key: OCR_PAGE_CACHE_SIZE
+        value: "64"

@@ -1,328 +1,662 @@
 <!DOCTYPE html>
 
+
+
 <html data-css-scope="admin-users" lang="en">
+
 <head>
+
 <meta charset="utf-8"/>
+
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
 <title>PGENRO IMS | User Management</title>
+<meta name="theme-color" content="#f5f7f8"/>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+
 <!-- Google Font -->
+
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
+
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
 <!-- Lucide Icons -->
 
+
+
 <!-- CSS -->
-<link href="Usermanagement.css?v=20261002-fixed" rel="stylesheet"/>
-<link href="../shared/deployment-layout.css?v=20261004-ui-preserve" rel="stylesheet"/>
+
+<link href="../shared/deployment-layout.css?v=20261005-users-supabase-v1" rel="stylesheet"/>
+
+<link href="Usermanagement.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
+
 </head>
+
 <body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="Usermanagement.html" data-css-scope="admin-users" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+
 <div class="app-layout">
+
 <!-- SIDEBAR -->
+
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
+
 <div class="sidebar-header">
+
 <a class="logo-area" href="admin.html">
+
 <div class="logo-icon">
+
 <img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
-</div>
-<div class="logo-text">
-<h2>PGENRO IMS</h2>
-<span>Admin Control Center</span>
-</div>
-</a>
-<button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-<i data-lucide="panel-left-close"></i>
-</button>
-</div>
-<nav aria-label="Administrator navigation" class="sidebar-nav">
-<div class="nav-group">
-<span class="nav-label">Main Panel</span>
-<ul>
-<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
-</ul>
-</div>
-<div class="nav-group">
-<span class="nav-label">Operations &amp; Records</span>
-<ul>
-<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
-<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
-<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
-<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
-<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
-<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
-</ul>
-</div>
-<div class="nav-group">
-<span class="nav-label">User &amp; Access</span>
-<ul>
-<li><a aria-current="page" class="nav-item active" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
-</ul>
-</div>
-<div class="nav-group">
-<span class="nav-label">System Control</span>
-<ul>
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
-<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
-</ul>
-</div>
-</nav>
-</aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
-<!-- MAIN WRAPPER -->
-<div class="main-wrapper">
-<!-- TOPBAR -->
-<header class="topbar">
-<div class="topbar-left">
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-<i data-lucide="menu"></i>
-</button>
-<div class="global-search" role="search">
-<i class="search-icon" data-lucide="search"></i>
-<input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search user accounts…" spellcheck="false" type="text"/>
-<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
-<!-- Search Quick Palette -->
-</div>
-</div>
-<div class="topbar-right">
-<!-- Notification Button & Drawer -->
-<div class="notification-wrapper">
-<button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
-<i data-lucide="bell"></i>
-<span class="notification-ping" id="notifPing" style="display: none;"></span>
-</button>
-<div class="notification-dropdown" id="notificationDropdown">
-<div class="notification-header">
-<h3>Notifications</h3>
-<span class="badge-count" id="notifBadgeCount">0 Unread</span>
-</div>
-<div class="notification-list" id="notificationList">
-<div class="empty-notif-state">No new notifications</div>
-</div>
-</div>
-</div>
-<div class="v-divider"></div>
-<!-- Profile Menu -->
-<div class="profile-menu" id="profileMenu">
-<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
-<div class="profile-avatar"><i data-lucide="user-round"></i></div>
-</button>
-<div class="profile-dropdown" id="profileDropdown">
-<div class="profile-dropdown-header">
-<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
-<div class="profile-dropdown-copy">
-<h3 id="dropdownUserName">PGENRO Admin</h3>
-<p id="dropdownUserEmail">Administrator Session</p>
-<span class="role-badge" id="dropdownUserRole">Administrator</span>
-</div>
-</div>
-<div class="dropdown-links">
-<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
-<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
-<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
-<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
-</div>
-<div class="dropdown-footer">
-<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
-</div>
-</div>
-</div>
-</div>
-</header>
-<!-- MAIN CONTENT -->
-<main class="main-content" id="adminMainContent" tabindex="-1">
-<div class="workspace-context"><span class="workspace-context-label">PGENRO / ADMIN WORKSPACE</span><time id="workspaceToday"></time></div>
-<!-- PAGE HEADER -->
-<section class="page-header">
-<div class="header-title">
-<div class="breadcrumb">
-<a href="admin.html">Admin Console</a>
-<i data-lucide="chevron-right"></i>
-<span class="active">User Management</span>
-</div>
-<h1>User Accounts &amp; Access Control</h1>
-<p>Create, configure division access, manage security credentials, and monitor user statuses.</p>
-</div>
-<div class="header-actions"><button class="btn btn-secondary" id="refreshUsersBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
-<button class="btn btn-secondary" id="exportUsersBtn" type="button">
-<i data-lucide="download"></i>
-<span>Export CSV</span>
-</button>
-<button class="btn btn-primary" id="openAddUserModalBtn" type="button">
-<i data-lucide="user-plus"></i>
-<span>Add New User</span>
-</button>
-</div>
-</section>
-<!-- KPI SUMMARY CARDS -->
-<section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Accounts</span><div class="kpi-icon emerald"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalUsers">0</h3><span class="kpi-trend">Personnel accounts</span></div><div class="kpi-footer"><span>Registered account profiles</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Active Administrators</span><div class="kpi-icon blue"><i data-lucide="shield-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalAdmins">0</h3><span class="kpi-trend">Administrator accounts</span></div><div class="kpi-footer"><span>Active access to admin modules</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingRequests">0</h3><span class="kpi-trend">Awaiting account review</span></div><div class="kpi-footer"><span>Review Account Requests</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Suspended / Inactive</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statSuspendedUsers">0</h3><span class="kpi-trend">Restricted access</span></div><div class="kpi-footer"><span>Inactive or suspended accounts</span></div></div></section>
-<!-- USER TABLE & FILTERS SECTION -->
-<section class="dashboard-section">
-<!-- Filter Controls Bar -->
-<div class="table-controls-card">
-<div class="controls-left">
-<div class="filter-search-box">
-<i data-lucide="search"></i>
-<input id="userSearchInput" placeholder="Filter by name, username, email..." type="text"/>
-</div>
-<select class="filter-select" id="roleFilterSelect">
-<option value="ALL">All Roles</option>
-<option value="Super Admin">Super Admin</option>
-<option value="Division Head">Division Head</option>
-<option value="System Staff">System Staff</option>
-</select>
-<select class="filter-select" id="divisionFilterSelect">
-<option value="ALL">All Divisions</option>
-<option value="Admin Office">Admin Office</option>
-<option value="Environment Management">Environment Management</option>
-<option value="Forestry Division">Forestry Division</option>
-<option value="Mines &amp; Quarry">Mines &amp; Quarry</option>
-</select>
-<select class="filter-select" id="statusFilterSelect">
-<option value="ALL">All Statuses</option>
-<option value="Active">Active</option>
-<option value="Inactive">Inactive</option>
-<option value="Suspended">Suspended</option>
-</select>
-</div>
-<div class="controls-right">
-<button class="btn btn-secondary btn-sm" disabled="" id="bulkDeleteBtn" type="button">
-<i data-lucide="trash-2"></i> Delete Selected
-              </button>
-</div>
-</div>
-<!-- USER DATA TABLE -->
-<div class="card table-card">
-<div class="table-responsive">
-<table class="data-table data-table" id="usersTable">
-<thead>
-<tr>
-<th width="40"><input id="selectAllCheckbox" type="checkbox"/></th>
-<th>Personnel User</th>
-<th>Division / Office</th>
-<th>Role Badge</th>
-<th>Account Status</th>
-<th>Last Login</th>
-<th style="text-align: right;" width="120">Actions</th>
-</tr>
-</thead>
-<tbody id="userTableBody">
-<!-- Dynamic rows rendered via JS -->
-</tbody>
-</table>
-</div>
-<!-- Table Pagination -->
-<div class="table-footer">
-<span class="text-muted" id="tableRangeText">Showing 1 to 6 of 6 Personnel Accounts</span>
-<div class="pagination">
-<button class="page-btn" disabled="" type="button">«</button>
-<button class="page-btn active" type="button">1</button>
-<button class="page-btn" disabled="" type="button">»</button>
-</div>
-</div>
-</div>
-</section>
-</main>
-</div>
-</div>
-<!-- ADD / EDIT USER MODAL -->
-<div aria-hidden="true" class="modal-backdrop" id="userModal">
-<div aria-labelledby="modalTitle" aria-modal="true" class="modal-container" role="dialog">
-<div class="modal-header">
-<div class="modal-title-group">
-<div class="modal-icon emerald"><i data-lucide="user-cog"></i></div>
-<div>
-<h3 id="modalTitle">Add New User Account</h3>
-<p id="modalSub">Configure personnel credentials and access permissions.</p>
-</div>
-</div>
-<button class="modal-close-btn" id="closeUserModalBtn" type="button">×</button>
-</div>
-<form id="userForm">
-<input id="userIdInput" type="hidden"/>
-<div class="modal-body">
-<div class="form-row">
-<div class="form-group">
-<label for="fullNameInput">Full Name <span class="required">*</span></label>
-<input class="form-control" id="fullNameInput" placeholder="e.g. Gabriel Mendoza" required="" type="text"/>
-</div>
-<div class="form-group">
-<label for="usernameInput">Username <span class="required">*</span></label>
-<input class="form-control" id="usernameInput" placeholder="e.g. gmendoza" required="" type="text"/>
-</div>
-</div>
-<div class="form-row">
-<div class="form-group">
-<label for="emailInput">Email Address <span class="required">*</span></label>
-<input class="form-control" id="emailInput" placeholder="gmendoza@pgenro.gov.ph" required="" type="email"/>
-</div>
-<div class="form-group">
-<label for="passwordInput">Password <span class="required" id="passRequiredStar">*</span></label>
-<input class="form-control" id="passwordInput" placeholder="••••••••" required="" type="password"/>
-</div>
-</div>
-<div class="form-row">
-<div class="form-group">
-<label for="positionInput">Position / Designation</label>
-<input class="form-control" id="positionInput" placeholder="e.g. Environmental Management Specialist" type="text"/>
-</div>
-<div class="form-group">
-<label for="contactInput">Mobile Contact</label>
-<input class="form-control" id="contactInput" inputmode="numeric" maxlength="11" placeholder="09XXXXXXXXX" type="tel"/>
-</div>
-</div>
-<div class="form-row">
-<div class="form-group">
-<label for="divisionSelect">PGENRO Division <span class="required">*</span></label>
-<select class="form-control" id="divisionSelect" required="">
-<option value="">Select Office Division</option>
-<option value="Admin Office">Admin Office</option>
-<option value="Environment Management">Environment Management Division</option>
-<option value="Forestry Division">Forestry Division</option>
-<option value="Mines &amp; Quarry">Mines &amp; Quarry Division</option>
-</select>
-</div>
-<div class="form-group">
-<label for="roleSelect">User Role <span class="required">*</span></label>
-<select class="form-control" id="roleSelect" required="">
-<option value="System Staff">System Staff (Standard)</option>
-<option value="Division Head">Division Head (Supervisor)</option>
-<option value="Super Admin">Super Admin (Full Control)</option>
-</select>
-</div>
-</div>
-<div class="form-group">
-<label for="statusSelect">Account Status</label>
-<select class="form-control" id="statusSelect">
-<option value="Active">Active</option>
-<option value="Inactive">Inactive</option>
-<option value="Suspended">Suspended</option>
-</select>
-</div>
-</div>
-<div class="modal-footer modal-actions">
-<button class="btn btn-secondary" id="cancelModalBtn" type="button">Cancel</button>
-<button class="btn btn-primary" id="saveUserBtn" type="submit">Save Account</button>
-</div>
-</form>
-</div>
-</div>
-<!-- TOAST NOTIFICATION -->
-<!-- JS -->
-<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261002-fixed"></script>
-<script defer="" src="Usermanagement.js?v=20261002-fixed"></script>
-<div aria-live="polite" class="toast-container" id="toastContainer"></div>
-<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
-  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
-    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
-    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
-    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
-    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
-  </div>
+
 </div>
 
+<div class="logo-text">
+
+<h2>PGENRO IMS</h2>
+
+<span>Administrative workspace</span>
+
+</div>
+
+</a>
+
+<button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+
+<i data-lucide="panel-left-close"></i>
+
+</button>
+
+</div>
+
+<nav aria-label="Administrator navigation" class="sidebar-nav">
+
+<div class="nav-group">
+
+<span class="nav-label">Workspace</span>
+
+<ul>
+
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+
+</ul>
+
+</div>
+
+<div class="nav-group">
+
+<span class="nav-label">Office operations</span>
+
+<ul>
+
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
+
+<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
+
+<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
+
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
+
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
+
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
+
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
+
+</ul>
+
+</div>
+
+<div class="nav-group">
+
+<span class="nav-label">Administration</span>
+
+<ul>
+
+<li><a aria-current="page" class="nav-item active" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
+
+<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
+
+</ul>
+
+</div>
+
+<div class="nav-group">
+
+<span class="nav-label">Workspace tools</span>
+
+<ul>
+
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
+
+</ul>
+
+</div>
+
+</nav>
+
+<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+</aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<!-- MAIN WRAPPER -->
+
+<div class="main-wrapper">
+
+<!-- TOPBAR -->
+
+<header class="topbar">
+
+<div class="topbar-left">
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>User management</span></a>
+
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+
+<i data-lucide="menu"></i>
+
+</button>
+
+<div class="global-search" role="search">
+
+<i class="search-icon" data-lucide="search"></i>
+
+<input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search user accounts…" spellcheck="false" type="text"/>
+
+<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+
+<!-- Search Quick Palette -->
+
+</div>
+
+</div>
+
+<div class="topbar-right">
+<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
+
+<!-- Notification Button & Drawer -->
+
+<div class="notification-wrapper">
+
+<button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
+
+<i data-lucide="bell"></i>
+
+<span class="notification-ping" id="notifPing" style="display: none;"></span>
+
+</button>
+
+<div class="notification-dropdown" id="notificationDropdown">
+
+<div class="notification-header">
+
+<h3>Notifications</h3>
+
+<span class="badge-count" id="notifBadgeCount">0 Unread</span>
+
+</div>
+
+<div class="notification-list" id="notificationList">
+
+<div class="empty-notif-state">No new notifications</div>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="v-divider"></div>
+
+<!-- Profile Menu -->
+
+<div class="profile-menu" id="profileMenu">
+
+<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
+
+<div class="profile-avatar"><i data-lucide="user-round"></i></div>
+
+<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+</button>
+
+<div class="profile-dropdown" id="profileDropdown">
+
+<div class="profile-dropdown-header">
+
+<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+
+<div class="profile-dropdown-copy">
+
+<h3 id="dropdownUserName">PGENRO Admin</h3>
+
+<p id="dropdownUserEmail">Administrator Session</p>
+
+<span class="role-badge" id="dropdownUserRole">Administrator</span>
+
+</div>
+
+</div>
+
+<div class="dropdown-links">
+
+<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
+
+<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
+
+<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
+
+<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
+
+</div>
+
+<div class="dropdown-footer">
+
+<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</header>
+
+<!-- MAIN CONTENT -->
+
+<main class="main-content" id="adminMainContent" tabindex="-1">
+
+<div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
+
+<!-- PAGE HEADER -->
+
+<section class="page-header">
+
+<div class="header-title">
+<div class="page-heading-mark" aria-hidden="true"><i data-lucide="user-cog"></i></div>
+
+<div class="breadcrumb">
+
+<a href="admin.html">Admin Console</a>
+
+<i data-lucide="chevron-right"></i>
+
+<span class="active">User Management</span>
+
+</div>
+
+<h1>User management</h1>
+<p>Manage authorized accounts, roles, and access to your workspace.</p>
+
+</div>
+
+<div class="header-actions"><button class="btn btn-secondary" id="refreshUsersBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
+
+<button class="btn btn-secondary" id="exportUsersBtn" type="button">
+
+<i data-lucide="download"></i>
+
+<span>Export CSV</span>
+
+</button>
+
+<button class="btn btn-primary" id="openAddUserModalBtn" type="button">
+
+<i data-lucide="user-plus"></i>
+
+<span>Add New User</span>
+
+</button>
+
+</div>
+
+</section>
+
+<!-- KPI SUMMARY CARDS -->
+
+<section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Accounts</span><div class="kpi-icon emerald"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalUsers">0</h3><span class="kpi-trend">Personnel accounts</span></div><div class="kpi-footer"><span>Registered account profiles</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Active Administrators</span><div class="kpi-icon blue"><i data-lucide="shield-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalAdmins">0</h3><span class="kpi-trend">Administrator accounts</span></div><div class="kpi-footer"><span>Active access to admin modules</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingRequests">0</h3><span class="kpi-trend">Awaiting account review</span></div><div class="kpi-footer"><span>Review Account Requests</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Suspended / Inactive</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statSuspendedUsers">0</h3><span class="kpi-trend">Restricted access</span></div><div class="kpi-footer"><span>Inactive or suspended accounts</span></div></div></section>
+
+<!-- USER TABLE & FILTERS SECTION -->
+
+<section class="dashboard-section">
+
+<!-- Filter Controls Bar -->
+
+<div class="table-controls-card">
+
+<div class="controls-left">
+
+<div class="filter-search-box">
+
+<i data-lucide="search"></i>
+
+<input id="userSearchInput" placeholder="Filter by name, username, email..." type="text"/>
+
+</div>
+
+<select class="filter-select" id="roleFilterSelect">
+
+<option value="ALL">All Roles</option>
+
+<option value="Super Admin">Super Admin</option>
+
+<option value="Division Head">Division Head</option>
+
+<option value="System Staff">System Staff</option>
+
+</select>
+
+<select class="filter-select" id="divisionFilterSelect">
+
+<option value="ALL">All Divisions</option>
+
+<option value="Admin Office">Admin Office</option>
+
+<option value="Environment Management">Environment Management</option>
+
+<option value="Forestry Division">Forestry Division</option>
+
+<option value="Mines &amp; Quarry">Mines &amp; Quarry</option>
+
+</select>
+
+<select class="filter-select" id="statusFilterSelect">
+
+<option value="ALL">All Statuses</option>
+
+<option value="Active">Active</option>
+
+<option value="Inactive">Inactive</option>
+
+<option value="Suspended">Suspended</option>
+
+</select>
+
+</div>
+
+<div class="controls-right">
+
+<button class="btn btn-secondary btn-sm" disabled="" id="bulkDeleteBtn" type="button">
+
+<i data-lucide="trash-2"></i> Delete Selected
+
+              </button>
+
+</div>
+
+</div>
+
+<!-- USER DATA TABLE -->
+
+<div class="card table-card">
+
+<div class="table-responsive">
+
+<table class="data-table data-table" id="usersTable">
+
+<thead>
+
+<tr>
+
+<th width="40"><input id="selectAllCheckbox" type="checkbox"/></th>
+
+<th>Personnel User</th>
+
+<th>Division / Office</th>
+
+<th>Role Badge</th>
+
+<th>Account Status</th>
+
+<th>Last Login</th>
+
+<th style="text-align: right;" width="120">Actions</th>
+
+</tr>
+
+</thead>
+
+<tbody id="userTableBody">
+
+<!-- Dynamic rows rendered via JS -->
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- Table Pagination -->
+
+<div class="table-footer">
+
+<span class="text-muted" id="tableRangeText">Showing 1 to 6 of 6 Personnel Accounts</span>
+
+<div class="pagination">
+
+<button class="page-btn" disabled="" type="button">«</button>
+
+<button class="page-btn active" type="button">1</button>
+
+<button class="page-btn" disabled="" type="button">»</button>
+
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+<footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
+</main>
+
+</div>
+
+</div>
+
+<!-- ADD / EDIT USER MODAL -->
+
+<div aria-hidden="true" class="modal-backdrop" id="userModal">
+
+<div aria-labelledby="modalTitle" aria-modal="true" class="modal-container" role="dialog">
+
+<div class="modal-header">
+
+<div class="modal-title-group">
+
+<div class="modal-icon emerald"><i data-lucide="user-cog"></i></div>
+
+<div>
+
+<h3 id="modalTitle">Add New User Account</h3>
+
+<p id="modalSub">Configure personnel credentials and access permissions.</p>
+
+</div>
+
+</div>
+
+<button class="modal-close-btn" id="closeUserModalBtn" type="button">×</button>
+
+</div>
+
+<form id="userForm">
+
+<input id="userIdInput" type="hidden"/>
+
+<div class="modal-body">
+
+<div class="form-row">
+
+<div class="form-group">
+
+<label for="fullNameInput">Full Name <span class="required">*</span></label>
+
+<input class="form-control" id="fullNameInput" placeholder="e.g. Gabriel Mendoza" required="" type="text"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="usernameInput">Username <span class="required">*</span></label>
+
+<input class="form-control" id="usernameInput" placeholder="e.g. gmendoza" required="" type="text"/>
+
+</div>
+
+</div>
+
+<div class="form-row">
+
+<div class="form-group">
+
+<label for="emailInput">Email Address <span class="required">*</span></label>
+
+<input class="form-control" id="emailInput" placeholder="gmendoza@pgenro.gov.ph" required="" type="email"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="passwordInput">Password <span class="required" id="passRequiredStar">*</span></label>
+
+<input class="form-control" id="passwordInput" placeholder="••••••••" required="" type="password"/>
+
+</div>
+
+</div>
+
+<div class="form-row">
+
+<div class="form-group">
+
+<label for="positionInput">Position / Designation</label>
+
+<input class="form-control" id="positionInput" placeholder="e.g. Environmental Management Specialist" type="text"/>
+
+</div>
+
+<div class="form-group">
+
+<label for="contactInput">Mobile Contact</label>
+
+<input class="form-control" id="contactInput" inputmode="numeric" maxlength="11" placeholder="09XXXXXXXXX" type="tel"/>
+
+</div>
+
+</div>
+
+<div class="form-row">
+
+<div class="form-group">
+
+<label for="divisionSelect">PGENRO Division <span class="required">*</span></label>
+
+<select class="form-control" id="divisionSelect" required="">
+
+<option value="">Select Office Division</option>
+
+<option value="Admin Office">Admin Office</option>
+
+<option value="Environment Management">Environment Management Division</option>
+
+<option value="Forestry Division">Forestry Division</option>
+
+<option value="Mines &amp; Quarry">Mines &amp; Quarry Division</option>
+
+</select>
+
+</div>
+
+<div class="form-group">
+
+<label for="roleSelect">User Role <span class="required">*</span></label>
+
+<select class="form-control" id="roleSelect" required="">
+
+<option value="System Staff">System Staff (Standard)</option>
+
+<option value="Division Head">Division Head (Supervisor)</option>
+
+<option value="Super Admin">Super Admin (Full Control)</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="form-group">
+
+<label for="statusSelect">Account Status</label>
+
+<select class="form-control" id="statusSelect">
+
+<option value="Active">Active</option>
+
+<option value="Inactive">Inactive</option>
+
+<option value="Suspended">Suspended</option>
+
+</select>
+
+</div>
+
+</div>
+
+<div class="modal-footer modal-actions">
+
+<button class="btn btn-secondary" id="cancelModalBtn" type="button">Cancel</button>
+
+<button class="btn btn-primary" id="saveUserBtn" type="submit">Save Account</button>
+
+</div>
+
+</form>
+
+</div>
+
+</div>
+
+<!-- TOAST NOTIFICATION -->
+
+<!-- JS -->
+
+<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script defer="" src="../shared/supabase.js?v=20261005-users-supabase-v1"></script>
+
+<script defer="" src="Usermanagement.js?v=20261006-modern-ui-v2"></script>
+
+<div aria-live="polite" class="toast-container" id="toastContainer"></div>
+
+<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
+
+  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
+
+    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
+
+    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
+
+    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
+
+    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+
+  </div>
+
+</div>
+
+
+
 </body>
+
 </html>
+
 

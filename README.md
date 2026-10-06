@@ -1,6 +1,8 @@
 # PGENRO Information Management System
 
-Organized deployment build for the PGENRO IMS.
+OCR and UI update, 4 October 2026. The existing Supabase integration and ordinary-user read-only workflows are retained.
+
+Before saving new shared attachments, run `supabase/DOCUMENT_STORAGE_PATCH.sql` in your existing Supabase project. Follow `FIXES_AND_SETUP.md` for local startup and deployment.
 
 ## Main folders
 
@@ -27,6 +29,7 @@ Organized deployment build for the PGENRO IMS.
 
 - `/` → `/User/login.html`
 - `/ocr` → full-document OCR API
+- `/ocr/status/<request_id>` → live page progress
 - `/cancel` → cancel an OCR request
 - `/health` → deployment/OCR health check
 

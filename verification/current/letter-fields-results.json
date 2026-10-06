@@ -1,0 +1,29 @@
+{
+  "passed": true,
+  "results": [
+    {
+      "scenario": "Inline closing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Inline designation",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Closing continued on page two",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Honorific without a space",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Conventional recipient block and unheaded native-text purpose marked for review",
+      "result": "PASS"
+    },
+    {
+      "scenario": "A numberless memorandum still detects its routing destination",
+      "result": "PASS"
+    }
+  ]
+}

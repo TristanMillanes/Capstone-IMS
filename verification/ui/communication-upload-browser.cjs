@@ -72,7 +72,8 @@ async function attachment(page,row,bytes,mime){
  assert.equal(row.data.fileType,mime,'MIME remains separate from communication direction');
  await page.locator(`[data-action="file"][data-id="${row.id}"]`).click();
  await page.waitForFunction(()=>document.querySelector('#viewDocumentModal').classList.contains('open'));
- assert.equal(await page.locator('#docViewerSubtitle').innerText(),row.data.fileName);
+ assert((await page.locator('#docViewerSubtitle').innerText()).includes(row.data.fileName));
+ await page.waitForFunction(()=>!document.getElementById('docViewerDownloadBtn').hidden&&document.getElementById('docViewerDownloadBtn').href.startsWith('blob:'));
  const downloadSize=await page.locator('#docViewerDownloadBtn').evaluate(async el=>(await (await fetch(el.href)).blob()).size);
  assert.equal(downloadSize,bytes.length,'Attached document remains downloadable');
  await page.locator('#closeDocViewerBtn').click();

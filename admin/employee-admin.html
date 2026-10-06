@@ -11,6 +11,8 @@
 <meta content="light" name="color-scheme"/>
 
 <title>PGENRO IMS | Employee Profiles Admin</title>
+<meta name="theme-color" content="#f5f7f8"/>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 
 <!-- Google Fonts -->
 
@@ -18,7 +20,7 @@
 
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 
 <!-- Lucide Icons & Supabase SDK -->
 
@@ -26,9 +28,9 @@
 
 <!-- Core Admin Stylesheets Matching admin.html -->
 
-<link href="employee-admin.css?v=20261003-polished-forms" rel="stylesheet"/>
+<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
 
-<link href="../shared/deployment-layout.css?v=20261004-ui-preserve" rel="stylesheet"/>
+<link href="employee-admin.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
 </head>
 
 <body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="employee-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
@@ -57,7 +59,7 @@
 
 <h2>PGENRO IMS</h2>
 
-<span>Admin Control Center</span>
+<span>Administrative workspace</span>
 
 </div>
 
@@ -75,11 +77,11 @@
 
 <div class="nav-group">
 
-<span class="nav-label">Main Panel</span>
+<span class="nav-label">Workspace</span>
 
 <ul>
 
-<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
 
 </ul>
 
@@ -87,25 +89,25 @@
 
 <div class="nav-group">
 
-<span class="nav-label">Operations &amp; Records</span>
+<span class="nav-label">Office operations</span>
 
 <ul>
 
-<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
 
 <li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
 
 <li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
 
-<li><a aria-current="page" class="nav-item active" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+<li><a aria-current="page" class="nav-item active" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
 
-<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
 
-<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
 
 <li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
 
-<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
 
 </ul>
 
@@ -113,7 +115,7 @@
 
 <div class="nav-group">
 
-<span class="nav-label">User &amp; Access</span>
+<span class="nav-label">Administration</span>
 
 <ul>
 
@@ -127,15 +129,15 @@
 
 <div class="nav-group">
 
-<span class="nav-label">System Control</span>
+<span class="nav-label">Workspace tools</span>
 
 <ul>
 
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
 
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
 
-<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
 
 </ul>
 
@@ -143,6 +145,7 @@
 
 </nav>
 
+<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 </aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
 
 <!-- =========================================================
@@ -156,6 +159,7 @@
 <header class="topbar">
 
 <div class="topbar-left">
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Employee directory</span></a>
 
 <button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 
@@ -178,6 +182,7 @@
 </div>
 
 <div class="topbar-right">
+<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
 
 <!-- Notification Button & Drawer -->
 
@@ -221,6 +226,7 @@
 
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
 
+<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
 </button>
 
 <div class="profile-dropdown" id="profileDropdown">
@@ -269,13 +275,14 @@
 
 <main class="main-content" id="adminMainContent" tabindex="-1">
 
-<div class="workspace-context"><span class="workspace-context-label">PGENRO / ADMIN WORKSPACE</span><time id="workspaceToday"></time></div>
+<div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 
 <!-- PAGE HEADER -->
 
 <section class="page-header" id="dashboard">
 
 <div class="header-title">
+<div class="page-heading-mark" aria-hidden="true"><i data-lucide="users-round"></i></div>
 
 <div class="breadcrumb">
 
@@ -287,9 +294,8 @@
 
 </div>
 
-<h1>Employee Masterfile</h1>
-
-<p>Official centralized personnel directory for plantilla assignments, employment appointments, 201 dossiers, and contacts.</p>
+<h1>Employee directory</h1>
+<p>A complete view of your people, records, and employment information.</p>
 
 </div>
 
@@ -773,6 +779,7 @@
 
 </footer>
 
+<footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
 </main>
 
 </div>
@@ -1390,9 +1397,9 @@
 
 <!-- Shared System Scripts -->
 
-<script defer="" src="../shared/supabase.js?v=20261002-fixed"></script>
+<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
 
-<script defer="" src="employee-admin.js?v=20261003-polished-forms"></script>
+<script defer="" src="employee-admin.js?v=20261006-modern-ui-v2"></script>
 
 <div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
 

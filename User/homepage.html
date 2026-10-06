@@ -1,420 +1,843 @@
 <!DOCTYPE html>
+
 <html data-theme="light" lang="en">
+
 <head>
+
   <meta charset="utf-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <meta name="description" content="PGENRO Information Management System dashboard.">
+
   <meta name="color-scheme" content="light">
+
   <title>PGENRO IMS | Dashboard</title>
 
+
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
-  <link href="homepage.css?v=20261002-fixed" rel="stylesheet">
-<link href="../shared/deployment-layout.css?v=20261004-ui-preserve" rel="stylesheet"/>
+
+  <link href="homepage.css?v=20261005-admin-charts-css2" rel="stylesheet">
+
+<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
+
 </head>
 
+
+
 <body class="pgenro-user workspace-dashboard"
+
       data-login-url="login.html"
+
       data-requires-auth="user" data-page-data-owner="module">
+
+
 
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
+
+
   <button class="hamburger-menu"
+
           id="hamburgerMenu"
+
           type="button"
+
           aria-controls="sidebar"
+
           aria-expanded="false"
+
           aria-label="Open module menu">
+
     <span></span>
+
     <span></span>
+
     <span></span>
+
   </button>
 
+
+
   <div class="app-container">
+
     <aside class="sidebar" id="sidebar">
+
       <div class="sidebar-brand">
+
         <div class="sidebar-logo">
+
           <img alt="PGENRO Logo" class="logo-image" src="../logo/enro.png">
+
         </div>
+
+
 
         <div class="sidebar-brand-copy">
+
           <strong>PGENRO IMS</strong>
+
           <span>Quezon Province</span>
+
         </div>
+
       </div>
+
+
 
       <div class="sidebar-header">
+
         <h2>Office Modules</h2>
+
         <p>Information Management System</p>
+
       </div>
+
+
 
       <nav class="sidebar-nav" aria-label="Office modules">
+
         <ul class="modules-list">
+
           <li><a class="active" aria-current="page" href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+
           <li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+
           <li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+
           <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+
           <li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+
           <li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
+
           <li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitors Log</span></a></li>
+
           <li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
+
           <li><a href="ics.html"><i data-lucide="layers"></i><span>ICS Property Slips</span></a></li>
+
         </ul>
+
       </nav>
 
+
+
       <div class="sidebar-footer">
+
         <div class="system-status" role="status">
+
           <span class="status-indicator standby" id="dbStatusIndicator"></span>
+
           <span class="status-text" id="dbStatusText">Connecting to office records…</span>
+
         </div>
+
+
 
         <div class="profile-menu" id="profileMenu">
+
           <button class="profile-btn"
+
                   id="profileBtn"
+
                   type="button"
+
                   aria-haspopup="true"
+
                   aria-expanded="false"
+
                   aria-label="Open account menu">
+
             <span class="profile-avatar"><i data-lucide="user"></i></span>
 
+
+
             <span class="profile-text">
+
               <strong>PGENRO User</strong>
+
               <small>Authorized account</small>
+
             </span>
 
+
+
             <i class="profile-chevron" data-lucide="chevron-up"></i>
+
           </button>
 
+
+
           <div class="profile-dropdown"
+
                id="profileDropdown"
+
                role="menu"
+
                aria-hidden="true">
+
             <div class="profile-dropdown-header">
+
               <span class="profile-avatar big"><i data-lucide="user"></i></span>
+
               <div>
+
                 <h3>PGENRO User</h3>
+
                 <p>Office account</p>
+
               </div>
+
             </div>
+
+
 
             <a href="homepage.html" role="menuitem">
+
               <i data-lucide="layout-dashboard"></i>
+
               <span>Dashboard</span>
+
             </a>
+
+
 
             <a href="../SettingIMS/Settings.html?from=user" role="menuitem">
+
               <i data-lucide="settings"></i>
+
               <span>Settings</span>
+
             </a>
 
+
+
             <button class="logout-btn" id="logoutBtn" role="menuitem" type="button">
+
               <i data-lucide="log-out"></i>
+
               <span>Logout</span>
+
             </button>
+
           </div>
+
         </div>
+
       </div>
+
     </aside>
 
+
+
     <main class="main-content" id="mainContent">
+
       <div class="content-shell">
 
+
+
         <section class="page-header reveal" id="home">
+
           <div class="header-copy">
+
             <div class="eyebrow">
+
               <i data-lucide="layout-dashboard"></i>
+
               <span>PGENRO Information Management System</span>
+
             </div>
+
+
 
             <h1>Office Dashboard</h1>
 
+
+
             <p>
+
               A consolidated view of office records, requests, personnel,
+
               assets, communications, and daily visitor activity.
+
             </p>
 
+
+
             <div class="header-actions">
+
               <a class="primary-action" href="communication.html">
+
                 <i data-lucide="mail"></i>
+
                 <span>Open Communications</span>
+
               </a>
+
+
 
               <a class="secondary-action" href="service.html">
+
                 <i data-lucide="wrench"></i>
+
                 <span>Service Requests</span>
+
               </a>
+
+
 
               <button class="secondary-action" id="refreshDashboardBtn" type="button">
+
                 <i data-lucide="refresh-cw"></i>
+
                 <span>Sync Dashboard</span>
+
               </button>
+
             </div>
+
           </div>
+
+
 
           <aside class="dashboard-summary">
+
             <div class="summary-date">
+
               <i data-lucide="calendar-days"></i>
+
               <span id="currentDateText">Loading date…</span>
+
             </div>
+
+
 
             <span class="summary-label">Total monitored records</span>
+
             <strong class="font-mono" id="heroTotalRecords">0</strong>
+
             <span class="summary-caption">Across active PGENRO modules</span>
 
+
+
             <div class="summary-status">
+
               <span class="summary-status-dot"></span>
+
               <span>Live dashboard overview</span>
+
             </div>
+
           </aside>
+
         </section>
+
+
 
         <section class="overview-section reveal" id="kpiOverview">
+
           <div class="section-heading">
+
             <div>
+
               <span class="section-kicker">Current totals</span>
+
               <h2>Office Summary</h2>
+
               <p>Quick totals from the modules currently monitored by the system.</p>
+
             </div>
+
           </div>
+
+
 
           <div class="kpi-grid">
+
             <article class="kpi-card">
+
               <div class="kpi-icon green"><i data-lucide="mail"></i></div>
+
               <div class="kpi-copy">
+
                 <span>Communications</span>
+
                 <strong class="font-mono" id="kpiTotalComms">0</strong>
+
                 <small><b id="kpiIncomingCount">0</b> incoming · <b id="kpiOutgoingCount">0</b> outgoing</small>
+
               </div>
+
             </article>
 
+
+
             <article class="kpi-card">
+
               <div class="kpi-icon yellow"><i data-lucide="wrench"></i></div>
+
               <div class="kpi-copy">
+
                 <span>Service Requests</span>
+
                 <strong class="font-mono" id="kpiTotalServices">0</strong>
+
                 <small><b id="kpiPendingServices">0</b> pending / in queue</small>
+
               </div>
+
             </article>
 
+
+
             <article class="kpi-card">
+
               <div class="kpi-icon blue"><i data-lucide="users-round"></i></div>
+
               <div class="kpi-copy">
+
                 <span>Personnel</span>
+
                 <strong class="font-mono" id="kpiTotalEmployees">0</strong>
+
                 <small>Staff records</small>
+
               </div>
+
             </article>
 
+
+
             <article class="kpi-card">
+
               <div class="kpi-icon violet"><i data-lucide="navigation"></i></div>
+
               <div class="kpi-copy">
+
                 <span>Travel Orders</span>
+
                 <strong class="font-mono" id="kpiTotalTravel">0</strong>
+
                 <small><b id="kpiActiveTravel">0</b> active</small>
+
               </div>
+
             </article>
 
+
+
             <article class="kpi-card">
+
               <div class="kpi-icon emerald"><i data-lucide="package"></i></div>
+
               <div class="kpi-copy">
+
                 <span>Tracked Assets</span>
+
                 <strong class="font-mono" id="kpiTotalAssets">0</strong>
+
                 <small><b id="kpiTotalIcs">0</b> ICS issued</small>
+
               </div>
+
             </article>
 
+
+
             <article class="kpi-card">
+
               <div class="kpi-icon cyan"><i data-lucide="clipboard-signature"></i></div>
+
               <div class="kpi-copy">
+
                 <span>Today's Visitors</span>
+
                 <strong class="font-mono" id="kpiVisitorsToday">0</strong>
+
                 <small><b id="kpiVisitorsInside">0</b> currently inside</small>
+
               </div>
+
             </article>
+
           </div>
+
         </section>
+
+
 
         <section class="dashboard-grid reveal" id="analytics">
+
           <article class="panel chart-panel">
+
             <div class="panel-header">
+
               <div>
-                <span class="section-kicker">Communication flow</span>
-                <h2>Incoming & Outgoing Activity</h2>
-                <p>Recent communications recorded during the last six reporting periods.</p>
+
+                <span class="section-kicker">Record activity</span>
+
+                <h2>Record Activity Trend</h2>
+
+                <p>Documents, travel orders, visitors, and services in the last 90 days.</p>
+
               </div>
 
-              <span class="panel-badge">6-period view</span>
+
+
+              <span class="panel-badge">90-day view</span>
+
             </div>
+
+
 
             <div class="chart-wrapper">
-              <canvas id="commCompareChart"></canvas>
+
+              <canvas id="commCompareChart" role="img" aria-label="Record activity over time" aria-describedby="dashboardTrendSummary"></canvas>
+              <p class="homepage-chart-empty" id="dashboardTrendEmpty" role="status" hidden></p>
+              <p class="homepage-chart-summary" id="dashboardTrendSummary">Waiting for dated records.</p>
+
             </div>
+
           </article>
 
+
+
           <article class="panel activity-panel">
+
             <div class="panel-header">
+
               <div>
+
                 <span class="section-kicker">Visitor activity</span>
+
                 <h2>Recent Visitor Logs</h2>
+
                 <p>Latest registered visitors and current visit status.</p>
+
               </div>
+
+
 
               <a class="panel-link" href="visitorsView.html">
+
                 View all
+
                 <i data-lucide="arrow-right"></i>
+
               </a>
+
             </div>
+
+
 
             <div class="activity-list" id="visitorRecentList" aria-live="polite">
+
               <div class="empty-state-box">
+
                 <span class="empty-icon"><i data-lucide="clipboard-list"></i></span>
+
                 <h3>No Visitor Records</h3>
+
                 <p>Visitor entries will appear here once available.</p>
+
               </div>
+
             </div>
+
           </article>
+
         </section>
+
+
 
         <section class="dashboard-grid reveal">
+
           <article class="panel chart-panel">
+
             <div class="panel-header">
+
               <div>
+
                 <span class="section-kicker">System distribution</span>
-                <h2>Records by Module</h2>
-                <p>Share of current records across monitored office modules.</p>
+
+                <h2>Activity Distribution</h2>
+
+                <p>Share of dated activity across office modules in the last 90 days.</p>
+
               </div>
 
-              <span class="panel-badge">Record share</span>
+
+
+              <span class="panel-badge">6 activity modules</span>
+
             </div>
+
+
 
             <div class="chart-wrapper">
-              <canvas id="operationsDistChart"></canvas>
+
+              <canvas id="operationsDistChart" role="img" aria-label="Record distribution by module" aria-describedby="dashboardDistributionSummary"></canvas>
+              <p class="homepage-chart-empty" id="dashboardDistributionEmpty" role="status" hidden></p>
+              <p class="homepage-chart-summary" id="dashboardDistributionSummary">Waiting for module records.</p>
+
             </div>
+
           </article>
+
+
 
           <article class="panel activity-panel">
+
             <div class="panel-header">
+
               <div>
+
                 <span class="section-kicker">Service desk</span>
+
                 <h2>Recent Service Requests</h2>
+
                 <p>Latest requests and their current workflow status.</p>
+
               </div>
+
+
 
               <a class="panel-link" href="service.html">
+
                 Manage
+
                 <i data-lucide="arrow-right"></i>
+
               </a>
+
             </div>
+
+
 
             <div class="activity-list service-list" id="serviceRecentList" aria-live="polite">
+
               <div class="empty-state-box">
+
                 <span class="empty-icon"><i data-lucide="wrench"></i></span>
+
                 <h3>No Active Service Requests</h3>
+
                 <p>Requests will appear here once registered.</p>
+
               </div>
+
             </div>
+
+
 
             <div class="queue-summary">
+
               <span>Queue Summary</span>
+
               <strong id="servicePendingSummary">0 pending</strong>
+
             </div>
+
           </article>
+
         </section>
+
+
 
         <section class="memo-section reveal" id="memo">
+
           <div class="section-heading">
+
             <div>
+
               <span class="section-kicker">Office notices</span>
+
               <h2>Pinned Memorandums</h2>
+
               <p>Important directives and announcements available for office reference.</p>
+
             </div>
+
+
 
             <a class="panel-link" href="officememo.html">
+
               Open Office Memos
+
               <i data-lucide="arrow-right"></i>
+
             </a>
+
           </div>
+
+
 
           <div class="memo-grid" id="memoGrid" aria-live="polite">
+
             <div class="memo-empty-card">
+
               <div class="empty-state-box">
+
                 <span class="empty-icon"><i data-lucide="file-text"></i></span>
+
                 <h3>No Pinned Memorandums</h3>
+
                 <p>Pinned office notices will appear here once available.</p>
+
               </div>
+
             </div>
+
           </div>
+
         </section>
+
+
 
         <section class="workflow-section reveal" id="process">
+
           <div class="section-heading">
+
             <div>
+
               <span class="section-kicker">Workspace guide</span>
+
               <h2>Using the IMS</h2>
+
               <p>A simple flow for navigating and maintaining office records.</p>
+
             </div>
+
           </div>
+
+
 
           <div class="workflow-grid">
+
             <article class="workflow-card">
+
               <span class="workflow-number">01</span>
+
               <div>
+
                 <h3>Select a Module</h3>
+
                 <p>Choose the office module you need from the left sidebar.</p>
+
               </div>
+
             </article>
 
+
+
             <article class="workflow-card">
+
               <span class="workflow-number">02</span>
+
               <div>
+
                 <h3>Review Records</h3>
+
                 <p>Search, inspect, or encode transactions based on your access.</p>
+
               </div>
+
             </article>
 
+
+
             <article class="workflow-card">
+
               <span class="workflow-number">03</span>
+
               <div>
+
                 <h3>Update Progress</h3>
+
                 <p>Keep requests and records current as office work progresses.</p>
+
               </div>
+
             </article>
 
+
+
             <article class="workflow-card">
+
               <span class="workflow-number">04</span>
+
               <div>
+
                 <h3>Monitor the Dashboard</h3>
+
                 <p>Return here for a consolidated view of current office activity.</p>
+
               </div>
+
             </article>
+
           </div>
+
         </section>
 
+
+
         <footer class="footer">
+
           <div>
+
             <strong>PGENRO IMS</strong>
+
             <span>Provincial Government Environment and Natural Resources Office</span>
+
           </div>
+
           <p>© 2026 Province of Quezon. Internal information management system.</p>
+
         </footer>
+
       </div>
+
     </main>
+
   </div>
 
+
+
   <button class="scroll-to-top-btn"
+
           id="scrollToTopBtn"
+
           type="button"
+
           aria-label="Scroll back to top">
+
     <i data-lucide="chevron-up"></i>
+
   </button>
+
+
 
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
+
+
   <script src="https://unpkg.com/lucide@latest"></script>
+
   <script defer src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="../shared/supabase.js?v=20261002-fixed"></script>
-<script defer src="homepage.js?v=20261002-fixed"></script>
+
+  <script defer src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
+
+<script defer src="homepage.js?v=20261005-admin-charts"></script>
+
 </body>
+
 </html>

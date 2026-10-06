@@ -63,20 +63,22 @@ def clean_printed_ink(image):
     return result
 
 
-def docx_text(path, image_reader=None):
+def docx_text(path, image_reader=None, part="word/document.xml"):
     """Preserve Word text order and optionally read embedded printed scans."""
     import posixpath
     ns = "{http://schemas.openxmlformats.org/wordprocessingml/2006/main}"
     drawing = "{http://schemas.openxmlformats.org/drawingml/2006/main}"
     relations = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}"
     with ZipFile(path) as archive:
-        entry = archive.getinfo("word/document.xml")
+        entry = archive.getinfo(part)
         if entry.file_size > 25 * 1024 * 1024:
             raise ValueError("The Word document text exceeds the reader limit.")
-        body = ET.fromstring(archive.read(entry)).find(ns + "body")
+        root = ET.fromstring(archive.read(entry))
+        body = root.find(ns + "body") if part == "word/document.xml" else root
         images = {}
-        if image_reader and "word/_rels/document.xml.rels" in archive.namelist():
-            for relation in ET.fromstring(archive.read("word/_rels/document.xml.rels")):
+        relationship_part = "word/_rels/" + posixpath.basename(part) + ".rels"
+        if image_reader and relationship_part in archive.namelist():
+            for relation in ET.fromstring(archive.read(relationship_part)):
                 if relation.get("Type", "").endswith("/image") and relation.get("TargetMode") != "External":
                     target = posixpath.normpath("word/" + relation.get("Target", ""))
                     if target.startswith("word/media/"):

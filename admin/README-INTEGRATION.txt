@@ -8,4 +8,6 @@ Live functionality requires the existing tables, authorization policies, adminis
 
 Ctrl K or the Modules button opens the keyboard-accessible module switcher. Topbar record searches continue to filter their current module. All modules share the same sidebar, headers, buttons, forms and responsive table controls. Memo chart/KPI interactions filter actual registry records. Communications OCR still routes detected memorandums to Office Memos after field review and a successful save.
 
-The application retains its pinned document reader libraries, Supabase SDK and Google Fonts CDN references. Keep network access for these dependencies. Local icons and native dashboard charts work without their icon/chart CDNs. Animations honor reduced motion. See VERIFICATION.md for verification and its limits.
+The topbar sun/moon control switches between light and dark appearance. Registry density buttons and Workspace Preferences control saved table spacing. Choices persist between modules; resetting preferences restores light appearance and comfortable spacing.
+
+The application retains its pinned document reader libraries, Supabase SDK and Google Fonts CDN references. Keep network access for these dependencies. Local icons and native dashboard charts work without their icon/chart CDNs. Animations honor reduced motion. See verification/MODERN_UI.md for current verification and its limits; older reports are historical.

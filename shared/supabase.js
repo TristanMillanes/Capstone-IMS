@@ -392,6 +392,55 @@
     }
   }
 
+  const DOCUMENT_BUCKET = 'pgenro-documents';
+  const DOCUMENT_MIME = {pdf:'application/pdf',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',bmp:'image/bmp',tif:'image/tiff',tiff:'image/tiff',txt:'text/plain',csv:'text/csv',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation'};
+
+  function documentPath(value) {
+    try {
+      const url = new URL(value, location.href);
+      if (url.origin !== new URL(CONFIG.url).origin) return '';
+      const prefix = '/storage/v1/object/';
+      const match = url.pathname.slice(prefix.length).match(/^(?:authenticated|public|sign)\/pgenro-documents\/(.+)$/);
+      if (!url.pathname.startsWith(prefix) || !match) return '';
+      const path = decodeURIComponent(match[1]);
+      return path.split('/').some(part => !part || part === '.' || part === '..') ? '' : path;
+    } catch { return ''; }
+  }
+
+  async function uploadDocument(file, module = 'communications') {
+    await requireAdmin();
+    const extension = String(file.name || '').split('.').pop().toLowerCase();
+    const mime = DOCUMENT_MIME[extension];
+    if (!mime || !file.size || file.size > 50 * 1024 * 1024) throw new Error('Choose a supported document up to 50 MB.');
+    const folder = module === 'office_memos' ? 'office_memos' : 'communications';
+    const path = `${folder}/${crypto.randomUUID()}.${extension}`;
+    const {error} = await client.storage.from(DOCUMENT_BUCKET).upload(path, file, {contentType:mime, upsert:false, cacheControl:'3600'});
+    if (error) throw new Error(`Document upload failed: ${error.message || 'Storage is unavailable'}. Apply supabase/DOCUMENT_STORAGE_PATCH.sql if document storage has not been set up. Your draft is kept.`);
+    // Store a stable private-object address. Sign it when a reader opens it.
+    return {url:`${CONFIG.url}/storage/v1/object/authenticated/${DOCUMENT_BUCKET}/${path}`, name:file.name, type:mime, size:file.size};
+  }
+
+  async function getDocumentUrl(value) {
+    const raw = String(value || '').trim();
+    const path = documentPath(raw);
+    if (path) {
+      const {data,error} = await client.storage.from(DOCUMENT_BUCKET).createSignedUrl(path, 900);
+      if (error || !data?.signedUrl) throw new Error(error?.message || 'The document is unavailable or you do not have viewing permission.');
+      return data.signedUrl;
+    }
+    if (/^data:(?:application\/(?:pdf|vnd\.openxmlformats-officedocument\.(?:wordprocessingml\.document|spreadsheetml\.sheet|presentationml\.presentation)|octet-stream)|image\/(?:png|jpeg|webp|bmp|tiff)|text\/(?:plain|csv))(?:;[^,]*)?,/i.test(raw)) return raw;
+    try { const url = new URL(raw, location.href); if (raw && ['https:','http:','blob:'].includes(url.protocol)) return url.href; } catch {}
+    throw new Error('The document address or file type is invalid.');
+  }
+
+  async function removeDocument(value) {
+    const path = documentPath(value);
+    if (!path) return;
+    await requireAdmin();
+    const {error} = await client.storage.from(DOCUMENT_BUCKET).remove([path]);
+    if (error) throw error;
+  }
+
   window.PGENRO_API = {
     config: CONFIG,
 
@@ -406,6 +455,9 @@
     redirectToWorkspace,
     invokeAdmin,
     testConnection,
+    uploadDocument,
+    getDocumentUrl,
+    removeDocument,
 
     isAdminRole(role) {
       return ADMIN_ROLES.has(

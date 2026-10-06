@@ -182,6 +182,8 @@
         operations: null
       },
 
+      chartSources: {},
+
       realtimeChannel: null,
       refreshTimer: 0,
       loading: false
@@ -2126,448 +2128,220 @@
     }
 
     /* =========================================================
-       COMMUNICATION CHART DATA
+       ADMIN-MATCHED CHARTS — existing user panels only
+       Same six activity modules, date precedence, 90-day range,
+       weekly buckets, datasets, palette, and options as admin.
        ========================================================= */
 
-    function buildCommunicationPeriods() {
-      const periods = [];
+    const chartDayMs = 86400000;
+    const chartActivityModules = [
+      { key: "communications", sourceKey: "communications", label: "Communications", color: "#2563eb" },
+      { key: "memos", sourceKey: "memos", label: "Office Memos", color: "#059669" },
+      { key: "travel", sourceKey: "travelOrders", label: "Travel Orders", color: "#8b5cf6" },
+      { key: "visitors", sourceKey: "visitors", label: "Visitors", color: "#d97706" },
+      { key: "services", sourceKey: "serviceRequests", label: "Service Requests", color: "#e05271" },
+      { key: "ics", sourceKey: "ics", label: "ICS Property Slips", color: "#0891b2" }
+    ];
 
-      const now =
-        new Date();
+    function chartRecordDay(row) {
+      const fields = [
+        "date", "receivedDate", "date_received", "letterDate", "docDate",
+        "requestDate", "date_requested", "dateIssued", "memoDate",
+        "departureDate", "travelDate", "date_from", "dateFrom",
+        "dateAcquired", "time_in", "timeIn", "created_at", "createdAt", "timestamp"
+      ];
+      for (const field of fields) {
+        const raw = row?.[field];
+        if (!raw) continue;
+        let date;
+        if (typeof raw?.toDate === "function") date = raw.toDate();
+        else if (typeof raw === "string") {
+          date = new Date(/^\d{4}-\d{2}-\d{2} \d{2}:/.test(raw) ? raw.replace(" ", "T") : raw);
+          if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) date = new Date(`${raw}T00:00:00`);
+        } else if (raw instanceof Date) date = raw;
+        else if (typeof raw === "number") date = new Date(raw > 1e11 ? raw : raw * 1000);
+        if (date instanceof Date && !Number.isNaN(date.getTime())) {
+          return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / chartDayMs);
+        }
+      }
+      return null;
+    }
 
-      for (
-        let offset = 5;
-        offset >= 0;
-        offset -= 1
-      ) {
-        const date =
-          new Date(
-            now.getFullYear(),
-            now.getMonth() -
-              offset,
-            1
-          );
-
-        periods.push({
-          year:
-            date.getFullYear(),
-
-          month:
-            date.getMonth(),
-
-          label:
-            new Intl
-              .DateTimeFormat(
-                "en-PH",
-                {
-                  month:
-                    "short",
-
-                  year:
-                    "2-digit"
-                }
-              )
-              .format(
-                date
-              ),
-
-          incoming: 0,
-          outgoing: 0
+    function buildDashboardChartModel(now = new Date()) {
+      const end = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / chartDayMs);
+      const start = end - 89;
+      const buckets = [];
+      for (let day = start; day <= end; day += 7) {
+        buckets.push({
+          label: new Date(day * chartDayMs).toLocaleDateString("en-US", {
+            month: "short", day: "numeric", timeZone: "UTC"
+          }),
+          documents: 0, travel: 0, visitors: 0, services: 0, total: 0
         });
       }
 
-      state.records
-        .communications
-        .forEach(
-          (record) => {
-            const date =
-              getRecordDate(
-                record
-              );
+      const breakdown = chartActivityModules.map((module) => {
+        let current = 0;
+        let missing = 0;
+        for (const row of state.records[module.sourceKey] || []) {
+          const day = chartRecordDay(row);
+          if (day === null) { missing++; continue; }
+          if (day < start || day > end) continue;
+          current++;
+          const bucket = buckets[Math.floor((day - start) / 7)];
+          const key = ["communications", "memos", "ics"].includes(module.key) ? "documents" : module.key;
+          bucket[key]++;
+          bucket.total++;
+        }
+        return { ...module, current, missing, available: state.chartSources[module.sourceKey] === "live" };
+      });
 
-            if (!date) {
-              return;
-            }
-
-            const period =
-              periods.find(
-                (item) =>
-                  item.year ===
-                    date.getFullYear() &&
-                  item.month ===
-                    date.getMonth()
-              );
-
-            if (!period) {
-              return;
-            }
-
-            const direction =
-              lower(
-                getFirstValue(
-                  record,
-                  [
-                    "type",
-                    "direction",
-                    "document_type",
-                    "category"
-                  ],
-                  "incoming"
-                )
-              );
-
-            if (
-              direction.includes(
-                "out"
-              )
-            ) {
-              period.outgoing += 1;
-            } else {
-              period.incoming += 1;
-            }
-          }
-        );
-
-      return periods;
+      return {
+        start, end, buckets, breakdown,
+        total: breakdown.reduce((sum, module) => sum + module.current, 0),
+        availableCount: breakdown.filter((module) => module.available).length,
+        missingDates: breakdown.reduce((sum, module) => sum + module.missing, 0)
+      };
     }
 
-    /* =========================================================
-       COMMUNICATION CHART
-       ========================================================= */
-
-    function renderCommunicationChart() {
-      if (
-        !window.Chart ||
-        !ui.commCompareChart
-      ) {
-        return;
-      }
-
-      state.charts
-        .comm
-        ?.destroy();
-
-      const periods =
-        buildCommunicationPeriods();
-
-      state.charts.comm =
-        new Chart(
-          ui.commCompareChart,
-          {
-            type: "line",
-
-            data: {
-              labels:
-                periods.map(
-                  (period) =>
-                    period.label
-                ),
-
-              datasets: [
-                {
-                  label:
-                    "Incoming",
-
-                  data:
-                    periods.map(
-                      (period) =>
-                        period.incoming
-                    ),
-
-                  borderColor:
-                    "#17633a",
-
-                  backgroundColor:
-                    "rgba(23,99,58,.08)",
-
-                  fill:
-                    true,
-
-                  tension:
-                    0.35,
-
-                  borderWidth:
-                    2,
-
-                  pointRadius:
-                    3
-                },
-                {
-                  label:
-                    "Outgoing",
-
-                  data:
-                    periods.map(
-                      (period) =>
-                        period.outgoing
-                    ),
-
-                  borderColor:
-                    "#5d9c73",
-
-                  backgroundColor:
-                    "rgba(93,156,115,.05)",
-
-                  fill:
-                    true,
-
-                  tension:
-                    0.35,
-
-                  borderWidth:
-                    2,
-
-                  pointRadius:
-                    3
-                }
-              ]
-            },
-
-            options: {
-              responsive:
-                true,
-
-              maintainAspectRatio:
-                false,
-
-              interaction: {
-                mode:
-                  "index",
-
-                intersect:
-                  false
-              },
-
-              plugins: {
-                legend: {
-                  position:
-                    "top",
-
-                  labels: {
-                    color:
-                      "#66736b",
-
-                    usePointStyle:
-                      true,
-
-                    boxWidth:
-                      7,
-
-                    font: {
-                      family:
-                        "Plus Jakarta Sans",
-
-                      size:
-                        10,
-
-                      weight:
-                        "600"
-                    }
-                  }
-                }
-              },
-
-              scales: {
-                x: {
-                  grid: {
-                    display:
-                      false
-                  },
-
-                  ticks: {
-                    color:
-                      "#758179",
-
-                    font: {
-                      family:
-                        "Plus Jakarta Sans",
-
-                      size:
-                        9
-                    }
-                  }
-                },
-
-                y: {
-                  beginAtZero:
-                    true,
-
-                  ticks: {
-                    precision:
-                      0,
-
-                    color:
-                      "#758179",
-
-                    font: {
-                      family:
-                        "Plus Jakarta Sans",
-
-                      size:
-                        9
-                    }
-                  },
-
-                  grid: {
-                    color:
-                      "rgba(23,99,58,.05)"
-                  }
-                }
-              }
-            }
+    function userChartBaseOptions() {
+      return {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? false : { duration: 400 },
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { usePointStyle: true, boxWidth: 6, padding: 12, font: { size: 10, family: "Plus Jakarta Sans" } }
           }
-        );
+        }
+      };
     }
 
-    /* =========================================================
-       MODULE DISTRIBUTION CHART
-       ========================================================= */
-
-    function renderOperationsChart() {
-      if (
-        !window.Chart ||
-        !ui.operationsDistChart
-      ) {
-        return;
+    // Native charts occupy the same fixed-size wrappers if Chart.js is unavailable.
+    function renderNativeUserChart(canvas, config) {
+      canvas.hidden = true;
+      let fallback = canvas.parentElement.querySelector(".homepage-chart-fallback");
+      if (!fallback) {
+        fallback = document.createElement("div");
+        fallback.className = "homepage-chart-fallback";
+        fallback.setAttribute("role", "img");
+        canvas.parentElement.appendChild(fallback);
       }
+      fallback.setAttribute("aria-label", canvas.getAttribute("aria-label"));
+      fallback.setAttribute("aria-describedby", canvas.getAttribute("aria-describedby"));
+      const { labels, datasets } = config.data;
+      let svg;
+      let legend;
 
-      state.charts
-        .operations
-        ?.destroy();
+      if (config.type === "line") {
+        const maximum = Math.max(1, ...datasets.flatMap((dataset) => dataset.data));
+        const x = (index) => 35 + (index / Math.max(1, labels.length - 1)) * 550;
+        const y = (value) => 180 - (value / maximum) * 160;
+        const ticks = labels.map((label, index) => index % Math.ceil(labels.length / 4) === 0
+          ? `<text x="${x(index)}" y="207" text-anchor="middle">${escapeHtml(label)}</text>` : "").join("");
+        const lines = datasets.map((dataset) => {
+          const points = dataset.data.map((value, index) => `${x(index)},${y(value)}`).join(" ");
+          const area = dataset.fill ? `<polygon points="35,180 ${points} 585,180" fill="${dataset.backgroundColor}"/>` : "";
+          const dots = dataset.data.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="2.5" fill="${dataset.borderColor}"><title>${escapeHtml(`${labels[index]} · ${dataset.label}: ${value}`)}</title></circle>`).join("");
+          return `${area}<polyline points="${points}" fill="none" stroke="${dataset.borderColor}" stroke-width="2"/>${dots}`;
+        }).join("");
+        svg = `<svg viewBox="0 0 620 220" aria-hidden="true"><g fill="#64748b" font-size="10"><path d="M35 20H585 M35 100H585 M35 180H585" stroke="#e2e8f0"/><text x="3" y="24">${maximum}</text><text x="18" y="184">0</text>${ticks}</g>${lines}</svg>`;
+        legend = datasets.map((dataset) => `<span><i style="background:${dataset.borderColor}"></i>${escapeHtml(dataset.label)}</span>`).join("");
+      } else {
+        const dataset = datasets[0];
+        const total = dataset.data.reduce((sum, value) => sum + value, 0);
+        const circumference = 2 * Math.PI * 76.5;
+        let offset = 0;
+        const segments = dataset.data.map((value, index) => {
+          if (!value || !total) return "";
+          const length = value / total * circumference;
+          const segment = `<circle cx="120" cy="100" r="76.5" fill="none" stroke="${dataset.backgroundColor[index]}" stroke-width="27" stroke-dasharray="${length} ${circumference - length}" stroke-dashoffset="${-offset}" transform="rotate(-90 120 100)"><title>${escapeHtml(`${labels[index]}: ${value}`)}</title></circle>`;
+          offset += length;
+          return segment;
+        }).join("");
+        svg = `<svg viewBox="0 0 240 200" aria-hidden="true">${segments}</svg>`;
+        legend = labels.map((label, index) => `<span><i style="background:${dataset.backgroundColor[index]}"></i>${escapeHtml(label)} (${dataset.data[index]})</span>`).join("");
+      }
+      fallback.innerHTML = `${svg}<div class="homepage-chart-legend">${legend}</div>`;
+    }
 
-      const values = [
-        state.records
-          .communications
-          .length,
-
-        state.records
-          .serviceRequests
-          .length,
-
-        state.records
-          .employees
-          .length,
-
-        state.records
-          .travelOrders
-          .length,
-
-        state.records
-          .inventory
-          .length +
-          state.records
-            .ics
-            .length,
-
-        state.records
-          .visitors
-          .length
-      ];
-
-      const hasData =
-        values.some(
-          (value) =>
-            value > 0
-        );
-
-      state.charts.operations =
-        new Chart(
-          ui.operationsDistChart,
-          {
-            type:
-              "doughnut",
-
-            data: {
-              labels:
-                hasData
-                  ? [
-                      "Comms",
-                      "Services",
-                      "Personnel",
-                      "Travel",
-                      "Assets / ICS",
-                      "Visitors"
-                    ]
-                  : [
-                      "No Records"
-                    ],
-
-              datasets: [
-                {
-                  data:
-                    hasData
-                      ? values
-                      : [1],
-
-                  backgroundColor:
-                    hasData
-                      ? [
-                          "#17633a",
-                          "#9a6514",
-                          "#255b94",
-                          "#7048a8",
-                          "#16834f",
-                          "#24758b"
-                        ]
-                      : [
-                          "#e7ece8"
-                        ],
-
-                  borderColor:
-                    "#ffffff",
-
-                  borderWidth:
-                    2
-                }
-              ]
-            },
-
-            options: {
-              responsive:
-                true,
-
-              maintainAspectRatio:
-                false,
-
-              cutout:
-                "70%",
-
-              plugins: {
-                tooltip: {
-                  enabled:
-                    hasData
-                },
-
-                legend: {
-                  position:
-                    "right",
-
-                  labels: {
-                    color:
-                      "#66736b",
-
-                    usePointStyle:
-                      true,
-
-                    boxWidth:
-                      7,
-
-                    font: {
-                      family:
-                        "Plus Jakarta Sans",
-
-                      size:
-                        9,
-
-                      weight:
-                        "600"
-                    }
-                  }
-                }
-              }
-            }
+    function updateUserChart(key, canvas, config) {
+      if (!canvas) return;
+      if (typeof window.Chart === "function") {
+        try {
+          canvas.hidden = false;
+          if (state.charts[key]) {
+            state.charts[key].data = config.data;
+            state.charts[key].options = config.options;
+            state.charts[key].update();
+          } else {
+            state.charts[key] = new window.Chart(canvas, config);
           }
-        );
+          canvas.parentElement.querySelector(".homepage-chart-fallback")?.remove();
+          return;
+        } catch (error) {
+          state.charts[key]?.destroy();
+          state.charts[key] = null;
+          console.warn("Dashboard chart is using its native fallback:", error);
+        }
+      }
+      renderNativeUserChart(canvas, config);
+    }
+
+    function renderCommunicationChart(model) {
+      updateUserChart("comm", ui.commCompareChart, {
+        type: "line",
+        data: {
+          labels: model.buckets.map((bucket) => bucket.label),
+          datasets: [
+            { label: "Documents & ICS", borderColor: "#059669", backgroundColor: "rgba(5, 150, 105, 0.08)", data: model.buckets.map((bucket) => bucket.documents), fill: true },
+            { label: "Travel Orders", borderColor: "#8b5cf6", data: model.buckets.map((bucket) => bucket.travel) },
+            { label: "Visitors", borderColor: "#d97706", data: model.buckets.map((bucket) => bucket.visitors) },
+            { label: "Service Requests", borderColor: "#e05271", data: model.buckets.map((bucket) => bucket.services) }
+          ].map((dataset) => ({ ...dataset, tension: 0.3, borderWidth: 2, pointRadius: 2.5 }))
+        },
+        options: {
+          ...userChartBaseOptions(),
+          scales: {
+            x: { grid: { display: false }, ticks: { maxRotation: 0, font: { size: 10 } } },
+            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#e2e8f0" } }
+          }
+        }
+      });
+    }
+
+    function renderOperationsChart(model) {
+      updateUserChart("operations", ui.operationsDistChart, {
+        type: "doughnut",
+        data: {
+          labels: chartActivityModules.map((module) => module.label),
+          datasets: [{
+            data: model.breakdown.map((module) => module.current),
+            backgroundColor: chartActivityModules.map((module) => module.color),
+            borderWidth: 2, borderColor: "#ffffff"
+          }]
+        },
+        options: { ...userChartBaseOptions(), cutout: "70%" }
+      });
+    }
+
+    function renderDashboardCharts() {
+      const model = buildDashboardChartModel();
+      const missingNote = model.missingDates ? ` ${model.missingDates} records without valid dates are excluded.` : "";
+      const availabilityNote = `${model.availableCount} of 6 activity modules available.`;
+      const trendSummary = $("#dashboardTrendSummary");
+      const distributionSummary = $("#dashboardDistributionSummary");
+      if (trendSummary) trendSummary.textContent = `${model.total} dated records over the last 90 days. ${availabilityNote}${missingNote}`;
+      if (distributionSummary) distributionSummary.textContent = `${availabilityNote} ${model.breakdown.map((module) => `${module.label}: ${module.current}`).join("; ")}.${missingNote}`;
+      for (const id of ["dashboardTrendEmpty", "dashboardDistributionEmpty"]) {
+        const empty = $(`#${id}`);
+        if (!empty) continue;
+        empty.hidden = model.total > 0;
+        empty.textContent = model.availableCount ? "No dated activity recorded in this period." : "Chart data is unavailable.";
+      }
+      renderCommunicationChart(model);
+      renderOperationsChart(model);
     }
 
     /* =========================================================
@@ -2583,9 +2357,7 @@
 
       renderMemos();
 
-      renderCommunicationChart();
-
-      renderOperationsChart();
+      renderDashboardCharts();
 
       refreshIcons();
     }
@@ -2701,12 +2473,16 @@
             ] =
               result.value;
 
+            state.chartSources[key] = "live";
+
           } else {
             failed += 1;
 
             state.records[
               key
             ] = [];
+
+            state.chartSources[key] = "unavailable";
 
             console.error(
               `Unable to load ${

@@ -1,5 +1,5 @@
 {
-  "method": "Node VM event-driven DOM harness with actual module database runtime and simulated Supabase/IndexedDB/FileReader",
+  "method": "Node VM event-driven DOM harness with actual module database runtime and simulated Supabase database/private Storage and IndexedDB",
   "scenarios": [
     {
       "scenario": "Detected memo routes with full attachment and fields (flat columns)",

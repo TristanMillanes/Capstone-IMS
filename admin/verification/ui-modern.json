@@ -1,0 +1,682 @@
+{
+  "date": "2026-10-06",
+  "browser": "Chromium 153",
+  "fixture": "Empty simulated Supabase; external assets blocked; no hosted database calls.",
+  "execution": "Completed page sets and targeted presentation rechecks; latest result retained for each scenario.",
+  "scenario_count": 112,
+  "results": [
+    {
+      "file": "admincommunication.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admincommunication.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "employee-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "travelOR-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "officememo-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "invetoryadmin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "visitors-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "serviceAdmin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "ics-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "Usermanagement.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "requestacc.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 320,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 320,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 390,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 390,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 768,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 768,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 1024,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 1024,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 1440,
+      "theme": "light",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html",
+      "width": 1440,
+      "height": 480,
+      "reducedMotion": true,
+      "result": "PASS"
+    },
+    {
+      "file": "admin.html + officememo-admin.html",
+      "width": 1440,
+      "preferenceSync": true,
+      "result": "PASS"
+    }
+  ]
+}

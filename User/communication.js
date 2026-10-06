@@ -92,6 +92,7 @@
         return "";
       }
 
+      if(/^data:(?:application\/(?:pdf|vnd\.openxmlformats-officedocument\.(?:wordprocessingml\.document|spreadsheetml\.sheet|presentationml\.presentation))|image\/(?:png|jpeg|webp|bmp|tiff)|text\/(?:plain|csv))(?:;[^,]*)?,/i.test(candidate))return candidate;
       try {
         const parsed = new URL(candidate, window.location.href);
 
@@ -494,11 +495,14 @@
       syncOverlay();
     }
 
-    function openModal(record) {
+    let communicationFileVersion=0,communicationBlobUrl="";
+    async function openModal(record) {
       if (!record || !ui.viewModal) {
         return;
       }
 
+      const fileVersion=++communicationFileVersion;
+      if(communicationBlobUrl){URL.revokeObjectURL(communicationBlobUrl);communicationBlobUrl="";}
       state.selectedRecord = record;
       state.lastFocusedElement = document.activeElement;
 
@@ -555,8 +559,14 @@
       );
 
       if (attachmentLink) {
-        attachmentLink.href =
-          record.attachmentUrl || "#";
+        attachmentLink.removeAttribute('href');attachmentLink.setAttribute('aria-disabled','true');
+        if(record.attachmentUrl){
+          window.PGENRO_API.getDocumentUrl(record.attachmentUrl).then(async url=>{
+            if(url.startsWith('data:')){const blob=await (await fetch(url)).blob();url=URL.createObjectURL(blob);if(fileVersion!==communicationFileVersion){URL.revokeObjectURL(url);return;}communicationBlobUrl=url;}
+            if(fileVersion!==communicationFileVersion)return;
+            attachmentLink.href=url;attachmentLink.removeAttribute('aria-disabled');attachmentLink.download=record.attachmentName||'document';
+          }).catch(error=>{if(fileVersion===communicationFileVersion)setText('#viewAttachmentHint',error.message);});
+        }
       }
 
       ui.viewModal.classList.add("open");
@@ -575,6 +585,7 @@
     }
 
     function closeModal() {
+      communicationFileVersion++;if(communicationBlobUrl){URL.revokeObjectURL(communicationBlobUrl);communicationBlobUrl="";}
       if (!ui.viewModal?.classList.contains("open")) {
         return;
       }

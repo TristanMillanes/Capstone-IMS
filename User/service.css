@@ -2097,3 +2097,10 @@ html[data-pgenro-auth-state="warning"] :is(.app-layout,.app-container,.settings-
 @media print {
   .pgenro-user:not(.pgenro-settings) .main-content { width:100%; margin-left:0; padding:0; }
 }
+
+/* Keep long records and action icons aligned inside this module. */
+.pgenro-user :is(.stat-card,.metric-card,.kpi-card) { min-width:0; }
+.pgenro-user :is(.stat-card,.metric-card,.kpi-card) :is(h3,strong,.metric-value) { font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.pgenro-user :is(button,a) > svg { flex-shrink:0; vertical-align:middle; }
+.pgenro-user :is(.attachment-card,.viewer-panel,.modal-panel) { min-width:0; }
+.pgenro-user :is(.attachment-card,.modal-subtitle,.file-name) { overflow-wrap:anywhere; }

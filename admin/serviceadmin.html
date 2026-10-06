@@ -5,15 +5,17 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Service Request &amp; Course of Action</title>
+<meta name="theme-color" content="#f5f7f8"/>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <!-- Lucide Icons -->
 <!-- Supabase JavaScript SDK -->
 <!-- Stylesheet -->
-<link href="serviceAdmin.css?v=20261002-fixed" rel="stylesheet"/>
-<link href="../shared/deployment-layout.css?v=20261004-ui-preserve" rel="stylesheet"/>
+<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
+<link href="serviceAdmin.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="serviceAdmin.html" data-css-scope="admin-services" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <!-- Mobile Sidebar Backdrop -->
@@ -29,7 +31,7 @@
 </div>
 <div class="logo-text">
 <h2>PGENRO IMS</h2>
-<span>Admin Control Center</span>
+<span>Administrative workspace</span>
 </div>
 </a>
 <button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
@@ -38,40 +40,41 @@
 </div>
 <nav aria-label="Administrator navigation" class="sidebar-nav">
 <div class="nav-group">
-<span class="nav-label">Main Panel</span>
+<span class="nav-label">Workspace</span>
 <ul>
-<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">Operations &amp; Records</span>
+<span class="nav-label">Office operations</span>
 <ul>
-<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
 <li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
 <li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
-<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
-<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
 <li><a aria-current="page" class="nav-item active" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">User &amp; Access</span>
+<span class="nav-label">Administration</span>
 <ul>
 <li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
 <li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">System Control</span>
+<span class="nav-label">Workspace tools</span>
 <ul>
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
-<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
 </ul>
 </div>
 </nav>
+<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 </aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
 <!-- ============================================================ -->
 <!-- MAIN APPLICATION WRAPPER                                    -->
@@ -80,6 +83,7 @@
 <!-- TOPBAR -->
 <header class="topbar">
 <div class="topbar-left">
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Service requests</span></a>
 <button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 <i data-lucide="menu"></i>
 </button>
@@ -91,6 +95,7 @@
 </div>
 </div>
 <div class="topbar-right">
+<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
 <!-- Notification Button & Drawer -->
 <div class="notification-wrapper">
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
@@ -112,6 +117,7 @@
 <div class="profile-menu" id="profileMenu">
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
+<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
 </button>
 <div class="profile-dropdown" id="profileDropdown">
 <div class="profile-dropdown-header">
@@ -137,17 +143,18 @@
 </header>
 <!-- MAIN CONTENT -->
 <main class="main-content" id="adminMainContent" tabindex="-1">
-<div class="workspace-context"><span class="workspace-context-label">PGENRO / ADMIN WORKSPACE</span><time id="workspaceToday"></time></div>
+<div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <!-- PAGE HEADER -->
 <section class="page-header">
 <div class="header-title">
+<div class="page-heading-mark" aria-hidden="true"><i data-lucide="wrench"></i></div>
 <div class="breadcrumb">
 <span>Admin Services</span>
 <i data-lucide="chevron-right"></i>
 <span class="active">Service Request Encoding</span>
 </div>
-<h1>Service Requests &amp; Course of Action</h1>
-<p>Manage public and LGU service requests, track the course of action, and review the registry.</p>
+<h1>Service requests</h1>
+<p>Follow every request from receipt through action and resolution.</p>
 </div>
 <div class="header-actions"><button class="btn btn-secondary" id="refreshServicesBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
 <button class="btn btn-secondary" id="btnOpenSummaryModal" type="button">
@@ -160,7 +167,8 @@
 </div>
 </section>
 <!-- ENCODING MASTER CARD -->
-<section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Requests</span><div class="kpi-icon blue"><i data-lucide="wrench"></i></div></div><div class="kpi-body"><h3 class="counter" id="serviceTotal">0</h3><span class="kpi-trend">Registered services</span></div><div class="kpi-footer"><span>All service request records</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Review</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="servicePending">0</h3><span class="kpi-trend">Awaiting action</span></div><div class="kpi-footer"><span>Requests for review</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">In Progress</span><div class="kpi-icon emerald"><i data-lucide="activity"></i></div></div><div class="kpi-body"><h3 class="counter" id="serviceActive">0</h3><span class="kpi-trend">Ongoing services</span></div><div class="kpi-footer"><span>Active course of action</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Completed Services</span><div class="kpi-icon purple"><i data-lucide="check-circle-2"></i></div></div><div class="kpi-body"><h3 class="counter" id="serviceCompleted">0</h3><span class="kpi-trend">Finished requests</span></div><div class="kpi-footer"><span>Completed and closed records</span></div></div></section><section class="card" id="serviceRegistry"><div class="section-header"><div><h2>Service Requests Registry</h2><p>Search the registry and open a record to update its course of action.</p></div><div class="table-actions"><input aria-label="Search service registry" class="input-sm" id="serviceRegistrySearch" placeholder="Search records…" type="search"/><button class="btn btn-secondary" id="exportServicesBtn" type="button"><i data-lucide="download"></i> Export CSV</button></div></div><div class="table-responsive"><table class="data-table"><thead><tr><th>Service No.</th><th>Date</th><th>Client</th><th>Organization</th><th>Service Scope</th><th>Status</th><th>Actions</th></tr></thead><tbody id="serviceRegistryBody"></tbody></table></div><div class="table-footer"><span id="serviceRegistryCount">Loading requests…</span></div></section></main>
+<section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Requests</span><div class="kpi-icon blue"><i data-lucide="wrench"></i></div></div><div class="kpi-body"><h3 class="counter" id="serviceTotal">0</h3><span class="kpi-trend">Registered services</span></div><div class="kpi-footer"><span>All service request records</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Review</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="servicePending">0</h3><span class="kpi-trend">Awaiting action</span></div><div class="kpi-footer"><span>Requests for review</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">In Progress</span><div class="kpi-icon emerald"><i data-lucide="activity"></i></div></div><div class="kpi-body"><h3 class="counter" id="serviceActive">0</h3><span class="kpi-trend">Ongoing services</span></div><div class="kpi-footer"><span>Active course of action</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Completed Services</span><div class="kpi-icon purple"><i data-lucide="check-circle-2"></i></div></div><div class="kpi-body"><h3 class="counter" id="serviceCompleted">0</h3><span class="kpi-trend">Finished requests</span></div><div class="kpi-footer"><span>Completed and closed records</span></div></div></section><section class="card" id="serviceRegistry"><div class="section-header"><div><h2>Service Requests Registry</h2><p>Search the registry and open a record to update its course of action.</p></div><div class="table-actions"><input aria-label="Search service registry" class="input-sm" id="serviceRegistrySearch" placeholder="Search records…" type="search"/><button class="btn btn-secondary" id="exportServicesBtn" type="button"><i data-lucide="download"></i> Export CSV</button></div></div><div class="table-responsive"><table class="data-table"><thead><tr><th>Service No.</th><th>Date</th><th>Client</th><th>Organization</th><th>Service Scope</th><th>Status</th><th>Actions</th></tr></thead><tbody id="serviceRegistryBody"></tbody></table></div><div class="table-footer"><span id="serviceRegistryCount">Loading requests…</span></div></section><footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
+</main>
 </div>
 </div>
 <!-- MODALS -->
@@ -241,8 +249,8 @@
 <div class="toast-container" id="toastContainer"></div>
 <!-- SCRIPT -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261002-fixed"></script>
-<script defer="" src="serviceAdmin.js?v=20261002-fixed"></script>
+<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
+<script defer="" src="serviceAdmin.js?v=20261006-modern-ui-v2"></script>
 <div aria-hidden="true" class="modal-backdrop" id="serviceFormModal"><div aria-labelledby="serviceFormTitle" aria-modal="true" class="modal-card service-form-card" role="dialog"><div class="modal-header"><div><h2 id="serviceFormTitle">Service Request Details</h2><p>Complete the client information, service scope, and course of action.</p></div><button aria-label="Close service form" data-close="serviceFormModal" type="button">×</button></div>
 <!-- CARD HEADER & TAB CONTROLLERS -->
 <div class="service-card-header">

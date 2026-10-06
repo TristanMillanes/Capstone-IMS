@@ -1,12 +1,20 @@
-# PGENRO Admin — interactive workspace update
+# PGENRO Admin — Modern Workspace (6 October 2026)
+
+All eleven pages now use a modern administrative workspace: a clean light sidebar, a soft neutral background, stronger Inter typography, an expressive green dashboard header, clearer cards and charts, and consistent tables, forms and menus. Light and dark appearances are available from the topbar or Workspace Preferences. Brief entrance, menu, modal and hover animations honor reduced-motion preferences. Every page keeps its own HTML, CSS and JavaScript; no shared UI file or new application dependency is added.
+
+The desktop profile control includes the current administrator's name and role. Phone layouts keep separate appearance, notification and profile controls. A complete set of 139 local vector icons covers the interface and existing controllers; icons added later by tables, OCR states and attachment controls also render. Table toolbars offer comfortable or compact row spacing. Theme and density choices are remembered across modules and synchronized between open tabs. Empty registries retain their real status messages with a clearer visual treatment. The supplied Supabase, authorization, OCR, chart and record-controller code is retained.
+
+See `verification/MODERN_UI.md` and `verification/ui-modern.json` for the current checks. Other validation reports describe earlier updates.
 
 Replace the `admin/` folder in your existing PGENRO application with this folder. Serve the application through HTTP or HTTPS and open `admin/admin.html`. All eleven pages retain their own HTML, CSS and JavaScript; no new shared UI files are required.
 
-The interface follows the same green/slate design on every page: a 275 px sidebar (78 px collapsed), 70 px topbar, matching navigation, page headers, buttons, profile and notification menus, and centered forms with internal scrolling. The saved sidebar preference works across modules. Mobile navigation and forms support 320 px screens.
+The interface follows the same design on every page: a 264 px sidebar (76 px collapsed), 70 px desktop topbar (64 px on phones), matching navigation, page headers, buttons, profile and notification menus, and centered forms with internal scrolling. The saved sidebar preference works across modules. Mobile navigation and forms support 320 px screens.
 
 ## Interface and interaction update
 
-All eleven pages have matching forest-green navigation, white page headers, consistent cards, buttons and centered forms. The layout supports 320 px phones, tablets and desktop screens. Tables include accessible horizontal scroll controls when their columns exceed the available width.
+All eleven pages have matching navigation, open module headers, consistent cards, buttons and centered forms. The dashboard adds a green welcome panel and useful module shortcuts. The layout supports 320 px phones, tablets and desktop screens. Tables include accessible horizontal scroll controls when their columns exceed the available width.
+
+Use the sun/moon button to change appearance. **Workspace Preferences** also offers a Light/Dark selector and **Compact table spacing**. Each registry has a density button for the same saved compact preference. **Reset Preferences to Defaults** restores light appearance and comfortable table spacing. Appearance applies to menus and forms as well as the main workspace; print layouts remain light.
 
 Use **Modules** in the topbar, or **Ctrl K / Cmd K**, to find any of the fourteen navigation destinations. Use arrow keys to move through the results, Enter to open one and Escape to close the switcher. Existing topbar record searches still filter their current module. The switcher preserves the current record query and stays closed while a form is open. Mobile menu focus returns to its toggle on Escape, and changing screen height does not dismiss an open menu.
 
@@ -60,20 +68,20 @@ The original routing is retained: **Communications upload → Run OCR → review
 
 ## Existing application dependencies
 
-This archive contains the full application, including the existing shared Supabase bootstrap, login pages, logos, setup scripts and administrator Edge Function. Follow `../FIXES_AND_SETUP.md` for this update and apply its read-only database patch to your existing database.
+This archive contains the eleven-page `admin/` folder supplied for this update. Your existing shared Supabase bootstrap, login pages, logos, database setup and administrator Edge Function belong to the full application and are not included in this archive. Replace the admin folder within that existing project. No database or schema changes are required for this UI update.
 
 Keep your real `shared/supabase.js` one level above `admin/`. It must initialize `window.pgenroSupabase` (or `window.PGENRO_DB.client`) and your existing administrator helpers `window.PGENRO_API.requireAdmin` and `window.PGENRO_API.invokeAdmin`. The full application's authorization guard should remain enabled.
 
 The account helpers must continue to handle `create`, `update`, `set_status`, `delete`, `approve_request` and `reject_request`. Stock changes require the existing `record_inventory_movement` RPC with its current `p_item_id`, `p_movement_type`, `p_quantity`, `p_reference_no`, `p_remarks` and `p_recorded_by` parameters. The required registries are `employees`, `communications`, `travel_orders`, `office_memos`, `inventory`, `inventory_movements`, `visitors`, `service_requests`, `ics_records`, `profiles` and `access_requests`; `audit_logs` supports the audit trail. Preserve your matching schema, constraints, access policies and realtime publication.
 
-Keep `logo/enro.png` and `User/login.html` in their existing locations outside `admin/`. A local text mark appears if the logo image is unavailable. Sign out continues to use the existing login route.
+Keep `logo/enro.png` and `User/login.html` in their existing locations outside `admin/`. A local leaf symbol appears if the logo image is unavailable. Sign out continues to use the existing login route.
 
 The official Supabase SDK and document reader libraries require network access. Fonts use the existing Google Fonts include; icons are rendered locally. The dashboard has native chart fallbacks. Workspace backup/restore manages local browser caches and preferences; it does not back up or restore the hosted database.
 
 ## Validation
 
-See `../verification/CURRENT_VERIFICATION.md` for this update. `VERIFICATION.md` and older reports are retained from the supplied source. Checks cover all eleven pages, mobile widths, keyboard navigation, forms, registry actions, exports, print views, OCR field review and Communications-to-Memo routing. Real PDF, DOCX, image and scanned-PDF extraction uses the production reader libraries, served locally for repeatable testing.
+See `verification/MODERN_UI.md` for this update. `VERIFICATION.md`, `verification/UI_REFRESH.md` and older reports are historical; their claims do not describe the current redesign. Current checks cover both appearances on all eleven pages at five widths, menu and form bounds, focus return, toolbar spacing, dynamic local icons, reduced motion, and saved preferences. The supplied parser, routing and upload regression suites are also run.
 
 Database responses were simulated; the existing Supabase bootstrap is retained and the hosted database was not modified or verified. Keep the existing integration and verify the deployed application with your authorized administrator account. OCR quality depends on the source document; review unclear or missing values before saving.
 
-Run `node verification/memo-parser.test.cjs` and `node verification/memorandum-routing.test.cjs` from `admin/` for the included dependency-free regression checks.
+Run `node verification/memo-parser.test.cjs`, `node verification/memorandum-routing.test.cjs` and `node verification/communication-upload.test.cjs` from `admin/` for the included dependency-free regression checks. With Playwright and Chromium installed in a test environment, run `node verification/ui-modern.test.cjs` for the browser checks.

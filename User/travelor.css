@@ -2387,3 +2387,10 @@ html[data-pgenro-auth-state="warning"] :is(.app-layout,.app-container,.settings-
 .pgenro-user .footer { display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; padding-top:20px; font-size:11px; color:#66736b; }
 .pgenro-user .footer strong,.pgenro-user .footer span { display:block; }
 @media(max-width:600px){.pgenro-user .metrics-grid{grid-template-columns:minmax(0,1fr);}}
+
+/* Keep long records and action icons aligned inside this module. */
+.pgenro-user :is(.stat-card,.metric-card,.kpi-card) { min-width:0; }
+.pgenro-user :is(.stat-card,.metric-card,.kpi-card) :is(h3,strong,.metric-value) { font-variant-numeric:tabular-nums; overflow-wrap:anywhere; }
+.pgenro-user :is(button,a) > svg { flex-shrink:0; vertical-align:middle; }
+.pgenro-user :is(.attachment-card,.viewer-panel,.modal-panel) { min-width:0; }
+.pgenro-user :is(.attachment-card,.modal-subtitle,.file-name) { overflow-wrap:anywhere; }

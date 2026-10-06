@@ -20,6 +20,7 @@
       "result": "PASS",
       "processingMs": 0,
       "readingStats": {
+        "cachedPages": 1,
         "ocrPasses": 0
       },
       "cacheHit": true
@@ -37,6 +38,7 @@
       "result": "PASS",
       "processingMs": 1,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 0
       },
       "cacheHit": false
@@ -46,6 +48,7 @@
       "result": "PASS",
       "processingMs": 1,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 0
       },
       "cacheHit": false
@@ -55,6 +58,7 @@
       "result": "PASS",
       "processingMs": 2,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 0
       },
       "cacheHit": false
@@ -64,6 +68,7 @@
       "result": "PASS",
       "processingMs": 1,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 0
       },
       "cacheHit": false
@@ -73,6 +78,7 @@
       "result": "PASS",
       "processingMs": 2,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 0
       },
       "cacheHit": false
@@ -80,8 +86,9 @@
     {
       "scenario": "Native incoming.pdf",
       "result": "PASS",
-      "processingMs": 8,
+      "processingMs": 9,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 0
       },
       "cacheHit": false
@@ -89,8 +96,9 @@
     {
       "scenario": "Printed scan rotated 90",
       "result": "PASS",
-      "processingMs": 998,
+      "processingMs": 1071,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 2
       },
       "cacheHit": false
@@ -98,8 +106,9 @@
     {
       "scenario": "Printed scan rotated 180",
       "result": "PASS",
-      "processingMs": 874,
+      "processingMs": 905,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 2
       },
       "cacheHit": false
@@ -107,8 +116,9 @@
     {
       "scenario": "Printed scan rotated 270",
       "result": "PASS",
-      "processingMs": 502,
+      "processingMs": 456,
       "readingStats": {
+        "cachedPages": 0,
         "ocrPasses": 1
       },
       "cacheHit": false

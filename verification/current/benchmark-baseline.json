@@ -1,0 +1,60 @@
+{
+  "profile": {
+    "workers": 1,
+    "dpi": 220,
+    "maxSide": 2800
+  },
+  "measurements": [
+    {
+      "file": "native-letter.pdf",
+      "status": 200,
+      "durationMs": 16,
+      "pages": 1,
+      "ocrPasses": 0,
+      "cachedPages": 0,
+      "expectedFieldsMatch": true,
+      "fields": {
+        "controlNo": "REF-2026-181",
+        "subject": "REQUEST FOR TECHNICAL ASSISTANCE FOR RIVER REHABILITATION",
+        "receivedFrom": "OFFICE OF THE MUNICIPAL MAYOR",
+        "documentType": "Request Letter"
+      }
+    },
+    {
+      "file": "wide-margins.png",
+      "status": 200,
+      "durationMs": 1301,
+      "pages": 1,
+      "ocrPasses": 2,
+      "cachedPages": 0,
+      "expectedFieldsMatch": false,
+      "fields": {
+        "controlNo": "REF-2026-221",
+        "subject": "REQUEST FOR TECHNICAL ASSISTANCE",
+        "receivedFrom": "",
+        "documentType": "Request Letter"
+      }
+    },
+    {
+      "file": "six-page-scan.pdf",
+      "status": 200,
+      "durationMs": 2936,
+      "pages": 6,
+      "ocrPasses": 6,
+      "cachedPages": 0,
+      "expectedFieldsMatch": true,
+      "fields": {
+        "controlNo": "REF-2026-221",
+        "subject": "REQUEST FOR TECHNICAL ASSISTANCE",
+        "receivedFrom": "MARIA L. SANTOS",
+        "documentType": "Request Letter"
+      }
+    },
+    {
+      "file": "same-file-retry.pdf",
+      "durationMs": 23,
+      "pages": 6,
+      "ocrPasses": 0
+    }
+  ]
+}

@@ -176,6 +176,7 @@
           row.is_pinned,
           false
         )),
+        fileName: text(first(data.pdfFileName,data.fileName,data.file_name,row.file_name)),
         fileUrl: text(first(
           data.fileUrl,
           data.fileURL,
@@ -733,6 +734,72 @@
         });
     }
 
+    const documentViewer={version:0,renderVersion:0,abort:null,task:null,pdf:null,render:null,chain:Promise.resolve(),url:'',page:1};
+    const docToolbar=$('#memoDocumentToolbar'),docCanvas=$('#memoUserPdfCanvas'),docImage=$('#memoUserDocumentImage'),docText=$('#memoUserDocumentText'),docLabel=$('#memoUserPageLabel'),docDownload=$('#memoUserDownload');
+    let pdfLibrary=null;
+    function cleanDocumentViewer(){
+      documentViewer.version++;documentViewer.renderVersion++;documentViewer.abort?.abort();documentViewer.render?.cancel();
+      if(documentViewer.task)Promise.resolve(documentViewer.task.destroy()).catch(()=>{});
+      if(documentViewer.url)URL.revokeObjectURL(documentViewer.url);
+      documentViewer.abort=null;documentViewer.task=null;documentViewer.pdf=null;documentViewer.url='';documentViewer.page=1;
+      docToolbar.hidden=true;ui.pdfFrame.hidden=true;ui.pdfFrame.setAttribute('aria-busy','false');docCanvas.hidden=true;docCanvas.width=docCanvas.height=0;
+      docImage.hidden=true;docImage.removeAttribute('src');docText.hidden=true;docText.textContent='';docDownload.removeAttribute('href');
+    }
+    function documentMessage(title,message){
+      ui.noPdfMessage.classList.remove('hidden');ui.noPdfMessage.querySelector('h3').textContent=title;ui.noPdfMessage.querySelector('p').textContent=message;
+    }
+    function renderDocumentPage(){
+      if(!documentViewer.pdf)return;
+      const version=documentViewer.version,renderVersion=++documentViewer.renderVersion,pdf=documentViewer.pdf,number=documentViewer.page;
+      documentViewer.render?.cancel();
+      documentViewer.chain=documentViewer.chain.catch(()=>{}).then(async()=>{
+        if(version!==documentViewer.version||renderVersion!==documentViewer.renderVersion)return;
+        const page=await pdf.getPage(number);if(version!==documentViewer.version||renderVersion!==documentViewer.renderVersion)return;
+        const base=page.getViewport({scale:1}),available=Math.max(80,ui.pdfFrame.clientWidth-32),viewport=page.getViewport({scale:Math.min(2,available/base.width)});
+        const ratio=Math.min(devicePixelRatio||1,2,Math.sqrt(12000000/(viewport.width*viewport.height)));
+        docCanvas.width=Math.ceil(viewport.width*ratio);docCanvas.height=Math.ceil(viewport.height*ratio);
+        docCanvas.style.width=viewport.width+'px';docCanvas.style.height=viewport.height+'px';docCanvas.hidden=false;
+        docLabel.textContent=`Page ${number} of ${pdf.numPages}`;$('#memoUserPrevPage').disabled=number<=1;$('#memoUserNextPage').disabled=number>=pdf.numPages;
+        ui.pdfFrame.setAttribute('aria-busy','true');const render=page.render({canvasContext:docCanvas.getContext('2d'),viewport,transform:ratio===1?null:[ratio,0,0,ratio,0,0]});documentViewer.render=render;
+        await render.promise;page.cleanup();if(version===documentViewer.version)ui.pdfFrame.setAttribute('aria-busy','false');
+      }).catch(error=>{if(version===documentViewer.version&&error.name!=='RenderingCancelledException')documentMessage('Page preview unavailable','Download the document to view it.');});
+    }
+    function viewerTimeout(promise,ms,message){let timer;return Promise.race([promise,new Promise((_,reject)=>timer=setTimeout(()=>reject(Error(message)),ms))]).finally(()=>clearTimeout(timer));}
+    async function readViewerDocument(record){
+      cleanDocumentViewer();const version=documentViewer.version,controller=new AbortController();documentViewer.abort=controller;
+      documentMessage(record.fileUrl?'Loading document…':'No Document Attached',record.fileUrl?'Preparing the attachment preview.':'This memorandum does not have a digital attachment.');
+      if(!record.fileUrl)return;
+      const timer=setTimeout(()=>controller.abort(),25000);
+      try{
+        const url=await window.PGENRO_API.getDocumentUrl(record.fileUrl);const response=await fetch(url,{signal:controller.signal});
+        if(!response.ok)throw Error('The attachment could not be retrieved.');
+        if(Number(response.headers.get('Content-Length'))>50*1024*1024)throw Error('The attachment exceeds the 50 MB preview limit.');
+        const blob=await response.blob();if(blob.size>50*1024*1024)throw Error('The attachment exceeds the 50 MB preview limit.');
+        if(version!==documentViewer.version)return;
+        const bytes=new Uint8Array(await blob.arrayBuffer());if(version!==documentViewer.version)return;
+        documentViewer.url=URL.createObjectURL(blob);docDownload.href=documentViewer.url;docDownload.download=record.fileName||record.id||'document';docToolbar.hidden=false;
+        const mime=blob.type.split(';')[0];
+        const pdf=new TextDecoder('ascii').decode(bytes.subarray(0,1024)).includes('%PDF-')||mime==='application/pdf';
+        $('#memoUserPrevPage').hidden=$('#memoUserNextPage').hidden=docLabel.hidden=!pdf;
+        if(pdf){
+          if(!pdfLibrary)pdfLibrary=import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.min.mjs').then(lib=>{lib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';return lib;}).catch(e=>{pdfLibrary=null;throw e;});
+          const lib=await viewerTimeout(pdfLibrary,15000,'The PDF reader could not load. Use Download document.');if(version!==documentViewer.version)return;
+          const task=lib.getDocument({data:bytes,isEvalSupported:false});documentViewer.task=task;
+          documentViewer.pdf=await viewerTimeout(task.promise,20000,'This PDF could not open. Use Download document.');if(version!==documentViewer.version)return;
+          ui.noPdfMessage.classList.add('hidden');ui.pdfFrame.hidden=false;renderDocumentPage();
+        }else if(/^image\/(?:png|jpeg|webp|bmp)$/.test(mime)){
+          docImage.src=documentViewer.url;docImage.hidden=false;ui.pdfFrame.hidden=false;ui.noPdfMessage.classList.add('hidden');
+        }else if(/^text\//.test(mime)){
+          const encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';docText.textContent=new TextDecoder(encoding).decode(bytes);docText.hidden=false;ui.pdfFrame.hidden=false;ui.noPdfMessage.classList.add('hidden');
+        }else documentMessage('Document ready to download','Use Download document to open this attachment in its application.');
+      }catch(error){if(version===documentViewer.version)documentMessage('Preview unavailable',error.name==='AbortError'?'The attachment took too long to load. Close and reopen the viewer.':error.message);}
+      finally{clearTimeout(timer);if(documentViewer.abort===controller)documentViewer.abort=null;}
+    }
+    $('#memoUserPrevPage').onclick=()=>{if(documentViewer.pdf&&documentViewer.page>1){documentViewer.page--;renderDocumentPage();}};
+    $('#memoUserNextPage').onclick=()=>{if(documentViewer.pdf&&documentViewer.page<documentViewer.pdf.numPages){documentViewer.page++;renderDocumentPage();}};
+    let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(state.viewerOpen)renderDocumentPage();},120);});
+    window.addEventListener('pagehide',cleanDocumentViewer);
+
     function openViewer(index) {
       const record = state.records[index];
       if (!record || !ui.viewerModal) return;
@@ -748,24 +815,9 @@
           `${record.id || "Memorandum"} — Document Viewer`;
       }
 
-      if (record.fileUrl) {
-        if (ui.pdfFrame) {
-          ui.pdfFrame.style.display = "block";
-          ui.pdfFrame.src = record.fileUrl;
-        }
-
-        ui.noPdfMessage?.classList.add("hidden");
-      } else {
-        if (ui.pdfFrame) {
-          ui.pdfFrame.src = "";
-          ui.pdfFrame.style.display = "none";
-        }
-
-        ui.noPdfMessage?.classList.remove("hidden");
-      }
-
       ui.viewerModal.classList.add("open");
       ui.viewerModal.setAttribute("aria-hidden", "false");
+      readViewerDocument(record);
 
       syncOverlay();
       refreshIcons();
@@ -783,10 +835,7 @@
       ui.viewerModal.classList.remove("open");
       ui.viewerModal.setAttribute("aria-hidden", "true");
 
-      if (ui.pdfFrame) {
-        ui.pdfFrame.src = "";
-        ui.pdfFrame.style.display = "block";
-      }
+      cleanDocumentViewer();
 
       ui.noPdfMessage?.classList.add("hidden");
 

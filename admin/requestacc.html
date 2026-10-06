@@ -5,11 +5,13 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Account Access Requests</title>
+<meta name="theme-color" content="#f5f7f8"/>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="requestacc.css?v=20261002-fixed" rel="stylesheet"/>
-<link href="../shared/deployment-layout.css?v=20261004-ui-preserve" rel="stylesheet"/>
+<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
+<link href="requestacc.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
@@ -21,7 +23,7 @@
 </div>
 <div class="logo-text">
 <h2>PGENRO IMS</h2>
-<span>Admin Control Center</span>
+<span>Administrative workspace</span>
 </div>
 </a>
 <button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
@@ -30,44 +32,46 @@
 </div>
 <nav aria-label="Administrator navigation" class="sidebar-nav">
 <div class="nav-group">
-<span class="nav-label">Main Panel</span>
+<span class="nav-label">Workspace</span>
 <ul>
-<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a></li>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">Operations &amp; Records</span>
+<span class="nav-label">Office operations</span>
 <ul>
-<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications Log</span></a></li>
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
 <li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
 <li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
-<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Supplies Inventory</span></a></li>
-<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors Log</span></a></li>
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
 <li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>ICS Property Slips</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">User &amp; Access</span>
+<span class="nav-label">Administration</span>
 <ul>
 <li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
 <li><a aria-current="page" class="nav-item active" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
 </ul>
 </div>
 <div class="nav-group">
-<span class="nav-label">System Control</span>
+<span class="nav-label">Workspace tools</span>
 <ul>
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Security Audit Trail</span></a></li>
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>System Backups</span></a></li>
-<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a></li>
+<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
 </ul>
 </div>
 </nav>
+<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 </aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="main-wrapper">
 <header class="topbar">
 <div class="topbar-left">
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Account requests</span></a>
 <button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 <i data-lucide="menu"></i>
 </button>
@@ -79,6 +83,7 @@
 </div>
 </div>
 <div class="topbar-right">
+<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
 <!-- Notification Button & Drawer -->
 <div class="notification-wrapper">
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
@@ -100,6 +105,7 @@
 <div class="profile-menu" id="profileMenu">
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
+<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
 </button>
 <div class="profile-dropdown" id="profileDropdown">
 <div class="profile-dropdown-header">
@@ -124,14 +130,17 @@
 </div>
 </header>
 <main class="main-content" id="adminMainContent" tabindex="-1">
-<div class="workspace-context"><span class="workspace-context-label">PGENRO / ADMIN WORKSPACE</span><time id="workspaceToday"></time></div>
-<section class="page-header"><div class="header-title"><div class="breadcrumb"><span>Admin Console</span><i data-lucide="chevron-right"></i><span class="active">Account Requests</span></div><h1>Account Access Request Review</h1><p>Review personnel access applications, assign roles, approve or reject clearance, and maintain a complete request history.</p></div><div class="header-actions"><button class="btn btn-secondary" id="refreshRequestsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button><a class="btn btn-secondary" href="Usermanagement.html"><i data-lucide="users"></i> User Directory</a></div></section>
+<div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
+<section class="page-header"><div class="header-title">
+<div class="page-heading-mark" aria-hidden="true"><i data-lucide="user-plus"></i></div><div class="breadcrumb"><span>Admin Console</span><i data-lucide="chevron-right"></i><span class="active">Account Requests</span></div><h1>Account requests</h1>
+<p>Review applications and provide the right access to your office workspace.</p></div><div class="header-actions"><button class="btn btn-secondary" id="refreshRequestsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button><a class="btn btn-secondary" href="Usermanagement.html"><i data-lucide="users"></i> User Directory</a></div></section>
 <section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingCount">0</h3><span class="kpi-trend">Awaiting review</span></div><div class="kpi-footer"><span>Verify applicant details</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Approved Accounts</span><div class="kpi-icon emerald"><i data-lucide="user-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statApprovedCount">0</h3><span class="kpi-trend">Access granted</span></div><div class="kpi-footer"><span>Approved request history</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Declined Requests</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statRejectedCount">0</h3><span class="kpi-trend">Declined applications</span></div><div class="kpi-footer"><span>Review reasons and remarks</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Applications</span><div class="kpi-icon blue"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalCount">0</h3><span class="kpi-trend">All access requests</span></div><div class="kpi-footer"><span>Live account request registry</span></div></div></section>
 <section class="table-card">
 <div style="padding:18px 18px 0"><div class="table-toolbar"><div class="table-toolbar-left"><input class="filter-input" id="requestSearchInput" placeholder="Search name, email, request ID, Gov ID..." type="search"/><select class="filter-select" id="divisionFilterSelect"><option value="ALL">All Divisions</option><option value="Admin Office">Admin Office</option><option value="Environment Management">Environment Management</option><option value="Forestry Division">Forestry Division</option><option value="Mines &amp; Quarry">Mines &amp; Quarry</option><option value="Administrative and Finance Division">Administrative &amp; Finance</option><option value="Environmental Management Division">Environmental Management Division</option><option value="Forest Management Division">Forest Management Division</option><option value="Mines and Geosciences Division">Mines &amp; Geosciences Division</option><option value="Office of the PG-ENRO">Office of the PG-ENRO</option></select><select class="filter-select" id="statusFilterSelect"><option value="ALL">All Status</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div><div class="table-toolbar-right"><button class="btn btn-secondary btn-sm" disabled="" id="bulkApproveBtn" type="button"><i data-lucide="check-check"></i> Approve Selected</button><button class="btn btn-danger btn-sm" disabled="" id="bulkRejectBtn" type="button"><i data-lucide="x-circle"></i> Reject Selected</button></div></div></div>
 <div class="table-responsive"><table class="data-table data-table"><thead><tr><th width="40"><input id="selectAllCheckbox" type="checkbox"/></th><th>Request / Date</th><th>Applicant</th><th>Division</th><th>Requested Role</th><th>Endorsement</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead><tbody id="requestTableBody"><tr><td colspan="8" style="text-align:center;padding:36px;color:#64748b">Loading access requests...</td></tr></tbody></table></div>
 <div class="table-footer"><span class="text-muted" id="tableRangeText">Showing 0 of 0 access requests</span><span class="text-muted">Live Registry</span></div>
 </section>
+<footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
 </main>
 </div>
 </div>
@@ -140,8 +149,8 @@
 <div aria-hidden="true" class="modal-backdrop" id="declineModal"><div aria-labelledby="declineModalTitle" aria-modal="true" class="modal-container" role="dialog" style="max-width:520px"><div class="modal-header"><div class="modal-title-group"><div class="modal-icon rose"><i data-lucide="shield-x"></i></div><div><h3 id="declineModalTitle">Decline Access Request</h3><p>Record the reason for the applicant.</p></div></div><button class="modal-close-btn" id="closeDeclineModalBtn" type="button">×</button></div><div class="modal-body"><div class="form-group"><label>Reason</label><select class="form-control" id="declineReasonSelect"><option>Unverified credentials</option><option>Incomplete information</option><option>Role requires additional authorization</option><option>Duplicate account request</option><option>Not eligible for requested system access</option><option>Other</option></select></div><div class="form-group"><label>Remarks / Notes</label><textarea class="form-control" id="declineNotesInput" placeholder="Add administrator remarks..." rows="4"></textarea></div></div><div class="modal-footer modal-actions"><button class="btn btn-secondary" id="cancelDeclineModalBtn" type="button">Cancel</button><button class="btn btn-danger" id="confirmDeclineBtn" type="button"><i data-lucide="user-x"></i> Confirm Decline</button></div></div></div>
 <div aria-hidden="true" class="modal-backdrop" id="systemConfirmModal"><div aria-labelledby="confirmModalTitle" aria-modal="true" class="modal-container confirm-modal-card" role="dialog" style="max-width:430px"><div class="modal-body"><div class="confirm-icon-box" id="confirmModalIconBox"><i data-lucide="alert-triangle"></i></div><h3 id="confirmModalTitle">Confirm Action</h3><p id="confirmModalDesc" style="color:var(--slate-500);margin-top:8px">Are you sure?</p><div class="confirm-modal-actions"><button class="btn btn-secondary" id="confirmModalCancelBtn" type="button">Cancel</button><button class="btn btn-danger" id="confirmModalActionBtn" type="button">Confirm</button></div></div></div></div>
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261002-fixed"></script>
-<script defer="" src="requestacc.js?v=20261002-fixed"></script>
+<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
+<script defer="" src="requestacc.js?v=20261006-modern-ui-v2"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
   <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">

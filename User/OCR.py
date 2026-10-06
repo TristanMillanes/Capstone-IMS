@@ -21,6 +21,7 @@ import copy
 import threading
 import contextvars
 from collections import OrderedDict
+from contextlib import contextmanager
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
@@ -51,8 +52,12 @@ OCR_MIN_CONFIDENCE = float(os.getenv('OCR_MIN_CONFIDENCE', '65'))
 OCR_NUMERIC_ENABLED = os.getenv('OCR_NUMERIC_PASS', '0').lower() not in ('0', 'false', 'off')
 OCR_CACHE_SIZE = max(0, int(os.getenv('OCR_CACHE_SIZE', '20')))
 OCR_CACHE_TTL = max(0, int(os.getenv('OCR_CACHE_TTL', '600')))
+OCR_PAGE_CACHE_SIZE = max(0, int(os.getenv('OCR_PAGE_CACHE_SIZE', '64')))
+OCR_DOCUMENT_WORKERS = max(1, min(4, int(os.getenv('OCR_DOCUMENT_WORKERS', '1'))))
 _pool = ThreadPoolExecutor(max_workers=OCR_WORKERS, thread_name_prefix='pgenro-ocr')
 _ocr_slots = threading.BoundedSemaphore(OCR_WORKERS)
+_document_slots = threading.BoundedSemaphore(OCR_DOCUMENT_WORKERS)
+_pdf_lock = threading.RLock()
 _state = contextvars.ContextVar('ocr_state', default=None)
 _cache = OrderedDict()
 _cache_lock = threading.Lock()
@@ -61,6 +66,9 @@ _CACHE_MAX_BYTES = 8 * 1024 * 1024
 _active_reads = {}
 _cancelled_reads = OrderedDict()
 _reads_lock = threading.Lock()
+_recent_reads = OrderedDict()
+_page_cache = OrderedDict()
+_page_cache_lock = threading.Lock()
 
 class ReadCancelled(RuntimeError):
     pass
@@ -77,6 +85,18 @@ class ReadState:
         self.warnings = []
         self.lock = threading.Lock()
         self.cancelled = threading.Event()
+        self.total_pages = 0
+        self.completed_pages = 0
+        self.completed_indices = set()
+        self.cached_pages = 0
+        self.stage = 'Preparing document'
+
+    def snapshot(self):
+        with self.lock:
+            return {'pages': self.total_pages, 'completedPages': self.completed_pages,
+                    'cachedPages': self.cached_pages, 'stage': self.stage,
+                    'durationMs': round((time.monotonic() - self.started) * 1000),
+                    'ocrPasses': self.passes, 'cancelled': self.cancelled.is_set()}
 
     def remaining(self):
         if self.cancelled.is_set():
@@ -89,6 +109,27 @@ class ReadState:
 def check_budget():
     current = _state.get()
     return current.remaining() if current else OCR_DOCUMENT_TIMEOUT
+
+def reading_progress(total=None, completed=None, stage=None):
+    current = _state.get()
+    if current:
+        with current.lock:
+            if total is not None:
+                current.total_pages = total
+            if completed is not None:
+                current.completed_pages = completed
+            if stage is not None:
+                current.stage = stage
+
+@contextmanager
+def pdf_access():
+    # Flask requests are threaded too. No two requests may enter PyMuPDF at once.
+    while not _pdf_lock.acquire(timeout=min(.2, check_budget())):
+        check_budget()
+    try:
+        yield
+    finally:
+        _pdf_lock.release()
 
 def warn(message):
     current = _state.get()
@@ -143,6 +184,8 @@ def clean_text(text):
 def name_value(value):
     value = re.sub(r'^(?:\(\s*sgd\.?\s*\)|sgd\.?|/s/|by\s*:)\s*', '', tidy(value), flags=re.I).strip('|:_- ')
     value = re.split(r'\s+[—–]\s+', value)[0]
+    value = re.split(r'\s*[|,]\s*(?=(?:Municipal|Provincial|City|Assistant|Acting|Department|Division|Regional|District|School|Officer|Director|Chief|Mayor|Governor|President|Secretary|Head|PGDH|PGENRO)\b)', value, maxsplit=1, flags=re.I)[0]
+    value = re.sub(r'^(Atty|Engr|Dr|EnP|Hon|Mr|Mrs|Ms|Prof)\.(?=[A-Z])', r'\1. ', value)
     if not 4 <= len(value) <= 100 or re.search(r'[\d@:/;!?()]', value):
         return ''
     if re.search(r'\b(?:republic|province|government|office|department|division|subject|memorandum|dear|thank|please|request|hereby|attached|enclosed|address|telephone|email|received|copy|cc|page|for|to|from)\b', value, re.I):
@@ -163,6 +206,7 @@ def name_value(value):
     value = re.sub(r'\.{2,}', '.', value)
     return re.sub(r'(?<=\s)([A-Z])(?=\s)', r'\1.', value)
 def parse_correspondence(text, signature_region=False):
+    text = re.sub(r'(?im)^((?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards))[,.:]\s+(?=[A-ZÀ-Þ])', r'\1,\n', str(text or ''))
     entries = []
     for page_number, page in enumerate(str(text or '').replace('\r', '').split('\f'), 1):
         top = [tidy(line) for line in page.split('\n') if tidy(line)][:8]
@@ -175,6 +219,11 @@ def parse_correspondence(text, signature_region=False):
             if tidy(line):
                 entries.append({'text': tidy(line), 'page': page_number, 'line': line_number, 'excluded': excluded})
     candidates = []
+    page_counts = {}
+    positions = {}
+    for i, entry in enumerate(entries):
+        positions[i] = page_counts.get(entry['page'], 0)
+        page_counts[entry['page']] = positions[i] + 1
     for i, entry in enumerate(entries):
         if entry['excluded']:
             continue
@@ -182,13 +231,15 @@ def parse_correspondence(text, signature_region=False):
         name = name_value(match.group(1) if match and match.group(1) else entry['text'])
         if not name:
             continue
-        before = [e for e in entries[max(0, i - 6):i] if e['page'] == entry['page']]
+        before = [e for e in entries[max(0, i - 6):i] if not e['excluded']]
         marker = next((e for e in reversed(before) if SIGN_LABEL.match(e['text'])), None)
         near_closing = any(CLOSING.match(e['text']) for e in before)
         following = entries[i + 1]['text'] if i + 1 < len(entries) and entries[i + 1]['page'] == entry['page'] else ''
+        inline_role = re.search(r'\s*[|,]\s*((?:Municipal|Provincial|City|Assistant|Acting|Department|Division|Regional|District|School|Officer|Director|Chief|Mayor|Governor|President|Secretary|Head|PGDH|PGENRO)\b.*)$', entry['text'], re.I)
+        if inline_role:
+            following = inline_role[1]
         has_role = bool(ROLE.search(following)) and not re.match(r'^dear\b', following, re.I)
-        page_entries = [e for e in entries if e['page'] == entry['page']]
-        position = page_entries.index(entry) / max(1, len(page_entries))
+        position = positions[i] / max(1, page_counts[entry['page']])
         score = 120 if match else 110 if near_closing else 100 if marker in before[-2:] else 75 if has_role and (signature_region or position > .45) else 0
         context = entry['text'] if match else marker['text'] if marker else ''
         if re.match(r'^(?:prepared|noted|certified|recommending)\b', context, re.I):
@@ -467,6 +518,15 @@ def extract_document_metadata(text, numeric_text='', numeric_tokens=None):
     header = parse_header(text)
     details = parse_letter_details(text)
     sender = parse_correspondence(text)
+    if not sender['recipient']:
+        # Conventional business letters often have an address block, without TO:.
+        lines = [tidy(line) for line in str(text).split('\f', 1)[0].splitlines()]
+        greeting = next((i for i, line in enumerate(lines) if re.match(r'^Dear\b|^(?:Sir|Madam|Ma.am)\s*[:,]', line, re.I)), -1)
+        if greeting >= 0:
+            block = lines[max(0, greeting - 8):greeting]
+            start = next((i for i, line in enumerate(block) if name_value(line)), -1)
+            if start >= 0 and any(ROLE.search(line) or re.search(r'\b(?:OFFICE|DEPARTMENT|DIVISION|UNIVERSITY|COLLEGE|SCHOOL)\b', line, re.I) for line in block[start + 1:]):
+                sender['recipient'] = ' '.join(line for line in block[start:] if line and not FIELD_LABEL.match(line))
     result = {**header, **sender, 'subject': header['subject'] or details['subject'], 'subjectSource': 'header' if header['subject'] else details['subjectSource'],
               'documentType': header['documentType'] or details['documentType'], 'documentTypeSource': 'heading' if header['documentType'] else details['documentTypeSource'], 'issuedBy': sender['sender'] or sender['signatory'],
               'sourceOffice': sender['sender'], 'detectedNumbers': numeric_tokens or extract_numeric_tokens(text),
@@ -478,9 +538,8 @@ def extract_numeric_tokens(text):
 
 def run_tesseract(image, psm=3, with_data=False, whitelist=''):
     """Get text and word confidence in ONE engine invocation."""
-    remaining = check_budget()
-    if not _ocr_slots.acquire(timeout=remaining):
-        raise DocumentTimeout('OCR is busy. Please try again after the current document finishes.')
+    while not _ocr_slots.acquire(timeout=min(.2, check_budget())):
+        check_budget()
     try:
         timeout = min(OCR_TIMEOUT, check_budget())
         with tempfile.TemporaryDirectory(prefix='pgenro_ocr_') as folder:
@@ -543,19 +602,38 @@ def opaque_image(image):
         return background
     return image.convert('RGB')
 
-def preprocess_image_for_ocr(image):
-    image = opaque_image(image)
+def resize_ocr_image(image):
     if image.width < 1600:
         scale = min(3, 1600 / image.width, OCR_MAX_SIDE / max(image.size))
     else:
         scale = min(1, OCR_MAX_SIDE / max(image.size))
     if abs(scale - 1) > .01:
         image = image.resize((max(1, round(image.width * scale)), max(1, round(image.height * scale))), Image.Resampling.LANCZOS)
+    return image
+
+def preprocess_image_for_ocr(image, resize=True):
+    image = opaque_image(image)
+    if resize:
+        image = resize_ocr_image(image)
     gray = ImageOps.grayscale(image)
     # White letters on a dark background become dark letters on white.
     if ImageStat.Stat(gray.resize((64, 64))).mean[0] < 110:
         gray = ImageOps.invert(gray)
     return ImageEnhance.Contrast(ImageOps.autocontrast(gray, cutoff=1)).enhance(1.3)
+
+def trim_blank_margins(image):
+    """Keep every printed region; discard only empty outer scan margins."""
+    gray = ImageOps.grayscale(image)
+    if ImageStat.Stat(gray.resize((64, 64))).mean[0] < 110:
+        return image
+    box = gray.point(lambda value: 255 if value < 250 else 0).getbbox()
+    if box is None:
+        return image
+    left, top, right, bottom = box
+    pad = max(24, round(min(image.size) * .02))
+    box = (max(0, left - pad), max(0, top - pad), min(image.width, right + pad), min(image.height, bottom + pad))
+    # Tiny logos/stamps must not be expanded to a full letter page.
+    return image.crop(box) if box[2] - box[0] >= 350 and box[3] - box[1] >= 100 else image
 
 def text_score(text):
     # Coverage matters more than the presence of header keywords.
@@ -603,10 +681,28 @@ def merge_missing(base, extra):
     return base + ('\n\n' + '\n'.join(additions) if additions else '')
 
 def fast_ocr_image(image, header_metadata=None):
-    image = opaque_image(image)
-    processed = preprocess_image_for_ocr(image)
+    # Set the reading resolution before trimming, avoiding a second enlargement
+    # of an otherwise small text block in a mostly empty scanned page.
+    image = trim_blank_margins(resize_ocr_image(opaque_image(image)))
+    processed = preprocess_image_for_ocr(image, resize=False)
     if processed.getextrema()[1] - processed.getextrema()[0] < 8:
         return ''
+    page_key = str(processed.size) + ':' + hashlib.sha256(processed.tobytes()).hexdigest()
+    with _page_cache_lock:
+        entry = _page_cache.get(page_key)
+        cached_page = entry[1] if entry and time.monotonic() - entry[0] <= OCR_CACHE_TTL else None
+        if cached_page:
+            _page_cache.move_to_end(page_key)
+    if cached_page:
+        check_budget()
+        current = _state.get()
+        if current:
+            with current.lock:
+                current.cached_pages += 1
+                current.confidences.append(cached_page['confidence'])
+        if cached_page['confidence'] < OCR_MIN_CONFIDENCE:
+            warn('Some scanned text has low confidence. Review the fields and extracted text before saving.')
+        return cached_page['text']
     first = run_tesseract(processed, 3, with_data=True)
     chosen = first
     words = re.findall(r'\w+', first['text'])
@@ -628,7 +724,8 @@ def fast_ocr_image(image, header_metadata=None):
     text = chosen['text']
     lines = text.splitlines()
     has_signature_hint = any(CLOSING.match(line) or SIGN_LABEL.match(line) for line in lines) or any(ROLE.search(line) or name_value(line) for line in lines[round(len(lines) * .55):])
-    if text and not parse_correspondence(text)['receivedFrom'] and has_signature_hint:
+    correspondence = parse_correspondence(text)
+    if text and not correspondence['signatory'] and not correspondence['signatoryCandidates'] and has_signature_hint:
         try:
             # Convert word coordinates from processed image back to source pixels.
             top = signature_top(chosen, processed.height) * image.height / processed.height
@@ -647,6 +744,12 @@ def fast_ocr_image(image, header_metadata=None):
         fields = parse_header_fields(text)
         if fields['subject']:
             header_metadata.update({'subject': fields['subject'], 'subjectEvidence': fields['fieldEvidence']['subject']})
+    if text and OCR_PAGE_CACHE_SIZE and len(text) <= 128000:
+        with _page_cache_lock:
+            _page_cache[page_key] = (time.monotonic(), {'text': text, 'confidence': chosen['confidence']})
+            _page_cache.move_to_end(page_key)
+            while len(_page_cache) > OCR_PAGE_CACHE_SIZE:
+                _page_cache.popitem(last=False)
     return text
 
 def image_has_uncovered_text(page, native):
@@ -674,19 +777,31 @@ def ordered_ocr(jobs, output):
     number, native, future = jobs.pop(0)
     scanned = future.result(timeout=check_budget())
     output[number] = merge_missing(scanned, native) if scanned and native else scanned or native
+    current = _state.get()
+    if current:
+        with current.lock:
+            current.completed_indices.add(number)
+            current.completed_pages = len(current.completed_indices)
+            current.stage = 'Reading all pages, body and printed signatures'
 
 def extract_pdf(file_path, header_metadata=None):
     jobs = []
-    with fitz.open(file_path) as document:
+    with pdf_access(), fitz.open(file_path) as document:
         if document.needs_pass:
             raise ValueError('This PDF is password protected. Upload an unlocked copy.')
         output = [''] * len(document)
+        reading_progress(total=len(document), stage='Reading PDF pages')
         try:
             for number, page in enumerate(document):
                 check_budget()
                 native = clean_text(page.get_text('text', sort=True))
                 if not image_has_uncovered_text(page, native):
                     output[number] = native
+                    current = _state.get()
+                    if current:
+                        with current.lock:
+                            current.completed_indices.add(number)
+                            current.completed_pages = len(current.completed_indices)
                     continue
                 # Render on the calling thread: PyMuPDF objects are never shared across threads.
                 scale = min(OCR_DPI / 72, OCR_MAX_SIDE / max(page.rect.width, page.rect.height))
@@ -702,6 +817,8 @@ def extract_pdf(file_path, header_metadata=None):
         finally:
             for _, _, future in jobs:
                 future.cancel()
+            if jobs and _state.get():
+                _state.get().cancelled.set()
     return '\n\f\n'.join(output)
 
 def xml_text(data, paragraph_tags=('p',)):
@@ -726,6 +843,8 @@ def office_archive(file_path, extension):
             raise ValueError('The expanded document is too large to read.')
         names = archive.namelist()
         if extension == 'docx':
+            if 'word/document.xml' not in names:
+                raise ValueError('The Word document is missing its main document text.')
             headers = sorted(n for n in names if re.fullmatch(r'word/header\d+\.xml', n))
             footers = sorted(n for n in names if re.fullmatch(r'word/footer\d+\.xml', n))
             parts = headers + ['word/document.xml'] + footers
@@ -735,12 +854,12 @@ def office_archive(file_path, extension):
             parts += sorted(n for n in names if re.fullmatch(r'ppt/notesSlides/notesSlide\d+\.xml', n))
         for part in parts:
             if part in names:
-                if part == 'word/document.xml':
+                if extension == 'docx' and (part == 'word/document.xml' or re.fullmatch(r'word/(?:header|footer)\d+\.xml', part)):
                     def embedded_reader(content):
                         check_budget()
                         with Image.open(io.BytesIO(content)) as image:
                             return fast_ocr_image(image) if image.width >= 400 and image.height >= 200 else ''
-                    output.append(docx_text(file_path, embedded_reader))
+                    output.append(docx_text(file_path, embedded_reader, part=part))
                 else:
                     output.append(xml_text(archive.read(part)))
         # Read embedded scanned letters as well as editable document text.
@@ -789,6 +908,7 @@ def read_document(file_path, extension):
         pages, jobs = [], []
         try:
             with Image.open(file_path) as source:
+                reading_progress(total=getattr(source, 'n_frames', 1), stage='Reading scanned pages')
                 for number, frame in enumerate(ImageSequence.Iterator(source)):
                     check_budget()
                     pages.append('')
@@ -801,6 +921,8 @@ def read_document(file_path, extension):
         finally:
             for _, _, future in jobs:
                 future.cancel()
+            if jobs and _state.get():
+                _state.get().cancelled.set()
         text = '\n\f\n'.join(pages)
     elif extension in {'docx', 'pptx'}:
         text, warnings = office_archive(file_path, extension)
@@ -812,7 +934,9 @@ def read_document(file_path, extension):
     else:
         raise ValueError(f'File type .{extension} is not supported.')
     text = clean_text(text)
-    return {'text': text, 'metadata': extract_document_metadata(text), 'warnings': warnings, 'pages': text.count('\f') + 1}
+    pages = text.count('\f') + 1
+    reading_progress(total=pages, completed=pages, stage='Detecting letter fields')
+    return {'text': text, 'metadata': extract_document_metadata(text), 'warnings': warnings, 'pages': pages}
 
 # Numeric tokens come from the already-read full text by default.
 # OCR_NUMERIC_PASS=1 adds ONE header-only numeric pass, never 12 passes per page.
@@ -833,7 +957,7 @@ def numeric_document(file_path, extension, full_text):
     try:
         result = None
         if extension == 'pdf':
-            with fitz.open(file_path) as document:
+            with pdf_access(), fitz.open(file_path) as document:
                 if len(document):
                     page = document[0]
                     if image_has_uncovered_text(page, clean_text(page.get_text('text', sort=True))):
@@ -854,6 +978,7 @@ def process_uploaded_file(uploaded_file, request_id=''):
     started = time.monotonic()
     token = None
     state = None
+    slot_acquired = False
     if uploaded_file is None or not getattr(uploaded_file, 'filename', ''):
         return {'success': False, 'error': 'No file received.'}, 400
     filename = Path(uploaded_file.filename.replace('\\', '/')).name
@@ -882,8 +1007,13 @@ def process_uploaded_file(uploaded_file, request_id=''):
             check_budget()
             duration = round((time.monotonic() - started) * 1000)
             existing.update(filename=filename, cacheHit=True, durationMs=duration, processingMs=duration,
-                            readingStats={'ocrPasses': 0}, performance={**existing['performance'], 'tesseractPasses': 0})
+                            readingStats={'ocrPasses': 0, 'cachedPages': existing['pages']}, performance={**existing['performance'], 'tesseractPasses': 0})
+            reading_progress(total=existing['pages'], completed=existing['pages'], stage='Complete')
             return existing, 200
+        reading_progress(stage='Waiting for the document reader')
+        while not _document_slots.acquire(timeout=min(.2, check_budget())):
+            check_budget()
+        slot_acquired = True
         with tempfile.TemporaryDirectory(prefix='PGENRO_OCR_UPLOAD_') as folder:
             path = Path(folder) / ('document.' + extension)
             path.write_bytes(content)
@@ -898,10 +1028,11 @@ def process_uploaded_file(uploaded_file, request_id=''):
         duration = round((time.monotonic() - started) * 1000)
         payload = {'success': True, 'filename': filename, 'characters': len(result['text']), 'numericText': numbers['text'],
                    'numericConfidence': numbers['confidence'], 'detectedNumbers': numbers['tokens'], **result,
-                   'durationMs': duration, 'processingMs': duration, 'readingStats': {'ocrPasses': state.passes}, 'cacheHit': False, 'engine': 'local-tesseract',
+                   'durationMs': duration, 'processingMs': duration, 'readingStats': {'ocrPasses': state.passes, 'cachedPages': state.cached_pages}, 'cacheHit': False, 'engine': 'local-tesseract',
                    'performance': {'tesseractPasses': state.passes, 'workers': OCR_WORKERS,
                                    'confidence': round(statistics.mean(state.confidences), 2) if state.confidences else None}}
         cache_result(key, payload)
+        reading_progress(stage='Complete')
         return payload, 200
     except (ValueError, zipfile.BadZipFile, ET.ParseError, fitz.FileDataError, UnidentifiedImageError) as error:
         return {'success': False, 'error': str(error)}, 400
@@ -916,9 +1047,16 @@ def process_uploaded_file(uploaded_file, request_id=''):
     except Exception as error:
         return {'success': False, 'error': str(error)}, 500
     finally:
+        if state and state.stage != 'Complete':
+            state.cancelled.set()
+        if slot_acquired:
+            _document_slots.release()
         with _reads_lock:
             if request_id and _active_reads.get(request_id) is state:
                 _active_reads.pop(request_id, None)
+                _recent_reads[request_id] = (time.monotonic(), state.snapshot())
+                while len(_recent_reads) > 100:
+                    _recent_reads.popitem(last=False)
         if token is not None:
             _state.reset(token)
 # Preserve the supplied server's Flask application and /health + /ocr API.
@@ -939,9 +1077,21 @@ if app is not None:
     def health():
         with _reads_lock:
             active = len(_active_reads)
-        return jsonify({'ok': True, 'success': True, 'service': 'PGENRO Flask Full Document OCR', 'version': 7, 'fullDocument': True, 'activeReads': active,
+        return jsonify({'ok': True, 'success': True, 'service': 'PGENRO Flask Full Document OCR', 'version': 8, 'fullDocument': True, 'activeReads': active, 'progressAvailable': True,
                         'formats': sorted(ALLOWED_EXTENSIONS), 'numeric_ocr': NUMERIC_OCR_ENABLED,
                         'workers': OCR_WORKERS, 'dpi': OCR_DPI, 'adaptive': True, 'documentTimeoutSeconds': OCR_DOCUMENT_TIMEOUT, 'tesseractAvailable': bool(shutil.which(TESSERACT_CMD) or Path(TESSERACT_CMD).is_file())}), 200
+    @app.get('/ocr/status/<request_id>')
+    def ocr_status(request_id):
+        if not re.fullmatch(r'[A-Za-z0-9_-]{1,80}', request_id):
+            return jsonify({'success': False}), 400
+        with _reads_lock:
+            state = _active_reads.get(request_id)
+            recent = _recent_reads.get(request_id)
+            if state:
+                return jsonify({'success': True, 'active': True, **state.snapshot()})
+            if recent and time.monotonic() - recent[0] < 90:
+                return jsonify({'success': True, 'active': False, **recent[1]})
+        return jsonify({'success': False, 'active': False}), 404
     @app.route('/ocr', methods=['POST'])
     def run_ocr():
         request_id = request.headers.get('X-OCR-Request-ID', '')

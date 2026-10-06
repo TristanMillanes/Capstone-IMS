@@ -1,0 +1,189 @@
+{
+  "method": "Production page scripts in Chromium with simulated Supabase responses; no live server mutations.",
+  "scenarios": [
+    {
+      "scenario": "employee-admin required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "employee-admin failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "employee-admin retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "ics-admin required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "ics-admin failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "ics-admin retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "invetoryadmin required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "invetoryadmin failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "invetoryadmin retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "visitors-admin required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "visitors-admin failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "visitors-admin retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "officememo-admin required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "officememo-admin failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "officememo-admin retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admincommunication required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admincommunication failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admincommunication retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "serviceAdmin required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "serviceAdmin failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "serviceAdmin retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "travelOR-admin required fields prevent an empty save",
+      "result": "PASS"
+    },
+    {
+      "scenario": "travelOR-admin failed save retains the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "travelOR-admin retry saves once and closes the form",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Usermanagement.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Usermanagement.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admincommunication.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admincommunication.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "employee-admin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "employee-admin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "ics-admin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "ics-admin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "invetoryadmin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "invetoryadmin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "officememo-admin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "officememo-admin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "requestacc.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "requestacc.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "serviceAdmin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "serviceAdmin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "travelOR-admin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "travelOR-admin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    },
+    {
+      "scenario": "visitors-admin.html short viewport menus and forms stay reachable",
+      "result": "PASS"
+    },
+    {
+      "scenario": "visitors-admin.html busy forms prevent closing and module switching",
+      "result": "PASS"
+    }
+  ]
+}

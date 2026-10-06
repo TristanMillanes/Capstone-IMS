@@ -4,7 +4,7 @@ const report=[];
 const formIds=['typeSelect','controlNoInput','docTypeSelect','dateInput','officeInput','subjectInput','actionTakenInput','remarksInput','statusSelect','ocrTextInput','memoRecipientInput','memoIssuerInput','documentFileInput','editIndex'];
 const memoText=(number='2026-099')=>`Republic of the Philippines\nProvincial Government\nOFFICE MEMORANDUM NO. ${number}\n\nTO: All Personnel\nFROM: Provincial ENRO\nDATE: September 30, 2026\nSUBJECT: Monthly reporting\n\nPlease submit the reports.\n`;
 function setup({wrapped=false,live=true,communications=[],memos=[],requiredTypeKey=''}={}){
- const nodes=new Map(),listeners=new Map(),db={communications:structuredClone(communications),office_memos:structuredClone(memos),audit_logs:[]},storage=new Map(),files=new Map(),messages=[],navigation=[];
+ const nodes=new Map(),listeners=new Map(),db={communications:structuredClone(communications),office_memos:structuredClone(memos),audit_logs:[]},storage=new Map(),files=new Map(),messages=[],navigation=[],remoteFiles=new Map();
  if(wrapped)for(const name of Object.keys(db))db[name]=db[name].map(r=>({id:r.id,data:r}));
  let context;
  class Element{
@@ -60,6 +60,7 @@ function setup({wrapped=false,live=true,communications=[],memos=[],requiredTypeK
  const location={href:'http://localhost/admin/admincommunication.html',assign:url=>navigation.push(url)};
  const sandbox={document,window:null,location,history:{},localStorage:{getItem:k=>storage.get(k)||null,setItem:(k,v)=>storage.set(k,v)},indexedDB,FileReader:Reader,File,Blob,URL,crypto,console,Event,AbortController,DOMException,TextDecoder,performance,Option:Element,setInterval,clearInterval,setTimeout:(fn,t)=>{if(t>1000)return 0;return setTimeout(fn,t);},clearTimeout,innerWidth:1440,confirm:()=>true};
  sandbox.window=sandbox;sandbox.addEventListener=()=>{};
+ sandbox.PGENRO_API={requireAdmin:async()=>{},uploadDocument:async(file,module)=>{const url='https://storage.test/'+module+'/'+crypto.randomUUID();remoteFiles.set(url,file);return {url};},removeDocument:async(url)=>{remoteFiles.delete(url);},getDocumentUrl:async(url)=>url};
  if(live)sandbox.pgenroSupabase={from,channel(){return {on(){return this;},subscribe(){return this;}}},removeChannel(){}};
  context=vm.createContext(sandbox);
  vm.runInContext(source,context);
@@ -67,7 +68,7 @@ function setup({wrapped=false,live=true,communications=[],memos=[],requiredTypeK
  async function open(id){if(id){const b=new Element();b.dataset={action:'edit',id};await get('communicationTableBody').fire('click',{target:{closest:()=>b}});if(get('docTypeSelect').value==='Memorandum'&&!get('memoRecipientInput').value)get('memoRecipientInput').value='All Personnel';}else await get('openEncodingModalBtn').fire('click');}
  async function upload(text=memoText(),name='memo.txt'){const file=new File([text],name,{type:'text/plain'});get('documentFileInput').files=[file];await get('documentFileInput').fire('change');await get('runOcrBtn').fire('click');return file;}
  const rows=table=>db[table].map(r=>wrapped?r.data:r);
- return {init,open,upload,get,flags,db,rows,storage,files,messages,navigation,calls,save:()=>get('communicationForm').fire('submit')};
+ return {init,open,upload,get,flags,db,rows,storage,files,messages,navigation,calls,remoteFiles,save:()=>get('communicationForm').fire('submit')};
 }
 async function run(name,fn){await fn();report.push({scenario:name,result:'PASS'});console.log('PASS',name);}
 (async()=>{
