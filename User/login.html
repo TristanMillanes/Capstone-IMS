@@ -1,16 +1,16 @@
 <!doctype html>
-<html lang="en" data-css-scope="auth-login" data-login-design="emerald-card-entry-v13">
+<html lang="en" data-css-scope="auth-login" data-login-design="emerald-motion-v16">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#063d30">
+  <meta name="theme-color" content="#053d31">
   <meta name="description" content="Sign in to the PGENRO Information Management System.">
   <title>PGENRO IMS | Sign in</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <link rel="preconnect" href="https://zssrxubajhqryrwijyzm.supabase.co" crossorigin>
-  <link rel="stylesheet" href="login-modern.css?v=20261009-emerald-card-entry-v13">
+  <link rel="stylesheet" href="login-modern.css?v=20261009-emerald-motion-v16">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="login-modern.js?v=20261009-emerald-card-entry-v13"></script>
+  <script defer src="login-modern.js?v=20261009-emerald-motion-v16"></script>
 </head>
 <body class="pgenro-auth pgenro-login" data-css-scope="auth-login" data-motion="paused">
   <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
@@ -33,10 +33,13 @@
   </svg>
 
   <div class="ambient-background" aria-hidden="true">
+    <div class="ambient-aurora aurora-one"></div>
+    <div class="ambient-aurora aurora-two"></div>
     <div class="ambient-grid"></div>
     <svg class="ambient-graph" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" focusable="false">
       <path d="M-270 622C84 610 162 191 437-48M-251 650C103 638 181 219 456-20M-232 678C122 666 200 247 475 8M-213 706C141 694 219 275 494 36M-194 734C160 722 238 303 513 64M-175 762C179 750 257 331 532 92M-156 790C198 778 276 359 551 120"/>
       <path class="graph-lines" d="m1096-49 53 191 225 83 127-53M1149 142l-118 204 343-121M1031 346l158 172 276-42M1189 518l-88 230 364-272M1101 748l185 155"/>
+      <path class="graph-flow" d="M-270 622C84 610 162 191 437-48M-194 734C160 722 238 303 513 64m583-113 53 191-118 204 158 172-88 230 185 155"/>
       <path class="graph-facet" d="m1031 346 343-121-185 293Z"/>
       <g class="graph-joints"><circle cx="342" cy="171" r="2.5"/><circle cx="217" cy="398" r="2"/><circle cx="1149" cy="142" r="2.5"/><circle cx="1031" cy="346" r="2.5"/><circle cx="1189" cy="518" r="2.5"/><circle cx="1101" cy="748" r="2"/></g>
     </svg>
@@ -61,6 +64,7 @@
     </svg>
     <svg class="falling-leaf leaf-one" viewBox="0 0 24 24" focusable="false"><use href="#icon-leaf"/></svg>
     <svg class="falling-leaf leaf-two" viewBox="0 0 24 24" focusable="false"><use href="#icon-leaf"/></svg>
+    <div class="ambient-particles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
   </div>
 
   <main class="portal-viewport">
@@ -90,15 +94,14 @@
           <aside class="portal-story" aria-labelledby="workspaceIntro">
             <div class="story-heading">
               <span class="story-eyebrow"><span aria-hidden="true"></span>Province of Quezon</span>
-              <h2 id="workspaceIntro">Your PGENRO<br><span>workspace.</span></h2>
-              <p>Documents, people, and services.<br>Connected in one place.</p>
+              <h2 id="workspaceIntro">Your work,<br><span>connected.</span></h2>
+              <p>Documents, personnel, and inventory.<br>Together in one PGENRO workspace.</p>
             </div>
             <svg class="story-art" viewBox="0 0 400 330" fill="none" aria-hidden="true" focusable="false">
               <defs>
                 <linearGradient id="storyTile" x1="92" y1="152" x2="312" y2="286" gradientUnits="userSpaceOnUse"><stop stop-color="#4e9a77"/><stop offset="1" stop-color="#144f3c"/></linearGradient>
                 <linearGradient id="storyLeaf" x1="148" y1="120" x2="260" y2="34" gradientUnits="userSpaceOnUse"><stop stop-color="#84b995"/><stop offset="1" stop-color="#e0ebc0"/></linearGradient>
                 <linearGradient id="storyLeafShade" x1="155" y1="70" x2="239" y2="137" gradientUnits="userSpaceOnUse"><stop stop-color="#57996e"/><stop offset="1" stop-color="#a2c698"/></linearGradient>
-                <linearGradient id="storyPaper" x1="46" y1="168" x2="140" y2="228" gradientUnits="userSpaceOnUse"><stop stop-color="#f5f8e9"/><stop offset="1" stop-color="#cbdcc7"/></linearGradient>
               </defs>
               <ellipse class="story-shadow" cx="207" cy="263" rx="149" ry="29" fill="#023323" fill-opacity=".34"/>
               <path d="m200 161 122 69-122 70-122-70Z" fill="#124d39" stroke="#589578" stroke-opacity=".45"/>
@@ -112,21 +115,23 @@
               <path d="m172 164-12-37m35 14 31 1m-14-29-6-32" stroke="#e3ebc9" stroke-opacity=".5" stroke-width="1.4" stroke-linecap="round"/>
               </g>
               <g class="story-document-motion">
-              <g transform="rotate(-7 93 192)">
-                <rect x="38" y="147" width="111" height="84" rx="12" fill="#063c2b" fill-opacity=".22"/>
-                <rect x="35" y="140" width="111" height="84" rx="12" fill="url(#storyPaper)" stroke="#eef5dd" stroke-opacity=".7"/>
-                <rect x="49" y="154" width="23" height="23" rx="6" fill="#9dc1a2" fill-opacity=".6"/>
-                <path d="M56 160h7l3 3v8H56Zm7 0v3h3" stroke="#326846" stroke-width="1.3" stroke-linejoin="round"/>
-                <path d="M82 159h45M82 166h29M49 189h77M49 198h58M49 207h68" stroke="#477653" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+              <g transform="rotate(-6 96 205)">
+                <rect x="25" y="165" width="148" height="105" rx="16" fill="#022c21" fill-opacity=".28"/>
+                <rect x="22" y="157" width="148" height="105" rx="16" fill="#f7fcf6" stroke="#d9ebdc"/>
+                <rect x="37" y="173" width="28" height="28" rx="8" fill="#dbeee0"/>
+                <path d="M45 180h8l4 4v10H45Zm8 0v4h4" stroke="#28764f" stroke-width="1.6" stroke-linejoin="round"/>
+                <text x="75" y="190" fill="#285c43" font-size="14" font-weight="600">Documents</text>
+                <path d="M39 218h111M39 230h84M39 242h101" stroke="#82aa91" stroke-opacity=".7" stroke-width="4" stroke-linecap="round"/>
               </g>
               </g>
               <g class="story-personnel-motion">
-              <g transform="rotate(7 308 142)">
-                <rect x="274" y="113" width="89" height="67" rx="12" fill="#033726" fill-opacity=".22"/>
-                <rect x="271" y="107" width="89" height="67" rx="12" fill="#d9e9d1" stroke="#f0f5df" stroke-opacity=".7"/>
-                <circle cx="291" cy="129" r="8" fill="#5b966d"/>
-                <path d="M282 154v-4a9 9 0 0 1 18 0v4" stroke="#5b966d" stroke-width="3" stroke-linecap="round"/>
-                <path d="M312 126h33M312 134h21M312 151h28" stroke="#477653" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+              <g transform="rotate(6 316 150)">
+                <rect x="271" y="117" width="108" height="81" rx="14" fill="#022c21" fill-opacity=".25"/>
+                <rect x="268" y="109" width="108" height="81" rx="14" fill="#e8f4e7" stroke="#f7fcf0"/>
+                <circle cx="289" cy="131" r="8" fill="#478d66"/>
+                <path d="M280 153v-3a9 9 0 0 1 18 0v3" stroke="#478d66" stroke-width="3" stroke-linecap="round"/>
+                <path d="M312 128h45M312 138h31" stroke="#83a992" stroke-width="3" stroke-linecap="round"/>
+                <text x="283" y="176" fill="#285c43" font-size="14" font-weight="600">Personnel</text>
               </g>
               </g>
               <path d="M50 115V94h21M337 211v22h-22" stroke="#b9d6ad" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"/>
@@ -148,7 +153,7 @@
             </svg>
             <div class="card-meta"><span class="card-eyebrow"><svg class="icon" aria-hidden="true"><use href="#icon-lock"/></svg>Staff sign in</span><span class="card-emblem" aria-hidden="true"><svg class="icon"><use href="#icon-leaf"/></svg></span></div>
             <h2 id="loginHeading">Welcome back<span aria-hidden="true">.</span></h2>
-            <p>Sign in to your PGENRO workspace.</p>
+            <p>Use your registered PGENRO account.</p>
           </header>
           <div class="card-body">
 
@@ -164,7 +169,7 @@
               <label class="input-label" for="email">Email address</label>
               <div id="emailFieldBox" class="input-box">
                 <span class="input-icon"><svg class="icon box-icon" aria-hidden="true"><use href="#icon-mail"/></svg></span>
-                <input id="email" name="email" type="email" placeholder="you@quezon.gov.ph" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="none" aria-describedby="emailError" required>
+                <input id="email" name="email" type="email" placeholder="Enter your email" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="none" aria-describedby="emailError" required>
                 <button id="clearEmailBtn" class="field-action-btn" type="button" aria-label="Clear email address" hidden><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button>
               </div>
               <p id="emailError" class="field-error" hidden></p>
@@ -173,7 +178,7 @@
               <label class="input-label" for="password">Password</label>
               <div id="passwordFieldBox" class="input-box">
                 <span class="input-icon"><svg class="icon box-icon" aria-hidden="true"><use href="#icon-lock"/></svg></span>
-                <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" aria-describedby="passwordError capsLockWarning" required>
+                <input id="password" name="password" type="password" placeholder="Enter password" autocomplete="current-password" aria-describedby="passwordError capsLockWarning" required>
                 <button id="togglePassword" class="field-action-btn" type="button" aria-label="Show password" aria-pressed="false" aria-controls="password"><svg class="icon" aria-hidden="true"><use href="#icon-eye"/></svg></button>
               </div>
               <p id="passwordError" class="field-error" hidden></p>
@@ -187,7 +192,7 @@
           <div class="card-divider"><span>Other access</span></div>
           <nav class="secondary-access" aria-label="Account and visitor access">
             <div class="access-card-entry"><a class="access-request" href="requestacc.html" data-access-link><span class="secondary-icon"><svg class="icon" aria-hidden="true"><use href="#icon-user-plus"/></svg></span><span class="access-copy"><strong>Request account</strong><small>For new staff</small></span><svg class="icon access-arrow" aria-hidden="true"><use href="#icon-arrow-up"/></svg></a></div>
-            <div class="access-card-entry"><a class="visitor-access-btn" href="../VisitorsLog/visitorsLogin.html" data-access-link><span class="secondary-icon"><svg class="icon" aria-hidden="true"><use href="#icon-visitor"/></svg></span><span class="access-copy"><strong>Visitors log</strong><small>Visitor access</small></span><svg class="icon access-arrow" aria-hidden="true"><use href="#icon-arrow-up"/></svg></a></div>
+            <div class="access-card-entry"><a class="visitor-access-btn" href="../VisitorsLog/visitorslog.html" data-access-link><span class="secondary-icon"><svg class="icon" aria-hidden="true"><use href="#icon-visitor"/></svg></span><span class="access-copy"><strong>Visitors log</strong><small>Visitor access</small></span><svg class="icon access-arrow" aria-hidden="true"><use href="#icon-arrow-up"/></svg></a></div>
           </nav>
           <noscript><p class="noscript-notice">Enable JavaScript in your browser to sign in.</p></noscript>
           </div>

@@ -1,25 +1,21 @@
 (() => {
   "use strict";
-
   // Existing Supabase project and insert payload are preserved.
   const CONFIG = Object.freeze({
     url: "https://zssrxubajhqryrwijyzm.supabase.co",
     publishableKey: "sb_publishable_5RWFfJ5oN6ike6SSyafajw_yF9DYApP",
     table: "visitors"
   });
-
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });
   } else {
     init();
   }
-
   function init() {
     const $ = (id) => document.getElementById(id);
     const form = $("visitorForm");
     if (!form || form.dataset.initialized === "true") return;
     form.dataset.initialized = "true";
-
     let db = null;
     let sdkFailed = false;
     function ensureDatabase() {
@@ -36,7 +32,6 @@
       return Boolean(db);
     }
     ensureDatabase();
-
     const ui = {
       form,
       fields: [...form.querySelectorAll("input, select")],
@@ -65,9 +60,9 @@
     };
     const state = { submitting: false, saveFailed: false, saveSucceeded: false, alertKind: null, modalFallback: false };
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    let syncMotion = () => {};
     const clean = (value) => String(value ?? "").replace(/\s+/g, " ").trim();
     const allowedPurposes = new Set([...ui.purpose.options].map((option) => option.value).filter(Boolean));
-
     function normalizePhone(value) {
       // Accept local numbers and pasted +63 / 63 numbers, storing the same 09 format.
       const digits = String(value ?? "").replace(/\D/g, "");
@@ -75,11 +70,9 @@
       if (/^9\d{9}$/.test(digits)) return `0${digits}`;
       return digits;
     }
-
     function activeFields() {
       return ui.fields.filter((input) => input.required && !input.disabled);
     }
-
     function fieldError(input) {
       const value = input.id === "contact" ? normalizePhone(input.value) : clean(input.value);
       if (input.disabled) return "";
@@ -103,7 +96,6 @@
       if (input.maxLength > 0 && value.length > input.maxLength) return `Use no more than ${input.maxLength} characters.`;
       return "";
     }
-
     function setFieldState(input, mode = "", message = "") {
       const group = input.closest(".input-group");
       group?.classList.toggle("error", mode === "error");
@@ -112,13 +104,11 @@
       const error = $(`${input.id}Error`);
       if (error) error.textContent = message;
     }
-
     function validate(input) {
       const message = fieldError(input);
       setFieldState(input, message ? "error" : clean(input.value) ? "success" : "", message);
       return !message;
     }
-
     function updateProgress() {
       const required = activeFields();
       const completed = required.filter((input) => !fieldError(input)).length;
@@ -128,7 +118,6 @@
       ui.progress.setAttribute("aria-valuenow", String(percentage));
       ui.progress.setAttribute("aria-valuetext", `${completed} of ${required.length} fields complete`);
     }
-
     function syncOtherPurpose() {
       const needsOther = /\bothers?\b/i.test(ui.purpose.value);
       ui.otherGroup.hidden = !needsOther;
@@ -140,13 +129,11 @@
       }
       updateProgress();
     }
-
     function setStatus(mode, label) {
       ui.status.classList.remove("is-ready", "is-offline", "is-error", "is-saving", "is-connecting");
       ui.status.classList.add(`is-${mode}`);
       ui.status.querySelector(".connection-label").textContent = label;
     }
-
     function syncConnectionStatus() {
       if (state.submitting) setStatus("saving", "Saving your visit…");
       else if (!navigator.onLine) setStatus("offline", "You’re offline");
@@ -155,19 +142,16 @@
       else if (state.saveSucceeded) setStatus("ready", "Visit recorded");
       else setStatus("ready", "Ready to register");
     }
-
     function showError(message, kind = "service") {
       state.alertKind = kind;
       ui.alertMessage.textContent = message;
       ui.alert.hidden = false;
     }
-
     function clearError() {
       state.alertKind = null;
       ui.alert.hidden = true;
       ui.alertMessage.textContent = "";
     }
-
     function setSubmitting(value) {
       state.submitting = value;
       ui.fieldset.disabled = value;
@@ -177,14 +161,13 @@
       ui.form.setAttribute("aria-busy", String(value));
       ui.submit.querySelector(".submit-btn-label").textContent = value ? "Saving your visit…" : "Register visit";
       syncConnectionStatus();
+      syncMotion();
     }
-
     function focusInvalid() {
       const invalid = activeFields().find((input) => fieldError(input));
       invalid?.focus({ preventScroll: true });
       invalid?.closest(".input-group")?.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth", block: "center" });
     }
-
     function openSuccess(name) {
       ui.modalName.textContent = clean(name).split(/\s+/)[0] || "Visitor";
       document.body.classList.add("modal-open");
@@ -201,7 +184,6 @@
       }
       ui.modalClose.focus({ preventScroll: true });
     }
-
     function closeSuccess() {
       if (!ui.modal.hasAttribute("open")) return;
       if (state.modalFallback) {
@@ -209,7 +191,6 @@
         finishModalClose();
       } else ui.modal.close();
     }
-
     function finishModalClose() {
       document.body.classList.remove("modal-open");
       ui.modalBackdrop.hidden = true;
@@ -218,12 +199,10 @@
       state.modalFallback = false;
       ui.fullName.focus({ preventScroll: true });
     }
-
     function refreshFieldFeedback() {
       updateProgress();
       if (state.alertKind === "validation" && activeFields().every((input) => !fieldError(input))) clearError();
     }
-
     async function submitVisitor(event) {
       event.preventDefault();
       if (state.submitting || ui.modal.hasAttribute("open")) return;
@@ -253,7 +232,6 @@
           : "Registration is still connecting. Please try again shortly.", "sdk");
         return;
       }
-
       const visitorData = {
         full_name: clean(ui.fullName.value),
         contact: normalizePhone(ui.contact.value),
@@ -291,7 +269,6 @@
         openSuccess(visitorData.full_name);
       }
     }
-
     ui.fields.forEach((input) => {
       input.addEventListener("input", () => {
         if (input.id === "contact") input.value = input.value.replace(/[^\d+()\s-]/g, "");
@@ -335,7 +312,6 @@
       if (event.key === "Escape") { event.preventDefault(); closeSuccess(); }
       else if (event.key === "Tab") { event.preventDefault(); ui.modalClose.focus(); }
     });
-
     const sdkScript = $("supabaseSdk");
     sdkScript?.addEventListener("load", () => {
       if (ensureDatabase() && state.alertKind === "sdk") clearError();
@@ -353,13 +329,13 @@
       const rect = ui.modal.getBoundingClientRect();
       if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeSuccess();
     });
-
     function initClock() {
       const options = { timeZone: "Asia/Manila" };
       const dateFormat = new Intl.DateTimeFormat("en-PH", { ...options, weekday: "long", year: "numeric", month: "long", day: "numeric" });
       const timeFormat = new Intl.DateTimeFormat("en-PH", { ...options, hour: "2-digit", minute: "2-digit", hour12: true });
       let lastTime = "";
       let lastDate = "";
+      let clockTimer;
       function tick() {
         const now = new Date();
         const parts = timeFormat.formatToParts(now);
@@ -377,21 +353,44 @@
         const currentDate = dateFormat.format(now);
         if (currentDate !== lastDate) { ui.date.textContent = currentDate; lastDate = currentDate; }
       }
-      tick();
-      window.setInterval(() => { if (!document.hidden) tick(); }, 1000);
-      document.addEventListener("visibilitychange", () => { if (!document.hidden) tick(); });
+      function scheduleClock() {
+        clearTimeout(clockTimer);
+        if (document.hidden) return;
+        tick();
+        // The displayed clock has minute precision; update at the next minute.
+        clockTimer = setTimeout(scheduleClock, 60000 - Date.now() % 60000 + 50);
+      }
+      scheduleClock();
+      document.addEventListener("visibilitychange", scheduleClock);
+      window.addEventListener("pageshow", scheduleClock);
+      window.addEventListener("pagehide", () => clearTimeout(clockTimer));
     }
-
     function initAmbient() {
-      // Wave/shape animation is CSS-only and follows the OS reduced-motion setting.
-      const syncVisibility = () => { document.documentElement.dataset.pageHidden = String(document.hidden); };
-      document.addEventListener("visibilitychange", syncVisibility);
-      syncVisibility();
+      // Decorative loops stay separate from form controls, with no pointer tracking.
+      const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+      syncMotion = () => {
+        const editing = ui.form.contains(document.activeElement);
+        const paused = document.hidden || reducedMotion.matches || connection?.saveData || editing || state.submitting || ui.modal.hasAttribute("open");
+        document.body.dataset.motion = paused ? "paused" : "running";
+        document.documentElement.dataset.pageHidden = String(document.hidden);
+      };
+      document.addEventListener("focusin", (event) => {
+        if (ui.form.contains(event.target)) document.body.dataset.entry = "complete";
+        syncMotion();
+      });
+      document.addEventListener("focusout", () => queueMicrotask(syncMotion));
+      document.addEventListener("visibilitychange", syncMotion);
+      window.addEventListener("pageshow", syncMotion);
+      ui.modal.addEventListener("close", syncMotion);
+      reducedMotion.addEventListener("change", syncMotion);
+      connection?.addEventListener?.("change", syncMotion);
+      syncMotion();
     }
-
     const logo = $("officeLogo");
-    logo.addEventListener("error", () => { logo.hidden = true; });
-    if (logo.complete && !logo.naturalWidth) logo.hidden = true;
+    function showLogoFallback() { logo.hidden = true; logo.parentElement.classList.add("has-fallback"); }
+    logo.addEventListener("error", showLogoFallback);
+    logo.addEventListener("load", () => { logo.hidden = false; logo.parentElement.classList.remove("has-fallback"); });
+    if (logo.complete && !logo.naturalWidth) showLogoFallback();
     syncOtherPurpose();
     setSubmitting(false);
     syncConnectionStatus();
