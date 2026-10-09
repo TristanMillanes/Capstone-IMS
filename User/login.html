@@ -1,234 +1,201 @@
-<!DOCTYPE html>
-
-<html data-css-scope="auth-login" lang="en">
+<!doctype html>
+<html lang="en" data-css-scope="auth-login" data-login-design="emerald-card-entry-v13">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=5.0" name="viewport"/>
-<meta content="#031409" name="theme-color"/>
-<meta content="PGENRO IMS — Unified Digital Personnel Portal of the Provincial Government Environment and Natural Resources Office of Quezon." name="description"/>
-<title>PGENRO IMS — Secure Personnel Portal</title>
-<!-- Google Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<!-- Lucide Icons -->
-<script src="https://unpkg.com/lucide@latest"></script>
-
-<link href="login.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#063d30">
+  <meta name="description" content="Sign in to the PGENRO Information Management System.">
+  <title>PGENRO IMS | Sign in</title>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="preconnect" href="https://zssrxubajhqryrwijyzm.supabase.co" crossorigin>
+  <link rel="stylesheet" href="login-modern.css?v=20261009-emerald-card-entry-v13">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="login-modern.js?v=20261009-emerald-card-entry-v13"></script>
 </head>
-<body class="pgenro-auth pgenro-login" data-css-scope="auth-login">
-<!-- ================================================================
-         HARDWARE-ACCELERATED ENVIRONMENTAL CANOPY CANVAS (60 FPS)
-         ================================================================ -->
-<canvas aria-hidden="true" class="canopy-canvas" id="canopyCanvas"></canvas>
-<!-- ================================================================
-         MAIN VIEWPORT
-         ================================================================ -->
-<main class="portal-viewport">
-<div class="portal-container">
-<!-- ========================================================
-                 LEFT: PROVINCIAL IDENTITY & EDITORIAL
-                 ======================================================== -->
-<section aria-labelledby="portalTitle" class="brand-showcase">
-<!-- Dual Official Seals Container -->
-<header class="brand-header">
-<div class="dual-seal-frame">
-<!-- PGENRO Logo -->
-<div class="seal-container" title="Provincial Environment and Natural Resources Office">
-<img alt="PGENRO Official Seal" class="seal-img" onerror="this.onerror=null; this.style.display='none'; this.parentElement.classList.add('fallback-mode')" src="../logo/enro.png"/>
-<span class="seal-fallback">PGENRO</span>
-</div>
-<div aria-hidden="true" class="seal-divider"></div>
-<!-- Quezon Province Logo -->
-<div class="seal-container" title="Provincial Government of Quezon">
-<img alt="Provincial Government of Quezon Seal" class="seal-img" onerror="this.onerror=null; this.src='../logo/quezonLLOGO.png'; this.parentElement.classList.add('fallback-mode')" src="../logo/Quezonlogo.png"/>
-<span class="seal-fallback">QUEZON</span>
-</div>
-</div>
-</header>
-<!-- Hero Section -->
-<div class="brand-core">
-<div class="agency-tag">
-<span aria-hidden="true" class="leaf-dot"></span>
-<span>PROVINCIAL GOVERNMENT OF QUEZON</span>
-</div>
-<h1 class="portal-title" id="portalTitle">
-                        PGENRO
-                        <span class="portal-title-sub">Information Management System</span>
-</h1>
-<p class="portal-description">
-                        The official unified digital platform of Quezon Province for environmental governance, natural resource records administration, regulatory clearances, and personnel operations.
-                    </p>
-<div class="security-status-badge">
-<i aria-hidden="true" data-lucide="shield-check"></i>
-<span>256-Bit Encrypted Government Clearance Session</span>
-</div>
-<div class="nature-quote">
-<i aria-hidden="true" class="quote-icon" data-lucide="sprout"></i>
-<span>Dedicated to the conservation, protection, and sustainable management of Quezon’s natural heritage.</span>
-</div>
-</div>
-<!-- Footer Time Display -->
-<footer class="brand-footer">
-<div class="time-widget">
-<i aria-hidden="true" class="time-icon" data-lucide="clock"></i>
-<div>
-<span class="time-label">Philippine Standard Time</span>
-<strong class="time-text" id="phTimeDisplay">PST (GMT+8) • Synchronizing...</strong>
-</div>
-</div>
-<span class="version-tag">Enterprise Portal v2.4</span>
-</footer>
-</section>
-<!-- ========================================================
-                 RIGHT: FROSTED GLASS LOGIN CARD
-                 ======================================================== -->
-<section aria-label="Personnel Sign-in Form" class="auth-wrapper">
-<div class="glass-login-card" id="interactiveCard">
-<!-- Mobile Seal Branding (Shown on Smartphones) -->
-<div class="mobile-seal-header">
-<img alt="PGENRO Logo" class="mobile-logo" onerror="this.onerror=null; this.src='../logo/enro.png'" src="../logo/enro.png"/>
-<div>
-<strong>PGENRO IMS</strong>
-<span>Provincial Government of Quezon</span>
-</div>
-</div>
-<!-- Header -->
-<div class="card-header">
-<div class="header-badge-icon">
-<i aria-hidden="true" data-lucide="shield-check"></i>
-</div>
-<div>
-<h2>Personnel Login</h2>
-<p>Enter your authorized credentials to access your workspace.</p>
-</div>
-</div>
-<!-- Network Status -->
-<div aria-live="polite" class="network-status-bar" id="networkStatusBar" role="status">
-<i aria-hidden="true" data-lucide="wifi-off"></i>
-<span>Workstation Offline: Reconnecting to network...</span>
-</div>
-<!-- Brute Force Lockout Countdown -->
-<div aria-live="assertive" class="lockout-box" id="lockoutNotice" role="alert">
-<i aria-hidden="true" data-lucide="lock"></i>
-<span>Security Lockout: Try again in <strong class="lockout-timer" id="lockoutSeconds">30</strong>s</span>
-</div>
-<!-- Alerts & Messages -->
-<div aria-live="assertive" class="message-box" id="messageBox" role="alert">
-<div id="messageContent"></div>
-<button aria-label="Dismiss message" class="alert-dismiss-btn" id="dismissAlert" type="button">
-<i aria-hidden="true" data-lucide="x"></i>
-</button>
-</div>
-<!-- Translucent Loading Overlay -->
-<div aria-hidden="true" aria-live="polite" class="loading-overlay" id="loadingOverlay">
-<div class="loading-modal">
-<div class="loading-spinner-box">
-<div class="spinner-track"></div>
-<div class="spinner-center"><i aria-hidden="true" data-lucide="leaf"></i></div>
-</div>
-<span class="loading-kicker">VERIFYING CLEARANCE</span>
-<h3 id="loadingStatusHeading">Authenticating</h3>
-<p id="loadingStatusText">Validating credentials against personnel directory...</p>
-</div>
-</div>
-<!-- Login Form -->
-<form autocomplete="on" id="loginForm" novalidate="">
-<!-- Email -->
-<div class="input-group">
-<label class="input-label" for="email">Official Email Address</label>
-<div class="input-box" id="emailFieldBox">
-<i aria-hidden="true" class="box-icon" data-lucide="mail"></i>
-<input aria-describedby="emailHint" autocomplete="username" id="email" inputmode="email" name="email" placeholder="name@quezon.gov.ph" required="" spellcheck="false" type="email"/>
-<button aria-label="Clear email input" class="field-action-btn" id="clearEmailBtn" style="display: none;" tabindex="-1" type="button">
-<i aria-hidden="true" data-lucide="x"></i>
-</button>
-</div>
-<!-- Fast-fill domain suggestions -->
-<div aria-label="Suggested email domains" class="domain-suggestions" id="domainSuggestions">
-<button class="domain-pill" data-domain="@quezon.gov.ph" type="button">+ @quezon.gov.ph</button>
-<button class="domain-pill" data-domain="@pgenro.gov.ph" type="button">+ @pgenro.gov.ph</button>
-</div>
-<div class="input-hint" id="emailHint">
-<i aria-hidden="true" data-lucide="info"></i>
-<span>Use your registered government email address.</span>
-</div>
-</div>
-<!-- Password -->
-<div class="input-group">
-<div class="input-label-row">
-<label class="input-label" for="password">Password</label>
-<a class="forgot-link" href="requestacc.html">Need Help?</a>
-</div>
-<div class="input-box" id="passwordFieldBox">
-<i aria-hidden="true" class="box-icon" data-lucide="key-round"></i>
-<input autocomplete="current-password" id="password" name="password" placeholder="••••••••••••" required="" type="password"/>
-<button aria-label="Show password" aria-pressed="false" class="field-action-btn" id="togglePassword" title="Show/Hide Password" type="button">
-<i aria-hidden="true" data-lucide="eye" id="toggleIcon"></i>
-</button>
-</div>
-<div aria-hidden="true" class="caps-warning-box" id="capsLockWarning">
-<i aria-hidden="true" data-lucide="alert-triangle"></i>
-<span>Caps Lock is currently <strong>ON</strong></span>
-</div>
-</div>
-<!-- Remember Me -->
-<div class="form-options-row">
-<label class="checkbox-label">
-<input id="rememberMe" type="checkbox"/>
-<span aria-hidden="true" class="custom-check"></span>
-<span class="check-caption">Remember email on this workstation</span>
-</label>
-</div>
-<!-- Action Button -->
-<button class="primary-sign-btn" id="loginBtn" type="submit">
-<span class="btn-caption">
-<strong id="btnLabel">Sign In to Portal</strong>
-<small id="btnSub">Authorized Personnel Session</small>
-</span>
-<span aria-hidden="true" class="btn-arrow-wrap">
-<i data-lucide="arrow-right"></i>
-</span>
-</button>
-<div class="divider-line">
-<span>QUICK ACCESS</span>
-</div>
-<!-- Public Visitors Log CTA -->
-<a class="visitor-access-btn" href="../VisitorsLog/visitorsLogin.html" aria-label="Open public visitors log registration">
-<div class="visitor-icon-box">
-<i aria-hidden="true" data-lucide="clipboard-signature"></i>
-</div>
-<div class="visitor-caption">
-<strong>Open Visitors Log</strong>
-<span>Register an office visit without a personnel account</span>
-</div>
-<i aria-hidden="true" class="visitor-chevron" data-lucide="chevron-right"></i>
-</a>
-<!-- Access Request CTA -->
-<a class="request-access-btn" href="requestacc.html">
-<div class="request-icon-box">
-<i aria-hidden="true" data-lucide="user-plus"></i>
-</div>
-<div class="request-caption">
-<strong>Register Access Request</strong>
-<span>Submit new personnel credentials for approval</span>
-</div>
-<i aria-hidden="true" class="request-chevron" data-lucide="chevron-right"></i>
-</a>
-</form>
-<footer class="card-footer">
-<span>© 2026 Provincial Government of Quezon</span>
-<span aria-hidden="true" class="dot">•</span>
-<span>PGENRO IMS</span>
-</footer>
-</div>
-</section>
-</div>
-</main>
-<!-- App Script -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="login.js?v=20261004-ocr-ui-v8" type="module"></script>
+<body class="pgenro-auth pgenro-login" data-css-scope="auth-login" data-motion="paused">
+  <svg class="icon-definitions" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="icon-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m3 7 9 6 9-6"/></symbol>
+      <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/></symbol>
+      <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+      <symbol id="icon-eye-off" viewBox="0 0 24 24"><path d="m3 3 18 18M10.6 5.1A12 12 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3 3.9M6.5 6.5A19 19 0 0 0 2 12s3.5 7 10 7a12 12 0 0 0 5.5-1.5M9.9 9.9a3 3 0 0 0 4.2 4.2"/></symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+      <symbol id="icon-visitor" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="17" rx="3"/><path d="M9 4V2h6v2M8 10h8m-8 5h5"/></symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+      <symbol id="icon-warning" viewBox="0 0 24 24"><path d="m10.3 4-8 14a2 2 0 0 0 1.7 3h16a2 2 0 0 0 1.7-3l-8-14a2 2 0 0 0-3.4 0ZM12 9v4m0 4h.01"/></symbol>
+      <symbol id="icon-offline" viewBox="0 0 24 24"><path d="m2 2 20 20M8.5 16.4a5 5 0 0 1 7 0M5 12.5a10 10 0 0 1 3-1.9M15 10.6a10 10 0 0 1 4 1.9M2 8.5a15 15 0 0 1 3-1.9M9 5.8a15 15 0 0 1 13 2.7M12 20h.01"/></symbol>
+      <symbol id="icon-user-plus" viewBox="0 0 24 24"><circle cx="9" cy="7" r="4"/><path d="M2 21v-2a7 7 0 0 1 12-4.9M19 13v8m-4-4h8"/></symbol>
+      <symbol id="icon-leaf" viewBox="0 0 24 24"><path d="M20 3c-9 0-16 4-16 11a6 6 0 0 0 6 6c7 0 10-8 10-17Z"/><path d="m3 21 12-12"/></symbol>
+      <symbol id="icon-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/><path d="M3 11h18"/></symbol>
+      <symbol id="icon-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+      <symbol id="icon-arrow-up" viewBox="0 0 24 24"><path d="M6 18 18 6M6 6h12v12"/></symbol>
+    </defs>
+  </svg>
 
+  <div class="ambient-background" aria-hidden="true">
+    <div class="ambient-grid"></div>
+    <svg class="ambient-graph" viewBox="0 0 1440 900" preserveAspectRatio="xMidYMid slice" fill="none" focusable="false">
+      <path d="M-270 622C84 610 162 191 437-48M-251 650C103 638 181 219 456-20M-232 678C122 666 200 247 475 8M-213 706C141 694 219 275 494 36M-194 734C160 722 238 303 513 64M-175 762C179 750 257 331 532 92M-156 790C198 778 276 359 551 120"/>
+      <path class="graph-lines" d="m1096-49 53 191 225 83 127-53M1149 142l-118 204 343-121M1031 346l158 172 276-42M1189 518l-88 230 364-272M1101 748l185 155"/>
+      <path class="graph-facet" d="m1031 346 343-121-185 293Z"/>
+      <g class="graph-joints"><circle cx="342" cy="171" r="2.5"/><circle cx="217" cy="398" r="2"/><circle cx="1149" cy="142" r="2.5"/><circle cx="1031" cy="346" r="2.5"/><circle cx="1189" cy="518" r="2.5"/><circle cx="1101" cy="748" r="2"/></g>
+    </svg>
+    <svg class="ambient-terrain" viewBox="0 0 1440 900" preserveAspectRatio="none" fill="none" focusable="false">
+      <defs>
+        <linearGradient id="ribbonMint" x1="0" y1="470" x2="1270" y2="780" gradientUnits="userSpaceOnUse"><stop stop-color="#91c5ae" stop-opacity=".22"/><stop offset=".48" stop-color="#287c5b" stop-opacity=".06"/><stop offset="1" stop-color="#86b697" stop-opacity=".14"/></linearGradient>
+        <linearGradient id="ribbonEmerald" x1="140" y1="860" x2="1270" y2="390" gradientUnits="userSpaceOnUse"><stop stop-color="#063b2d"/><stop offset=".6" stop-color="#12644b" stop-opacity=".85"/><stop offset="1" stop-color="#438f70" stop-opacity=".45"/></linearGradient>
+        <linearGradient id="ribbonEdge" x1="0" y1="490" x2="1440" y2="730" gradientUnits="userSpaceOnUse"><stop stop-color="#bddec9" stop-opacity=".35"/><stop offset=".5" stop-color="#92c4ad" stop-opacity=".06"/><stop offset="1" stop-color="#c0d9ac" stop-opacity=".25"/></linearGradient>
+      </defs>
+      <path d="M-120 455C97 315 241 589 443 634S764 596 971 713 1306 686 1550 406V1020H-120Z" fill="url(#ribbonMint)"/>
+      <path d="M-120 455C97 315 241 589 443 634S764 596 971 713 1306 686 1550 406" stroke="url(#ribbonEdge)" stroke-width="1.2"/>
+      <g class="terrain-contours">
+        <path d="M-120 478C97 338 241 612 443 657S764 619 971 736 1306 709 1550 429"/>
+        <path d="M-120 501C97 361 241 635 443 680S764 642 971 759 1306 732 1550 452"/>
+        <path d="M-120 524C97 384 241 658 443 703S764 665 971 782 1306 755 1550 475"/>
+        <path d="M-120 547C97 407 241 681 443 726S764 688 971 805 1306 778 1550 498"/>
+        <path d="M-120 570C97 430 241 704 443 749S764 711 971 828 1306 801 1550 521"/>
+      </g>
+      <path d="M-120 981C131 756 391 838 594 892S924 783 1031 548 1290 439 1550 514V1020H-120Z" fill="url(#ribbonEmerald)"/>
+      <path d="M-120 981C131 756 391 838 594 892S924 783 1031 548 1290 439 1550 514" stroke="url(#ribbonEdge)" stroke-width="1"/>
+      <g class="foreground-contours"><path d="M-120 1004C131 779 391 861 594 915S924 806 1031 571 1290 462 1550 537"/><path d="M-120 1027C131 802 391 884 594 938S924 829 1031 594 1290 485 1550 560"/></g>
+    </svg>
+    <svg class="falling-leaf leaf-one" viewBox="0 0 24 24" focusable="false"><use href="#icon-leaf"/></svg>
+    <svg class="falling-leaf leaf-two" viewBox="0 0 24 24" focusable="false"><use href="#icon-leaf"/></svg>
+  </div>
+
+  <main class="portal-viewport">
+    <header class="portal-topbar">
+      <div class="brand-showcase" aria-labelledby="portalTitle">
+        <div class="dual-seal-frame" aria-label="PGENRO and Quezon Province">
+          <div class="seal-container">
+            <img class="seal-img" src="../logo/enro.png" alt="PGENRO seal" width="40" height="40" decoding="async" data-seal>
+            <span class="seal-fallback" aria-hidden="true"><svg class="icon"><use href="#icon-leaf"/></svg><span>ENRO</span></span>
+          </div>
+          <div class="seal-container">
+            <img class="seal-img" src="../logo/Quezonlogo.png" alt="Quezon Province seal" width="40" height="40" decoding="async" data-seal data-fallback-src="../logo/quezonLLOGO.png">
+            <span class="seal-fallback" aria-hidden="true"><span class="seal-monogram">Q</span><span>QUEZON</span></span>
+          </div>
+        </div>
+        <div class="brand-wordmark">
+          <h1 id="portalTitle">PGENRO<span>IMS</span></h1>
+          <p>Information Management System</p>
+        </div>
+      </div>
+      <p class="province-label">Provincial Government of <strong>Quezon</strong></p>
+    </header>
+
+    <div class="portal-container">
+      <section class="auth-wrapper" aria-labelledby="loginHeading">
+        <div id="loginCard" class="login-panel">
+          <aside class="portal-story" aria-labelledby="workspaceIntro">
+            <div class="story-heading">
+              <span class="story-eyebrow"><span aria-hidden="true"></span>Province of Quezon</span>
+              <h2 id="workspaceIntro">Your PGENRO<br><span>workspace.</span></h2>
+              <p>Documents, people, and services.<br>Connected in one place.</p>
+            </div>
+            <svg class="story-art" viewBox="0 0 400 330" fill="none" aria-hidden="true" focusable="false">
+              <defs>
+                <linearGradient id="storyTile" x1="92" y1="152" x2="312" y2="286" gradientUnits="userSpaceOnUse"><stop stop-color="#4e9a77"/><stop offset="1" stop-color="#144f3c"/></linearGradient>
+                <linearGradient id="storyLeaf" x1="148" y1="120" x2="260" y2="34" gradientUnits="userSpaceOnUse"><stop stop-color="#84b995"/><stop offset="1" stop-color="#e0ebc0"/></linearGradient>
+                <linearGradient id="storyLeafShade" x1="155" y1="70" x2="239" y2="137" gradientUnits="userSpaceOnUse"><stop stop-color="#57996e"/><stop offset="1" stop-color="#a2c698"/></linearGradient>
+                <linearGradient id="storyPaper" x1="46" y1="168" x2="140" y2="228" gradientUnits="userSpaceOnUse"><stop stop-color="#f5f8e9"/><stop offset="1" stop-color="#cbdcc7"/></linearGradient>
+              </defs>
+              <ellipse class="story-shadow" cx="207" cy="263" rx="149" ry="29" fill="#023323" fill-opacity=".34"/>
+              <path d="m200 161 122 69-122 70-122-70Z" fill="#124d39" stroke="#589578" stroke-opacity=".45"/>
+              <path d="m200 146 122 69-122 70-122-70Z" fill="#286b50" stroke="#79b390" stroke-opacity=".5"/>
+              <path d="m200 131 122 69-122 70-122-70Z" fill="url(#storyTile)" stroke="#91c2a0" stroke-opacity=".65"/>
+              <path d="m200 152 86 48-86 49-86-49Z" stroke="#c9dfb8" stroke-opacity=".2"/>
+              <g class="story-leaf-motion">
+              <path d="M160 179c-35-20-31-61 4-91 28-24 64-35 103-47 0 52-8 93-36 126-20 23-46 29-71 12Z" fill="url(#storyLeaf)"/>
+              <path d="M160 179c-35-20-31-61 4-91 28-24 64-35 103-47-31 55-74 93-107 138Z" fill="url(#storyLeafShade)"/>
+              <path d="M146 209c16-49 57-72 97-134" stroke="#e5efd1" stroke-opacity=".75" stroke-width="2" stroke-linecap="round"/>
+              <path d="m172 164-12-37m35 14 31 1m-14-29-6-32" stroke="#e3ebc9" stroke-opacity=".5" stroke-width="1.4" stroke-linecap="round"/>
+              </g>
+              <g class="story-document-motion">
+              <g transform="rotate(-7 93 192)">
+                <rect x="38" y="147" width="111" height="84" rx="12" fill="#063c2b" fill-opacity=".22"/>
+                <rect x="35" y="140" width="111" height="84" rx="12" fill="url(#storyPaper)" stroke="#eef5dd" stroke-opacity=".7"/>
+                <rect x="49" y="154" width="23" height="23" rx="6" fill="#9dc1a2" fill-opacity=".6"/>
+                <path d="M56 160h7l3 3v8H56Zm7 0v3h3" stroke="#326846" stroke-width="1.3" stroke-linejoin="round"/>
+                <path d="M82 159h45M82 166h29M49 189h77M49 198h58M49 207h68" stroke="#477653" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+              </g>
+              </g>
+              <g class="story-personnel-motion">
+              <g transform="rotate(7 308 142)">
+                <rect x="274" y="113" width="89" height="67" rx="12" fill="#033726" fill-opacity=".22"/>
+                <rect x="271" y="107" width="89" height="67" rx="12" fill="#d9e9d1" stroke="#f0f5df" stroke-opacity=".7"/>
+                <circle cx="291" cy="129" r="8" fill="#5b966d"/>
+                <path d="M282 154v-4a9 9 0 0 1 18 0v4" stroke="#5b966d" stroke-width="3" stroke-linecap="round"/>
+                <path d="M312 126h33M312 134h21M312 151h28" stroke="#477653" stroke-opacity=".5" stroke-width="3" stroke-linecap="round"/>
+              </g>
+              </g>
+              <path d="M50 115V94h21M337 211v22h-22" stroke="#b9d6ad" stroke-opacity=".5" stroke-width="1.2" stroke-linecap="round"/>
+              <circle cx="91" cy="91" r="3" fill="#d0dfad"/>
+              <circle cx="334" cy="83" r="2" fill="#bbd7af"/>
+              <path d="M324 197h8m-4-4v8M107 266h8m-4-4v8" stroke="#bed6a8" stroke-opacity=".7" stroke-linecap="round"/>
+            </svg>
+            <div class="story-details" aria-label="Workspace areas">
+              <span><svg class="icon" aria-hidden="true"><use href="#icon-folder"/></svg>Documents</span>
+              <span><svg class="icon" aria-hidden="true"><use href="#icon-user-plus"/></svg>Personnel</span>
+              <span><svg class="icon" aria-hidden="true"><use href="#icon-grid"/></svg>Inventory</span>
+            </div>
+          </aside>
+          <div class="auth-content">
+          <header class="card-header">
+            <svg class="card-header-art" viewBox="0 0 200 150" fill="none" aria-hidden="true" focusable="false">
+              <path d="M222-28C99-8 179 109 64 151M242-13C119 7 199 124 84 166M262 2C139 22 219 139 104 181M282 17C159 37 239 154 124 196M302 32C179 52 259 169 144 211"/>
+              <path class="header-leaf" d="M168 19c-46 0-79 21-79 53a27 27 0 0 0 27 27c32 0 52-39 52-80Z"/><path d="m86 102 59-58"/>
+            </svg>
+            <div class="card-meta"><span class="card-eyebrow"><svg class="icon" aria-hidden="true"><use href="#icon-lock"/></svg>Staff sign in</span><span class="card-emblem" aria-hidden="true"><svg class="icon"><use href="#icon-leaf"/></svg></span></div>
+            <h2 id="loginHeading">Welcome back<span aria-hidden="true">.</span></h2>
+            <p>Sign in to your PGENRO workspace.</p>
+          </header>
+          <div class="card-body">
+
+          <div id="networkStatusBar" class="network-status-bar" role="status" aria-live="polite" hidden><svg class="icon" aria-hidden="true"><use href="#icon-offline"/></svg><span>You're offline. Check your connection.</span></div>
+          <div id="lockoutNotice" class="lockout-box" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#icon-lock"/></svg><span>Try again in <strong id="lockoutSeconds" class="lockout-timer">30</strong>s.</span></div>
+          <div id="messageBox" class="message-box" role="alert" hidden>
+            <div id="messageContent"></div>
+            <button id="dismissAlert" class="alert-dismiss-btn" type="button" aria-label="Dismiss message"><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button>
+          </div>
+
+          <form id="loginForm" autocomplete="on" novalidate>
+            <div class="input-group">
+              <label class="input-label" for="email">Email address</label>
+              <div id="emailFieldBox" class="input-box">
+                <span class="input-icon"><svg class="icon box-icon" aria-hidden="true"><use href="#icon-mail"/></svg></span>
+                <input id="email" name="email" type="email" placeholder="you@quezon.gov.ph" autocomplete="username" inputmode="email" spellcheck="false" autocapitalize="none" aria-describedby="emailError" required>
+                <button id="clearEmailBtn" class="field-action-btn" type="button" aria-label="Clear email address" hidden><svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg></button>
+              </div>
+              <p id="emailError" class="field-error" hidden></p>
+            </div>
+            <div class="input-group">
+              <label class="input-label" for="password">Password</label>
+              <div id="passwordFieldBox" class="input-box">
+                <span class="input-icon"><svg class="icon box-icon" aria-hidden="true"><use href="#icon-lock"/></svg></span>
+                <input id="password" name="password" type="password" placeholder="Enter your password" autocomplete="current-password" aria-describedby="passwordError capsLockWarning" required>
+                <button id="togglePassword" class="field-action-btn" type="button" aria-label="Show password" aria-pressed="false" aria-controls="password"><svg class="icon" aria-hidden="true"><use href="#icon-eye"/></svg></button>
+              </div>
+              <p id="passwordError" class="field-error" hidden></p>
+              <div id="capsLockWarning" class="caps-warning-box" role="status" hidden><svg class="icon" aria-hidden="true"><use href="#icon-warning"/></svg><span>Caps Lock is on.</span></div>
+            </div>
+            <div class="form-options-row"><label class="checkbox-label"><input id="rememberMe" type="checkbox"><span>Remember email</span></label></div>
+            <div class="sign-in-entry"><button id="loginBtn" class="primary-sign-btn" type="submit"><span class="button-spinner" aria-hidden="true"></span><span id="btnLabel">Sign in</span><span class="button-arrow-wrap"><svg class="icon button-arrow" aria-hidden="true"><use href="#icon-arrow"/></svg></span></button></div>
+            <div id="loadingOverlay" class="loading-status" role="status" aria-live="polite" hidden><strong id="loadingStatusHeading">Signing in.</strong> <span id="loadingStatusText">Checking your account…</span></div>
+          </form>
+
+          <div class="card-divider"><span>Other access</span></div>
+          <nav class="secondary-access" aria-label="Account and visitor access">
+            <div class="access-card-entry"><a class="access-request" href="requestacc.html" data-access-link><span class="secondary-icon"><svg class="icon" aria-hidden="true"><use href="#icon-user-plus"/></svg></span><span class="access-copy"><strong>Request account</strong><small>For new staff</small></span><svg class="icon access-arrow" aria-hidden="true"><use href="#icon-arrow-up"/></svg></a></div>
+            <div class="access-card-entry"><a class="visitor-access-btn" href="../VisitorsLog/visitorsLogin.html" data-access-link><span class="secondary-icon"><svg class="icon" aria-hidden="true"><use href="#icon-visitor"/></svg></span><span class="access-copy"><strong>Visitors log</strong><small>Visitor access</small></span><svg class="icon access-arrow" aria-hidden="true"><use href="#icon-arrow-up"/></svg></a></div>
+          </nav>
+          <noscript><p class="noscript-notice">Enable JavaScript in your browser to sign in.</p></noscript>
+          </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <footer class="portal-footer">© 2026 PGENRO <span aria-hidden="true">·</span> Province of Quezon</footer>
+  </main>
 </body>
 </html>
