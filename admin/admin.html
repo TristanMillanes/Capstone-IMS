@@ -17,9 +17,10 @@
 <script defer="" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
 <!-- Stylesheet -->
 <link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="admin.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
+<link href="admin.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
+<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div>
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
@@ -148,7 +149,7 @@
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <!-- PAGE HEADER -->
-<section class="page-header modern-dashboard-hero" id="dashboard">
+<section class="page-header modern-dashboard-hero depth-hero" id="dashboard">
 <div class="header-title">
 <div class="page-heading-mark" aria-hidden="true"><i data-lucide="layout-dashboard"></i></div>
 <div class="breadcrumb">
@@ -160,6 +161,18 @@
 <p>Your records, people, and daily operations. All in one place.</p>
 </div>
 <div class="header-actions"><a class="btn btn-primary" href="admincommunication.html"><i data-lucide="arrow-left-right"></i>Open communications</a><a class="btn btn-secondary" href="#analytics"><i data-lucide="bar-chart-3"></i>View analytics</a></div>
+
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
+</div>
 </section>
 <!-- KPI METRICS GRID -->
 <section class="kpi-grid">
@@ -611,8 +624,8 @@
 </div>
 <!-- SCRIPTS -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
-<script defer="" src="admin.js?v=20261006-modern-ui-v2"></script>
+<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
+<script defer="" src="admin.js?v=20261010-slide-confirm-v3"></script>
 
 <div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
   <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">

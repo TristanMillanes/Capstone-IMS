@@ -53,10 +53,20 @@
     };return query;
   }
   const user={id:'qa-user',email:profile.email,user_metadata:{full_name:profile.full_name}};
+  window.__signOutFailure=false;
+  window.__signOutDelay=0;
+  const session=()=>sessionStorage.getItem('qa_signed_out')==='true'?null:{user,access_token:'qa-token'};
+  async function signOut(){
+    sessionStorage.setItem('qa_signout_count',String(Number(sessionStorage.getItem('qa_signout_count')||0)+1));
+    if(window.__signOutDelay)await new Promise(resolve=>setTimeout(resolve,window.__signOutDelay));
+    if(window.__signOutFailure)return {error:{message:'Simulated sign-out failure'}};
+    sessionStorage.setItem('qa_signed_out','true');
+    return {error:null};
+  }
   const client = {
     from,
-    auth:{getSession:async()=>({data:{session:{user,access_token:'qa-token'}}}),getUser:async()=>({data:{user}}),signOut:async()=>({error:null}),onAuthStateChange(callback){queueMicrotask(()=>callback('INITIAL_SESSION',{user}));return {data:{subscription:{unsubscribe(){}}}};},updateUser:async()=>({data:{user},error:null}),resetPasswordForEmail:async()=>({data:{},error:null})},
-    rpc:async(name,args)=>({data:name==='get_system_settings'?{}:{success:true},error:null}),
+    auth:{getSession:async()=>({data:{session:session()}}),getUser:async()=>({data:{user:session()?.user||null}}),signOut,onAuthStateChange(callback){queueMicrotask(()=>callback('INITIAL_SESSION',session()));return {data:{subscription:{unsubscribe(){}}}};},updateUser:async()=>({data:{user},error:null}),resetPasswordForEmail:async()=>({data:{},error:null})},
+    rpc:async(name,args)=>({data:name==='pgenro_is_admin'?admin:name==='pgenro_admin_list_users'?[profile]:name==='pgenro_admin_pending_count'?1:name==='get_system_settings'?{}:{success:true},error:null}),
     channel(name){const channel={name,on(event,filter,callback){channel.table=filter.table;channel.callback=callback;return channel;},subscribe(callback){window.__channels.push(channel);callback?.('SUBSCRIBED');return channel;},unsubscribe(){}};return channel;},
     removeChannel(){},functions:{invoke:async(name,{body})=>{window.__mutations.push({function:name,body});return {data:{success:true},error:null};}},
     storage:{from(){return {upload:async(path)=>({data:{path},error:null}),getPublicUrl:path=>({data:{publicUrl:'https://example.com/'+path}}),remove:async()=>({error:null}),createSignedUrl:async()=>({data:{signedUrl:'https://example.com/fixture.pdf'},error:null})};}}

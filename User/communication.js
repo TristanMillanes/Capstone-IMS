@@ -1,3 +1,68 @@
+/* Page-owned UI helpers: render new placeholders without rebuilding existing SVGs. */
+const PGENRO_PageUI = (() => {
+  function icons() {
+    if (!window.lucide?.createIcons) return;
+    const pending = document.querySelectorAll('i[data-lucide]');
+    if (!pending.length) return;
+    pending.forEach(el => el.setAttribute('data-pgenro-pending', el.getAttribute('data-lucide')));
+    window.lucide.createIcons({nameAttr: 'data-pgenro-pending'});
+    document.querySelectorAll('svg[data-pgenro-pending]').forEach(el => el.removeAttribute('data-pgenro-pending'));
+  }
+
+  const pages = new Map();
+  let printing = false;
+  function search(render) {
+    let timer;
+    return () => { clearTimeout(timer); timer = setTimeout(render, 100); };
+  }
+  function paginate(rows, tbody, render) {
+    if (printing) return rows;
+    let state = pages.get(tbody);
+    if (!state) {
+      const nav = document.createElement('nav');
+      nav.className = 'registry-pagination';
+      nav.setAttribute('aria-label', 'Registry pagination');
+      nav.innerHTML = '<span class="registry-range" role="status" aria-live="polite"></span><div class="registry-page-controls"><button type="button" data-page="first" aria-label="First page">«</button><button type="button" data-page="previous">Previous</button><span class="registry-page-label"></span><button type="button" data-page="next">Next</button><button type="button" data-page="last" aria-label="Last page">»</button></div>';
+      const table = tbody.closest('table');
+      const region = table.closest('.table-wrapper, .table-responsive, .table-wrap, .table-container, .table-scroll, .table-frame') || table;
+      region.after(nav);
+      state = {page: 1, totalPages: 1, key: null, nav, render};
+      pages.set(tbody, state);
+      nav.addEventListener('click', event => {
+        const button = event.target.closest('button[data-page]');
+        if (!button || button.disabled) return;
+        const action = button.dataset.page;
+        state.page = action === 'first' ? 1 : action === 'last' ? state.totalPages : state.page + (action === 'next' ? 1 : -1);
+        state.render();
+      });
+    }
+    // Filter changes start at page one; realtime updates clamp the current page.
+    const key = [...document.querySelectorAll('main input, main select, main .tab-btn.active')]
+      .map(el => `${el.id}:${el.value || el.dataset.filter || ''}`).join('\u001f');
+    if (state.key !== key) state.page = 1;
+    state.key = key;
+    state.render = render;
+    state.totalPages = Math.max(1, Math.ceil(rows.length / 25));
+    state.page = Math.max(1, Math.min(state.page, state.totalPages));
+    const start = (state.page - 1) * 25;
+    state.nav.hidden = rows.length === 0;
+    const range = `${rows.length ? start + 1 : 0}–${Math.min(start + 25, rows.length)} of ${rows.length.toLocaleString()} records`;
+    const label = `Page ${state.page} of ${state.totalPages}`;
+    const rangeEl = state.nav.querySelector('.registry-range');
+    const labelEl = state.nav.querySelector('.registry-page-label');
+    if (rangeEl.textContent !== range) rangeEl.textContent = range;
+    if (labelEl.textContent !== label) labelEl.textContent = label;
+    state.nav.querySelectorAll('button').forEach(button => {
+      button.disabled = ['first', 'previous'].includes(button.dataset.page) ? state.page === 1 : state.page === state.totalPages;
+    });
+    return rows.slice(start, start + 25);
+  }
+  // Registry printing and export retain the complete filtered dataset.
+  window.addEventListener('beforeprint', () => { printing = true; pages.forEach(state => state.render()); });
+  window.addEventListener('afterprint', () => { printing = false; pages.forEach(state => state.render()); });
+  return {icons, paginate, search};
+})();
+
 (() => {
   "use strict";
 
@@ -70,7 +135,7 @@
     const mobileQuery = window.matchMedia("(max-width: 1024px)");
 
     const refreshIcons = () => {
-      window.lucide?.createIcons?.();
+      PGENRO_PageUI.icons();
     };
 
     const value = (input) => String(input ?? "").trim();
@@ -652,6 +717,7 @@
       }
 
       const filtered = filteredRecords();
+      const pageRows = PGENRO_PageUI.paginate(filtered, ui.recordsTable, renderRecords);
 
       if (ui.recordTotalLabel) {
         ui.recordTotalLabel.textContent =
@@ -676,7 +742,7 @@
 
       const fragment = document.createDocumentFragment();
 
-      filtered.forEach((record) => {
+      pageRows.forEach((record) => {
         const row = document.createElement("tr");
         const index = state.records.indexOf(record);
 
@@ -1333,7 +1399,7 @@
 
     ui.searchInput?.addEventListener(
       "input",
-      renderRecords
+      PGENRO_PageUI.search(renderRecords)
     );
 
     ui.statusFilter?.addEventListener(
@@ -1554,3 +1620,200 @@
     );
   }
 })();
+
+/* ===== PGENRO DEPTH MOTION · page-owned, short animations only ===== */
+(() => {
+  'use strict';
+  function initDepthWorkspace() {
+    const body = document.body;
+    if (!body?.classList.contains('depth-workspace') || body.dataset.depthReady) return;
+    body.dataset.depthReady = 'true';
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
+    document.querySelectorAll('main .kpi-card, main .stat-card, main .metric-card, main .module-control-card')
+      .forEach(card => card.classList.add('depth-tilt'));
+    let observer;
+    function configure() {
+      observer?.disconnect();
+      body.classList.toggle('depth-motion-paused', document.hidden || reduce.matches);
+      if (reduce.matches) {
+        document.querySelectorAll('.depth-entered').forEach(el => el.classList.remove('depth-entered'));
+        return;
+      }
+      if (!('IntersectionObserver' in window)) return;
+      observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const el = entry.target;
+          if (body.dataset.pageTransition === 'entering') { observer.unobserve(el); return; }
+          el.classList.add('depth-entered');
+          el.addEventListener('animationend', event => {
+            if (event.target === el) el.classList.remove('depth-entered');
+          }, {once: true});
+          observer.unobserve(el);
+        });
+      }, {threshold: .04});
+      document.querySelectorAll('.main-content > section, .main-content > .card, .main-content > .panel, .content-shell > section, .settings-panel.active')
+        .forEach((el, index) => {
+          if (el.dataset.depthSeen) return;
+          el.dataset.depthSeen = 'true';
+          el.style.setProperty('--depth-delay', `${Math.min(index, 3) * 40}ms`);
+          observer.observe(el);
+        });
+    }
+    configure();
+    reduce.addEventListener?.('change', configure);
+    document.addEventListener('visibilitychange', () => body.classList.toggle('depth-motion-paused', document.hidden || reduce.matches));
+    window.addEventListener('pagehide', () => observer?.disconnect());
+    window.addEventListener('pageshow', event => { if (event.persisted) configure(); });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initDepthWorkspace, {once: true});
+  else initDepthWorkspace();
+})();
+/* ===== END PGENRO DEPTH MOTION ===== */
+
+/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT · module-owned presentation ===== */
+(() => {
+  'use strict';
+  function initWorkspaceNavigation() {
+    const body = document.body;
+    if (!body?.classList.contains('depth-workspace') || body.dataset.navigationReady) return;
+    body.dataset.navigationReady = 'true';
+    const surface = document.querySelector('main');
+    const media = matchMedia('(prefers-reduced-motion: reduce)');
+    const reduced = () => media.matches || body.classList.contains('pgenro-reduced-motion');
+    let navigationPending = false, navigationTimer = 0, entranceTimer = 0;
+
+    function resetTransition() {
+      clearTimeout(entranceTimer);
+      clearTimeout(navigationTimer);
+      navigationPending = false;
+      surface?.classList.remove('workspace-slide-enter', 'workspace-slide-leave');
+      body.classList.remove('workspace-transitioning');
+      body.dataset.pageTransition = 'idle';
+    }
+    function enter() {
+      resetTransition();
+      if (!surface || reduced()) return;
+      body.classList.add('workspace-transitioning');
+      body.dataset.pageTransition = 'entering';
+      surface.classList.add('workspace-slide-enter');
+      entranceTimer = setTimeout(resetTransition, 280);
+    }
+    // One short compositor animation, with no continuous rendering loop.
+    enter();
+    window.addEventListener('pageshow', event => { if (event.persisted) enter(); });
+    media.addEventListener?.('change', () => { if (!navigationPending) resetTransition(); });
+
+    window.addEventListener('click', event => {
+      if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self') || link.getAttribute('aria-disabled') === 'true') return;
+      const destination = new URL(link.href, location.href);
+      if (destination.origin !== location.origin || !/\/(?:admin|User|SettingIMS)\/[^/]+\.html$/i.test(destination.pathname)) return;
+      if (destination.pathname === location.pathname && destination.search === location.search) return;
+      event.preventDefault();
+      if (navigationPending || document.querySelector('dialog[open]')) return;
+      navigationPending = true;
+      clearTimeout(entranceTimer);
+      const go = () => location.assign(destination.href);
+      if (reduced() || !surface) { go(); return; }
+      surface.classList.remove('workspace-slide-enter');
+      surface.classList.add('workspace-slide-leave');
+      body.classList.add('workspace-transitioning');
+      body.dataset.pageTransition = 'leaving';
+      navigationTimer = setTimeout(go, 140);
+    });
+
+    let dialog = null, resolveConfirmation = null, confirmationPromise = null, busy = false, returnFocus = null;
+    function setBusy(value) {
+      busy = value;
+      dialog.classList.toggle('is-busy', value);
+      dialog.setAttribute('aria-busy', String(value));
+      dialog.querySelector('[data-workspace-logout-cancel]').disabled = value;
+      dialog.querySelector('[data-workspace-logout-confirm]').disabled = value;
+      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging out…' : 'Yes, log out';
+    }
+    function dismiss() {
+      if (busy) return;
+      const done = resolveConfirmation;
+      resolveConfirmation = null; confirmationPromise = null;
+      dialog.close();
+      body.classList.remove('workspace-logout-open');
+      done?.(false);
+      if (returnFocus?.isConnected && returnFocus.getClientRects().length && !returnFocus.closest('[inert]')) returnFocus.focus({preventScroll: true});
+      else document.querySelector('#profileBtn, [data-pgenro-logout]')?.focus({preventScroll: true});
+    }
+    function confirmLogout() {
+      if (busy) return;
+      dialog.querySelector('.workspace-logout-error').textContent = '';
+      setBusy(true);
+      if (resolveConfirmation) {
+        const done = resolveConfirmation; resolveConfirmation = null; done(true);
+      } else {
+        // Retry uses the existing session gateway; never opens a second prompt.
+        window.PGENRO_API?.signOut?.({confirm: false, ask: false});
+      }
+    }
+    function createDialog() {
+      if (dialog) return;
+      dialog = document.createElement('dialog');
+      dialog.id = 'workspaceLogoutDialog';
+      dialog.className = 'workspace-logout-dialog';
+      dialog.setAttribute('aria-labelledby', 'workspaceLogoutTitle');
+      dialog.setAttribute('aria-describedby', 'workspaceLogoutDescription');
+      dialog.innerHTML = `
+        <div class="workspace-logout-content">
+          <div class="workspace-logout-heading"><span class="workspace-logout-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg></span><span class="workspace-logout-brand">PGENRO IMS<span>Secure workspace</span></span></div>
+          <h2 id="workspaceLogoutTitle">Log out of your workspace?</h2>
+          <p id="workspaceLogoutDescription">You’ll need to sign in again to access your records and office modules.</p>
+          <p class="workspace-logout-error" role="alert"></p>
+          <div class="workspace-logout-actions"><button type="button" class="workspace-logout-cancel" data-workspace-logout-cancel autofocus>Cancel</button><button type="button" class="workspace-logout-confirm" data-workspace-logout-confirm><span>Yes, log out</span></button></div>
+        </div>`;
+      body.appendChild(dialog);
+      dialog.addEventListener('cancel', event => { event.preventDefault(); dismiss(); });
+      dialog.addEventListener('click', event => {
+        event.stopPropagation();
+        if (event.target.closest('[data-workspace-logout-cancel]')) dismiss();
+        else if (event.target.closest('[data-workspace-logout-confirm]')) confirmLogout();
+        else if (event.target === dialog) {
+          const rect = dialog.getBoundingClientRect();
+          if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dismiss();
+        }
+      });
+    }
+    // The auth gateway asks this page-owned UI for confirmation before signing out.
+    window.PGENRO_ConfirmLogout = () => {
+      if (confirmationPromise) return confirmationPromise;
+      createDialog();
+      returnFocus = document.activeElement;
+      dialog.querySelector('.workspace-logout-error').textContent = '';
+      setBusy(false);
+      confirmationPromise = new Promise(resolve => { resolveConfirmation = resolve; });
+      if (!dialog.open) dialog.showModal();
+      body.classList.add('workspace-logout-open');
+      dialog.querySelector('[data-workspace-logout-cancel]').focus({preventScroll: true});
+      return confirmationPromise;
+    };
+    window.addEventListener('pgenro:logout-error', () => {
+      if (!dialog?.open) return;
+      confirmationPromise = null; resolveConfirmation = null;
+      setBusy(false);
+      dialog.querySelector('.workspace-logout-error').textContent = 'Could not log out. Check your connection and try again.';
+      dialog.querySelector('[data-workspace-logout-confirm]').focus({preventScroll: true});
+    });
+    window.addEventListener('keydown', event => {
+      if (!dialog?.open) return;
+      if (event.key === 'Escape') {
+        event.preventDefault(); event.stopImmediatePropagation(); dismiss();
+      } else if (event.key === 'Tab') {
+        const buttons = [...dialog.querySelectorAll('button:not(:disabled)')];
+        if (!buttons.length) { event.preventDefault(); return; }
+        if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons.at(-1).focus(); }
+        else if (!event.shiftKey && document.activeElement === buttons.at(-1)) { event.preventDefault(); buttons[0].focus(); }
+      }
+    }, true);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initWorkspaceNavigation, {once: true});
+  else initWorkspaceNavigation();
+})();
+/* ===== END PGENRO SLIDE NAVIGATION AND LOGOUT ===== */

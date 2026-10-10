@@ -15,9 +15,10 @@
 <!-- Supabase JavaScript SDK -->
 <!-- Stylesheet -->
 <link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="serviceAdmin.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
+<link href="serviceAdmin.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="serviceAdmin.html" data-css-scope="admin-services" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="serviceAdmin.html" data-css-scope="admin-services" data-requires-auth="admin">
+<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <!-- Mobile Sidebar Backdrop -->
 <div class="app-layout">
 <!-- ============================================================ -->
@@ -145,7 +146,7 @@
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <!-- PAGE HEADER -->
-<section class="page-header">
+<section class="page-header depth-hero">
 <div class="header-title">
 <div class="page-heading-mark" aria-hidden="true"><i data-lucide="wrench"></i></div>
 <div class="breadcrumb">
@@ -164,6 +165,18 @@
 <i data-lucide="search"></i> Lookup Record
             </button>
 <button class="btn btn-primary" id="btnNewRecord" type="button"><i data-lucide="plus"></i> New Service Request</button>
+</div>
+
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <!-- ENCODING MASTER CARD -->
@@ -249,8 +262,8 @@
 <div class="toast-container" id="toastContainer"></div>
 <!-- SCRIPT -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
-<script defer="" src="serviceAdmin.js?v=20261006-modern-ui-v2"></script>
+<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
+<script defer="" src="serviceAdmin.js?v=20261010-slide-confirm-v3"></script>
 <div aria-hidden="true" class="modal-backdrop" id="serviceFormModal"><div aria-labelledby="serviceFormTitle" aria-modal="true" class="modal-card service-form-card" role="dialog"><div class="modal-header"><div><h2 id="serviceFormTitle">Service Request Details</h2><p>Complete the client information, service scope, and course of action.</p></div><button aria-label="Close service form" data-close="serviceFormModal" type="button">×</button></div>
 <!-- CARD HEADER & TAB CONTROLLERS -->
 <div class="service-card-header">

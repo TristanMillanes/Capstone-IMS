@@ -5,7 +5,10 @@
   "scripts": {
     "test": "node browser-audit.cjs current && node functional-browser.cjs",
     "test:ocr": "node ocr-ui.cjs",
-    "test:upload": "node communication-upload-browser.cjs"
+    "test:upload": "node communication-upload-browser.cjs",
+    "test:depth": "node depth-workspace.cjs",
+    "test:performance": "node performance-workspace.cjs after",
+    "test:navigation": "node navigation-logout.cjs"
   },
   "devDependencies": {
     "playwright": "1.62.1",

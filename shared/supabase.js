@@ -698,12 +698,14 @@
     return destination;
   }
 
-  async function endSessionAndRedirect() {
+  async function endSessionAndRedirect({ strict = false } = {}) {
     try {
       if (client) {
-        await client.auth.signOut();
+        const response = await client.auth.signOut();
+        if (strict && response?.error) throw response.error;
       }
     } catch (error) {
+      if (strict) throw error;
       console.warn(
         "PGENRO sign-out warning:",
         error
@@ -979,20 +981,29 @@
     }
   }
 
+  let signOutInProgress = false;
   async function signOutFromUi(
     { confirm = true } = {}
   ) {
-    if (
-      confirm &&
-      !window.confirm(
-        "Are you sure you want to end your current session?"
-      )
-    ) {
+    if (signOutInProgress) return false;
+    signOutInProgress = true;
+    try {
+      if (confirm) {
+        const allowed = typeof window.PGENRO_ConfirmLogout === "function"
+          ? await window.PGENRO_ConfirmLogout()
+          : window.confirm("Are you sure you want to end your current session?");
+        if (!allowed) return false;
+      }
+      await endSessionAndRedirect({ strict: true });
+      return true;
+    } catch (error) {
+      window.dispatchEvent(new CustomEvent("pgenro:logout-error", {
+        detail: { message: error?.message || "Logout failed. Please try again." }
+      }));
       return false;
+    } finally {
+      signOutInProgress = false;
     }
-
-    await endSessionAndRedirect();
-    return true;
   }
 
   window.PGENRO_API.signOut =

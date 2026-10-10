@@ -1,6 +1,6 @@
 # PGENRO Information Management System
 
-OCR and UI update, 4 October 2026. The existing Supabase integration and ordinary-user read-only workflows are retained.
+Modern interface, slide navigation and logout confirmation update, 10 October 2026. See `UI_MODERN_3D_UPDATE.md` for the refreshed design, faster paginated registries and verification, and `UI_NAVIGATION_LOGOUT_UPDATE.md` for transitions and the system confirmation dialog. Supabase integration, OCR and ordinary-user read-only workflows are retained.
 
 Before saving new shared attachments, run `supabase/DOCUMENT_STORAGE_PATCH.sql` in your existing Supabase project. Follow `FIXES_AND_SETUP.md` for local startup and deployment.
 

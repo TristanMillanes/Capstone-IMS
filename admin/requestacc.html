@@ -11,9 +11,10 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="requestacc.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
+<link href="requestacc.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin">
+<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
 <div class="sidebar-header">
@@ -131,9 +132,21 @@
 </header>
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
-<section class="page-header"><div class="header-title">
+<section class="page-header depth-hero"><div class="header-title">
 <div class="page-heading-mark" aria-hidden="true"><i data-lucide="user-plus"></i></div><div class="breadcrumb"><span>Admin Console</span><i data-lucide="chevron-right"></i><span class="active">Account Requests</span></div><h1>Account requests</h1>
-<p>Review applications and provide the right access to your office workspace.</p></div><div class="header-actions"><button class="btn btn-secondary" id="refreshRequestsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button><a class="btn btn-secondary" href="Usermanagement.html"><i data-lucide="users"></i> User Directory</a></div></section>
+<p>Review applications and provide the right access to your office workspace.</p></div><div class="header-actions"><button class="btn btn-secondary" id="refreshRequestsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button><a class="btn btn-secondary" href="Usermanagement.html"><i data-lucide="users"></i> User Directory</a></div>
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
+</div>
+</section>
 <section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingCount">0</h3><span class="kpi-trend">Awaiting review</span></div><div class="kpi-footer"><span>Verify applicant details</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Approved Accounts</span><div class="kpi-icon emerald"><i data-lucide="user-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statApprovedCount">0</h3><span class="kpi-trend">Access granted</span></div><div class="kpi-footer"><span>Approved request history</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Declined Requests</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statRejectedCount">0</h3><span class="kpi-trend">Declined applications</span></div><div class="kpi-footer"><span>Review reasons and remarks</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Applications</span><div class="kpi-icon blue"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalCount">0</h3><span class="kpi-trend">All access requests</span></div><div class="kpi-footer"><span>Live account request registry</span></div></div></section>
 <section class="table-card">
 <div style="padding:18px 18px 0"><div class="table-toolbar"><div class="table-toolbar-left"><input class="filter-input" id="requestSearchInput" placeholder="Search name, email, request ID, Gov ID..." type="search"/><select class="filter-select" id="divisionFilterSelect"><option value="ALL">All Divisions</option><option value="Admin Office">Admin Office</option><option value="Environment Management">Environment Management</option><option value="Forestry Division">Forestry Division</option><option value="Mines &amp; Quarry">Mines &amp; Quarry</option><option value="Administrative and Finance Division">Administrative &amp; Finance</option><option value="Environmental Management Division">Environmental Management Division</option><option value="Forest Management Division">Forest Management Division</option><option value="Mines and Geosciences Division">Mines &amp; Geosciences Division</option><option value="Office of the PG-ENRO">Office of the PG-ENRO</option></select><select class="filter-select" id="statusFilterSelect"><option value="ALL">All Status</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div><div class="table-toolbar-right"><button class="btn btn-secondary btn-sm" disabled="" id="bulkApproveBtn" type="button"><i data-lucide="check-check"></i> Approve Selected</button><button class="btn btn-danger btn-sm" disabled="" id="bulkRejectBtn" type="button"><i data-lucide="x-circle"></i> Reject Selected</button></div></div></div>
@@ -149,8 +162,8 @@
 <div aria-hidden="true" class="modal-backdrop" id="declineModal"><div aria-labelledby="declineModalTitle" aria-modal="true" class="modal-container" role="dialog" style="max-width:520px"><div class="modal-header"><div class="modal-title-group"><div class="modal-icon rose"><i data-lucide="shield-x"></i></div><div><h3 id="declineModalTitle">Decline Access Request</h3><p>Record the reason for the applicant.</p></div></div><button class="modal-close-btn" id="closeDeclineModalBtn" type="button">×</button></div><div class="modal-body"><div class="form-group"><label>Reason</label><select class="form-control" id="declineReasonSelect"><option>Unverified credentials</option><option>Incomplete information</option><option>Role requires additional authorization</option><option>Duplicate account request</option><option>Not eligible for requested system access</option><option>Other</option></select></div><div class="form-group"><label>Remarks / Notes</label><textarea class="form-control" id="declineNotesInput" placeholder="Add administrator remarks..." rows="4"></textarea></div></div><div class="modal-footer modal-actions"><button class="btn btn-secondary" id="cancelDeclineModalBtn" type="button">Cancel</button><button class="btn btn-danger" id="confirmDeclineBtn" type="button"><i data-lucide="user-x"></i> Confirm Decline</button></div></div></div>
 <div aria-hidden="true" class="modal-backdrop" id="systemConfirmModal"><div aria-labelledby="confirmModalTitle" aria-modal="true" class="modal-container confirm-modal-card" role="dialog" style="max-width:430px"><div class="modal-body"><div class="confirm-icon-box" id="confirmModalIconBox"><i data-lucide="alert-triangle"></i></div><h3 id="confirmModalTitle">Confirm Action</h3><p id="confirmModalDesc" style="color:var(--slate-500);margin-top:8px">Are you sure?</p><div class="confirm-modal-actions"><button class="btn btn-secondary" id="confirmModalCancelBtn" type="button">Cancel</button><button class="btn btn-danger" id="confirmModalActionBtn" type="button">Confirm</button></div></div></div></div>
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
-<script defer="" src="requestacc.js?v=20261006-modern-ui-v2"></script>
+<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
+<script defer="" src="requestacc.js?v=20261010-slide-confirm-v3"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
   <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">

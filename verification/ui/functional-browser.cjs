@@ -23,6 +23,7 @@ async function fillRequired(page,selector){
     else if(el.type==='time')el.value='10:00';
     else if(el.type==='email')el.value='qa-record@example.com';
     else if(el.type==='password')el.value='QaOffice2026!';
+    else if(/username/i.test(el.id))el.value='qa.validation';
     else if(/contact|phone|mobile/i.test(el.id))el.value='09123456789';
     else if(/email/i.test(el.id))el.value='qa-record@example.com';
     else el.value='QA VALIDATION RECORD';
@@ -72,7 +73,7 @@ const configs=[
  {
   const {page,context}=await open('admin/admin.html');
   assert(await page.evaluate(()=>['monthlyChart','categoryChart','statusChart'].every(id=>window.Chart.getChart(document.getElementById(id)))),'All three main charts created');
-  await page.locator('#sidebarCollapseBtn').click();const layout=await page.evaluate(()=>{const a=document.querySelector('.main-wrapper').getBoundingClientRect();return {left:a.left,right:a.right};});assert.equal(Math.round(layout.right),1440);assert.equal(Math.round(layout.left),78);
+  await page.locator('#sidebarCollapseBtn').click();await page.waitForTimeout(150);const layout=await page.evaluate(()=>{const a=document.querySelector('.main-wrapper').getBoundingClientRect();return {left:a.left,right:a.right};});assert.equal(Math.round(layout.right),await page.evaluate(()=>Math.round(document.querySelector('.app-layout').getBoundingClientRect().right)));assert.equal(Math.round(layout.left),await page.evaluate(()=>parseFloat(getComputedStyle(document.body).getPropertyValue('--sidebar-collapsed-width'))));
   await page.keyboard.press('Control+k');assert(await page.locator('#workspaceJumpModal').evaluate(el=>el.classList.contains('open')));await page.keyboard.press('Escape');
   findings.push({scenario:'Dashboard charts, full-width collapsed content, keyboard module switcher',result:'PASS'});await context.close();
  }

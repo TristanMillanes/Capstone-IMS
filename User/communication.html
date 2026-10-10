@@ -9,10 +9,11 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest"></script>
-  <link href="communication.css?v=20261004-ocr-ui-v8" rel="stylesheet">
+  <link href="communication.css?v=20261010-slide-confirm-v3" rel="stylesheet">
 <link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
 </head>
-<body class="pgenro-user" data-css-scope="user-communication" data-requires-auth="user" data-page-data-owner="module">
+<body class="pgenro-user depth-workspace" data-css-scope="user-communication" data-requires-auth="user" data-page-data-owner="module">
+<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div>
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
   <button class="hamburger-menu" id="hamburgerMenu" type="button"
@@ -87,8 +88,13 @@
     </aside>
 
     <main class="main-content" id="mainContent">
+<header class="depth-user-topbar" aria-label="Workspace toolbar">
+              <nav class="depth-topbar-breadcrumb" aria-label="Breadcrumb"><a href="homepage.html">Workspace</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span>Communications</span></nav>
+              <div class="depth-topbar-actions"><span class="depth-access-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"/><path d="m8 12 3 3 5-6"/></svg>Viewer workspace</span><a class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" aria-label="Account settings" title="Account settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a></div>
+            </header>
+
       <div class="content-shell">
-        <section class="page-header reveal">
+        <section class="page-header reveal depth-hero">
           <div class="header-copy">
             <div class="eyebrow"><i data-lucide="mails"></i><span>Records Management</span></div>
             <h1>Communications</h1>
@@ -98,7 +104,19 @@
             <span class="viewer-pill"><span class="status-dot"></span>Viewer access</span>
             <span class="last-updated" id="lastUpdated">Waiting for records</span>
           </div>
-        </section>
+        
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
+</div>
+</section>
 
         <section class="stats-grid reveal" aria-label="Communication summary">
           <article class="stat-card">
@@ -280,7 +298,7 @@
   <div class="toast-container" id="toastContainer" aria-live="polite"></div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
-<script defer src="communication.js?v=20261004-ocr-ui-v8"></script>
+  <script defer src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
+<script defer src="communication.js?v=20261010-slide-confirm-v3"></script>
 </body>
 </html>

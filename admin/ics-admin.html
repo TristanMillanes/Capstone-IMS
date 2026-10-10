@@ -14,9 +14,10 @@
 <!-- Supabase JavaScript SDK -->
 <!-- Your existing admin theme + ICS module styles -->
 <link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="ics-admin.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
+<link href="ics-admin.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="ics-admin.html" data-css-scope="admin-ics" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="ics-admin.html" data-css-scope="admin-ics" data-requires-auth="admin">
+<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- ====================== SIDEBAR ====================== -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -137,7 +138,7 @@
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <!-- PAGE HEADER -->
-<section class="page-header" id="icsOverview">
+<section class="page-header depth-hero" id="icsOverview">
 <div class="header-title">
 <div class="page-heading-mark" aria-hidden="true"><i data-lucide="file-check-2"></i></div>
 <div class="breadcrumb">
@@ -153,6 +154,18 @@
 <div class="header-actions"><button class="btn btn-secondary" id="refreshIcsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
 <button class="btn btn-secondary" id="exportCsvBtn" type="button"><i data-lucide="download"></i> Export CSV</button>
 <button class="btn btn-primary" id="addIcsBtn" type="button"><i data-lucide="plus"></i> New ICS Record</button>
+</div>
+
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <!-- KPI METRICS GRID -->
@@ -476,8 +489,8 @@
 </div>
 </div>
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
-<script defer="" src="ics-admin.js?v=20261006-modern-ui-v2"></script>
+<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
+<script defer="" src="ics-admin.js?v=20261010-slide-confirm-v3"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
   <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">

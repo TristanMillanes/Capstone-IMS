@@ -16,9 +16,10 @@
 <!-- Icons are rendered locally by this module. -->
 <!-- External Stylesheets -->
 <link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="admincommunication.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
+<link href="admincommunication.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin">
+<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div>
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
@@ -143,7 +144,7 @@
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <!-- BREADCRUMB & HEADER -->
-<section class="page-header communication-page-header">
+<section class="page-header communication-page-header depth-hero">
 <div class="header-title">
 <div class="page-heading-mark" aria-hidden="true"><i data-lucide="arrow-left-right"></i></div>
 <div class="breadcrumb">
@@ -167,6 +168,18 @@
 <i data-lucide="plus-circle"></i>
 <span>New Communication</span>
 </button>
+</div>
+
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <!-- KPI SUMMARY GRID -->
@@ -550,8 +563,8 @@
 </div>
 <!-- Scripts -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
-<script defer="" src="admincommunication.js?v=20261006-modern-ui-v2"></script>
+<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
+<script defer="" src="admincommunication.js?v=20261010-slide-confirm-v3"></script>
 <div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
   <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
     <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>

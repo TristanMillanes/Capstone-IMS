@@ -15,9 +15,10 @@
 
 <!-- Unified Admin Stylesheets -->
 <link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="visitors-admin.css?v=20261006-modern-ui-v2" rel="stylesheet"/>
+<link href="visitors-admin.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern" data-admin-page="visitors-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin"><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="visitors-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
+<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION (1:1 with admin.html) -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -140,7 +141,7 @@
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <!-- PAGE HEADER -->
-<section class="page-header" id="dashboard">
+<section class="page-header depth-hero" id="dashboard">
 <div class="header-title">
 <div class="page-heading-mark" aria-hidden="true"><i data-lucide="clipboard-check"></i></div>
 <div class="breadcrumb">
@@ -155,6 +156,18 @@
 <button class="btn btn-secondary" id="exportCsvBtn" type="button"><i data-lucide="download"></i><span>Export CSV</span></button>
 <button class="btn btn-secondary" id="refreshBtn" type="button"><i data-lucide="refresh-cw"></i><span>Sync Data</span></button>
 <button class="btn btn-primary" id="addVisitorBtn" type="button"><i data-lucide="user-plus"></i><span>New Visitor</span></button>
+</div>
+
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <!-- KPI METRICS GRID (1:1 styling with admin.html) -->
@@ -466,8 +479,8 @@
 <!-- TOAST -->
 <!-- SDKs & Script Controller -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
-<script defer="" src="visitors-admin.js?v=20261006-modern-ui-v2"></script>
+<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
+<script defer="" src="visitors-admin.js?v=20261010-slide-confirm-v3"></script>
 <div aria-hidden="true" class="modal-backdrop" id="detailDrawer"><aside aria-labelledby="drawerName" aria-modal="true" class="modal-card visitor-detail-card" role="dialog">
 <div class="drawer-header modal-header">
 <div class="drawer-title-group">

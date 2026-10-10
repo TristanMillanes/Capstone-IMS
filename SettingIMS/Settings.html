@@ -11,9 +11,9 @@
 <script src="https://unpkg.com/lucide@latest"></script>
 
 
-<link href="Setting.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
+<link href="Setting.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
 </head>
-<body class="pgenro-user pgenro-settings" data-css-scope="user-settings" data-requires-auth="user">
+<body class="pgenro-user pgenro-settings depth-workspace" data-css-scope="user-settings" data-requires-auth="user">
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <header class="settings-topbar">
 <a class="settings-back" href="../User/homepage.html" id="backToWorkspace">
@@ -26,13 +26,24 @@
 <button class="settings-signout" data-pgenro-logout="" title="Sign out" type="button"><i data-lucide="log-out"></i><span>Sign out</span></button>
 </header>
 <main class="settings-shell" id="workspaceMain">
-<section class="settings-heading">
+<section class="settings-heading depth-hero">
 <div>
 <span class="eyebrow"><i data-lucide="settings-2"></i> Workspace configuration</span>
 <h1>Account &amp; System Settings</h1>
 <p>Manage your profile, password, interface preferences, and administrator-level system controls.</p>
 </div>
 <div class="settings-status" id="settingsDbStatus"><span></span> Connecting to Supabase…</div>
+<div class="depth-scene" aria-hidden="true">
+  <span class="depth-orbit"></span><span class="depth-orb"></span>
+  <div class="depth-stack">
+    <span class="depth-sheet depth-sheet-back"></span>
+    <span class="depth-sheet depth-sheet-middle"></span>
+    <span class="depth-sheet depth-sheet-front">
+      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
+      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+    </span>
+  </div><span class="depth-scene-dot"></span>
+</div>
 </section>
 <div class="settings-layout">
 <aside class="settings-nav-card">
@@ -118,9 +129,9 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js?v=20261004-ocr-ui-v8"></script>
+<script src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
 <script src="../shared/settings-runtime.js?v=20261004-ocr-ui-v8"></script>
-<script src="Settings.js?v=20261004-ocr-ui-v8"></script>
+<script src="Settings.js?v=20261010-slide-confirm-v3"></script>
 
 </body>
 </html>
