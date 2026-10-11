@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+
+<html data-css-scope="admin-backup" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Workspace Backups</title>
+<meta content="#f5f7f8" name="theme-color"/>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Lucide Icons -->
+<!-- Icons are rendered locally by admin.js. -->
+<!-- Chart.js -->
+<!-- Stylesheet -->
+<link href="backup-admin.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+</head>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="backup-admin.html" data-css-scope="admin-backup" data-requires-auth="admin">
+<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<div class="app-layout">
+<!-- SIDEBAR NAVIGATION -->
+<aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<a class="logo-area" href="admin.html">
+<div class="logo-icon">
+<img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
+</div>
+<div class="logo-text">
+<h2>PGENRO IMS</h2>
+<span>Administrative workspace</span>
+</div>
+</a>
+
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
+<nav aria-label="Administrator navigation" class="sidebar-nav">
+<div class="nav-group">
+<span class="nav-label">Workspace</span>
+<ul>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Office operations</span>
+<ul>
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
+<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
+<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Administration</span>
+<ul>
+<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
+<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Workspace tools</span>
+<ul>
+<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a aria-current="page" class="nav-item active" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+</aside>
+<div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+<!-- MAIN CONTENT WRAPPER -->
+<div class="main-wrapper">
+<!-- TOPBAR -->
+<header class="topbar">
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+<i data-lucide="menu"></i>
+</button>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Backups</span></a>
+
+<div class="global-search" role="search">
+<i class="search-icon" data-lucide="search"></i>
+<input aria-controls="searchPaletteDropdown" aria-expanded="false" aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search modules and workspace sections…" spellcheck="false" type="text"/>
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<!-- Search Quick Palette -->
+<div aria-label="Module search results" class="search-palette-dropdown" id="searchPaletteDropdown">
+<div class="search-palette-group-title">Jump to Module</div>
+<div id="searchPaletteModules"></div>
+</div>
+</div>
+</div>
+<div class="topbar-right">
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
+<!-- Notification Button & Drawer -->
+<div class="notification-wrapper">
+<button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
+<i data-lucide="bell"></i>
+<span class="notification-ping" id="notifPing" style="display: none;"></span>
+</button>
+<div class="notification-dropdown" id="notificationDropdown">
+<div class="notification-header">
+<h3>Notifications</h3>
+<span class="badge-count" id="notifBadgeCount">0 Unread</span>
+</div>
+<div class="notification-list" id="notificationList">
+<div class="empty-notif-state">No new notifications</div>
+</div>
+</div>
+</div>
+<div class="v-divider"></div>
+<!-- Profile Menu -->
+<div class="profile-menu" id="profileMenu">
+<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
+<div class="profile-avatar"><i data-lucide="user-round"></i></div>
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+</button>
+<div class="profile-dropdown" id="profileDropdown">
+<div class="profile-dropdown-header">
+<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+<div class="profile-dropdown-copy">
+<h3 id="dropdownUserName">PGENRO Admin</h3>
+<p id="dropdownUserEmail">Administrator Session</p>
+<span class="role-badge" id="dropdownUserRole">Administrator</span>
+</div>
+</div>
+<div class="dropdown-links">
+<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
+<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
+<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
+<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
+</div>
+<div class="dropdown-footer">
+<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="main-content" id="adminMainContent" tabindex="-1">
+<div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
+<section aria-labelledby="backupTitle" class="page-header">
+<div class="header-title"><div aria-hidden="true" class="page-heading-mark"><i data-lucide="database-backup"></i></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><i data-lucide="chevron-right"></i><span class="active">Backups</span></div><h1 id="backupTitle">Your workspace, preserved.</h1><p>Save a copy of local module caches and preferences, or review a backup before restoring it.</p></div>
+<div class="header-actions"><button class="btn btn-secondary" id="refreshBackupBtn" type="button"><i data-lucide="refresh-cw"></i>Refresh summary</button></div>
+</section>
+<section aria-label="Local backup summary" class="audit-metrics backup-metrics">
+<article class="audit-metric"><span class="audit-metric-label">Available keys</span><strong id="backupKeyCount">0</strong><small>Supported local workspace data</small></article>
+<article class="audit-metric"><span class="audit-metric-label">Backup size</span><strong id="backupBytes">0 B</strong><small>Estimated JSON file size</small></article>
+<article class="audit-metric"><span class="audit-metric-label">Last export</span><strong class="backup-date" id="backupLastExport">Never</strong><small>From this browser</small></article>
+</section>
+<section aria-label="Backup actions" class="backup-tools-grid">
+<article class="card backup-tool"><span class="backup-tool-icon"><i data-lucide="download"></i></span><span class="section-eyebrow">Save a copy</span><h2>Export workspace backup</h2><p>Download available local records and preferences as a JSON file. Keep the file somewhere you can find it later.</p><button class="btn btn-primary" id="downloadLocalBackupBtn" type="button"><i data-lucide="download"></i>Download backup</button></article>
+<article class="card backup-tool"><span class="backup-tool-icon"><i data-lucide="upload"></i></span><span class="section-eyebrow">Review and restore</span><h2>Import an existing backup</h2><p>Select a PGENRO IMS JSON backup. Review its contents before replacing matching local data.</p><label class="btn btn-secondary file-input-label" for="restoreBackupInput"><i data-lucide="file-up"></i>Choose backup file</label><input accept="application/json,.json" hidden="" id="restoreBackupInput" type="file"/><small>JSON · Up to 20 MB</small><p class="backup-error" hidden="" id="backupError" role="alert"></p></article>
+</section>
+<p class="backup-scope-note"><i data-lucide="info"></i><span>This tool copies local browser caches and preferences. Supabase records and uploaded attachments remain in the cloud. Exported JSON files are not encrypted.</span></p>
+<section aria-labelledby="backupInventoryTitle" class="card backup-inventory"><div class="section-header"><div><span class="section-eyebrow">This browser</span><h2 id="backupInventoryTitle">Available workspace data</h2><p>Only data already stored in this browser is included.</p></div></div><div class="table-wrapper"><table class="data-table"><thead><tr><th>Workspace area</th><th>Available keys</th><th>Size</th><th>Availability</th></tr></thead><tbody id="backupInventoryBody"></tbody></table></div></section>
+<footer class="admin-footer"><span>PGENRO IMS · Province of Quezon</span><div class="footer-links"><a href="admin.html">Dashboard</a><a href="audittrail-admin.html">Audit trail</a><a href="admin.html#settings">Preferences</a></div></footer>
+</main>
+</div>
+</div>
+<!-- AUDIT EVENT INSPECTION MODAL -->
+<div aria-hidden="true" class="modal-overlay" id="backupReviewModal"><section aria-labelledby="backupReviewTitle" aria-modal="true" class="modal-container" role="dialog">
+<div class="modal-header"><div><h2 id="backupReviewTitle">Review workspace backup</h2><p id="backupFileName"></p></div><button aria-label="Close backup review" id="backupReviewClose" type="button">×</button></div>
+<div class="backup-review-body"><dl class="backup-review-meta"><div><dt>Exported</dt><dd id="backupExportedAt">—</dd></div><div><dt>Supported keys</dt><dd id="backupRestoreKeys">0</dd></div><div><dt>Ignored keys</dt><dd id="backupIgnoredKeys">0</dd></div></dl><div class="backup-key-list" id="backupReviewKeys"></div><p class="backup-scope-note">Restoring replaces matching local caches and preferences. Your Supabase records remain unchanged.</p><p class="backup-error" hidden="" id="backupRestoreError" role="alert"></p></div>
+<div class="modal-actions backup-review-actions"><button class="btn btn-secondary" id="backupReviewCancel" type="button">Cancel</button><button class="btn btn-primary" id="confirmRestoreBtn" type="button"><i data-lucide="rotate-ccw"></i>Restore local data</button></div>
+</section></div>
+<!-- Backup module scripts -->
+<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="backup-admin.js?v=20261011-navigation-pdf-v2"></script>
+<div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
+<div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
+<div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
+<div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html data-css-scope="admin-audit" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PGENRO IMS | Audit Trail</title>
+<meta content="#f5f7f8" name="theme-color"/>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Lucide Icons -->
+<!-- Icons are rendered locally by admin.js. -->
+<!-- Chart.js -->
+<script defer="" src="../vendor/chart.umd.min.js"></script>
+<!-- Stylesheet -->
+<link href="audittrail-admin.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+</head>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="audittrail-admin.html" data-css-scope="admin-audit" data-requires-auth="admin">
+<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<div class="app-layout">
+<!-- SIDEBAR NAVIGATION -->
+<aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
+<div class="sidebar-header">
+<a class="logo-area" href="admin.html">
+<div class="logo-icon">
+<img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
+</div>
+<div class="logo-text">
+<h2>PGENRO IMS</h2>
+<span>Administrative workspace</span>
+</div>
+</a>
+
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
+<nav aria-label="Administrator navigation" class="sidebar-nav">
+<div class="nav-group">
+<span class="nav-label">Workspace</span>
+<ul>
+<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Office operations</span>
+<ul>
+<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
+<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
+<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
+<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
+<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
+<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
+<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Administration</span>
+<ul>
+<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
+<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
+</ul>
+</div>
+<div class="nav-group">
+<span class="nav-label">Workspace tools</span>
+<ul>
+<li><a aria-current="page" class="nav-item active" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
+</ul>
+</div>
+</nav>
+<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+</aside>
+<div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+<!-- MAIN CONTENT WRAPPER -->
+<div class="main-wrapper">
+<!-- TOPBAR -->
+<header class="topbar">
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+<i data-lucide="menu"></i>
+</button>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Audit Trail</span></a>
+
+<div class="global-search" role="search">
+<i class="search-icon" data-lucide="search"></i>
+<input aria-controls="searchPaletteDropdown" aria-expanded="false" aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search modules and workspace sections…" spellcheck="false" type="text"/>
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<!-- Search Quick Palette -->
+<div aria-label="Module search results" class="search-palette-dropdown" id="searchPaletteDropdown">
+<div class="search-palette-group-title">Jump to Module</div>
+<div id="searchPaletteModules"></div>
+</div>
+</div>
+</div>
+<div class="topbar-right">
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
+<!-- Notification Button & Drawer -->
+<div class="notification-wrapper">
+<button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
+<i data-lucide="bell"></i>
+<span class="notification-ping" id="notifPing" style="display: none;"></span>
+</button>
+<div class="notification-dropdown" id="notificationDropdown">
+<div class="notification-header">
+<h3>Notifications</h3>
+<span class="badge-count" id="notifBadgeCount">0 Unread</span>
+</div>
+<div class="notification-list" id="notificationList">
+<div class="empty-notif-state">No new notifications</div>
+</div>
+</div>
+</div>
+<div class="v-divider"></div>
+<!-- Profile Menu -->
+<div class="profile-menu" id="profileMenu">
+<button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
+<div class="profile-avatar"><i data-lucide="user-round"></i></div>
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+</button>
+<div class="profile-dropdown" id="profileDropdown">
+<div class="profile-dropdown-header">
+<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+<div class="profile-dropdown-copy">
+<h3 id="dropdownUserName">PGENRO Admin</h3>
+<p id="dropdownUserEmail">Administrator Session</p>
+<span class="role-badge" id="dropdownUserRole">Administrator</span>
+</div>
+</div>
+<div class="dropdown-links">
+<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
+<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
+<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
+<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
+</div>
+<div class="dropdown-footer">
+<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+</div>
+</div>
+</div>
+</div>
+</header>
+<!-- MAIN CONTENT -->
+<main class="main-content" id="adminMainContent" tabindex="-1">
+<div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
+<section aria-labelledby="auditPageTitle" class="page-header audit-page-header">
+<div class="header-title">
+<div aria-hidden="true" class="page-heading-mark"><i data-lucide="shield-check"></i></div>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><i data-lucide="chevron-right"></i><span class="active">Audit Trail</span></div>
+<h1 id="auditPageTitle">Every action, in view.</h1>
+<p>Review recorded account activity and changes across your office modules.</p>
+</div>
+<div class="header-actions">
+<button class="btn btn-primary" id="refreshAuditBtn" type="button"><i data-lucide="refresh-cw"></i>Refresh activity</button>
+<a class="btn btn-secondary" href="admin.html"><i data-lucide="layout-dashboard"></i>Dashboard</a>
+</div>
+</section>
+<div class="audit-context-row"><span class="analytics-source-pill" id="auditSourceStatus" role="status">Loading activity…</span><span class="text-muted" id="auditUpdatedAt">Waiting for activity</span></div>
+<section aria-label="Summary of matching audit events" class="audit-metrics">
+<article class="audit-metric"><span class="audit-metric-label"><i data-lucide="activity"></i>Matching events</span><strong id="auditTotal">—</strong><small id="auditTotalDetail">All recorded dates</small></article>
+<article class="audit-metric"><span class="audit-metric-label"><i data-lucide="clock-3"></i>Activity today</span><strong id="auditToday">—</strong><small>Philippine calendar day</small></article>
+<article class="audit-metric"><span class="audit-metric-label"><i data-lucide="users-round"></i>Distinct operators</span><strong id="auditUsers">—</strong><small>Among matching events</small></article>
+<article class="audit-metric"><span class="audit-metric-label"><i data-lucide="shield-alert"></i>Flagged events</span><strong id="auditFlagged">—</strong><small>Recorded failure or denial</small></article>
+</section>
+<section aria-labelledby="auditFeedTitle" class="dashboard-section" id="audit">
+<div class="section-header"><div><span class="section-eyebrow">Activity register</span><h2 id="auditFeedTitle">Audit Trail</h2><p>Search, filter, or open an event to inspect its recorded details.</p></div><button class="btn btn-secondary btn-sm" disabled="" id="exportCsvBtn" type="button"><i data-lucide="download"></i>Export CSV</button></div>
+<form class="audit-filter-bar" id="auditFilterForm" role="search">
+<label class="audit-search-field" for="tableSearchInput"><span>Search activity</span><div class="input-icon"><i data-lucide="search"></i><input autocomplete="off" id="tableSearchInput" placeholder="Name, email, action, details, or IP…" type="search"/></div></label>
+<label for="auditTypeFilter"><span>Event type</span><select id="auditTypeFilter"><option value="all">All events</option><option value="login">Sign in</option><option value="logout">Sign out</option><option value="activity">System actions</option></select></label>
+<label for="auditModuleFilter"><span>Module</span><select id="auditModuleFilter"><option value="all">All modules</option></select></label>
+<label for="auditStatusFilter"><span>Status</span><select id="auditStatusFilter"><option value="all">All statuses</option><option value="success">Successful</option><option value="flagged">Failed / denied</option><option value="other">Other / not recorded</option></select></label>
+<label for="auditDateFrom"><span>From date</span><input id="auditDateFrom" type="date"/></label>
+<label for="auditDateTo"><span>To date</span><input id="auditDateTo" type="date"/></label>
+<button class="btn btn-ghost audit-reset" id="resetAuditFiltersBtn" type="button"><i data-lucide="rotate-ccw"></i>Reset</button>
+</form>
+<p class="audit-filter-error" hidden="" id="auditFilterError" role="alert"></p>
+<div class="audit-selection-bar" hidden="" id="auditSelectionBar"><span id="auditSelectionCount">0 selected</span><span>Export includes selected matching events.</span><button class="btn btn-ghost btn-sm" id="clearAuditSelectionBtn" type="button">Clear selection</button></div>
+<div class="card table-card">
+<div aria-label="Audit activity table" class="audit-scroll-box" id="auditScrollBox" role="region" tabindex="0">
+<table class="data-table" id="auditTable">
+<thead><tr><th class="audit-select-cell" scope="col"><input aria-label="Select events on this page" id="selectAllRows" type="checkbox"/></th><th scope="col">Timestamp <span class="table-timezone">PHT</span></th><th scope="col">Operator</th><th scope="col">Activity / event</th><th scope="col">Details / module</th><th scope="col">Role / division</th><th scope="col">IP address</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Inspect event</span></th></tr></thead>
+<tbody id="auditTableBody"><tr><td class="empty-table-cell" colspan="9">Loading audit activity…</td></tr></tbody>
+</table>
+</div>
+<div class="table-footer"><span class="text-muted" id="tablePaginationInfo" role="status">Showing 0 events</span><label class="audit-page-size" for="auditPageSize">Rows <select id="auditPageSize"><option selected="" value="25">25</option><option value="50">50</option><option value="100">100</option></select></label><nav aria-label="Audit pagination" class="audit-pagination-controls" id="auditPaginationControls"></nav></div>
+</div>
+<p class="audit-source-note" id="auditDataNote">The feed combines accessible Supabase audit records with actions retained in this browser.</p>
+</section>
+<footer class="admin-footer"><p>© 2026 PGENRO · Records and operations workspace</p><div class="footer-links"><a href="admin.html">Dashboard</a><a href="Usermanagement.html">User Management</a><a href="admin.html#settings">Preferences</a></div></footer>
+</main>
+</div>
+</div>
+<!-- AUDIT EVENT INSPECTION MODAL -->
+<div aria-hidden="true" aria-labelledby="modalEventTitle" aria-modal="true" class="modal-overlay" id="auditDetailModal" role="dialog">
+<div class="modal-container audit-detail-dialog">
+<div class="admin-modal-header">
+<h3 id="modalEventTitle">Audit Event Details</h3>
+<button aria-label="Close dialog" class="admin-modal-close" id="closeAuditModalBtn" type="button">
+<i data-lucide="x"></i>
+</button>
+</div>
+<div class="admin-modal-body">
+<div class="modal-detail-grid">
+<div class="modal-detail-item">
+<span>Timestamp</span>
+<strong id="modalEventTime">—</strong>
+</div>
+<div class="modal-detail-item">
+<span>Status</span>
+<strong id="modalEventStatus">—</strong>
+</div>
+<div class="modal-detail-item">
+<span>User Account</span>
+<strong id="modalEventUser">—</strong>
+</div>
+<div class="modal-detail-item">
+<span>Role / Division</span>
+<strong id="modalEventRole">—</strong>
+</div>
+<div class="modal-detail-item">
+<span>IP Address</span>
+<strong id="modalEventIp">—</strong>
+</div>
+<div class="modal-detail-item">
+<span>Module Origin</span>
+<strong id="modalEventModule">—</strong>
+</div>
+</div>
+<div class="modal-detail-item">
+<span>Event Action</span>
+<strong id="modalEventAction">—</strong>
+</div>
+<div class="modal-detail-item">
+<span>Full Activity Log Details</span>
+<strong id="modalEventDetails" style="font-weight: 500; line-height: 1.6;">—</strong>
+</div>
+</div>
+<div class="admin-modal-footer">
+<button class="btn btn-secondary btn-sm" id="closeAuditModalBtn2" type="button">Close</button>
+</div>
+</div>
+</div>
+<!-- SCRIPTS -->
+<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="audittrail-admin.js?v=20261011-navigation-pdf-v2"></script>
+<div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
+<div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
+<div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
+<div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{
+  "result": "PASS",
+  "scenario_groups": 10,
+  "mobile_pages": 21,
+  "checks": [
+    {
+      "scenario": "Admin registration submits the selected request role and displays the same role in the review summary",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User registration submits the selected request role and displays the same role in the review summary",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Review and quick approval let Admin assign either final role while retaining the original requested role",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Bulk approval requires a final role and applies it to every selected account",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Realtime inserts update the bell and correct module badge; marking read survives page navigation",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User notifications show permitted operational modules and keyboard dismissal restores bell focus",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Notification service failure shows a usable error state without inventing unread records",
+      "result": "PASS"
+    },
+    {
+      "scenario": "All five Admin charts render real fixture counts with the modern theme, totals and reduced-motion behavior",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User chart period selection recalculates actual dated records and updates the summary",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Notifications mount once on all 21 authenticated pages and the mobile pages/popovers stay within the viewport",
+      "result": "PASS"
+    }
+  ],
+  "hosted_changes": false
+}

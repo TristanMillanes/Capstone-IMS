@@ -44,6 +44,7 @@
   }
   let currentIds = new Map(); const unread = [];
   function observeRecords(key, rows) {
+    window.PGENRO_Notifications?.scheduleRefresh();
     const ids = rows.map(r => String(r.id)).filter(Boolean); const prior = currentIds.get(key);
     if (prior) {
       const added = ids.filter(id => !prior.has(id));
@@ -1038,7 +1039,7 @@ function escapeAttr(v) {
       if (name !== currentSidebarIcon) {
         currentSidebarIcon = name;
         const icon = document.createElement('i'); icon.dataset.lucide = name;
-        sidebarToggle.replaceChildren(icon); renderIcons();
+        const label=document.createElement('span');label.className='navigation-button-label';label.textContent='Menu';sidebarToggle.replaceChildren(icon,label); renderIcons();
       }
       if (mobile) { sidebarToggle.setAttribute('aria-label', 'Close navigation'); sidebarToggle.title = 'Close navigation'; }
     }
@@ -1327,3 +1328,234 @@ function escapeAttr(v) {
   else initWorkspaceNavigation();
 })();
 /* ===== END PGENRO SLIDE NAVIGATION AND LOGOUT ===== */
+
+/* PGENRO module notifications, 10 October 2026. */
+/* Module-owned notifications: copies live inside each workspace page script. */
+(() => {
+  'use strict';
+  if (window.PGENRO_Notifications) return;
+  const modules = {
+    communications:['Communications','admincommunication.html','communication.html'],
+    travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
+    office_memos:['Office Memos','officememo-admin.html','officememo.html'],
+    employees:['Employees','employee-admin.html','employee.html'],
+    inventory:['Inventory','invetoryadmin.html','inventory.html'],
+    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
+    service_requests:['Service Requests','serviceAdmin.html','service.html'],
+    ics_records:['Property Slips','ics-admin.html','ics.html'],
+    user_accounts:['User Management','Usermanagement.html',null],
+    account_requests:['Account Requests','requestacc.html',null]
+  };
+  const empty=()=>({total:0,counts:{},items:[],workspace:'user'});
+  let feed=empty(),status='loading',db,userId='',generation=0,loading=false,again=false,disposed=false;
+  let wrapper,button,panel,list,count,markAll,badge,channel,timer,debounce,authSubscription;
+  const element=(tag,className,text)=>{const el=document.createElement(tag);el.className=className||'';if(text!==undefined)el.textContent=text;return el;};
+  function destination(module){
+    const info=modules[module],admin=feed.workspace==='admin',file=info?.[admin?1:2];
+    return file?new URL(`../${admin?'admin':'User'}/${file}`,location.href).href:null;
+  }
+  function render(){
+    if(!button)return;
+    const total=Number(feed.total)||0;
+    badge.textContent=total>99?'99+':String(total);badge.hidden=!total;
+    count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
+    button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
+    list.replaceChildren();
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications…'));
+    else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
+    else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
+    for(const item of feed.items||[]){
+      const href=destination(item.module);if(!href)continue;
+      const link=element('a','module-notification-item');link.href=href;link.dataset.notificationId=item.id;
+      const dot=element('span','module-notification-dot');dot.setAttribute('aria-hidden','true');
+      const copy=element('span','module-notification-copy');copy.append(element('strong','',modules[item.module][0]));
+      copy.append(element('span','module-notification-title',item.title||'New record added'));
+      const date=new Date(item.createdAt);copy.append(element('small','',Number.isNaN(date.getTime())?'New record':date.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})));
+      link.append(dot,copy);link.addEventListener('click',async event=>{
+        event.preventDefault();link.setAttribute('aria-busy','true');
+        try{await markRead({p_ids:[item.id]});}catch{/* The destination remains usable if marking read fails. */}
+        location.assign(href);
+      });list.append(link);
+    }
+    if(total>(feed.items||[]).length&&status==='ready')list.append(element('p','module-notification-more',`Showing the latest ${(feed.items||[]).length} new records`));
+    document.querySelectorAll('aside a[href], .sidebar a[href]').forEach(link=>{
+      const path=new URL(link.getAttribute('href'),location.href).pathname;
+      const module=Object.keys(modules).find(key=>destination(key)&&new URL(destination(key)).pathname===path);
+      let chip=link.querySelector('.module-new-badge');
+      if(!module){chip?.remove();return;}
+      const value=Number(feed.counts?.[module])||0;
+      if(!chip){chip=element('span','module-new-badge');link.append(chip);}
+      chip.dataset.module=module;chip.hidden=!value;chip.textContent=value>99?'99+':String(value);
+      chip.setAttribute('aria-label',`${value} new ${modules[module][0]} records`);
+    });
+    document.body.dataset.notificationsState=status;
+  }
+  function close(){if(!panel)return;panel.hidden=true;button.setAttribute('aria-expanded','false');}
+  function position(){
+    const rect=button.getBoundingClientRect(),width=Math.min(390,innerWidth-24);
+    panel.style.width=`${width}px`;panel.style.right=`${Math.min(Math.max(12,innerWidth-rect.right),innerWidth-width-12)}px`;
+    panel.style.top=`${Math.min(Math.max(12,rect.bottom+10),innerHeight-160)}px`;
+  }
+  async function refresh(){
+    if(disposed||!db||!userId)return;
+    if(loading){again=true;return;}
+    loading=true;const token=generation;
+    try{
+      const result=await db.rpc('pgenro_get_module_notifications',{p_limit:30});
+      if(token!==generation||disposed)return;
+      if(result.error)throw result.error;
+      const data=result.data;
+      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      feed=data;status='ready';render();
+    }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
+    finally{loading=false;if(again){again=false;scheduleRefresh();}}
+  }
+  function scheduleRefresh(){clearTimeout(debounce);debounce=setTimeout(refresh,250);}
+  async function markRead(args={}){
+    const result=await db.rpc('pgenro_mark_notifications_read',args);if(result.error)throw result.error;
+    await refresh();
+  }
+  async function attachSession(user){
+    if(disposed)return;
+    if(!user?.id){generation++;userId='';feed=empty();status='unavailable';close();render();if(channel)db.removeChannel(channel);channel=null;return;}
+    if(userId===user.id){scheduleRefresh();return;}
+    generation++;userId=user.id;feed=empty();status='loading';render();
+    if(channel)db.removeChannel(channel);
+    channel=db.channel(`pgenro-module-notifications-${user.id}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_module_notifications'},scheduleRefresh)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_notification_reads',filter:`user_id=eq.${user.id}`},scheduleRefresh)
+      .subscribe(state=>{if(state==='SUBSCRIBED')scheduleRefresh();});
+    await refresh();
+  }
+  function init(){
+    const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
+    document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
+    wrapper=element('div','module-notifications');button=element('button','module-notification-button');button.type='button';button.id='moduleNotificationButton';
+    button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','moduleNotificationPanel');
+    button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>';
+    badge=element('span','module-notification-badge');badge.hidden=true;button.append(badge);wrapper.append(button);
+    if(header.classList.contains('settings-topbar'))header.insertBefore(wrapper,header.lastElementChild);else header.prepend(wrapper);
+    panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
+    const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
+    count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
+    const closeBtn=element('button','module-notification-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
+    markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
+    tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
+    button.addEventListener('click',()=>{const open=panel.hidden;close();if(open){panel.hidden=false;position();button.setAttribute('aria-expanded','true');closeBtn.focus();refresh();}});
+    document.addEventListener('click',event=>{if(!wrapper.contains(event.target)&&!panel.contains(event.target))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){close();button.focus();}});
+    window.addEventListener('resize',()=>{if(!panel.hidden)position();});
+    window.addEventListener('focus',scheduleRefresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRefresh();});
+    window.addEventListener('pageshow',event=>{if(event.persisted)scheduleRefresh();});
+    render();db=window.pgenroSupabase||window.PGENRO_DB?.client;
+    if(!db){status='unavailable';render();return;}
+    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
+    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
+    timer=setInterval(()=>{if(!document.hidden)refresh();},30000);
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
+  }
+  window.PGENRO_Notifications={refresh,scheduleRefresh};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+/* Page-owned layout helpers; do not change record permissions or data writes. */
+(() => {
+  'use strict';
+  function init() {
+    if (document.body.dataset.unifiedLayoutReady) return;
+    document.body.dataset.unifiedLayoutReady = 'true';
+    // A wide registry scrolls within its own region, including dynamically mounted tables.
+    function containTables() {
+      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
+        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
+        const region = document.createElement('div'); region.className = 'ui-table-scroll';
+        table.before(region); region.append(table);
+      });
+    }
+    containTables();
+    let tableFrame;
+    const insertedTables = new MutationObserver(records => {
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    });
+    insertedTables.observe(document.body, {childList:true,subtree:true});
+    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
+    // Account Settings and the module pages use one saved user appearance.
+    let appearanceObserver;
+    if (document.body.classList.contains('pgenro-user')) {
+      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
+      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+      function applyAppearance(theme) {
+        theme=theme==='dark'?'dark':'light';
+        if(html.dataset.theme!==theme)html.dataset.theme=theme;
+        const dark=theme==='dark';
+        if(button&&button.dataset.appearance!==theme) {
+          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
+          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
+        }
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
+      }
+      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
+      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
+      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
+      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
+      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
+      button?.addEventListener('click',()=>{
+        const theme=html.dataset.theme==='dark'?'light':'dark';
+        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
+        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
+        html.dataset.pgenroTheme=theme;applyAppearance(theme);
+      });
+      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
+    }
+    // The existing user page controls continue to open and close its module menu.
+    const sidebar = document.querySelector('.pgenro-user .sidebar');
+    if (sidebar) {
+      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
+      let previouslyOpen = false;
+      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
+      function desktopNavigation() {
+        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
+        collapsed=!media.matches&&collapsed;
+        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
+        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
+      }
+      menu?.addEventListener('click',event=>{
+        if(media.matches)return;
+        event.preventDefault();event.stopImmediatePropagation();
+        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
+        desktopNavigation();
+      },true);
+      function sync() {
+        const open = media.matches && sidebar.classList.contains('open');
+        sidebar.inert = media.matches && !open;
+        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
+        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
+        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
+        previouslyOpen = open;
+      }
+      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
+      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
+      let navigationFrame;
+      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
+      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
+      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
+      document.addEventListener('keydown',event=>{
+        if(!media.matches||!sidebar.classList.contains('open')) return;
+        if(event.key==='Escape') {menu?.click();return;}
+        if(event.key!=='Tab')return;
+        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
+        if(!items.length)return;
+        const first=items[0],last=items.at(-1);
+        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
+        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+

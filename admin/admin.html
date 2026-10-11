@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Admin Dashboard</title>
-<meta name="theme-color" content="#f5f7f8"/>
+<meta content="#f5f7f8" name="theme-color"/>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -14,13 +14,12 @@
 <!-- Lucide Icons -->
 <!-- Icons are rendered locally by admin.js. -->
 <!-- Chart.js -->
-<script defer="" src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+<script defer="" src="../vendor/chart.umd.min.js"></script>
 <!-- Stylesheet -->
-<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="admin.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
+<link href="admin.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
-<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
+<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
@@ -35,10 +34,8 @@
 <span>Administrative workspace</span>
 </div>
 </a>
-<button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-<i data-lucide="panel-left-close"></i>
-</button>
-</div>
+
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
 <nav aria-label="Administrator navigation" class="sidebar-nav">
 <div class="nav-group">
 <span class="nav-label">Workspace</span>
@@ -69,8 +66,8 @@
 <div class="nav-group">
 <span class="nav-label">Workspace tools</span>
 <ul>
-<li><a class="nav-item" href="#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
-<li><a class="nav-item" href="#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
 <li><a class="nav-item" href="#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
 </ul>
 </div>
@@ -82,15 +79,17 @@
 <div class="main-wrapper">
 <!-- TOPBAR -->
 <header class="topbar">
-<div class="topbar-left">
-<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Workspace overview</span></a>
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 <i data-lucide="menu"></i>
 </button>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Workspace overview</span></a>
+
 <div class="global-search" role="search">
 <i class="search-icon" data-lucide="search"></i>
 <input aria-controls="searchPaletteDropdown" aria-expanded="false" aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search modules and workspace sections…" spellcheck="false" type="text"/>
-<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
 <!-- Search Quick Palette -->
 <div aria-label="Module search results" class="search-palette-dropdown" id="searchPaletteDropdown">
 <div class="search-palette-group-title">Jump to Module</div>
@@ -99,7 +98,7 @@
 </div>
 </div>
 <div class="topbar-right">
-<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
 <!-- Notification Button & Drawer -->
 <div class="notification-wrapper">
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
@@ -121,7 +120,7 @@
 <div class="profile-menu" id="profileMenu">
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
-<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
 </button>
 <div class="profile-dropdown" id="profileDropdown">
 <div class="profile-dropdown-header">
@@ -151,28 +150,16 @@
 <!-- PAGE HEADER -->
 <section class="page-header modern-dashboard-hero depth-hero" id="dashboard">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><i data-lucide="layout-dashboard"></i></div>
+<div aria-hidden="true" class="page-heading-mark"><i data-lucide="layout-dashboard"></i></div>
 <div class="breadcrumb">
 <span>Admin Console</span>
 <i data-lucide="chevron-right"></i>
-<span class="active">Overview</span>
+<span class="active">Dashboard</span>
 </div>
-<h1>Workspace overview</h1>
+<h1>Your workspace, at a glance.</h1>
 <p>Your records, people, and daily operations. All in one place.</p>
 </div>
 <div class="header-actions"><a class="btn btn-primary" href="admincommunication.html"><i data-lucide="arrow-left-right"></i>Open communications</a><a class="btn btn-secondary" href="#analytics"><i data-lucide="bar-chart-3"></i>View analytics</a></div>
-
-<div class="depth-scene" aria-hidden="true">
-  <span class="depth-orbit"></span><span class="depth-orb"></span>
-  <div class="depth-stack">
-    <span class="depth-sheet depth-sheet-back"></span>
-    <span class="depth-sheet depth-sheet-middle"></span>
-    <span class="depth-sheet depth-sheet-front">
-      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
-      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-    </span>
-  </div><span class="depth-scene-dot"></span>
-</div>
 </section>
 <!-- KPI METRICS GRID -->
 <section class="kpi-grid">
@@ -229,7 +216,7 @@
 </div>
 </div>
 </section>
-<section class="workspace-quick-actions" aria-label="Frequently used modules"><div><strong>Quick access</strong><p>Your everyday office tools.</p></div><nav class="workspace-quick-links" aria-label="Quick module access"><a href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span><strong>Communications</strong><small>Incoming &amp; outgoing</small></span><i data-lucide="arrow-up-right"></i></a><a href="officememo-admin.html"><i data-lucide="file-text"></i><span><strong>Office memos</strong><small>Directives &amp; issuances</small></span><i data-lucide="arrow-up-right"></i></a><a href="serviceAdmin.html"><i data-lucide="wrench"></i><span><strong>Service requests</strong><small>Actions &amp; follow-up</small></span><i data-lucide="arrow-up-right"></i></a><a href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span><strong>Visitor logbook</strong><small>Arrivals &amp; departures</small></span><i data-lucide="arrow-up-right"></i></a></nav></section>
+<section aria-label="Frequently used modules" class="workspace-quick-actions"><div><strong>Quick access</strong><p>Your everyday office tools.</p></div><nav aria-label="Quick module access" class="workspace-quick-links"><a href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span><strong>Communications</strong><small>Incoming &amp; outgoing</small></span><i data-lucide="arrow-up-right"></i></a><a href="officememo-admin.html"><i data-lucide="file-text"></i><span><strong>Office memos</strong><small>Directives &amp; issuances</small></span><i data-lucide="arrow-up-right"></i></a><a href="serviceAdmin.html"><i data-lucide="wrench"></i><span><strong>Service requests</strong><small>Actions &amp; follow-up</small></span><i data-lucide="arrow-up-right"></i></a><a href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span><strong>Visitor logbook</strong><small>Arrivals &amp; departures</small></span><i data-lucide="arrow-up-right"></i></a></nav></section>
 <!-- DATA ANALYTICS -->
 <section aria-labelledby="analyticsTitle" class="dashboard-section data-analytics" id="analytics">
 <div class="analytics-heading">
@@ -247,6 +234,7 @@
 <option value="all">All recorded dates</option>
 </select>
 </label>
+<button class="btn btn-secondary" id="refreshAnalyticsBtn" type="button"><i data-lucide="refresh-cw"></i>Refresh</button>
 <button class="btn btn-secondary" disabled="" id="exportAnalyticsBtn" type="button">
 <i data-lucide="download"></i> Export Analytics
               </button>
@@ -254,7 +242,7 @@
 </div>
 <div class="analytics-context">
 <p id="analyticsPeriodLabel">Loading reporting period…</p>
-<span class="analytics-source-pill" id="analyticsSourceStatus" role="status" hidden>Waiting for data</span>
+<span class="analytics-source-pill" hidden="" id="analyticsSourceStatus" role="status">Waiting for data</span>
 </div>
 <div class="analytics-metrics">
 <article class="analytics-metric">
@@ -288,13 +276,13 @@
 <article class="chart-card analytics-trend-card">
 <div class="chart-card-header">
 <div>
-<h3>Activity Over Time</h3>
-<p id="analyticsTrendDescription">Record creation dates across operational modules.</p>
+<span class="chart-eyebrow">Office performance</span><h3>Activity Over Time</h3>
+<p id="analyticsTrendDescription">Dated activity across office modules.</p>
 </div>
 <span class="analytics-tag" id="analyticsBucketLabel">Trend</span>
 </div>
 <div class="analytics-chart-wrap">
-<canvas aria-describedby="analyticsTrendSummary" aria-label="Record activity over time" id="monthlyChart" role="img"></canvas>
+<div class="chart-canvas-host"><canvas aria-describedby="analyticsTrendSummary" aria-label="Record activity over time" id="monthlyChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsTrendEmpty"></p>
 </div>
 <p class="analytics-chart-caption" id="analyticsTrendSummary">Waiting for dated records.</p>
@@ -303,12 +291,12 @@
 <article class="chart-card analytics-distribution-card">
 <div class="chart-card-header">
 <div>
-<h3>Activity by Module</h3>
+<span class="chart-eyebrow">Workload distribution</span><h3>Activity by Module</h3>
 <p>Share of records in selected period</p>
 </div>
 </div>
 <div class="analytics-chart-wrap">
-<canvas aria-describedby="analyticsDistributionSummary" aria-label="Record distribution by module" id="categoryChart" role="img"></canvas>
+<div class="chart-canvas-host"><canvas aria-describedby="analyticsDistributionSummary" aria-label="Record distribution by module" id="categoryChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsDistributionEmpty"></p>
 </div>
 <p class="analytics-chart-caption" id="analyticsDistributionSummary">Waiting for module records.</p>
@@ -323,7 +311,7 @@
 <a class="analytics-text-link" href="serviceAdmin.html">Open Module →</a>
 </div>
 <div class="analytics-chart-wrap analytics-chart-short">
-<canvas aria-describedby="analyticsServiceSummary" aria-label="Service requests by current status" id="statusChart" role="img"></canvas>
+<div class="chart-canvas-host"><canvas aria-describedby="analyticsServiceSummary" aria-label="Service requests by current status" id="statusChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsServiceEmpty"></p>
 </div>
 <p class="analytics-chart-caption" id="analyticsServiceSummary">Completion includes completed and closed requests.</p>
@@ -355,7 +343,7 @@
 <li>Insights will generate when module records are loaded.</li>
 </ul>
 </article>
-<!-- 6. NEW: Personnel Distribution by Division Chart -->
+<!-- 6. NEW: Personnel by division Chart -->
 <article class="chart-card analytics-personnel-card">
 <div class="chart-card-header">
 <div>
@@ -365,7 +353,7 @@
 <a class="analytics-text-link" href="employee-admin.html">View Roster →</a>
 </div>
 <div class="analytics-chart-wrap analytics-chart-short">
-<canvas aria-describedby="analyticsPersonnelSummary" aria-label="Personnel distribution by division" id="personnelChart" role="img"></canvas>
+<div class="chart-canvas-host"><canvas aria-describedby="analyticsPersonnelSummary" aria-label="Personnel distribution by division" id="personnelChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsPersonnelEmpty"></p>
 </div>
 <p class="analytics-chart-caption" id="analyticsPersonnelSummary">Current personnel snapshot across all recorded dates.</p>
@@ -374,13 +362,13 @@
 <article class="chart-card analytics-comm-card">
 <div class="chart-card-header">
 <div>
-<h3>Communications Flow &amp; Classification</h3>
-<p>Incoming, outgoing, internal and unclassified records in this period</p>
+<h3>Communications flow</h3>
+<p>Direction of dated communications in the selected period</p>
 </div>
 <a class="analytics-text-link" href="admincommunication.html">Open Logs →</a>
 </div>
 <div class="analytics-chart-wrap analytics-chart-short">
-<canvas aria-describedby="analyticsCommSummary" aria-label="Communications flow by direction and type" id="commChart" role="img"></canvas>
+<div class="chart-canvas-host"><canvas aria-describedby="analyticsCommSummary" aria-label="Communications flow by direction and type" id="commChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsCommEmpty"></p>
 </div>
 <p class="analytics-chart-caption" id="analyticsCommSummary">Includes incoming communications, endorsements, and official issuances.</p>
@@ -450,89 +438,7 @@
 </div>
 </div>
 </section>
-<!-- USER ACTIVITY AUDIT TRAIL DATA TABLE -->
-<section class="dashboard-section" id="audit">
-<div class="section-header">
-<div>
-<h2>Complete User Activity Audit Trail</h2>
-<p>Available activity from module audit logs and this browser’s dashboard actions.</p>
-</div>
-<div class="table-actions">
-<input aria-label="Search audit activity" class="input-sm" id="tableSearchInput" placeholder="Search user activity, IP, email..." type="text"/>
-<select aria-label="Filter audit activity" class="input-sm audit-filter" id="auditTypeFilter">
-<option value="all">All Activity</option>
-<option value="login">Login Only</option>
-<option value="logout">Logout Only</option>
-<option value="activity">System Actions</option>
-</select>
-<button class="btn btn-secondary btn-sm" id="exportCsvBtn" type="button">
-<i data-lucide="download"></i> Export CSV
-              </button>
-</div>
-</div>
-<div class="card table-card">
-<div aria-label="Scrollable user audit records" class="audit-scroll-box" id="auditScrollBox" tabindex="0">
-<table class="data-table" id="auditTable">
-<thead>
-<tr>
-<th style="width: 40px;"><input aria-label="Select entries on this page" id="selectAllRows" title="Select entries on this page" type="checkbox"/></th>
-<th>Timestamp</th>
-<th>User Account</th>
-<th>Activity / Event</th>
-<th>Activity Details</th>
-<th>Role / Division</th>
-<th>IP Address</th>
-<th>Session Status</th>
-</tr>
-</thead>
-<tbody id="auditTableBody">
-<tr>
-<td class="empty-table-cell" colspan="8">No user activity recorded yet.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<!-- Audit Pagination & Footer -->
-<div class="table-footer">
-<span class="audit-live-label"><span class="status-dot online"></span> Audit Activity Feed</span>
-<span class="text-muted" id="tablePaginationInfo" style="font-size: 11.5px;">Showing 0 of 0 log entries</span>
-<div class="audit-pagination-controls" id="auditPaginationControls"></div>
-</div>
-</div>
-</section>
 <!-- SYSTEM BACKUP & RECOVERY -->
-<section class="dashboard-section" id="backup">
-<div class="section-header">
-<div>
-<h2>System Backup &amp; Recovery</h2>
-<p>Export or restore browser-side IMS records, caches, and operator preferences.</p>
-</div>
-</div>
-<div class="system-tools-grid">
-<div class="system-tool-card">
-<div class="system-tool-icon"><i data-lucide="download"></i></div>
-<div>
-<h3>Export Local Backup</h3>
-<p>Downloads local IMS module cache and administrator configuration into a plain JSON file. This file is not encrypted.</p>
-<button class="btn btn-primary" id="downloadLocalBackupBtn" type="button">
-<i data-lucide="database-backup"></i> Download Backup
-                </button>
-</div>
-</div>
-<div class="system-tool-card">
-<div class="system-tool-icon" style="background: var(--purple-50); color: var(--purple-600);"><i data-lucide="upload"></i></div>
-<div>
-<h3>Restore Local Backup</h3>
-<p>Import a previously saved backup file. Matching local keys will update after confirmation.</p>
-<label class="btn btn-secondary file-input-label">
-<i data-lucide="file-up"></i> Choose Backup File
-                  <input accept="application/json,.json" hidden="" id="restoreBackupInput" type="file"/>
-</label>
-</div>
-</div>
-</div>
-<p class="backup-note"><i data-lucide="info" style="width: 15px; height: 15px;"></i> Cloud records are stored in Supabase; this tool manages local browser workspace storage.</p>
-</section>
 <!-- GLOBAL SETTINGS -->
 <section class="dashboard-section" id="settings">
 <div class="section-header">
@@ -549,7 +455,7 @@
 </div>
 <input id="compactModeToggle" type="checkbox"/>
 </label>
-<div class="modern-appearance-setting"><div><strong>Workspace appearance</strong><p>Choose a light or dark workspace.</p></div><select id="appearanceThemeSelect" aria-label="Workspace appearance"><option value="light">Light</option><option value="dark">Dark</option></select></div>
+<div class="modern-appearance-setting"><div><strong>Workspace appearance</strong><p>Choose a light or dark workspace.</p></div><select aria-label="Workspace appearance" id="appearanceThemeSelect"><option value="light">Light</option><option value="dark">Dark</option></select></div>
 <div class="settings-actions">
 <button class="btn btn-secondary" id="resetAdminPrefsBtn" type="button">
 <i data-lucide="rotate-ccw"></i> Reset Preferences to Defaults
@@ -563,8 +469,8 @@
 <p>© 2026 Provincial Government Environment and Natural Resources Office (PGENRO). All rights reserved.</p>
 </div>
 <div class="footer-links">
-<a href="#audit">Security Audit</a>
-<a href="#backup">Backups</a>
+<a href="audittrail-admin.html">Security Audit</a>
+<a href="backup-admin.html">Backups</a>
 <a href="#settings">Preferences</a>
 <a href="Usermanagement.html">User Management</a>
 </div>
@@ -572,70 +478,17 @@
 </main>
 </div>
 </div>
-<!-- AUDIT EVENT INSPECTION MODAL -->
-<div aria-hidden="true" aria-labelledby="modalEventTitle" aria-modal="true" class="admin-modal-backdrop" id="auditDetailModal" role="dialog">
-<div class="admin-modal-dialog">
-<div class="admin-modal-header">
-<h3 id="modalEventTitle">Audit Event Details</h3>
-<button aria-label="Close dialog" class="admin-modal-close" id="closeAuditModalBtn" type="button">
-<i data-lucide="x"></i>
-</button>
-</div>
-<div class="admin-modal-body">
-<div class="modal-detail-grid">
-<div class="modal-detail-item">
-<span>Timestamp</span>
-<strong id="modalEventTime">—</strong>
-</div>
-<div class="modal-detail-item">
-<span>Status</span>
-<strong id="modalEventStatus">—</strong>
-</div>
-<div class="modal-detail-item">
-<span>User Account</span>
-<strong id="modalEventUser">—</strong>
-</div>
-<div class="modal-detail-item">
-<span>Role / Division</span>
-<strong id="modalEventRole">—</strong>
-</div>
-<div class="modal-detail-item">
-<span>IP Address</span>
-<strong id="modalEventIp">—</strong>
-</div>
-<div class="modal-detail-item">
-<span>Module Origin</span>
-<strong id="modalEventModule">—</strong>
-</div>
-</div>
-<div class="modal-detail-item" style="grid-column: span 2;">
-<span>Event Action</span>
-<strong id="modalEventAction">—</strong>
-</div>
-<div class="modal-detail-item" style="grid-column: span 2;">
-<span>Full Activity Log Details</span>
-<strong id="modalEventDetails" style="font-weight: 500; line-height: 1.6;">—</strong>
-</div>
-</div>
-<div class="admin-modal-footer">
-<button class="btn btn-secondary btn-sm" id="closeAuditModalBtn2" type="button">Close</button>
-</div>
-</div>
-</div>
 <!-- SCRIPTS -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
-<script defer="" src="admin.js?v=20261010-slide-confirm-v3"></script>
-
-<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
-  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
-    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
-    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
-    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
-    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
-  </div>
+<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="admin.js?v=20261011-navigation-pdf-v2"></script>
+<div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
+<div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
+<div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
+<div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
 </div>
-
+</div>
 </body>
 </html>
-

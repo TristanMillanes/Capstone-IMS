@@ -1,3 +1,15 @@
+# Current unified UI verification — 11 October 2026
+
+Run `npm install`, `npx playwright install chromium`, then `npm run test:unified` in this folder. Alternatively set `PGENRO_CHROMIUM_EXECUTABLE` to an existing Chromium browser.
+
+The current suite covers 26 actual pages at 320, 390, 768, 1024 and 1440 pixels; record dialog layouts; module menus; Chart.js instances and legend bounds; period and theme changes; realtime refresh bursts; Chart.js fallback; local Backup export, preview, cancel, restore, invalid files and storage rollback; old audit/backup bookmarks; and logout cancellation.
+
+The tests use the production HTML, CSS and JavaScript with a simulated Supabase SDK. They do not contact live Supabase or change hosted accounts and records. Reports from the current run are `unified-layout-results.json` and `unified-workflow-results.json`. New runs write reports and screenshots to `unified-results/`.
+
+The previous decorative 3D expectations in `test:depth` describe the earlier UI. Compact headers now replace those decorations; use `test:unified` for current layout acceptance. The existing OCR and upload suites remain available for the unchanged backend and document workflows.
+
+---
+
 # Current UI verification
 
 Run from this folder:

@@ -40,107 +40,26 @@ end $$;
 -- Safe first-admin helper. Create the account first in Authentication > Users,
 -- then run: select public.promote_pgenro_first_admin('your@email.com');
 create or replace function public.promote_pgenro_first_admin(admin_email text)
-returns text
-language plpgsql
-security definer
-set search_path = ''
-as $$
-declare
-  admin_uid uuid;
-  admin_name text;
+returns text language plpgsql security definer set search_path = '' as $$
+declare account auth.users;
 begin
-  select id,
-         coalesce(raw_user_meta_data->>'full_name', split_part(email, '@', 1))
-    into admin_uid, admin_name
-  from auth.users
-  where lower(email) = lower(admin_email)
-  limit 1;
-
-  if admin_uid is null then
-    raise exception 'No Supabase Auth user exists for email %', admin_email;
+  select * into account from auth.users where lower(email)=lower(trim(admin_email));
+  if account.id is null then raise exception 'Create this email in Authentication > Users first: %',admin_email; end if;
+  insert into public.profiles(user_id,full_name,email,username,role,account_type,status,is_active)
+  values(account.id,coalesce(nullif(account.raw_user_meta_data->>'full_name',''),split_part(account.email,'@',1)),
+    account.email,coalesce(nullif(account.raw_user_meta_data->>'username',''),split_part(account.email,'@',1)),
+    'Admin','Administrator','Active',true)
+  on conflict(user_id) do update set role='Admin',account_type='Administrator',status='Active',is_active=true;
+  update auth.users set banned_until=null,raw_app_meta_data=coalesce(raw_app_meta_data,'{}'::jsonb)
+    || jsonb_build_object('role','admin','pgenro_role','Admin','pgenro_status','Active') where id=account.id;
+  if to_regclass('public.access_requests') is not null then
+    update public.access_requests set data=(data-'password'-'confirmPassword')
+      || jsonb_build_object('role','Admin','accountType','Administrator','status','Approved','approvedBy','Bootstrap')
+    where data->>'uid'=account.id::text;
   end if;
-
-  insert into public.profiles (
-    user_id, full_name, email, username, role, account_type,
-    status, is_active, created_at, updated_at
-  )
-  values (
-    admin_uid,
-    admin_name,
-    lower(admin_email),
-    split_part(lower(admin_email), '@', 1),
-    'System Administrator',
-    'Administrator',
-    'Active',
-    true,
-    now(),
-    now()
-  )
-  on conflict (user_id) do update
-  set
-    full_name = coalesce(nullif(public.profiles.full_name, ''), excluded.full_name),
-    email = excluded.email,
-    username = coalesce(nullif(public.profiles.username, ''), excluded.username),
-    role = 'System Administrator',
-    account_type = 'Administrator',
-    status = 'Active',
-    is_active = true,
-    updated_at = now();
-
-  insert into public.users (id, data, created_at, updated_at)
-  values (
-    admin_uid::text,
-    jsonb_build_object(
-      'fullName', admin_name,
-      'username', split_part(lower(admin_email), '@', 1),
-      'email', lower(admin_email),
-      'role', 'System Administrator',
-      'accountType', 'Administrator',
-      'status', 'Active',
-      'updatedAt', now()::text
-    ),
-    now(),
-    now()
-  )
-  on conflict (id) do update
-  set data = excluded.data, updated_at = now();
-
-  insert into public.admins (id, data, created_at, updated_at)
-  values (
-    admin_uid::text,
-    jsonb_build_object(
-      'fullName', admin_name,
-      'email', lower(admin_email),
-      'role', 'System Administrator',
-      'status', 'Active',
-      'assignedBy', 'Bootstrap',
-      'updatedAt', now()::text
-    ),
-    now(),
-    now()
-  )
-  on conflict (id) do update
-  set data = excluded.data, updated_at = now();
-
-  update public.access_requests
-  set
-    data = (data - 'password' - 'confirmPassword') || jsonb_build_object(
-      'role', 'System Administrator',
-      'accountType', 'Administrator',
-      'status', 'Approved',
-      'approvedBy', 'Bootstrap',
-      'approvedAt', now()::text
-    ),
-    updated_at = now()
-  where data->>'uid' = admin_uid::text;
-
-  return 'System Administrator enabled: ' || lower(admin_email);
-end;
-$$;
-
-revoke all on function public.promote_pgenro_first_admin(text) from public;
-revoke all on function public.promote_pgenro_first_admin(text) from anon;
-revoke all on function public.promote_pgenro_first_admin(text) from authenticated;
+  return 'Admin enabled: '||account.email;
+end $$;
+revoke all on function public.promote_pgenro_first_admin(text) from public,anon,authenticated;
 grant execute on function public.promote_pgenro_first_admin(text) to service_role;
 
 -- Keep Realtime publication complete for operational modules. This is safe to

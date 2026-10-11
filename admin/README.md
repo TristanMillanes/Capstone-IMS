@@ -1,5 +1,7 @@
 # PGENRO Admin — Modern Workspace (6 October 2026)
 
+The complete system uses Admin and User access. Follow `../ADMIN_USER_SETUP.md` for SQL and Edge Function deployment. User Management and account requests are available to an active Admin; ordinary User accounts retain read-only operational access.
+
 All eleven pages now use a modern administrative workspace: a clean light sidebar, a soft neutral background, stronger Inter typography, an expressive green dashboard header, clearer cards and charts, and consistent tables, forms and menus. Light and dark appearances are available from the topbar or Workspace Preferences. Brief entrance, menu, modal and hover animations honor reduced-motion preferences. Every page keeps its own HTML, CSS and JavaScript; no shared UI file or new application dependency is added.
 
 The desktop profile control includes the current administrator's name and role. Phone layouts keep separate appearance, notification and profile controls. A complete set of 139 local vector icons covers the interface and existing controllers; icons added later by tables, OCR states and attachment controls also render. Table toolbars offer comfortable or compact row spacing. Theme and density choices are remembered across modules and synchronized between open tabs. Empty registries retain their real status messages with a clearer visual treatment. The supplied Supabase, authorization, OCR, chart and record-controller code is retained.

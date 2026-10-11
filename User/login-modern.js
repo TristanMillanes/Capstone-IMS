@@ -7,7 +7,7 @@
     publishableKey: "sb_publishable_5RWFfJ5oN6ike6SSyafajw_yF9DYApP"
   });
   const POLICY = Object.freeze({ maxAttempts: 5, cooldownMs: 30000, cacheDurationMs: 8 * 60 * 60 * 1000 });
-  const ADMIN_ROLES = new Set(["admin", "administrator", "super admin", "superadmin", "system administrator"]);
+  const ADMIN_ROLES = new Set(['admin']);
   const normalize = value => String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
   const isAdminRole = role => ADMIN_ROLES.has(normalize(role));
   const isApproved = profile => profile?.is_active === true && ["active", "approved"].includes(normalize(profile.status));
@@ -102,7 +102,7 @@
       fullName: profile.full_name || profile.username || user.user_metadata?.full_name || email.split("@")[0],
       username: profile.username || email.split("@")[0], email: profile.email || email,
       contact: profile.contact || "", position: profile.position || "", division: profile.division || "",
-      role: profile.role || "System Staff", accountType: profile.account_type || "Standard User",
+      role: profile.role || "User", accountType: profile.account_type || "Standard User",
       status: profile.status || "Active", lastLogin: new Date().toISOString(),
       sessionInitialized: Date.now(), sessionExpires: Date.now() + POLICY.cacheDurationMs
     };
@@ -402,3 +402,104 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initLogin, { once: true });
   else initLogin();
 })();
+
+/* Page-owned layout helpers; do not change record permissions or data writes. */
+(() => {
+  'use strict';
+  function init() {
+    if (document.body.dataset.unifiedLayoutReady) return;
+    document.body.dataset.unifiedLayoutReady = 'true';
+    // A wide registry scrolls within its own region, including dynamically mounted tables.
+    function containTables() {
+      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
+        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
+        const region = document.createElement('div'); region.className = 'ui-table-scroll';
+        table.before(region); region.append(table);
+      });
+    }
+    containTables();
+    let tableFrame;
+    const insertedTables = new MutationObserver(records => {
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    });
+    insertedTables.observe(document.body, {childList:true,subtree:true});
+    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
+    // Account Settings and the module pages use one saved user appearance.
+    let appearanceObserver;
+    if (document.body.classList.contains('pgenro-user')) {
+      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
+      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+      function applyAppearance(theme) {
+        theme=theme==='dark'?'dark':'light';
+        if(html.dataset.theme!==theme)html.dataset.theme=theme;
+        const dark=theme==='dark';
+        if(button&&button.dataset.appearance!==theme) {
+          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
+          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
+        }
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
+      }
+      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
+      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
+      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
+      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
+      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
+      button?.addEventListener('click',()=>{
+        const theme=html.dataset.theme==='dark'?'light':'dark';
+        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
+        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
+        html.dataset.pgenroTheme=theme;applyAppearance(theme);
+      });
+      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
+    }
+    // The existing user page controls continue to open and close its module menu.
+    const sidebar = document.querySelector('.pgenro-user .sidebar');
+    if (sidebar) {
+      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
+      let previouslyOpen = false;
+      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
+      function desktopNavigation() {
+        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
+        collapsed=!media.matches&&collapsed;
+        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
+        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
+      }
+      menu?.addEventListener('click',event=>{
+        if(media.matches)return;
+        event.preventDefault();event.stopImmediatePropagation();
+        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
+        desktopNavigation();
+      },true);
+      function sync() {
+        const open = media.matches && sidebar.classList.contains('open');
+        sidebar.inert = media.matches && !open;
+        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
+        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
+        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
+        previouslyOpen = open;
+      }
+      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
+      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
+      let navigationFrame;
+      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
+      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
+      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
+      document.addEventListener('keydown',event=>{
+        if(!media.matches||!sidebar.classList.contains('open')) return;
+        if(event.key==='Escape') {menu?.click();return;}
+        if(event.key!=='Tab')return;
+        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
+        if(!items.length)return;
+        const first=items[0],last=items.at(-1);
+        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
+        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+

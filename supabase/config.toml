@@ -1,0 +1,4 @@
+# admin-users validates the bearer token with Supabase Auth, then checks the
+# current active Admin profile. Required for projects using publishable keys.
+[functions.admin-users]
+verify_jwt = false

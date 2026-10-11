@@ -1,10 +1,10 @@
 (() => {
   const admin = location.pathname.includes('/admin/');
-  const profile = {user_id:'qa-user',id:'qa-profile',email:'qa@example.com',full_name:'QA Office Personnel',username:'qa',role:admin?'Administrator':'System Staff',account_type:admin?'ADMIN':'USER',status:'Active',is_active:true,preferences:{}};
+  const profile = {user_id:'qa-user',id:'qa-profile',email:'qa@example.com',full_name:'QA Office Personnel',username:'qa',role:admin?'Admin':'User',account_type:admin?'ADMIN':'USER',status:'Active',is_active:true,preferences:{}};
   const timestamp='2026-10-02T05:00:00Z';
   const base = {created_at:timestamp,updated_at:timestamp};
   window.__db = {
-    profiles:[profile],audit_logs:[],admin_logs:[],access_requests:[{id:'request-1',data:{fullName:'New Personnel',email:'new@example.com',role:'System Staff',accountType:'USER',status:'Pending',division:'Administration',createdAt:timestamp}}],
+    profiles:[profile],audit_logs:[],admin_logs:[],access_requests:[{id:'request-1',data:{fullName:'New Personnel',email:'new@example.com',role:'User',accountType:'USER',status:'Pending',division:'Administration',createdAt:timestamp}}],
     communications:[{...base,id:'comm-1',data:{controlNo:'COMM-2026-00001',type:'Incoming',docType:'Letter',date:'2026-10-01',office:'MARIA L. SANTOS',subject:'REQUEST FOR TECHNICAL ASSISTANCE',status:'Pending',remarks:''}}],
     office_memos:[{...base,id:'memo-1',data:{controlNo:'MEMO-2026-00001',memoNo:'12',subject:'WEEKLY OFFICE COORDINATION',dateIssued:'2026-10-01',date:'2026-10-01',office:'PGENRO',issuedBy:'MARIA L. SANTOS',signatory:'MARIA L. SANTOS',addressedTo:'ALL DIVISION HEADS',status:'Active',memoType:'Memorandum',priority:'Normal'}}],
     travel_orders:[{...base,id:'travel-1',data:{controlNo:'TOR-2026-00001',torNo:'TOR-2026-00001',employeeName:'MARIA L. SANTOS',traveler:'MARIA L. SANTOS',destination:'Lucena City',dateFrom:'2026-10-03',dateTo:'2026-10-04',startDate:'2026-10-03',endDate:'2026-10-04',status:'Pending',type:'Official',purpose:'Inspection'}}],
@@ -66,7 +66,7 @@
   const client = {
     from,
     auth:{getSession:async()=>({data:{session:session()}}),getUser:async()=>({data:{user:session()?.user||null}}),signOut,onAuthStateChange(callback){queueMicrotask(()=>callback('INITIAL_SESSION',session()));return {data:{subscription:{unsubscribe(){}}}};},updateUser:async()=>({data:{user},error:null}),resetPasswordForEmail:async()=>({data:{},error:null})},
-    rpc:async(name,args)=>({data:name==='pgenro_is_admin'?admin:name==='pgenro_admin_list_users'?[profile]:name==='pgenro_admin_pending_count'?1:name==='get_system_settings'?{}:{success:true},error:null}),
+    rpc:async(name,args)=>({data:name==='pgenro_um_context'?{authorized:admin,reason:admin?null:'USER',profile}:name==='pgenro_um_directory'?{items:[profile],total:1,pending:1,offset:args?.p_offset||0,hasMore:false}:(name==='pgenro_is_admin'||name==='is_pgenro_admin')?admin:name==='pgenro_admin_list_users'?[profile]:name==='pgenro_admin_pending_count'?1:name==='get_system_settings'?{}:{success:true},error:null}),
     channel(name){const channel={name,on(event,filter,callback){channel.table=filter.table;channel.callback=callback;return channel;},subscribe(callback){window.__channels.push(channel);callback?.('SUBSCRIBED');return channel;},unsubscribe(){}};return channel;},
     removeChannel(){},functions:{invoke:async(name,{body})=>{window.__mutations.push({function:name,body});return {data:{success:true},error:null};}},
     storage:{from(){return {upload:async(path)=>({data:{path},error:null}),getPublicUrl:path=>({data:{publicUrl:'https://example.com/'+path}}),remove:async()=>({error:null}),createSignedUrl:async()=>({data:{signedUrl:'https://example.com/fixture.pdf'},error:null})};}}

@@ -1,0 +1,63 @@
+{
+  "method": "Actual Chromium, real Chart.js, production scripts, simulated Supabase only",
+  "checks": [
+    {
+      "name": "admin/admin.html chart containers, legends, period reuse, dark mode and 320–1440 px sizes",
+      "result": "PASS"
+    },
+    {
+      "name": "Dashboard realtime bursts update existing chart instances",
+      "result": "PASS"
+    },
+    {
+      "name": "User/homepage.html chart containers, legends, period reuse, dark mode and 320–1440 px sizes",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/admin.html renders a native fallback when Chart.js is unavailable",
+      "result": "PASS"
+    },
+    {
+      "name": "User/homepage.html renders a native fallback when Chart.js is unavailable",
+      "result": "PASS"
+    },
+    {
+      "name": "Backup export includes workspace data and excludes session keys",
+      "result": "PASS"
+    },
+    {
+      "name": "Backup review fits mobile; cancel, restore and invalid JSON preserve the expected data",
+      "result": "PASS"
+    },
+    {
+      "name": "Backup restores roll back earlier writes if browser storage fills up",
+      "result": "PASS"
+    },
+    {
+      "name": "Legacy #audit bookmark redirects to its dedicated module",
+      "result": "PASS"
+    },
+    {
+      "name": "Legacy #backup bookmark redirects to its dedicated module",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/admincommunication.html logout confirmation and cancellation fit mobile",
+      "result": "PASS"
+    },
+    {
+      "name": "User/communication.html logout confirmation and cancellation fit mobile",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/backup-admin.html logout confirmation and cancellation fit mobile",
+      "result": "PASS"
+    },
+    {
+      "name": "SettingIMS/Settings.html logout confirmation and cancellation fit mobile",
+      "result": "PASS"
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

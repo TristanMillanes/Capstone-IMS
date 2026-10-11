@@ -1,3 +1,42 @@
+/* PGENRO modern charts, 10 October 2026. */
+/* Dashboard-owned chart style; data stays with the existing analytics model. */
+(() => {
+  'use strict';
+  const colors=['#278560','#4b9da7','#8b7ac7','#c79b46','#ce7d78','#7caa9f'];
+  const family='Inter, system-ui, sans-serif';
+  function theme(){const style=getComputedStyle(document.body);return {label:style.getPropertyValue('--chart-label-color').trim()||'#718379',grid:style.getPropertyValue('--chart-grid-color').trim()||'#e0e9e3'};}
+  function options(){
+    return {responsive:true,maintainAspectRatio:false,resizeDelay:0,
+      animation:matchMedia('(prefers-reduced-motion: reduce)').matches?false:{duration:220,easing:'easeOutQuart'},
+      interaction:{mode:'index',intersect:false},
+      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',boxWidth:7,boxHeight:7,padding:12,color:theme().label,font:{size:10,weight:550,family}}},
+        tooltip:{backgroundColor:'#183e30',titleColor:'#fff',bodyColor:'#e2eee6',padding:13,cornerRadius:11,
+          boxPadding:5,usePointStyle:true,titleFont:{size:12,weight:650,family},bodyFont:{size:12,family}}}};
+  }
+  function scales(){return {
+    x:{border:{display:false},grid:{display:false},ticks:{maxRotation:0,maxTicksLimit:8,font:{size:11,family},color:theme().label}},
+    y:{beginAtZero:true,border:{display:false},grid:{color:theme().grid,drawTicks:false},ticks:{precision:0,padding:9,font:{size:11,family},color:theme().label}}
+  };}
+  function area(context){
+    const {chart}=context,box=chart.chartArea;if(!box)return '#27856012';
+    const gradient=chart.ctx.createLinearGradient(0,box.top,0,box.bottom);gradient.addColorStop(0,'#2785602d');gradient.addColorStop(1,'#27856000');return gradient;
+  }
+  window.PGENRO_ChartStyle={colors,options,scales,area};
+  if(!window.Chart)return;
+  window.Chart.defaults.font.family=family;window.Chart.defaults.font.size=11;window.Chart.defaults.color='#758b7d';
+  Object.assign(window.Chart.defaults.plugins.tooltip,options().plugins.tooltip);
+  window.Chart.register({id:'pgenroDoughnutTotal',afterDraw(chart){
+    if(chart.config.type!=='doughnut'||!chart.chartArea)return;
+    const sum=(chart.data.datasets[0]?.data||[]).reduce((total,value,index)=>total+(chart.getDataVisibility(index)?Number(value)||0:0),0);
+    const {left,right,top,bottom}=chart.chartArea,x=(left+right)/2,y=(top+bottom)/2,ctx=chart.ctx;
+    const radius=chart.getDatasetMeta(0).data[0]?.innerRadius||45;
+    ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=getComputedStyle(chart.canvas).getPropertyValue('--chart-total-color').trim()||'#244d39';
+    ctx.font=`750 ${Math.min(32,Math.max(19,radius*.6))}px ${family}`;
+    ctx.fillText(new Intl.NumberFormat(undefined,{notation:sum>=10000?'compact':'standard',maximumFractionDigits:1}).format(sum),x,y-6);
+    ctx.fillStyle='#84988b';ctx.font=`550 10px ${family}`;ctx.fillText('TOTAL RECORDS',x,y+18);ctx.restore();
+  }});
+})();
+
 /* Page-owned UI helpers: render new placeholders without rebuilding existing SVGs. */
 const PGENRO_PageUI = (() => {
   function icons() {
@@ -204,7 +243,7 @@ const PGENRO_PageUI = (() => {
 
     const mobileQuery =
       window.matchMedia(
-        "(max-width: 1024px)"
+        "(max-width: 900px)"
       );
 
     const text = (value) =>
@@ -876,7 +915,7 @@ const PGENRO_PageUI = (() => {
         }
 
         const currentRole = lower(profile?.role).replace(/\s+/g, " ").trim();
-        if (["admin", "administrator", "super admin", "superadmin", "system administrator"].includes(currentRole)) {
+        if (['admin'].includes(currentRole)) {
           window.location.replace("../admin/admin.html");
           return false;
         }
@@ -2145,43 +2184,59 @@ const PGENRO_PageUI = (() => {
        weekly buckets, datasets, palette, and options as admin.
        ========================================================= */
 
+    let chartRangeDays = 90;
     const chartDayMs = 86400000;
     const chartActivityModules = [
-      { key: "communications", sourceKey: "communications", label: "Communications", color: "#2563eb" },
-      { key: "memos", sourceKey: "memos", label: "Office Memos", color: "#059669" },
-      { key: "travel", sourceKey: "travelOrders", label: "Travel Orders", color: "#8b5cf6" },
-      { key: "visitors", sourceKey: "visitors", label: "Visitors", color: "#d97706" },
-      { key: "services", sourceKey: "serviceRequests", label: "Service Requests", color: "#e05271" },
-      { key: "ics", sourceKey: "ics", label: "ICS Property Slips", color: "#0891b2" }
+      { key: "communications", sourceKey: "communications", label: "Communications", color: "#4b9da7" },
+      { key: "memos", sourceKey: "memos", label: "Office Memos", color: "#278560" },
+      { key: "travel", sourceKey: "travelOrders", label: "Travel Orders", color: "#8b7ac7" },
+      { key: "visitors", sourceKey: "visitors", label: "Visitors", color: "#c79b46" },
+      { key: "services", sourceKey: "serviceRequests", label: "Service Requests", color: "#ce7d78" },
+      { key: "ics", sourceKey: "ics", label: "ICS Property Slips", color: "#7caa9f" }
     ];
 
-    function chartRecordDay(row) {
-      const fields = [
-        "date", "receivedDate", "date_received", "letterDate", "docDate",
-        "requestDate", "date_requested", "dateIssued", "memoDate",
-        "departureDate", "travelDate", "date_from", "dateFrom",
-        "dateAcquired", "time_in", "timeIn", "created_at", "createdAt", "timestamp"
-      ];
-      for (const field of fields) {
-        const raw = row?.[field];
-        if (!raw) continue;
-        let date;
-        if (typeof raw?.toDate === "function") date = raw.toDate();
-        else if (typeof raw === "string") {
-          date = new Date(/^\d{4}-\d{2}-\d{2} \d{2}:/.test(raw) ? raw.replace(" ", "T") : raw);
-          if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) date = new Date(`${raw}T00:00:00`);
-        } else if (raw instanceof Date) date = raw;
-        else if (typeof raw === "number") date = new Date(raw > 1e11 ? raw : raw * 1000);
-        if (date instanceof Date && !Number.isNaN(date.getTime())) {
-          return Math.floor(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / chartDayMs);
+    const officeDateFormat=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'});
+  const moduleDateFields = {
+    communications: ['receivedDate', 'received_date', 'date_received', 'dateReceived', 'sentDate', 'sent_date', 'date_sent', 'letterDate', 'docDate', 'document_date'],
+    memos: ['memoDate', 'memo_date', 'dateIssued', 'date_issued', 'issuedDate', 'issued_date'],
+    travel: ['departureDate', 'departure_date', 'travelDate', 'travel_date', 'date_from', 'dateFrom', 'start_date', 'startDate'],
+    visitors: ['visitDate', 'visit_date', 'dateVisited', 'date_visited', 'time_in', 'timeIn', 'check_in', 'checkIn'],
+    services: ['requestDate', 'request_date', 'date_requested', 'dateRequested'],
+    ics: ['dateIssued', 'date_issued', 'issuedDate', 'issued_date', 'icsDate', 'ics_date']
+  };
+  function chartRecordDay(row, key) {
+    const fields = [...(moduleDateFields[key] || []), 'date', 'created_at', 'createdAt', 'timestamp'];
+    for (const field of fields) {
+      const raw = row?.[field];
+      if (raw === null || raw === undefined || raw === '') continue;
+      let date;
+      if (typeof raw?.toDate === 'function') date = raw.toDate();
+      else if (raw instanceof Date) date = raw;
+      else if (typeof raw === 'number') date = new Date(raw > 1e11 ? raw : raw * 1000);
+      else if (typeof raw === 'string') {
+        const text = raw.trim();
+        if (/^\d{1,2}:\d{2}/.test(text)) continue; // A time alone is not an activity date.
+        const plain = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (plain) {
+          const [year, month, day] = plain.slice(1).map(Number);
+          const stamp = new Date(Date.UTC(year, month - 1, day));
+          if (stamp.getUTCFullYear() !== year || stamp.getUTCMonth() !== month - 1 || stamp.getUTCDate() !== day) continue;
+          return Math.floor(stamp.getTime() / chartDayMs);
         }
+        date = new Date(/^\d{4}-\d{2}-\d{2} \d{2}:/.test(text) ? text.replace(' ', 'T') : text);
       }
-      return null;
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) continue;
+      // The office reports in Philippine calendar days, including UTC timestamps near midnight.
+      const parts = officeDateFormat.formatToParts(date);
+      const part = type => Number(parts.find(p => p.type === type)?.value);
+      return Math.floor(Date.UTC(part('year'), part('month') - 1, part('day')) / chartDayMs);
     }
+    return null;
+  }
 
     function buildDashboardChartModel(now = new Date()) {
-      const end = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / chartDayMs);
-      const start = end - 89;
+      const end = chartRecordDay({date:now});
+      const start = end - (chartRangeDays - 1);
       const buckets = [];
       for (let day = start; day <= end; day += 7) {
         buckets.push({
@@ -2196,7 +2251,7 @@ const PGENRO_PageUI = (() => {
         let current = 0;
         let missing = 0;
         for (const row of state.records[module.sourceKey] || []) {
-          const day = chartRecordDay(row);
+          const day = chartRecordDay(row,module.key);
           if (day === null) { missing++; continue; }
           if (day < start || day > end) continue;
           current++;
@@ -2217,17 +2272,7 @@ const PGENRO_PageUI = (() => {
     }
 
     function userChartBaseOptions() {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? false : { duration: 400 },
-        plugins: {
-          legend: {
-            position: "bottom",
-            labels: { usePointStyle: true, boxWidth: 6, padding: 12, font: { size: 10, family: "Plus Jakarta Sans" } }
-          }
-        }
-      };
+      return window.PGENRO_ChartStyle.options();
     }
 
     // Native charts occupy the same fixed-size wrappers if Chart.js is unavailable.
@@ -2286,7 +2331,7 @@ const PGENRO_PageUI = (() => {
           if (state.charts[key]) {
             state.charts[key].data = config.data;
             state.charts[key].options = config.options;
-            state.charts[key].update();
+            state.charts[key].update("none");
           } else {
             state.charts[key] = new window.Chart(canvas, config);
           }
@@ -2307,18 +2352,15 @@ const PGENRO_PageUI = (() => {
         data: {
           labels: model.buckets.map((bucket) => bucket.label),
           datasets: [
-            { label: "Documents & ICS", borderColor: "#059669", backgroundColor: "rgba(5, 150, 105, 0.08)", data: model.buckets.map((bucket) => bucket.documents), fill: true },
-            { label: "Travel Orders", borderColor: "#8b5cf6", data: model.buckets.map((bucket) => bucket.travel) },
-            { label: "Visitors", borderColor: "#d97706", data: model.buckets.map((bucket) => bucket.visitors) },
-            { label: "Service Requests", borderColor: "#e05271", data: model.buckets.map((bucket) => bucket.services) }
-          ].map((dataset) => ({ ...dataset, tension: 0.3, borderWidth: 2, pointRadius: 2.5 }))
+            { label: "Documents & ICS", borderColor: "#278560", backgroundColor: window.PGENRO_ChartStyle.area, data: model.buckets.map((bucket) => bucket.documents), fill: true },
+            { label: "Travel Orders", borderColor: "#8b7ac7", data: model.buckets.map((bucket) => bucket.travel) },
+            { label: "Visitors", borderColor: "#c79b46", data: model.buckets.map((bucket) => bucket.visitors) },
+            { label: "Service Requests", borderColor: "#ce7d78", data: model.buckets.map((bucket) => bucket.services) }
+          ].map((dataset) => ({ ...dataset, tension: 0.38, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5, pointHitRadius: 12 }))
         },
         options: {
           ...userChartBaseOptions(),
-          scales: {
-            x: { grid: { display: false }, ticks: { maxRotation: 0, font: { size: 10 } } },
-            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#e2e8f0" } }
-          }
+          scales: window.PGENRO_ChartStyle.scales()
         }
       });
     }
@@ -2331,20 +2373,27 @@ const PGENRO_PageUI = (() => {
           datasets: [{
             data: model.breakdown.map((module) => module.current),
             backgroundColor: chartActivityModules.map((module) => module.color),
-            borderWidth: 2, borderColor: "#ffffff"
+            borderWidth: 3, borderColor: getComputedStyle(document.body).getPropertyValue("--bg-surface").trim()||"#ffffff", borderRadius: 6, spacing: 3
           }]
         },
-        options: { ...userChartBaseOptions(), cutout: "70%" }
+        options: { ...userChartBaseOptions(), cutout: "76%" }
       });
     }
 
+    document.getElementById('dashboardChartRange')?.addEventListener('change', event => {
+      const days=Number(event.target.value);if(![30,90,180,365].includes(days))return;
+      chartRangeDays=days;renderDashboardCharts();
+    });
+
     function renderDashboardCharts() {
       const model = buildDashboardChartModel();
+      const description=document.getElementById("dashboardTrendDescription");
+      if(description)description.textContent=`Documents, travel orders, visitors, and services in the last ${chartRangeDays} days.`;
       const missingNote = model.missingDates ? ` ${model.missingDates} records without valid dates are excluded.` : "";
       const availabilityNote = `${model.availableCount} of 6 activity modules available.`;
       const trendSummary = $("#dashboardTrendSummary");
       const distributionSummary = $("#dashboardDistributionSummary");
-      if (trendSummary) trendSummary.textContent = `${model.total} dated records over the last 90 days. ${availabilityNote}${missingNote}`;
+      if (trendSummary) trendSummary.textContent = `${model.total} dated records over the last ${chartRangeDays} days. ${availabilityNote}${missingNote}`;
       if (distributionSummary) distributionSummary.textContent = `${availabilityNote} ${model.breakdown.map((module) => `${module.label}: ${module.current}`).join("; ")}.${missingNote}`;
       for (const id of ["dashboardTrendEmpty", "dashboardDistributionEmpty"]) {
         const empty = $(`#${id}`);
@@ -2355,6 +2404,10 @@ const PGENRO_PageUI = (() => {
       renderCommunicationChart(model);
       renderOperationsChart(model);
     }
+
+    const chartThemeObserver = new MutationObserver(() => renderDashboardCharts());
+    chartThemeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;chartThemeObserver.disconnect();Object.values(state.charts).forEach(chart=>chart?.destroy());});
 
     /* =========================================================
        RENDER EVERYTHING
@@ -3111,3 +3164,234 @@ const PGENRO_PageUI = (() => {
   else initWorkspaceNavigation();
 })();
 /* ===== END PGENRO SLIDE NAVIGATION AND LOGOUT ===== */
+
+/* PGENRO module notifications, 10 October 2026. */
+/* Module-owned notifications: copies live inside each workspace page script. */
+(() => {
+  'use strict';
+  if (window.PGENRO_Notifications) return;
+  const modules = {
+    communications:['Communications','admincommunication.html','communication.html'],
+    travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
+    office_memos:['Office Memos','officememo-admin.html','officememo.html'],
+    employees:['Employees','employee-admin.html','employee.html'],
+    inventory:['Inventory','invetoryadmin.html','inventory.html'],
+    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
+    service_requests:['Service Requests','serviceAdmin.html','service.html'],
+    ics_records:['Property Slips','ics-admin.html','ics.html'],
+    user_accounts:['User Management','Usermanagement.html',null],
+    account_requests:['Account Requests','requestacc.html',null]
+  };
+  const empty=()=>({total:0,counts:{},items:[],workspace:'user'});
+  let feed=empty(),status='loading',db,userId='',generation=0,loading=false,again=false,disposed=false;
+  let wrapper,button,panel,list,count,markAll,badge,channel,timer,debounce,authSubscription;
+  const element=(tag,className,text)=>{const el=document.createElement(tag);el.className=className||'';if(text!==undefined)el.textContent=text;return el;};
+  function destination(module){
+    const info=modules[module],admin=feed.workspace==='admin',file=info?.[admin?1:2];
+    return file?new URL(`../${admin?'admin':'User'}/${file}`,location.href).href:null;
+  }
+  function render(){
+    if(!button)return;
+    const total=Number(feed.total)||0;
+    badge.textContent=total>99?'99+':String(total);badge.hidden=!total;
+    count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
+    button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
+    list.replaceChildren();
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications…'));
+    else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
+    else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
+    for(const item of feed.items||[]){
+      const href=destination(item.module);if(!href)continue;
+      const link=element('a','module-notification-item');link.href=href;link.dataset.notificationId=item.id;
+      const dot=element('span','module-notification-dot');dot.setAttribute('aria-hidden','true');
+      const copy=element('span','module-notification-copy');copy.append(element('strong','',modules[item.module][0]));
+      copy.append(element('span','module-notification-title',item.title||'New record added'));
+      const date=new Date(item.createdAt);copy.append(element('small','',Number.isNaN(date.getTime())?'New record':date.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})));
+      link.append(dot,copy);link.addEventListener('click',async event=>{
+        event.preventDefault();link.setAttribute('aria-busy','true');
+        try{await markRead({p_ids:[item.id]});}catch{/* The destination remains usable if marking read fails. */}
+        location.assign(href);
+      });list.append(link);
+    }
+    if(total>(feed.items||[]).length&&status==='ready')list.append(element('p','module-notification-more',`Showing the latest ${(feed.items||[]).length} new records`));
+    document.querySelectorAll('aside a[href], .sidebar a[href]').forEach(link=>{
+      const path=new URL(link.getAttribute('href'),location.href).pathname;
+      const module=Object.keys(modules).find(key=>destination(key)&&new URL(destination(key)).pathname===path);
+      let chip=link.querySelector('.module-new-badge');
+      if(!module){chip?.remove();return;}
+      const value=Number(feed.counts?.[module])||0;
+      if(!chip){chip=element('span','module-new-badge');link.append(chip);}
+      chip.dataset.module=module;chip.hidden=!value;chip.textContent=value>99?'99+':String(value);
+      chip.setAttribute('aria-label',`${value} new ${modules[module][0]} records`);
+    });
+    document.body.dataset.notificationsState=status;
+  }
+  function close(){if(!panel)return;panel.hidden=true;button.setAttribute('aria-expanded','false');}
+  function position(){
+    const rect=button.getBoundingClientRect(),width=Math.min(390,innerWidth-24);
+    panel.style.width=`${width}px`;panel.style.right=`${Math.min(Math.max(12,innerWidth-rect.right),innerWidth-width-12)}px`;
+    panel.style.top=`${Math.min(Math.max(12,rect.bottom+10),innerHeight-160)}px`;
+  }
+  async function refresh(){
+    if(disposed||!db||!userId)return;
+    if(loading){again=true;return;}
+    loading=true;const token=generation;
+    try{
+      const result=await db.rpc('pgenro_get_module_notifications',{p_limit:30});
+      if(token!==generation||disposed)return;
+      if(result.error)throw result.error;
+      const data=result.data;
+      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      feed=data;status='ready';render();
+    }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
+    finally{loading=false;if(again){again=false;scheduleRefresh();}}
+  }
+  function scheduleRefresh(){clearTimeout(debounce);debounce=setTimeout(refresh,250);}
+  async function markRead(args={}){
+    const result=await db.rpc('pgenro_mark_notifications_read',args);if(result.error)throw result.error;
+    await refresh();
+  }
+  async function attachSession(user){
+    if(disposed)return;
+    if(!user?.id){generation++;userId='';feed=empty();status='unavailable';close();render();if(channel)db.removeChannel(channel);channel=null;return;}
+    if(userId===user.id){scheduleRefresh();return;}
+    generation++;userId=user.id;feed=empty();status='loading';render();
+    if(channel)db.removeChannel(channel);
+    channel=db.channel(`pgenro-module-notifications-${user.id}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_module_notifications'},scheduleRefresh)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_notification_reads',filter:`user_id=eq.${user.id}`},scheduleRefresh)
+      .subscribe(state=>{if(state==='SUBSCRIBED')scheduleRefresh();});
+    await refresh();
+  }
+  function init(){
+    const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
+    document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
+    wrapper=element('div','module-notifications');button=element('button','module-notification-button');button.type='button';button.id='moduleNotificationButton';
+    button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','moduleNotificationPanel');
+    button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>';
+    badge=element('span','module-notification-badge');badge.hidden=true;button.append(badge);wrapper.append(button);
+    if(header.classList.contains('settings-topbar'))header.insertBefore(wrapper,header.lastElementChild);else header.prepend(wrapper);
+    panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
+    const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
+    count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
+    const closeBtn=element('button','module-notification-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
+    markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
+    tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
+    button.addEventListener('click',()=>{const open=panel.hidden;close();if(open){panel.hidden=false;position();button.setAttribute('aria-expanded','true');closeBtn.focus();refresh();}});
+    document.addEventListener('click',event=>{if(!wrapper.contains(event.target)&&!panel.contains(event.target))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){close();button.focus();}});
+    window.addEventListener('resize',()=>{if(!panel.hidden)position();});
+    window.addEventListener('focus',scheduleRefresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRefresh();});
+    window.addEventListener('pageshow',event=>{if(event.persisted)scheduleRefresh();});
+    render();db=window.pgenroSupabase||window.PGENRO_DB?.client;
+    if(!db){status='unavailable';render();return;}
+    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
+    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
+    timer=setInterval(()=>{if(!document.hidden)refresh();},30000);
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
+  }
+  window.PGENRO_Notifications={refresh,scheduleRefresh};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+/* Page-owned layout helpers; do not change record permissions or data writes. */
+(() => {
+  'use strict';
+  function init() {
+    if (document.body.dataset.unifiedLayoutReady) return;
+    document.body.dataset.unifiedLayoutReady = 'true';
+    // A wide registry scrolls within its own region, including dynamically mounted tables.
+    function containTables() {
+      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
+        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
+        const region = document.createElement('div'); region.className = 'ui-table-scroll';
+        table.before(region); region.append(table);
+      });
+    }
+    containTables();
+    let tableFrame;
+    const insertedTables = new MutationObserver(records => {
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    });
+    insertedTables.observe(document.body, {childList:true,subtree:true});
+    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
+    // Account Settings and the module pages use one saved user appearance.
+    let appearanceObserver;
+    if (document.body.classList.contains('pgenro-user')) {
+      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
+      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+      function applyAppearance(theme) {
+        theme=theme==='dark'?'dark':'light';
+        if(html.dataset.theme!==theme)html.dataset.theme=theme;
+        const dark=theme==='dark';
+        if(button&&button.dataset.appearance!==theme) {
+          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
+          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
+        }
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
+      }
+      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
+      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
+      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
+      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
+      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
+      button?.addEventListener('click',()=>{
+        const theme=html.dataset.theme==='dark'?'light':'dark';
+        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
+        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
+        html.dataset.pgenroTheme=theme;applyAppearance(theme);
+      });
+      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
+    }
+    // The existing user page controls continue to open and close its module menu.
+    const sidebar = document.querySelector('.pgenro-user .sidebar');
+    if (sidebar) {
+      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
+      let previouslyOpen = false;
+      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
+      function desktopNavigation() {
+        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
+        collapsed=!media.matches&&collapsed;
+        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
+        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
+      }
+      menu?.addEventListener('click',event=>{
+        if(media.matches)return;
+        event.preventDefault();event.stopImmediatePropagation();
+        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
+        desktopNavigation();
+      },true);
+      function sync() {
+        const open = media.matches && sidebar.classList.contains('open');
+        sidebar.inert = media.matches && !open;
+        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
+        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
+        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
+        previouslyOpen = open;
+      }
+      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
+      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
+      let navigationFrame;
+      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
+      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
+      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
+      document.addEventListener('keydown',event=>{
+        if(!media.matches||!sidebar.classList.contains('open')) return;
+        if(event.key==='Escape') {menu?.click();return;}
+        if(event.key!=='Tab')return;
+        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
+        if(!items.length)return;
+        const first=items[0],last=items.at(-1);
+        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
+        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+

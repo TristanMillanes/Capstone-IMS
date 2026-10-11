@@ -44,6 +44,7 @@
   }
   let currentIds = new Map(); const unread = [];
   function observeRecords(key, rows) {
+    window.PGENRO_Notifications?.scheduleRefresh();
     const ids = rows.map(r => String(r.id)).filter(Boolean); const prior = currentIds.get(key);
     if (prior) {
       const added = ids.filter(id => !prior.has(id));
@@ -168,8 +169,11 @@
 (() => {
  'use strict';
  const M=window.PGENRO_Module,$=id=>document.getElementById(id),api=window.PGENRO_API;
- let rows=[],selected=null,authorized=false,online=false,busy=false,version=0,channel=null;
- const roles={USER:['System Staff','Division Head','Viewer'],ADMIN:['Super Admin','Admin']};
+ let rows=[],selected=null,bulkSelection=[],authorized=false,online=false,busy=false,version=0,channel=null;
+ const roles=['User','Admin'];
+ const canonicalRole=value=>String(value||'').trim().toLowerCase()==='admin'?'Admin':'User';
+ const requestedRole=r=>canonicalRole(r.requestedRole||r.requested_role||r.requested_system||r.role);
+ const assignedRole=r=>r.assignedRole||(['approved','active','suspended','inactive'].includes(status(r))?canonicalRole(r.role):'');
  const status=r=>String(r.status||'Pending').toLowerCase();
  const pending=r=>status(r)==='pending';
  const key=r=>String(r.key||r.id);
@@ -189,8 +193,8 @@
    const raw=r.status||'Pending',cls=['pending','approved','rejected'].includes(status(r))?status(r):'';
    let date=r.date||r.created_at||r.createdAt||r.timestamp;
    if(date){const d=new Date(date);if(!Number.isNaN(d.getTime()))date=d.toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}
-   return `<tr><td><input type="checkbox" class="row-checkbox" data-key="${M.escape(key(r))}" aria-label="Select ${M.escape(name(r))}" ${!pending(r)||!online||busy?'disabled':''}/></td><td><strong>${M.escape(r.refCode||r.requestId||r.id)}</strong><small class="employee-sub">${M.escape(date||'Recent')}</small></td><td><div class="user-cell" style="display:flex;gap:10px;align-items:center"><div class="avatar-circle">${M.escape(initials)}</div><div><strong>${M.escape(name(r))}</strong><small class="employee-sub">${M.escape(r.email)}</small></div></div></td><td>${M.escape(r.division||'Unassigned')}</td><td>${M.escape(r.role||'System Staff')}</td><td>${M.escape(r.endorser||'For review')}</td><td><span class="status-badge-dot ${cls}">${M.escape(raw)}</span></td><td><div class="action-buttons"><button class="btn-icon-action review-btn" data-key="${M.escape(key(r))}" title="Review request" aria-label="Review ${M.escape(name(r))}"><i data-lucide="eye"></i></button>${pending(r)?`<button class="btn-icon-action approve-quick-btn" data-key="${M.escape(key(r))}" title="Approve request" aria-label="Approve ${M.escape(name(r))}" ${!online||busy?'disabled':''}><i data-lucide="user-check"></i></button><button class="btn-icon-action reject-quick-btn" data-key="${M.escape(key(r))}" title="Decline request" aria-label="Decline ${M.escape(name(r))}" ${!online||busy?'disabled':''}><i data-lucide="user-x"></i></button>`:`<button class="btn-icon-action delete-req-btn" data-key="${M.escape(key(r))}" title="Delete request history" aria-label="Delete ${M.escape(name(r))}" ${!online||busy?'disabled':''}><i data-lucide="trash-2"></i></button>`}</div></td></tr>`;
-  }).join(''):'<tr><td colspan="8" class="empty-table-cell">No account requests match these filters.</td></tr>';
+   return `<tr><td><input type="checkbox" class="row-checkbox" data-key="${M.escape(key(r))}" aria-label="Select ${M.escape(name(r))}" ${!pending(r)||!online||busy?'disabled':''}/></td><td><strong>${M.escape(r.refCode||r.requestId||r.id)}</strong><small class="employee-sub">${M.escape(date||'Recent')}</small></td><td><div class="user-cell" style="display:flex;gap:10px;align-items:center"><div class="avatar-circle">${M.escape(initials)}</div><div><strong>${M.escape(name(r))}</strong><small class="employee-sub">${M.escape(r.email)}</small></div></div></td><td>${M.escape(r.division||'Unassigned')}</td><td>${M.escape(requestedRole(r))}</td><td>${M.escape(assignedRole(r)||'Not assigned')}</td><td>${M.escape(r.endorser||'For review')}</td><td><span class="status-badge-dot ${cls}">${M.escape(raw)}</span></td><td><div class="action-buttons"><button class="btn-icon-action review-btn" data-key="${M.escape(key(r))}" title="Review request" aria-label="Review ${M.escape(name(r))}"><i data-lucide="eye"></i></button>${pending(r)?`<button class="btn-icon-action approve-quick-btn" data-key="${M.escape(key(r))}" title="Approve request" aria-label="Approve ${M.escape(name(r))}" ${!online||busy?'disabled':''}><i data-lucide="user-check"></i></button><button class="btn-icon-action reject-quick-btn" data-key="${M.escape(key(r))}" title="Decline request" aria-label="Decline ${M.escape(name(r))}" ${!online||busy?'disabled':''}><i data-lucide="user-x"></i></button>`:`<button class="btn-icon-action delete-req-btn" data-key="${M.escape(key(r))}" title="Delete request history" aria-label="Delete ${M.escape(name(r))}" ${!online||busy?'disabled':''}><i data-lucide="trash-2"></i></button>`}</div></td></tr>`;
+  }).join(''):'<tr><td colspan="9" class="empty-table-cell">No account requests match these filters.</td></tr>';
   $('tableRangeText').textContent=`Showing ${filtered.length} of ${rows.length} access requests`;
   $('statPendingCount').textContent=rows.filter(pending).length;$('statApprovedCount').textContent=rows.filter(r=>status(r)==='approved').length;$('statRejectedCount').textContent=rows.filter(r=>status(r)==='rejected').length;$('statTotalCount').textContent=rows.length;
   controls();M.renderIcons();
@@ -203,15 +207,16 @@
    online=true;M.observeRecords('account requests',rows);render();return true;
   }catch(error){if(loadId!==version)return false;online=false;render();M.toast(error.message||'Account requests could not refresh. Try again.','error');return false;}
  }
- function roleOptions(type){$('assignRoleSelect').innerHTML=(roles[type]||roles.USER).map(r=>`<option>${r}</option>`).join('');}
+ function approvalLabel(){
+  $('approveModalActionBtn').innerHTML=`<i data-lucide="user-check"></i> Approve as ${M.escape($('assignRoleSelect').value)}`;M.renderIcons();
+ }
  function review(id){
   selected=rows.find(r=>key(r)===String(id));if(!selected)return;
   const r=selected;
-  const values={reviewReqId:r.refCode||r.id,reviewDate:r.date||r.created_at||r.createdAt||'Recent',reviewFullName:name(r),reviewEmail:r.email,reviewContact:r.contact||r.contact_number,reviewGovId:'Account Authentication',reviewPosition:r.position,reviewDivision:r.division,reviewRole:r.role,reviewEndorser:r.endorser,reviewReason:r.reason};
+  const values={reviewReqId:r.refCode||r.id,reviewDate:r.date||r.created_at||r.createdAt||'Recent',reviewFullName:name(r),reviewEmail:r.email,reviewContact:r.contact||r.contact_number,reviewGovId:'Account Authentication',reviewPosition:r.position,reviewDivision:r.division,reviewRole:requestedRole(r),reviewEndorser:r.endorser,reviewReason:r.reason};
   Object.entries(values).forEach(([id,v])=>{$(id).textContent=v||'None provided';});
-  const type=roles.ADMIN.includes(r.role)?'ADMIN':'USER';$('assignAccountTypeSelect').value=type;roleOptions(type);
-  const requested=r.role==='User'?'System Staff':r.role;if(roles[type].includes(requested))$('assignRoleSelect').value=requested;
-  for(const id of ['assignAccountTypeSelect','assignRoleSelect','approveModalActionBtn','declineModalActionBtn'])$(id).disabled=!pending(r)||!online||busy;
+  $('assignRoleSelect').value=pending(r)?requestedRole(r):canonicalRole(assignedRole(r)||r.role);approvalLabel();
+  for(const id of ['assignRoleSelect','approveModalActionBtn','declineModalActionBtn'])$(id).disabled=!pending(r)||!online||busy;
   M.openModal('reviewModal');
  }
  function decline(id){selected=rows.find(r=>key(r)===String(id));if(!selected||!pending(selected)||busy)return;$('declineReasonSelect').selectedIndex=0;$('declineNotesInput').value='';M.openModal('declineModal');}
@@ -233,10 +238,10 @@
     try{
      if(action==='delete')await M.remove('access_requests',[key(r)]);
      else {
-      const type=opts.type||(roles.ADMIN.includes(r.role)?'ADMIN':'USER'),role=opts.role||(r.role==='User'?'System Staff':r.role)||'System Staff';
-      if(action==='approve'&&!roles[type]?.includes(role))throw new Error('Choose a supported account role in the review form.');
+      const role=opts.role;
+      if(action==='approve'&&!roles.includes(role))throw new Error('Choose Admin or User as the final account role.');
       if(!api?.invokeAdmin)throw new Error('Administrator service is unavailable.');
-      const response=await api.invokeAdmin(action==='approve'?'approve_request':'reject_request',action==='approve'?{requestId:key(r),userId:r.uid||r.user_id||'',role,accountType:type}:{requestId:key(r),userId:r.uid||r.user_id||'',reason:opts.reason||'Declined via Bulk Review',remarks:opts.remarks||''});
+      const response=await api.invokeAdmin(action==='approve'?'approve_request':'reject_request',action==='approve'?{requestId:key(r),userId:r.uid||r.user_id||'',role}:{requestId:key(r),userId:r.uid||r.user_id||'',reason:opts.reason||'Declined via Bulk Review',remarks:opts.remarks||''});
       if(response?.error||response?.success===false)throw new Error(response.error?.message||response.message||'The administrator service rejected this action.');
      }
      succeeded++;
@@ -245,7 +250,7 @@
    if(succeeded){M.toast(`${succeeded} request${succeeded===1?'':'s'} ${action==='approve'?'approved':action==='delete'?'deleted':'declined'}.`);await load();}
    if(errors.length)M.toast(`${succeeded} succeeded; ${errors.length} failed. ${errors[0]}`,'error');
   }finally{
-   busy=false;document.querySelectorAll('.modal-backdrop').forEach(m=>{m.dataset.busy='false';m.querySelectorAll('button,select,textarea').forEach(b=>b.disabled=false);});if(succeeded&&!errors.length){M.closeModal('reviewModal');M.closeModal('declineModal');}render();
+   busy=false;document.querySelectorAll('.modal-backdrop').forEach(m=>{m.dataset.busy='false';m.querySelectorAll('button,select,textarea').forEach(b=>b.disabled=false);});if(succeeded&&!errors.length){M.closeModal('reviewModal');M.closeModal('declineModal');M.closeModal('bulkApprovalModal');}render();
   }
  }
  document.addEventListener('DOMContentLoaded',async()=>{
@@ -257,16 +262,25 @@
    const btn=e.target.closest('button[data-key]');if(!btn||btn.disabled)return;const id=btn.dataset.key,r=rows.find(r=>key(r)===id);if(!r)return;
    if(btn.classList.contains('review-btn'))review(id);
    else if(btn.classList.contains('reject-quick-btn'))decline(id);
-   else if(btn.classList.contains('approve-quick-btn')){if(await confirmAction('Grant Account Access',`Approve ${name(r)} as ${r.role||'System Staff'}?`,'Grant Access'))await operation('approve',[r]);}
+   else if(btn.classList.contains('approve-quick-btn')){review(id);$('assignRoleSelect').focus();}
    else if(await confirmAction('Delete Request History',`Delete the request history for ${name(r)}?`,'Delete'))await operation('delete',[r]);
   });
-  $('assignAccountTypeSelect').addEventListener('change',e=>roleOptions(e.target.value));
-  for(const [id,modal] of [['closeReviewModalBtn','reviewModal'],['closeDeclineModalBtn','declineModal'],['cancelDeclineModalBtn','declineModal']])$(id).addEventListener('click',()=>M.closeModal(modal));
+  $('assignRoleSelect').addEventListener('change',approvalLabel);
+  for(const [id,modal] of [['closeReviewModalBtn','reviewModal'],['closeDeclineModalBtn','declineModal'],['cancelDeclineModalBtn','declineModal'],['closeBulkApprovalBtn','bulkApprovalModal'],['cancelBulkApprovalBtn','bulkApprovalModal']])$(id).addEventListener('click',()=>M.closeModal(modal));
   $('declineModalActionBtn').addEventListener('click',()=>decline(key(selected)));
-  $('approveModalActionBtn').addEventListener('click',()=>selected&&operation('approve',[selected],{type:$('assignAccountTypeSelect').value,role:$('assignRoleSelect').value}));
+  $('approveModalActionBtn').addEventListener('click',()=>selected&&operation('approve',[selected],{role:$('assignRoleSelect').value}));
   $('confirmDeclineBtn').addEventListener('click',()=>{const reason=$('declineReasonSelect').value,remarks=$('declineNotesInput').value.trim();if(reason==='Other'&&!remarks){M.toast('Add notes explaining the reason for declining.','warning');$('declineNotesInput').focus();return;}if(selected)operation('reject',[selected],{reason,remarks});});
   $('confirmModalCancelBtn').onclick=()=>finishConfirm(false);$('confirmModalActionBtn').onclick=()=>finishConfirm(true);confirmWatcher.observe($('systemConfirmModal'),{attributes:true,attributeFilter:['class']});
-  for(const [id,action] of [['bulkApproveBtn','approve'],['bulkRejectBtn','reject']])$(id).addEventListener('click',async()=>{const items=checked();if(items.length&&await confirmAction(action==='approve'?'Bulk Approve Requests':'Bulk Decline Requests',`${action==='approve'?'Approve':'Decline'} ${items.length} selected pending requests?`))await operation(action,items);});
+  $('bulkApproveBtn').addEventListener('click',()=>{
+   bulkSelection=checked().map(key);if(!bulkSelection.length)return;
+   $('bulkApprovalCount').textContent=`${bulkSelection.length} selected pending request${bulkSelection.length===1?'':'s'}`;
+   $('bulkAssignRoleSelect').value='';M.openModal('bulkApprovalModal');$('bulkAssignRoleSelect').focus();
+  });
+  $('confirmBulkApproveBtn').addEventListener('click',()=>{
+   const role=$('bulkAssignRoleSelect').value;if(!roles.includes(role)){M.toast('Choose Admin or User for the selected accounts.','warning');$('bulkAssignRoleSelect').focus();return;}
+   const items=rows.filter(r=>bulkSelection.includes(key(r))&&pending(r));operation('approve',items,{role});
+  });
+  $('bulkRejectBtn').addEventListener('click',async()=>{const items=checked();if(items.length&&await confirmAction('Bulk Decline Requests',`Decline ${items.length} selected pending requests?`))await operation('reject',items);});
   $('refreshRequestsBtn').onclick=async()=>{if(!authorized)return;$('refreshRequestsBtn').disabled=true;try{if(await load())M.toast('Account requests refreshed.');}finally{$('refreshRequestsBtn').disabled=false;}};
   render();
   try{
@@ -493,7 +507,7 @@
       if (name !== currentSidebarIcon) {
         currentSidebarIcon = name;
         const icon = document.createElement('i'); icon.dataset.lucide = name;
-        sidebarToggle.replaceChildren(icon); renderIcons();
+        const label=document.createElement('span');label.className='navigation-button-label';label.textContent='Menu';sidebarToggle.replaceChildren(icon,label); renderIcons();
       }
       if (mobile) { sidebarToggle.setAttribute('aria-label', 'Close navigation'); sidebarToggle.title = 'Close navigation'; }
     }
@@ -782,3 +796,234 @@
   else initWorkspaceNavigation();
 })();
 /* ===== END PGENRO SLIDE NAVIGATION AND LOGOUT ===== */
+
+/* PGENRO module notifications, 10 October 2026. */
+/* Module-owned notifications: copies live inside each workspace page script. */
+(() => {
+  'use strict';
+  if (window.PGENRO_Notifications) return;
+  const modules = {
+    communications:['Communications','admincommunication.html','communication.html'],
+    travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
+    office_memos:['Office Memos','officememo-admin.html','officememo.html'],
+    employees:['Employees','employee-admin.html','employee.html'],
+    inventory:['Inventory','invetoryadmin.html','inventory.html'],
+    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
+    service_requests:['Service Requests','serviceAdmin.html','service.html'],
+    ics_records:['Property Slips','ics-admin.html','ics.html'],
+    user_accounts:['User Management','Usermanagement.html',null],
+    account_requests:['Account Requests','requestacc.html',null]
+  };
+  const empty=()=>({total:0,counts:{},items:[],workspace:'user'});
+  let feed=empty(),status='loading',db,userId='',generation=0,loading=false,again=false,disposed=false;
+  let wrapper,button,panel,list,count,markAll,badge,channel,timer,debounce,authSubscription;
+  const element=(tag,className,text)=>{const el=document.createElement(tag);el.className=className||'';if(text!==undefined)el.textContent=text;return el;};
+  function destination(module){
+    const info=modules[module],admin=feed.workspace==='admin',file=info?.[admin?1:2];
+    return file?new URL(`../${admin?'admin':'User'}/${file}`,location.href).href:null;
+  }
+  function render(){
+    if(!button)return;
+    const total=Number(feed.total)||0;
+    badge.textContent=total>99?'99+':String(total);badge.hidden=!total;
+    count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
+    button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
+    list.replaceChildren();
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications…'));
+    else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
+    else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
+    for(const item of feed.items||[]){
+      const href=destination(item.module);if(!href)continue;
+      const link=element('a','module-notification-item');link.href=href;link.dataset.notificationId=item.id;
+      const dot=element('span','module-notification-dot');dot.setAttribute('aria-hidden','true');
+      const copy=element('span','module-notification-copy');copy.append(element('strong','',modules[item.module][0]));
+      copy.append(element('span','module-notification-title',item.title||'New record added'));
+      const date=new Date(item.createdAt);copy.append(element('small','',Number.isNaN(date.getTime())?'New record':date.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})));
+      link.append(dot,copy);link.addEventListener('click',async event=>{
+        event.preventDefault();link.setAttribute('aria-busy','true');
+        try{await markRead({p_ids:[item.id]});}catch{/* The destination remains usable if marking read fails. */}
+        location.assign(href);
+      });list.append(link);
+    }
+    if(total>(feed.items||[]).length&&status==='ready')list.append(element('p','module-notification-more',`Showing the latest ${(feed.items||[]).length} new records`));
+    document.querySelectorAll('aside a[href], .sidebar a[href]').forEach(link=>{
+      const path=new URL(link.getAttribute('href'),location.href).pathname;
+      const module=Object.keys(modules).find(key=>destination(key)&&new URL(destination(key)).pathname===path);
+      let chip=link.querySelector('.module-new-badge');
+      if(!module){chip?.remove();return;}
+      const value=Number(feed.counts?.[module])||0;
+      if(!chip){chip=element('span','module-new-badge');link.append(chip);}
+      chip.dataset.module=module;chip.hidden=!value;chip.textContent=value>99?'99+':String(value);
+      chip.setAttribute('aria-label',`${value} new ${modules[module][0]} records`);
+    });
+    document.body.dataset.notificationsState=status;
+  }
+  function close(){if(!panel)return;panel.hidden=true;button.setAttribute('aria-expanded','false');}
+  function position(){
+    const rect=button.getBoundingClientRect(),width=Math.min(390,innerWidth-24);
+    panel.style.width=`${width}px`;panel.style.right=`${Math.min(Math.max(12,innerWidth-rect.right),innerWidth-width-12)}px`;
+    panel.style.top=`${Math.min(Math.max(12,rect.bottom+10),innerHeight-160)}px`;
+  }
+  async function refresh(){
+    if(disposed||!db||!userId)return;
+    if(loading){again=true;return;}
+    loading=true;const token=generation;
+    try{
+      const result=await db.rpc('pgenro_get_module_notifications',{p_limit:30});
+      if(token!==generation||disposed)return;
+      if(result.error)throw result.error;
+      const data=result.data;
+      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      feed=data;status='ready';render();
+    }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
+    finally{loading=false;if(again){again=false;scheduleRefresh();}}
+  }
+  function scheduleRefresh(){clearTimeout(debounce);debounce=setTimeout(refresh,250);}
+  async function markRead(args={}){
+    const result=await db.rpc('pgenro_mark_notifications_read',args);if(result.error)throw result.error;
+    await refresh();
+  }
+  async function attachSession(user){
+    if(disposed)return;
+    if(!user?.id){generation++;userId='';feed=empty();status='unavailable';close();render();if(channel)db.removeChannel(channel);channel=null;return;}
+    if(userId===user.id){scheduleRefresh();return;}
+    generation++;userId=user.id;feed=empty();status='loading';render();
+    if(channel)db.removeChannel(channel);
+    channel=db.channel(`pgenro-module-notifications-${user.id}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_module_notifications'},scheduleRefresh)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_notification_reads',filter:`user_id=eq.${user.id}`},scheduleRefresh)
+      .subscribe(state=>{if(state==='SUBSCRIBED')scheduleRefresh();});
+    await refresh();
+  }
+  function init(){
+    const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
+    document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
+    wrapper=element('div','module-notifications');button=element('button','module-notification-button');button.type='button';button.id='moduleNotificationButton';
+    button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','moduleNotificationPanel');
+    button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>';
+    badge=element('span','module-notification-badge');badge.hidden=true;button.append(badge);wrapper.append(button);
+    if(header.classList.contains('settings-topbar'))header.insertBefore(wrapper,header.lastElementChild);else header.prepend(wrapper);
+    panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
+    const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
+    count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
+    const closeBtn=element('button','module-notification-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
+    markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
+    tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
+    button.addEventListener('click',()=>{const open=panel.hidden;close();if(open){panel.hidden=false;position();button.setAttribute('aria-expanded','true');closeBtn.focus();refresh();}});
+    document.addEventListener('click',event=>{if(!wrapper.contains(event.target)&&!panel.contains(event.target))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){close();button.focus();}});
+    window.addEventListener('resize',()=>{if(!panel.hidden)position();});
+    window.addEventListener('focus',scheduleRefresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRefresh();});
+    window.addEventListener('pageshow',event=>{if(event.persisted)scheduleRefresh();});
+    render();db=window.pgenroSupabase||window.PGENRO_DB?.client;
+    if(!db){status='unavailable';render();return;}
+    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
+    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
+    timer=setInterval(()=>{if(!document.hidden)refresh();},30000);
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
+  }
+  window.PGENRO_Notifications={refresh,scheduleRefresh};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+/* Page-owned layout helpers; do not change record permissions or data writes. */
+(() => {
+  'use strict';
+  function init() {
+    if (document.body.dataset.unifiedLayoutReady) return;
+    document.body.dataset.unifiedLayoutReady = 'true';
+    // A wide registry scrolls within its own region, including dynamically mounted tables.
+    function containTables() {
+      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
+        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
+        const region = document.createElement('div'); region.className = 'ui-table-scroll';
+        table.before(region); region.append(table);
+      });
+    }
+    containTables();
+    let tableFrame;
+    const insertedTables = new MutationObserver(records => {
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    });
+    insertedTables.observe(document.body, {childList:true,subtree:true});
+    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
+    // Account Settings and the module pages use one saved user appearance.
+    let appearanceObserver;
+    if (document.body.classList.contains('pgenro-user')) {
+      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
+      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+      function applyAppearance(theme) {
+        theme=theme==='dark'?'dark':'light';
+        if(html.dataset.theme!==theme)html.dataset.theme=theme;
+        const dark=theme==='dark';
+        if(button&&button.dataset.appearance!==theme) {
+          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
+          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
+        }
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
+      }
+      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
+      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
+      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
+      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
+      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
+      button?.addEventListener('click',()=>{
+        const theme=html.dataset.theme==='dark'?'light':'dark';
+        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
+        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
+        html.dataset.pgenroTheme=theme;applyAppearance(theme);
+      });
+      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
+    }
+    // The existing user page controls continue to open and close its module menu.
+    const sidebar = document.querySelector('.pgenro-user .sidebar');
+    if (sidebar) {
+      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
+      let previouslyOpen = false;
+      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
+      function desktopNavigation() {
+        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
+        collapsed=!media.matches&&collapsed;
+        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
+        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
+      }
+      menu?.addEventListener('click',event=>{
+        if(media.matches)return;
+        event.preventDefault();event.stopImmediatePropagation();
+        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
+        desktopNavigation();
+      },true);
+      function sync() {
+        const open = media.matches && sidebar.classList.contains('open');
+        sidebar.inert = media.matches && !open;
+        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
+        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
+        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
+        previouslyOpen = open;
+      }
+      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
+      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
+      let navigationFrame;
+      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
+      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
+      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
+      document.addEventListener('keydown',event=>{
+        if(!media.matches||!sidebar.classList.contains('open')) return;
+        if(event.key==='Escape') {menu?.click();return;}
+        if(event.key!=='Tab')return;
+        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
+        if(!items.length)return;
+        const first=items[0],last=items.at(-1);
+        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
+        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+

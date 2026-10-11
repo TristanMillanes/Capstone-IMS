@@ -1,25 +1,25 @@
 <!DOCTYPE html>
+
 <html data-css-scope="admin-communication" lang="en">
 <head>
 <!-- Optional OCR service. Start OCR.py for full local extraction. Browser fallback is automatic. -->
-<meta name="pgenro-ocr-endpoint" content="/ocr"/>
+<meta content="/ocr" name="pgenro-ocr-endpoint"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Communications Log Admin</title>
-<meta name="theme-color" content="#f5f7f8"/>
+<meta content="#f5f7f8" name="theme-color"/>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <!-- Lucide Icons -->
 <!-- Icons are rendered locally by this module. -->
 <!-- External Stylesheets -->
-<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="admincommunication.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
+<link href="admincommunication.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin">
-<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin">
+<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
@@ -34,10 +34,8 @@
 <span>Administrative workspace</span>
 </div>
 </a>
-<button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-<i data-lucide="panel-left-close"></i>
-</button>
-</div>
+
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
 <nav aria-label="Administrator navigation" class="sidebar-nav">
 <div class="nav-group">
 <span class="nav-label">Workspace</span>
@@ -68,8 +66,8 @@
 <div class="nav-group">
 <span class="nav-label">Workspace tools</span>
 <ul>
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
 <li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
 </ul>
 </div>
@@ -81,20 +79,22 @@
 <div class="main-wrapper">
 <!-- TOPBAR -->
 <header class="topbar">
-<div class="topbar-left">
-<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Communications</span></a>
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 <i data-lucide="menu"></i>
 </button>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Communications</span></a>
+
 <div class="global-search" role="search">
 <i class="search-icon" data-lucide="search"></i>
 <input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search communication records…" spellcheck="false" type="text"/>
-<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
 <!-- Search Quick Palette -->
 </div>
 </div>
 <div class="topbar-right">
-<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
 <!-- Notification Button & Drawer -->
 <div class="notification-wrapper">
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
@@ -116,7 +116,7 @@
 <div class="profile-menu" id="profileMenu">
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
-<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
 </button>
 <div class="profile-dropdown" id="profileDropdown">
 <div class="profile-dropdown-header">
@@ -146,7 +146,7 @@
 <!-- BREADCRUMB & HEADER -->
 <section class="page-header communication-page-header depth-hero">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><i data-lucide="arrow-left-right"></i></div>
+<div aria-hidden="true" class="page-heading-mark"><i data-lucide="arrow-left-right"></i></div>
 <div class="breadcrumb">
 <span>Admin Console</span>
 <i data-lucide="chevron-right"></i>
@@ -169,17 +169,16 @@
 <span>New Communication</span>
 </button>
 </div>
-
-<div class="depth-scene" aria-hidden="true">
-  <span class="depth-orbit"></span><span class="depth-orb"></span>
-  <div class="depth-stack">
-    <span class="depth-sheet depth-sheet-back"></span>
-    <span class="depth-sheet depth-sheet-middle"></span>
-    <span class="depth-sheet depth-sheet-front">
-      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
-      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-    </span>
-  </div><span class="depth-scene-dot"></span>
+<div aria-hidden="true" class="depth-scene">
+<span class="depth-orbit"></span><span class="depth-orb"></span>
+<div class="depth-stack">
+<span class="depth-sheet depth-sheet-back"></span>
+<span class="depth-sheet depth-sheet-middle"></span>
+<span class="depth-sheet depth-sheet-front">
+<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
+<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+</span>
+</div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <!-- KPI SUMMARY GRID -->
@@ -201,7 +200,7 @@
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiIncomingCount">0</h3>
-<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> External & Internal</span>
+<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> External &amp; Internal</span>
 </div>
 </div>
 <div class="kpi-card">
@@ -271,7 +270,7 @@
 <thead>
 <tr>
 <th width="40"><input aria-label="Select all visible records" id="selectAllRows" type="checkbox"/></th>
-<th>Control No. & Type</th>
+<th>Control No. &amp; Type</th>
 <th>Date</th>
 <th>Office</th>
 <th>Subject / Particulars</th>
@@ -297,9 +296,9 @@
 <p>© 2026 Provincial Government Environment and Natural Resources Office (PGENRO).</p>
 </div>
 <div class="footer-links">
-<a href="admin.html#audit">Security & Audit</a>
+<a href="audittrail-admin.html">Security &amp; Audit</a>
 <a href="admin.html#settings">Workspace Preferences</a>
-<a href="admin.html#backup">Backup & Recovery</a>
+<a href="backup-admin.html">Backup &amp; Recovery</a>
 </div>
 </footer>
 <footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
@@ -323,7 +322,7 @@
 <i data-lucide="x"></i>
 </button>
 </div>
-<div class="ocr-stop-controls" id="ocrStopControls" hidden><button class="btn btn-secondary" id="cancelOcrBtn" type="button">Stop reading</button></div>
+<div class="ocr-stop-controls" hidden="" id="ocrStopControls"><button class="btn btn-secondary" id="cancelOcrBtn" type="button">Stop reading</button></div>
 <form id="communicationForm">
 <div class="modal-body communication-modal-body" id="encodingModalBody">
 <input id="editIndex" type="hidden" value=""/>
@@ -335,8 +334,8 @@
 </div>
 <span class="encoder-required-note"><span>*</span> Required fields</span>
 </div>
-<p class="document-destination" id="documentDestination" role="status" aria-live="polite">Save destination: Communications.</p>
-<p class="communication-memo-review" id="communicationMemoReview" role="status" aria-live="polite" hidden></p>
+<p aria-live="polite" class="document-destination" id="documentDestination" role="status">Save destination: Communications.</p>
+<p aria-live="polite" class="communication-memo-review" hidden="" id="communicationMemoReview" role="status"></p>
 <div class="form-grid encoder-meta-grid">
 <div class="form-group">
 <label for="typeSelect"><i data-lucide="arrow-left-right"></i> Communication Type <span class="required-mark">*</span></label>
@@ -391,11 +390,11 @@
 <label for="officeInput"><i data-lucide="building-2"></i> Received From / Recipient Office <span class="required-mark">*</span></label>
 <textarea class="form-control compact-textarea" id="officeInput" placeholder="e.g. Juan Dela Cruz (sender/signatory) or recipient office" required=""></textarea>
 </div>
-<div class="form-group memo-routing-field" id="memoRecipientGroup" hidden>
+<div class="form-group memo-routing-field" hidden="" id="memoRecipientGroup">
 <label for="memoRecipientInput">Addressed To <span class="required-mark">*</span></label>
 <textarea class="form-control compact-textarea" id="memoRecipientInput" placeholder="Memo recipient or personnel"></textarea>
 </div>
-<div class="form-group memo-routing-field" id="memoIssuerGroup" hidden>
+<div class="form-group memo-routing-field" hidden="" id="memoIssuerGroup">
 <label for="memoIssuerInput">Issued By</label>
 <input class="form-control" id="memoIssuerInput" placeholder="Issuing office or signatory" type="text"/>
 </div>
@@ -482,11 +481,11 @@
 </div>
 </section>
 <!-- OCR RESULT AREA -->
-<p class="ocr-review-note" id="communicationOcrReview" role="status" aria-live="polite" hidden></p>
-<div class="form-group" id="ocrSignatoryGroup" hidden>
- <label for="ocrSignatorySelect">Review detected signatories</label>
- <select class="form-control" id="ocrSignatorySelect"><option value="">Choose the sender / signatory…</option></select>
- <small>Select the person who sent or signed the letter to fill Received From.</small>
+<p aria-live="polite" class="ocr-review-note" hidden="" id="communicationOcrReview" role="status"></p>
+<div class="form-group" hidden="" id="ocrSignatoryGroup">
+<label for="ocrSignatorySelect">Review detected signatories</label>
+<select class="form-control" id="ocrSignatorySelect"><option value="">Choose the sender / signatory…</option></select>
+<small>Select the person who sent or signed the letter to fill Received From.</small>
 </div>
 <section class="encoder-ocr-result">
 <div class="encoder-result-heading">
@@ -541,37 +540,37 @@
 </div>
 <div class="modal-body doc-viewer-body" id="docViewerBody">
 <div class="pdf-viewer-box">
-<div class="pdf-preview-toolbar" id="commPdfToolbar" hidden>
-<div class="pdf-page-controls"><button type="button" id="commPdfPrevPage" aria-label="Previous PDF page">←</button><span id="commPdfPageLabel" role="status" aria-live="polite">Page 1</span><button type="button" id="commPdfNextPage" aria-label="Next PDF page">→</button></div>
+<div class="pdf-preview-toolbar" hidden="" id="commPdfToolbar">
+<div class="pdf-page-controls"><button aria-label="Previous PDF page" id="commPdfPrevPage" type="button">←</button><span aria-live="polite" id="commPdfPageLabel" role="status">Page 1</span><button aria-label="Next PDF page" id="commPdfNextPage" type="button">→</button></div>
 <label for="commPdfZoom">Zoom<select id="commPdfZoom"><option value="fit">Fit width</option><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option></select></label>
 <span class="pdf-preview-status" id="commPdfRenderStatus" role="status"></span>
 </div>
-<div class="pdf-preview-stage" id="commPdfStage" tabindex="0" aria-label="Document preview; scroll to view the page" hidden>
-<canvas id="commPdfCanvas" role="img" aria-label="PDF page" hidden></canvas>
-<img id="docViewerImage" alt="Communication attachment" hidden/>
-<pre id="docViewerText" hidden></pre>
+<div aria-label="Document preview; scroll to view the page" class="pdf-preview-stage" hidden="" id="commPdfStage" tabindex="0">
+<canvas aria-label="PDF page" hidden="" id="commPdfCanvas" role="img"></canvas>
+<img alt="Communication attachment" hidden="" id="docViewerImage"/>
+<pre hidden="" id="docViewerText"></pre>
 </div>
 <div class="doc-viewer-fallback" id="docViewerFallback"><i class="no-pdf-icon" data-lucide="file-text"></i><h3>Attachment preview</h3><p>Preparing the document preview.</p></div>
 </div>
 </div>
 <div class="modal-footer modal-actions">
-<a class="btn btn-secondary" download="document" id="docViewerDownloadBtn" hidden><i data-lucide="download"></i>Download Document</a>
-<a class="btn btn-secondary" id="docViewerExternalBtn" rel="noopener noreferrer" target="_blank" hidden><i data-lucide="external-link"></i>Open in new tab</a>
+<a class="btn btn-secondary" download="document" hidden="" id="docViewerDownloadBtn"><i data-lucide="download"></i>Download Document</a>
+<a class="btn btn-secondary" hidden="" id="docViewerExternalBtn" rel="noopener noreferrer" target="_blank"><i data-lucide="external-link"></i>Open in new tab</a>
 <button class="btn btn-primary" id="dismissDocViewerBtn" type="button">Close</button>
 </div>
 </div>
 </div>
 <!-- Scripts -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
-<script defer="" src="admincommunication.js?v=20261010-slide-confirm-v3"></script>
-<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
-  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
-    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
-    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
-    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
-    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
-  </div>
+<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="admincommunication.js?v=20261011-navigation-pdf-v2"></script>
+<div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
+<div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
+<div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
+<div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+</div>
 </div>
 </body>
 </html>

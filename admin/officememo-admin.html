@@ -1,11 +1,12 @@
 <!DOCTYPE html>
+
 <html data-css-scope="admin-officememo" lang="en">
 <head>
-<meta name="pgenro-ocr-endpoint" content="/ocr"/>
+<meta content="/ocr" name="pgenro-ocr-endpoint"/>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Office Memorandum Administration</title>
-<meta name="theme-color" content="#f5f7f8"/>
+<meta content="#f5f7f8" name="theme-color"/>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
@@ -14,11 +15,10 @@
 <!-- Lucide Icons -->
 <!-- Supabase JavaScript SDK -->
 <!-- Stylesheets -->
-<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-<link href="officememo-admin.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
+<link href="officememo-admin.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin">
-<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin">
+<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -32,10 +32,8 @@
 <span>Administrative workspace</span>
 </div>
 </a>
-<button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-<i data-lucide="panel-left-close"></i>
-</button>
-</div>
+
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
 <nav aria-label="Administrator navigation" class="sidebar-nav">
 <div class="nav-group">
 <span class="nav-label">Workspace</span>
@@ -66,8 +64,8 @@
 <div class="nav-group">
 <span class="nav-label">Workspace tools</span>
 <ul>
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
+<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
 <li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
 </ul>
 </div>
@@ -78,20 +76,22 @@
 <div class="main-wrapper">
 <!-- TOPBAR -->
 <header class="topbar">
-<div class="topbar-left">
-<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Office memorandums</span></a>
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
 <i data-lucide="menu"></i>
 </button>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Office memorandums</span></a>
+
 <div class="global-search" role="search">
 <i class="search-icon" data-lucide="search"></i>
 <input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search office memos…" spellcheck="false" type="text"/>
-<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
 <!-- Search Quick Palette -->
 </div>
 </div>
 <div class="topbar-right">
-<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
 <!-- Notification Button & Drawer -->
 <div class="notification-wrapper">
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
@@ -113,7 +113,7 @@
 <div class="profile-menu" id="profileMenu">
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
-<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
 </button>
 <div class="profile-dropdown" id="profileDropdown">
 <div class="profile-dropdown-header">
@@ -143,7 +143,7 @@
 <!-- PAGE HEADER -->
 <section class="page-header depth-hero">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><i data-lucide="file-text"></i></div>
+<div aria-hidden="true" class="page-heading-mark"><i data-lucide="file-text"></i></div>
 <div class="breadcrumb">
 <span>Admin Console</span>
 <i data-lucide="chevron-right"></i>
@@ -165,22 +165,21 @@
 <i data-lucide="plus-circle"></i> Issue New Memorandum
             </button>
 </div>
-
-<div class="depth-scene" aria-hidden="true">
-  <span class="depth-orbit"></span><span class="depth-orb"></span>
-  <div class="depth-stack">
-    <span class="depth-sheet depth-sheet-back"></span>
-    <span class="depth-sheet depth-sheet-middle"></span>
-    <span class="depth-sheet depth-sheet-front">
-      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
-      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-    </span>
-  </div><span class="depth-scene-dot"></span>
+<div aria-hidden="true" class="depth-scene">
+<span class="depth-orbit"></span><span class="depth-orb"></span>
+<div class="depth-stack">
+<span class="depth-sheet depth-sheet-back"></span>
+<span class="depth-sheet depth-sheet-middle"></span>
+<span class="depth-sheet depth-sheet-front">
+<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
+<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+</span>
+</div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <!-- KPI METRICS GRID -->
 <section class="kpi-grid">
-<div class="kpi-card" role="button" tabindex="0" data-memo-kpi="all" aria-label="Show all memorandums" aria-pressed="false" title="Show all memorandums">
+<div aria-label="Show all memorandums" aria-pressed="false" class="kpi-card" data-memo-kpi="all" role="button" tabindex="0" title="Show all memorandums">
 <div class="kpi-header">
 <span class="kpi-label">Total Memorandums</span>
 <div class="kpi-icon emerald"><i data-lucide="file-text"></i></div>
@@ -190,7 +189,7 @@
 <span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> Official Records</span>
 </div>
 </div>
-<div class="kpi-card urgent-border" role="button" tabindex="0" data-memo-kpi="pinned" aria-label="Show pinned memorandums" aria-pressed="false" title="Show pinned memorandums">
+<div aria-label="Show pinned memorandums" aria-pressed="false" class="kpi-card urgent-border" data-memo-kpi="pinned" role="button" tabindex="0" title="Show pinned memorandums">
 <div class="kpi-header">
 <span class="kpi-label">Pinned Directives</span>
 <div class="kpi-icon amber"><i data-lucide="pin"></i></div>
@@ -200,7 +199,7 @@
 <span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> High Priority</span>
 </div>
 </div>
-<div class="kpi-card" role="button" tabindex="0" data-memo-kpi="month" aria-label="Show memorandums issued this month" aria-pressed="false" title="Show memorandums issued this month">
+<div aria-label="Show memorandums issued this month" aria-pressed="false" class="kpi-card" data-memo-kpi="month" role="button" tabindex="0" title="Show memorandums issued this month">
 <div class="kpi-header">
 <span class="kpi-label">Issued This Month</span>
 <div class="kpi-icon blue"><i data-lucide="calendar"></i></div>
@@ -210,7 +209,7 @@
 <span class="kpi-trend" id="memoMonthTrend">Compared with last month</span>
 </div>
 </div>
-<div class="kpi-card" role="button" tabindex="0" data-memo-kpi="attached" aria-label="Show memorandums with attachments" aria-pressed="false" title="Show memorandums with attachments">
+<div aria-label="Show memorandums with attachments" aria-pressed="false" class="kpi-card" data-memo-kpi="attached" role="button" tabindex="0" title="Show memorandums with attachments">
 <div class="kpi-header">
 <span class="kpi-label">Digital Attachments</span>
 <div class="kpi-icon purple"><i data-lucide="file-check"></i></div>
@@ -224,7 +223,7 @@
 <section aria-label="Memorandum dashboard" class="memo-dashboard-grid">
 <article class="card memo-dashboard-card">
 <div class="memo-dashboard-heading"><div><span class="memo-form-eyebrow">Issuance overview</span><h2>Memorandums over time</h2><p id="memoChartPeriod">Last six months · all registry records</p></div><i data-lucide="bar-chart-3"></i></div>
-<div class="memo-month-chart" id="memoMonthlyChart" role="list" aria-label="Monthly memorandum counts; choose a month to filter the registry"></div>
+<div aria-label="Monthly memorandum counts; choose a month to filter the registry" class="memo-month-chart" id="memoMonthlyChart" role="list"></div>
 <p class="memo-dashboard-note" id="memoChartSummary">No issuance data yet.</p>
 </article>
 <article class="card memo-dashboard-card">
@@ -242,22 +241,22 @@
 </div>
 </div>
 <div class="toolbar-filters">
-<select class="form-select filter-select" id="pinnedFilterSelect" aria-label="Filter by pinned status">
+<select aria-label="Filter by pinned status" class="form-select filter-select" id="pinnedFilterSelect">
 <option value="all">All Directives</option>
 <option value="pinned">Pinned Only</option>
 <option value="unpinned">Unpinned Only</option>
 </select>
-<select class="form-select filter-select" id="attachmentFilterSelect" aria-label="Filter by attachment">
+<select aria-label="Filter by attachment" class="form-select filter-select" id="attachmentFilterSelect">
 <option value="all">All Attachments</option>
 <option value="with_pdf">With Attachment</option>
 <option value="no_pdf">Without Attachment</option>
 </select>
-<label class="memo-month-filter" for="memoMonthFilter">Issue month<input class="form-control" id="memoMonthFilter" type="month"/></label><select class="form-select filter-select" id="memoSortSelect" aria-label="Sort memorandum registry"><option value="pinned">Pinned first</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="number">Memo number</option></select>
+<label class="memo-month-filter" for="memoMonthFilter">Issue month<input class="form-control" id="memoMonthFilter" type="month"/></label><select aria-label="Sort memorandum registry" class="form-select filter-select" id="memoSortSelect"><option value="pinned">Pinned first</option><option value="newest">Newest first</option><option value="oldest">Oldest first</option><option value="number">Memo number</option></select>
 <button class="btn btn-secondary btn-sm" id="clearMemoFiltersBtn" type="button">Clear filters</button>
 </div>
 </div>
-<p class="memo-filter-summary" id="memoFilterSummary" aria-live="polite"></p>
-<div class="memo-selection-bar" id="memoSelectionBar" hidden><span id="memoSelectionCount">0 selected</span><button class="btn btn-secondary btn-sm" id="clearMemoSelectionBtn" type="button">Clear selection</button></div>
+<p aria-live="polite" class="memo-filter-summary" id="memoFilterSummary"></p>
+<div class="memo-selection-bar" hidden="" id="memoSelectionBar"><span id="memoSelectionCount">0 selected</span><button class="btn btn-secondary btn-sm" id="clearMemoSelectionBtn" type="button">Clear selection</button></div>
 </section>
 <!-- DATA TABLE -->
 <section class="card table-card printable-registry" id="memoRegistry">
@@ -314,7 +313,7 @@
 <i data-lucide="x"></i>
 </button>
 </div>
-<div class="ocr-stop-controls" id="memoOcrStopControls" hidden><button class="btn btn-secondary" id="cancelMemoOcrBtn" type="button">Stop reading</button></div>
+<div class="ocr-stop-controls" hidden="" id="memoOcrStopControls"><button class="btn btn-secondary" id="cancelMemoOcrBtn" type="button">Stop reading</button></div>
 <form id="memoForm" novalidate="">
 <input id="memoDocId" type="hidden" value=""/>
 <div class="modal-body memo-form-body modal-body">
@@ -434,9 +433,9 @@
 <span>Run OCR</span>
 </button>
 </div>
-<section class="memo-extraction-review" id="memoExtractionReview" hidden aria-labelledby="memoReviewHeading">
+<section aria-labelledby="memoReviewHeading" class="memo-extraction-review" hidden="" id="memoExtractionReview">
 <h4 id="memoReviewHeading">Detected fields</h4>
-<p id="memoReviewSummary" role="status" aria-live="polite"></p>
+<p aria-live="polite" id="memoReviewSummary" role="status"></p>
 <dl class="memo-review-fields" id="memoReviewFields"></dl>
 </section>
 <div class="memo-ocr-results">
@@ -484,15 +483,15 @@
 </div>
 <div class="modal-body viewer-body">
 <div class="pdf-viewer-box">
-<div class="pdf-preview-toolbar" id="memoPdfToolbar" hidden>
-<div class="pdf-page-controls"><button type="button" id="memoPdfPrevPage" aria-label="Previous PDF page">←</button><span id="memoPdfPageLabel" role="status" aria-live="polite">Page 1</span><button type="button" id="memoPdfNextPage" aria-label="Next PDF page">→</button></div>
+<div class="pdf-preview-toolbar" hidden="" id="memoPdfToolbar">
+<div class="pdf-page-controls"><button aria-label="Previous PDF page" id="memoPdfPrevPage" type="button">←</button><span aria-live="polite" id="memoPdfPageLabel" role="status">Page 1</span><button aria-label="Next PDF page" id="memoPdfNextPage" type="button">→</button></div>
 <label for="memoPdfZoom">Zoom<select id="memoPdfZoom"><option value="fit">Fit width</option><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option></select></label>
 <span class="pdf-preview-status" id="memoPdfRenderStatus" role="status"></span>
 </div>
-<div class="pdf-preview-stage" id="memoPdfStage" tabindex="0" aria-label="Document preview; scroll to view the page" hidden>
-<canvas id="memoPdfCanvas" role="img" aria-label="PDF page" hidden></canvas>
-<img id="memoAttachmentImage" alt="Memorandum attachment" hidden/>
-<pre id="memoAttachmentText" hidden></pre>
+<div aria-label="Document preview; scroll to view the page" class="pdf-preview-stage" hidden="" id="memoPdfStage" tabindex="0">
+<canvas aria-label="PDF page" hidden="" id="memoPdfCanvas" role="img"></canvas>
+<img alt="Memorandum attachment" hidden="" id="memoAttachmentImage"/>
+<pre hidden="" id="memoAttachmentText"></pre>
 </div>
 <div class="no-pdf-placeholder hidden" id="adminNoPdfState">
 <i class="no-pdf-icon" data-lucide="file-x-2"></i>
@@ -502,10 +501,10 @@
 </div>
 </div>
 <div class="modal-footer modal-actions">
-<a class="btn btn-secondary" download="Memorandum.pdf" id="downloadPdfBtn" hidden>
+<a class="btn btn-secondary" download="Memorandum.pdf" hidden="" id="downloadPdfBtn">
 <i data-lucide="download"></i> Download Document
 </a>
-<a class="btn btn-secondary" id="openPdfNewTabBtn" target="_blank" rel="noopener noreferrer" hidden><i data-lucide="external-link"></i>Open in new tab</a>
+<a class="btn btn-secondary" hidden="" id="openPdfNewTabBtn" rel="noopener noreferrer" target="_blank"><i data-lucide="external-link"></i>Open in new tab</a>
 <button class="btn btn-primary" id="dismissViewPdfBtn" type="button">Close</button>
 </div>
 </div>
@@ -538,15 +537,15 @@
 <div class="toast-container" id="toastContainer"></div>
 <!-- SCRIPTS -->
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
-<script defer="" src="officememo-admin.js?v=20261010-slide-confirm-v3"></script>
-<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
-  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
-    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
-    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
-    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
-    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
-  </div>
+<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="officememo-admin.js?v=20261011-navigation-pdf-v2"></script>
+<div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
+<div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
+<div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
+<div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+</div>
 </div>
 </body>
 </html>

@@ -1,0 +1,43 @@
+{
+  "result": "PASS",
+  "method": "Actual Chromium pages; local Supabase mocks",
+  "checks": [
+    {
+      "scenario": "Admin opens User Management directly, lists profiles despite a broken legacy RPC, and creates User accounts with only Admin/User choices",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Revoked or banned access clears the account directory, closes the form and disables export",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User opening an Admin URL is redirected to the User workspace despite a forged Admin browser cache",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Signed-out access returns to login",
+      "result": "PASS"
+    },
+    {
+      "scenario": "A database error is shown inside the registry with disabled actions; the Admin workspace remains visible without an extra access screen",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Mobile registry and account role form remain usable without horizontal page overflow",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Without JavaScript only the static Admin shell is visible, with no personnel account data or separate access card",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Admin login routes to its corresponding workspace using the Supabase profile",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User login routes to its corresponding workspace using the Supabase profile",
+      "result": "PASS"
+    }
+  ],
+  "hosted_changes": false
+}

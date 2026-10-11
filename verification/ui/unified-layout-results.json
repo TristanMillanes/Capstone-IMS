@@ -1,0 +1,2431 @@
+{
+  "mode": "verified",
+  "method": "Chromium, production HTML/CSS/JS, real Chart.js, simulated Supabase only",
+  "pages": [
+    {
+      "file": "admin/Usermanagement.html",
+      "url": "http://127.0.0.1:42313/admin/Usermanagement.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1433,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/admin.html",
+      "url": "http://127.0.0.1:42313/admin/admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "monthlyChart",
+              "r": {
+                "x": 306,
+                "y": 1071.0625,
+                "w": 701,
+                "h": 280,
+                "right": 1007,
+                "bottom": 1351.0625
+              },
+              "p": {
+                "x": 306,
+                "y": 1071.0625,
+                "w": 701,
+                "h": 280,
+                "right": 1007,
+                "bottom": 1351.0625
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "categoryChart",
+              "r": {
+                "x": 1068,
+                "y": 1071.0625,
+                "w": 320,
+                "h": 280,
+                "right": 1388,
+                "bottom": 1351.0625
+              },
+              "p": {
+                "x": 1068,
+                "y": 1071.0625,
+                "w": 320,
+                "h": 280,
+                "right": 1388,
+                "bottom": 1351.0625
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "statusChart",
+              "r": {
+                "x": 306,
+                "y": 1517.25,
+                "w": 320,
+                "h": 280,
+                "right": 626,
+                "bottom": 1797.25
+              },
+              "p": {
+                "x": 306,
+                "y": 1517.25,
+                "w": 320,
+                "h": 280,
+                "right": 626,
+                "bottom": 1797.25
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "personnelChart",
+              "r": {
+                "x": 306,
+                "y": 1963.4375,
+                "w": 510,
+                "h": 240,
+                "right": 816,
+                "bottom": 2203.4375
+              },
+              "p": {
+                "x": 306,
+                "y": 1963.4375,
+                "w": 510.5,
+                "h": 240,
+                "right": 816.5,
+                "bottom": 2203.4375
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "commChart",
+              "r": {
+                "x": 877.5,
+                "y": 1963.4375,
+                "w": 510,
+                "h": 280,
+                "right": 1387.5,
+                "bottom": 2243.4375
+              },
+              "p": {
+                "x": 877.5,
+                "y": 1963.4375,
+                "w": 510.5,
+                "h": 280,
+                "right": 1388,
+                "bottom": 2243.4375
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "monthlyChart",
+              "r": {
+                "x": 298,
+                "y": 1488.703125,
+                "w": 372,
+                "h": 280,
+                "right": 670,
+                "bottom": 1768.703125
+              },
+              "p": {
+                "x": 298,
+                "y": 1488.703125,
+                "w": 372.40625,
+                "h": 280,
+                "right": 670.40625,
+                "bottom": 1768.703125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "categoryChart",
+              "r": {
+                "x": 731.40625,
+                "y": 1488.703125,
+                "w": 248,
+                "h": 280,
+                "right": 979.40625,
+                "bottom": 1768.703125
+              },
+              "p": {
+                "x": 731.40625,
+                "y": 1488.703125,
+                "w": 248.59375,
+                "h": 280,
+                "right": 980,
+                "bottom": 1768.703125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "statusChart",
+              "r": {
+                "x": 298,
+                "y": 1934.890625,
+                "w": 310,
+                "h": 280,
+                "right": 608,
+                "bottom": 2214.890625
+              },
+              "p": {
+                "x": 298,
+                "y": 1934.890625,
+                "w": 310.5,
+                "h": 280,
+                "right": 608.5,
+                "bottom": 2214.890625
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "personnelChart",
+              "r": {
+                "x": 298,
+                "y": 2651.359375,
+                "w": 310,
+                "h": 240,
+                "right": 608,
+                "bottom": 2891.359375
+              },
+              "p": {
+                "x": 298,
+                "y": 2651.359375,
+                "w": 310.5,
+                "h": 240,
+                "right": 608.5,
+                "bottom": 2891.359375
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "commChart",
+              "r": {
+                "x": 669.5,
+                "y": 2631.21875,
+                "w": 310,
+                "h": 280,
+                "right": 979.5,
+                "bottom": 2911.21875
+              },
+              "p": {
+                "x": 669.5,
+                "y": 2631.21875,
+                "w": 310.5,
+                "h": 280,
+                "right": 980,
+                "bottom": 2911.21875
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "monthlyChart",
+              "r": {
+                "x": 42,
+                "y": 1483.453125,
+                "w": 373,
+                "h": 280,
+                "right": 415,
+                "bottom": 1763.453125
+              },
+              "p": {
+                "x": 42,
+                "y": 1483.453125,
+                "w": 373.578125,
+                "h": 280,
+                "right": 415.578125,
+                "bottom": 1763.453125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "categoryChart",
+              "r": {
+                "x": 476.578125,
+                "y": 1483.453125,
+                "w": 249,
+                "h": 280,
+                "right": 725.578125,
+                "bottom": 1763.453125
+              },
+              "p": {
+                "x": 476.578125,
+                "y": 1483.453125,
+                "w": 249.40625,
+                "h": 280,
+                "right": 725.984375,
+                "bottom": 1763.453125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "statusChart",
+              "r": {
+                "x": 42,
+                "y": 1929.640625,
+                "w": 311,
+                "h": 280,
+                "right": 353,
+                "bottom": 2209.640625
+              },
+              "p": {
+                "x": 42,
+                "y": 1929.640625,
+                "w": 311.5,
+                "h": 280,
+                "right": 353.5,
+                "bottom": 2209.640625
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "personnelChart",
+              "r": {
+                "x": 42,
+                "y": 2646.109375,
+                "w": 311,
+                "h": 240,
+                "right": 353,
+                "bottom": 2886.109375
+              },
+              "p": {
+                "x": 42,
+                "y": 2646.109375,
+                "w": 311.5,
+                "h": 240,
+                "right": 353.5,
+                "bottom": 2886.109375
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "commChart",
+              "r": {
+                "x": 414.5,
+                "y": 2625.96875,
+                "w": 311,
+                "h": 280,
+                "right": 725.5,
+                "bottom": 2905.96875
+              },
+              "p": {
+                "x": 414.5,
+                "y": 2625.96875,
+                "w": 311.484375,
+                "h": 280,
+                "right": 725.984375,
+                "bottom": 2905.96875
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "monthlyChart",
+              "r": {
+                "x": 31,
+                "y": 1786.71875,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 2066.71875
+              },
+              "p": {
+                "x": 31,
+                "y": 1786.71875,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 2066.71875
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "categoryChart",
+              "r": {
+                "x": 31,
+                "y": 2238.984375,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 2518.984375
+              },
+              "p": {
+                "x": 31,
+                "y": 2238.984375,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 2518.984375
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "statusChart",
+              "r": {
+                "x": 31,
+                "y": 2678.171875,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 2958.171875
+              },
+              "p": {
+                "x": 31,
+                "y": 2678.171875,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 2958.171875
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "personnelChart",
+              "r": {
+                "x": 31,
+                "y": 3831.0625,
+                "w": 328,
+                "h": 240,
+                "right": 359,
+                "bottom": 4071.0625
+              },
+              "p": {
+                "x": 31,
+                "y": 3831.0625,
+                "w": 328,
+                "h": 240,
+                "right": 359,
+                "bottom": 4071.0625
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "commChart",
+              "r": {
+                "x": 31,
+                "y": 4240.390625,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 4520.390625
+              },
+              "p": {
+                "x": 31,
+                "y": 4240.390625,
+                "w": 328,
+                "h": 280,
+                "right": 359,
+                "bottom": 4520.390625
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "monthlyChart",
+              "r": {
+                "x": 31,
+                "y": 2244.78125,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 2524.78125
+              },
+              "p": {
+                "x": 31,
+                "y": 2244.78125,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 2524.78125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "categoryChart",
+              "r": {
+                "x": 31,
+                "y": 2697.046875,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 2977.046875
+              },
+              "p": {
+                "x": 31,
+                "y": 2697.046875,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 2977.046875
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "statusChart",
+              "r": {
+                "x": 31,
+                "y": 3166.515625,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 3446.515625
+              },
+              "p": {
+                "x": 31,
+                "y": 3166.515625,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 3446.515625
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "personnelChart",
+              "r": {
+                "x": 31,
+                "y": 4391.734375,
+                "w": 258,
+                "h": 240,
+                "right": 289,
+                "bottom": 4631.734375
+              },
+              "p": {
+                "x": 31,
+                "y": 4391.734375,
+                "w": 258,
+                "h": 240,
+                "right": 289,
+                "bottom": 4631.734375
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "commChart",
+              "r": {
+                "x": 31,
+                "y": 4817.25,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 5097.25
+              },
+              "p": {
+                "x": 31,
+                "y": 4817.25,
+                "w": 258,
+                "h": 280,
+                "right": 289,
+                "bottom": 5097.25
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "url": "http://127.0.0.1:42313/admin/admincommunication.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1433,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "url": "http://127.0.0.1:42313/admin/audittrail-admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "url": "http://127.0.0.1:42313/admin/backup-admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "url": "http://127.0.0.1:42313/admin/employee-admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1433,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "url": "http://127.0.0.1:42313/admin/ics-admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1432,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1016,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 760,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1432,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "url": "http://127.0.0.1:42313/admin/invetoryadmin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1434,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1018,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 762,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1434,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "url": "http://127.0.0.1:42313/admin/officememo-admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1433,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/requestacc.html",
+      "url": "http://127.0.0.1:42313/admin/requestacc.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "url": "http://127.0.0.1:42313/admin/serviceAdmin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1433,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "url": "http://127.0.0.1:42313/admin/travelOR-admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1433,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "url": "http://127.0.0.1:42313/admin/visitors-admin.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1433,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1017,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 761,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1433,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/communication.html",
+      "url": "http://127.0.0.1:42313/User/communication.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/employee.html",
+      "url": "http://127.0.0.1:42313/User/employee.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/homepage.html",
+      "url": "http://127.0.0.1:42313/User/homepage.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "r": {
+                "x": 325,
+                "y": 972.890625,
+                "w": 574,
+                "h": 280,
+                "right": 899,
+                "bottom": 1252.890625
+              },
+              "p": {
+                "x": 325,
+                "y": 972.890625,
+                "w": 574.078125,
+                "h": 280,
+                "right": 899.078125,
+                "bottom": 1252.890625
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "operationsDistChart",
+              "r": {
+                "x": 325,
+                "y": 1491.109375,
+                "w": 574,
+                "h": 280,
+                "right": 899,
+                "bottom": 1771.109375
+              },
+              "p": {
+                "x": 325,
+                "y": 1491.109375,
+                "w": 574.078125,
+                "h": 280,
+                "right": 899.078125,
+                "bottom": 1771.109375
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "r": {
+                "x": 325,
+                "y": 1312.78125,
+                "w": 628,
+                "h": 280,
+                "right": 953,
+                "bottom": 1592.78125
+              },
+              "p": {
+                "x": 325,
+                "y": 1312.78125,
+                "w": 628,
+                "h": 280,
+                "right": 953,
+                "bottom": 1592.78125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "operationsDistChart",
+              "r": {
+                "x": 325,
+                "y": 2204.21875,
+                "w": 628,
+                "h": 280,
+                "right": 953,
+                "bottom": 2484.21875
+              },
+              "p": {
+                "x": 325,
+                "y": 2204.21875,
+                "w": 628,
+                "h": 280,
+                "right": 953,
+                "bottom": 2484.21875
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "r": {
+                "x": 71,
+                "y": 1312.78125,
+                "w": 626,
+                "h": 280,
+                "right": 697,
+                "bottom": 1592.78125
+              },
+              "p": {
+                "x": 71,
+                "y": 1312.78125,
+                "w": 626,
+                "h": 280,
+                "right": 697,
+                "bottom": 1592.78125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "operationsDistChart",
+              "r": {
+                "x": 71,
+                "y": 2204.21875,
+                "w": 626,
+                "h": 280,
+                "right": 697,
+                "bottom": 2484.21875
+              },
+              "p": {
+                "x": 71,
+                "y": 2204.21875,
+                "w": 626,
+                "h": 280,
+                "right": 697,
+                "bottom": 2484.21875
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "r": {
+                "x": 51,
+                "y": 1516.125,
+                "w": 288,
+                "h": 300,
+                "right": 339,
+                "bottom": 1816.125
+              },
+              "p": {
+                "x": 51,
+                "y": 1516.125,
+                "w": 288,
+                "h": 300,
+                "right": 339,
+                "bottom": 1816.125
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "operationsDistChart",
+              "r": {
+                "x": 51,
+                "y": 2474.25,
+                "w": 288,
+                "h": 300,
+                "right": 339,
+                "bottom": 2774.25
+              },
+              "p": {
+                "x": 51,
+                "y": 2474.25,
+                "w": 288,
+                "h": 300,
+                "right": 339,
+                "bottom": 2774.25
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "r": {
+                "x": 51,
+                "y": 2206.359375,
+                "w": 218,
+                "h": 300,
+                "right": 269,
+                "bottom": 2506.359375
+              },
+              "p": {
+                "x": 51,
+                "y": 2206.359375,
+                "w": 218,
+                "h": 300,
+                "right": 269,
+                "bottom": 2506.359375
+              },
+              "instance": true,
+              "fit": true
+            },
+            {
+              "id": "operationsDistChart",
+              "r": {
+                "x": 51,
+                "y": 3183.171875,
+                "w": 218,
+                "h": 300,
+                "right": 269,
+                "bottom": 3483.171875
+              },
+              "p": {
+                "x": 51,
+                "y": 3183.171875,
+                "w": 218,
+                "h": 300,
+                "right": 269,
+                "bottom": 3483.171875
+              },
+              "instance": true,
+              "fit": true
+            }
+          ],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/ics.html",
+      "url": "http://127.0.0.1:42313/User/ics.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [
+        {
+          "width": 1440,
+          "geometry": {
+            "width": 1440,
+            "scroll": 1440,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 390,
+          "geometry": {
+            "width": 390,
+            "scroll": 390,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        },
+        {
+          "width": 320,
+          "geometry": {
+            "width": 320,
+            "scroll": 320,
+            "outside": [],
+            "overlaps": [],
+            "charts": [],
+            "duplicateIds": []
+          }
+        }
+      ],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/inventory.html",
+      "url": "http://127.0.0.1:42313/User/inventory.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/login.html",
+      "url": "http://127.0.0.1:42313/User/login.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": []
+    },
+    {
+      "file": "User/officememo.html",
+      "url": "http://127.0.0.1:42313/User/officememo.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/requestacc.html",
+      "url": "http://127.0.0.1:42313/User/requestacc.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": []
+    },
+    {
+      "file": "User/service.html",
+      "url": "http://127.0.0.1:42313/User/service.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/travelOR.html",
+      "url": "http://127.0.0.1:42313/User/travelOR.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "User/visitorsView.html",
+      "url": "http://127.0.0.1:42313/User/visitorsView.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": [],
+      "mobileMenu": {
+        "fits": true,
+        "visible": true,
+        "expanded": "true"
+      }
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "url": "http://127.0.0.1:42313/SettingIMS/Settings.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "url": "http://127.0.0.1:42313/VisitorsLog/visitorslog.html",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "outside": [],
+          "overlaps": [],
+          "charts": [],
+          "duplicateIds": []
+        }
+      ],
+      "dialogs": []
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "summary": {
+    "pages": 26,
+    "viewports": 130,
+    "dialog_viewports": 30,
+    "failures": 0
+  }
+}

@@ -1,3 +1,5 @@
+Current 10 October 2026 update: see `access/VALIDATION.md` for Admin/User registration and approval, SQL, account-service, persistent module notifications, modern dashboards, routing and layout checks. The reports below describe the earlier 4 October revision.
+
 # Verification of the 4 October 2026 update
 
 These checks used the production application and real local Chromium/Flask/Tesseract. Supabase database, authentication and Storage responses were simulated. No hosted records, policies, Edge Functions or deployments were changed or verified.

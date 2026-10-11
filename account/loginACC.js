@@ -34,7 +34,7 @@ loginForm?.addEventListener("submit", async (event) => {
       email: profile.email || email,
       division: profile.division || "",
       position: profile.position || "",
-      role: profile.role || "System Staff",
+      role: profile.role || "User",
       status: profile.status || "Active"
     };
 

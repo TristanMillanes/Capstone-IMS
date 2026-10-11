@@ -2,18 +2,16 @@
 
 <html data-css-scope="user-settings" data-theme="light" lang="en">
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-8"/><script id="moduleThemeBoot">try{const p=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}');const t=(localStorage.getItem('pgenro_user_theme')||p.theme)==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.dataset.pgenroTheme=t;}catch(e){document.documentElement.dataset.theme='light';}</script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Account &amp; System Settings</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
-
-
-<link href="Setting.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
+<link href="Setting.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
 </head>
-<body class="pgenro-user pgenro-settings depth-workspace" data-css-scope="user-settings" data-requires-auth="user">
+<body class="pgenro-user pgenro-settings depth-workspace ui-unified" data-css-scope="user-settings" data-requires-auth="user">
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <header class="settings-topbar">
 <a class="settings-back" href="../User/homepage.html" id="backToWorkspace">
@@ -23,8 +21,8 @@
 <img alt="PGENRO" src="../logo/enro.png"/>
 <div><strong>PGENRO IMS</strong><span>Account &amp; System Settings</span></div>
 </div>
-<button class="settings-signout" data-pgenro-logout="" title="Sign out" type="button"><i data-lucide="log-out"></i><span>Sign out</span></button>
-</header>
+
+<div class="settings-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><button class="settings-signout" data-pgenro-logout="" title="Sign out" type="button"><i data-lucide="log-out"></i><span>Sign out</span></button></div></header>
 <main class="settings-shell" id="workspaceMain">
 <section class="settings-heading depth-hero">
 <div>
@@ -33,16 +31,16 @@
 <p>Manage your profile, password, interface preferences, and administrator-level system controls.</p>
 </div>
 <div class="settings-status" id="settingsDbStatus"><span></span> Connecting to Supabase…</div>
-<div class="depth-scene" aria-hidden="true">
-  <span class="depth-orbit"></span><span class="depth-orb"></span>
-  <div class="depth-stack">
-    <span class="depth-sheet depth-sheet-back"></span>
-    <span class="depth-sheet depth-sheet-middle"></span>
-    <span class="depth-sheet depth-sheet-front">
-      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
-      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-    </span>
-  </div><span class="depth-scene-dot"></span>
+<div aria-hidden="true" class="depth-scene">
+<span class="depth-orbit"></span><span class="depth-orb"></span>
+<div class="depth-stack">
+<span class="depth-sheet depth-sheet-back"></span>
+<span class="depth-sheet depth-sheet-middle"></span>
+<span class="depth-sheet depth-sheet-front">
+<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
+<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+</span>
+</div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <div class="settings-layout">
@@ -129,9 +127,8 @@
 </div>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
-<script src="../shared/settings-runtime.js?v=20261004-ocr-ui-v8"></script>
-<script src="Settings.js?v=20261010-slide-confirm-v3"></script>
-
+<script src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script src="../shared/settings-runtime.js?v=20261011-navigation-pdf-v2"></script>
+<script src="Settings.js?v=20261011-navigation-pdf-v2"></script>
 </body>
 </html>

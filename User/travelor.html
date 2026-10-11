@@ -2,21 +2,19 @@
 
 <html data-css-scope="user-travelor" lang="en">
 <head>
-<meta charset="utf-8"/>
+<meta charset="utf-8"/><script id="moduleThemeBoot">try{const p=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}');const t=(localStorage.getItem('pgenro_user_theme')||p.theme)==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.dataset.pgenroTheme=t;}catch(e){document.documentElement.dataset.theme='light';}</script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Travel Order (Viewer)</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
-
-<link href="travelOR.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
-<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
+<link href="travelOR.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
 </head>
-<body class="pgenro-user depth-workspace" data-css-scope="user-travelor" data-requires-auth="user" data-page-data-owner="module">
-<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div><div class="overlay" id="overlay"></div><button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button"><span></span><span></span><span></span></button>
+<body class="pgenro-user depth-workspace ui-unified" data-css-scope="user-travelor" data-page-data-owner="module" data-requires-auth="user">
+<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><div class="overlay" id="overlay"></div>
 <div class="app-container"><aside class="sidebar" id="sidebar">
-<div class="sidebar-brand">
+<div class="sidebar-brand"><button aria-label="Close module menu" class="user-sidebar-close" type="button">×</button>
 <div class="sidebar-logo"><img alt="PGENRO Logo" class="logo-image" src="../logo/enro.png"/></div>
 <div class="sidebar-brand-copy"><strong>PGENRO IMS</strong><span>Quezon Province</span></div>
 </div>
@@ -39,30 +37,31 @@
 </div>
 </div>
 </aside><main class="main-content" id="mainContent">
-<header class="depth-user-topbar" aria-label="Workspace toolbar">
-              <nav class="depth-topbar-breadcrumb" aria-label="Breadcrumb"><a href="homepage.html">Workspace</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m9 5 7 7-7 7"/></svg><span>Travel Order Tracking</span></nav>
-              <div class="depth-topbar-actions"><span class="depth-access-label"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"/><path d="m8 12 3 3 5-6"/></svg>Viewer workspace</span><a class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" aria-label="Account settings" title="Account settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/></svg></a></div>
-            </header>
+<header aria-label="Workspace toolbar" class="depth-user-topbar">
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button"><span></span><span></span><span></span></button>
+<nav aria-label="Breadcrumb" class="depth-topbar-breadcrumb"><a href="homepage.html">Workspace</a><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m9 5 7 7-7 7"></path></svg><span>Travel Order Tracking</span></nav>
+<div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer workspace</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
+</header>
 <div class="content-shell">
 <section class="page-header depth-hero">
-<div class="header-overlay-glow"></div>
+<div class="header-copy">
 <span class="page-badge">
 <i data-lucide="eye"></i>
         VIEWER ACCESS
       </span>
 <h1>Travel Order Tracking</h1>
 <p>Database logs of official staff travel orders, destinations, and trip approvals.</p>
-
-<div class="depth-scene" aria-hidden="true">
-  <span class="depth-orbit"></span><span class="depth-orb"></span>
-  <div class="depth-stack">
-    <span class="depth-sheet depth-sheet-back"></span>
-    <span class="depth-sheet depth-sheet-middle"></span>
-    <span class="depth-sheet depth-sheet-front">
-      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
-      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-    </span>
-  </div><span class="depth-scene-dot"></span>
+</div>
+<div aria-hidden="true" class="depth-scene">
+<span class="depth-orbit"></span><span class="depth-orb"></span>
+<div class="depth-stack">
+<span class="depth-sheet depth-sheet-back"></span>
+<span class="depth-sheet depth-sheet-middle"></span>
+<span class="depth-sheet depth-sheet-front">
+<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
+<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+</span>
+</div><span class="depth-scene-dot"></span>
 </div>
 </section>
 <!-- METRICS -->
@@ -118,7 +117,7 @@
 </section>
 <footer class="footer"><div><strong>PGENRO IMS</strong><span>Provincial Government Environment and Natural Resources Office</span></div><p>© 2026 Province of Quezon.</p></footer></div></main></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
-<script defer src="travelOR.js?v=20261010-slide-confirm-v3"></script>
+<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="travelOR.js?v=20261011-navigation-pdf-v2"></script>
 </body>
 </html>

@@ -1,0 +1,279 @@
+{
+  "method": "Actual Chromium; production pages; real bundled Chart.js and PDF.js; simulated Supabase only",
+  "checks": [
+    {
+      "name": "admin/Usermanagement.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/admincommunication.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/audittrail-admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/backup-admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/employee-admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/ics-admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/invetoryadmin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/officememo-admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/requestacc.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/serviceAdmin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/travelOR-admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/visitors-admin.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/communication.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/employee.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/homepage.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/ics.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/inventory.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/officememo.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/service.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/travelOR.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "User/visitorsView.html top navigation, themes, drawer and width containment",
+      "result": "PASS"
+    },
+    {
+      "name": "Account Settings and user appearance use the same preference",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/admincommunication.html real three-page PDF, paging, zoom, fit width, dark viewer and cleanup",
+      "result": "PASS"
+    },
+    {
+      "name": "admin/officememo-admin.html real three-page PDF, paging, zoom, fit width, dark viewer and cleanup",
+      "result": "PASS"
+    },
+    {
+      "name": "User/officememo.html real three-page PDF, paging, zoom, fit width, dark viewer and cleanup",
+      "result": "PASS"
+    },
+    {
+      "name": "User/communication.html real three-page PDF, paging, zoom, fit width, dark viewer and cleanup",
+      "result": "PASS"
+    },
+    {
+      "name": "A damaged PDF shows a readable error and retains Download",
+      "result": "PASS"
+    },
+    {
+      "name": "Travel order details remain available without Print and fit 320 px",
+      "result": "PASS"
+    }
+  ],
+  "errors": [],
+  "themes": [
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "dark",
+      "surface": "#142c23",
+      "scheme": "dark",
+      "white": []
+    }
+  ],
+  "passed": true
+}

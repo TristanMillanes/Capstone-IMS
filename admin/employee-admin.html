@@ -1,1436 +1,753 @@
 <!DOCTYPE html>
 
 <html data-css-scope="admin-dashboard" lang="en">
-
 <head>
-
 <meta charset="utf-8"/>
-
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-
 <meta content="light" name="color-scheme"/>
-
 <title>PGENRO IMS | Employee Profiles Admin</title>
-<meta name="theme-color" content="#f5f7f8"/>
+<meta content="#f5f7f8" name="theme-color"/>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
-
 <!-- Google Fonts -->
-
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
-
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-
 <!-- Lucide Icons & Supabase SDK -->
-
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <!-- Core Admin Stylesheets Matching admin.html -->
-
-<link href="../shared/deployment-layout.css?v=20261004-ocr-ui-v8" rel="stylesheet"/>
-
-<link href="employee-admin.css?v=20261010-slide-confirm-v3" rel="stylesheet"/>
+<link href="employee-admin.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
 </head>
-
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace" data-admin-page="employee-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
-<div class="depth-ambient" aria-hidden="true"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
-
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="employee-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
+<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
-
 <!-- =========================================================
 
          ADMIN SIDEBAR
 
          ========================================================= -->
-
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
-
 <div class="sidebar-header">
-
 <a class="logo-area" href="admin.html">
-
 <div class="logo-icon">
-
 <img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
-
 </div>
-
 <div class="logo-text">
-
 <h2>PGENRO IMS</h2>
-
 <span>Administrative workspace</span>
-
 </div>
-
 </a>
 
-<button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-
-<i data-lucide="panel-left-close"></i>
-
-</button>
-
-</div>
-
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
 <nav aria-label="Administrator navigation" class="sidebar-nav">
-
 <div class="nav-group">
-
 <span class="nav-label">Workspace</span>
-
 <ul>
-
 <li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-
 </ul>
-
 </div>
-
 <div class="nav-group">
-
 <span class="nav-label">Office operations</span>
-
 <ul>
-
 <li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
-
 <li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
-
 <li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-
 <li><a aria-current="page" class="nav-item active" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
-
 <li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
-
 <li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
-
 <li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-
 <li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
-
 </ul>
-
 </div>
-
 <div class="nav-group">
-
 <span class="nav-label">Administration</span>
-
 <ul>
-
 <li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-
 <li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
-
 </ul>
-
 </div>
-
 <div class="nav-group">
-
 <span class="nav-label">Workspace tools</span>
-
 <ul>
-
-<li><a class="nav-item" href="admin.html#audit"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
-
-<li><a class="nav-item" href="admin.html#backup"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
-
+<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
+<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
 <li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
-
 </ul>
-
 </div>
-
 </nav>
-
 <div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 </aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
-
 <!-- =========================================================
 
          MAIN WRAPPER
 
          ========================================================= -->
-
 <div class="main-wrapper">
-
 <header class="topbar">
-
-<div class="topbar-left">
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+<i data-lucide="panel-left-close"></i>
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+<i data-lucide="menu"></i>
+</button>
 <a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Employee directory</span></a>
 
-<button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-
-<i data-lucide="menu"></i>
-
-</button>
-
 <div class="global-search" role="search">
-
 <i class="search-icon" data-lucide="search"></i>
-
 <input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search employee records…" spellcheck="false" type="text"/>
-
-<button type="button" id="workspaceJumpBtn" class="workspace-jump-btn" aria-label="Jump to a module (Control K)" aria-haspopup="dialog" aria-controls="workspaceJumpModal" title="Jump to a module (Ctrl K)"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
-
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
 <!-- Search Quick Palette -->
-
 </div>
-
 </div>
-
 <div class="topbar-right">
-<button type="button" class="modern-theme-toggle" id="appearanceThemeBtn" aria-label="Switch to dark appearance" aria-pressed="false" title="Switch to dark appearance"><i data-lucide="moon"></i></button>
-
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
 <!-- Notification Button & Drawer -->
-
 <div class="notification-wrapper">
-
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
-
 <i data-lucide="bell"></i>
-
 <span class="notification-ping" id="notifPing" style="display: none;"></span>
-
 </button>
-
 <div class="notification-dropdown" id="notificationDropdown">
-
 <div class="notification-header">
-
 <h3>Notifications</h3>
-
 <span class="badge-count" id="notifBadgeCount">0 Unread</span>
-
 </div>
-
 <div class="notification-list" id="notificationList">
-
 <div class="empty-notif-state">No new notifications</div>
-
 </div>
-
 </div>
-
 </div>
-
 <div class="v-divider"></div>
-
 <!-- Profile Menu -->
-
 <div class="profile-menu" id="profileMenu">
-
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
-
 <div class="profile-avatar"><i data-lucide="user-round"></i></div>
-
-<span class="profile-btn-copy" aria-hidden="true"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
 </button>
-
 <div class="profile-dropdown" id="profileDropdown">
-
 <div class="profile-dropdown-header">
-
 <div class="profile-avatar big"><i data-lucide="user-round"></i></div>
-
 <div class="profile-dropdown-copy">
-
 <h3 id="dropdownUserName">PGENRO Admin</h3>
-
 <p id="dropdownUserEmail">Administrator Session</p>
-
 <span class="role-badge" id="dropdownUserRole">Administrator</span>
-
 </div>
-
 </div>
-
 <div class="dropdown-links">
-
 <a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
-
 <a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
-
 <a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
-
 <a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
-
 </div>
-
 <div class="dropdown-footer">
-
 <button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
-
 </div>
-
 </div>
-
 </div>
-
 </div>
-
 </header>
-
 <main class="main-content" id="adminMainContent" tabindex="-1">
-
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
-
 <!-- PAGE HEADER -->
-
 <section class="page-header depth-hero" id="dashboard">
-
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><i data-lucide="users-round"></i></div>
-
+<div aria-hidden="true" class="page-heading-mark"><i data-lucide="users-round"></i></div>
 <div class="breadcrumb">
-
 <span>Admin Console</span>
-
 <i data-lucide="chevron-right"></i>
-
 <span class="active">Employee Profiles</span>
-
 </div>
-
 <h1>Employee directory</h1>
 <p>A complete view of your people, records, and employment information.</p>
-
 </div>
-
 <div class="header-actions">
-
 <button class="btn btn-secondary" id="exportBtn" type="button">
-
 <i data-lucide="download"></i>
-
 <span>Export CSV</span>
-
 </button>
-
 <button class="btn btn-secondary" id="refreshBtn" type="button">
-
 <i data-lucide="refresh-cw"></i>
-
 <span>Refresh</span>
-
 </button>
-
 <button class="btn btn-primary" id="addEmployeeBtn" type="button">
-
 <i data-lucide="user-plus"></i>
-
 <span>Add Employee</span>
-
 </button>
-
 </div>
-
-
-<div class="depth-scene" aria-hidden="true">
-  <span class="depth-orbit"></span><span class="depth-orb"></span>
-  <div class="depth-stack">
-    <span class="depth-sheet depth-sheet-back"></span>
-    <span class="depth-sheet depth-sheet-middle"></span>
-    <span class="depth-sheet depth-sheet-front">
-      <span class="depth-sheet-seal"><svg viewBox="0 0 24 24" fill="none"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"/><path d="M5 21c1-5 4-8 9-12"/></svg></span>
-      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-    </span>
-  </div><span class="depth-scene-dot"></span>
+<div aria-hidden="true" class="depth-scene">
+<span class="depth-orbit"></span><span class="depth-orb"></span>
+<div class="depth-stack">
+<span class="depth-sheet depth-sheet-back"></span>
+<span class="depth-sheet depth-sheet-middle"></span>
+<span class="depth-sheet depth-sheet-front">
+<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
+<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+</span>
+</div><span class="depth-scene-dot"></span>
 </div>
 </section>
-
 <!-- QUICK ACTIONS STRIP (MATCHING ADMIN.HTML) -->
-
 <section class="quick-actions-strip">
-
 <h3>Quick Actions</h3>
-
 <div class="action-buttons-list">
-
 <button class="quick-btn" id="quickAddBtn" type="button">
-
 <i data-lucide="user-plus"></i>
-
 <span>Add Employee</span>
-
 </button>
-
 <button class="quick-btn" id="quickExportBtn" type="button">
-
 <i data-lucide="file-spreadsheet"></i>
-
 <span>Export Masterlist</span>
-
 </button>
-
 <button class="quick-btn" id="quickPrintBtn" type="button">
-
 <i data-lucide="printer"></i>
-
 <span>Print Directory</span>
-
 </button>
-
 <button class="quick-btn" id="quickFilterPermanent" type="button">
-
 <i data-lucide="shield-check"></i>
-
 <span>Permanent Staff</span>
-
 </button>
-
 <button class="quick-btn" id="quickFilterCasual" type="button">
-
 <i data-lucide="briefcase"></i>
-
 <span>Casual / Job Order</span>
-
 </button>
-
 <button class="quick-btn" id="quickFilterLeave" type="button">
-
 <i data-lucide="calendar-off"></i>
-
 <span>On Leave Records</span>
-
 </button>
-
 </div>
-
 </section>
-
 <!-- KPI METRICS GRID -->
-
 <section class="kpi-grid">
-
 <div class="kpi-card">
-
 <div class="kpi-header">
-
 <span class="kpi-label">Registered Personnel</span>
-
 <div class="kpi-icon emerald"><i data-lucide="users"></i></div>
-
 </div>
-
 <div class="kpi-body">
-
 <h3 class="counter" id="kpiPersonnel">0</h3>
-
 <span class="kpi-trend positive"><i data-lucide="trending-up"></i> Active Service Records</span>
-
 </div>
-
 <div class="kpi-footer">
-
 <a href="#directorySection">View Directory Masterfile →</a>
-
 </div>
-
 </div>
-
 <div class="kpi-card">
-
 <div class="kpi-header">
-
 <span class="kpi-label">Active Duty Staff</span>
-
 <div class="kpi-icon blue"><i data-lucide="user-check"></i></div>
-
 </div>
-
 <div class="kpi-body">
-
 <h3 class="counter" id="kpiActive">0</h3>
-
 <span class="kpi-trend positive"><i data-lucide="activity"></i> <span id="kpiActivePct">0% of workforce</span></span>
-
 </div>
-
 <div class="kpi-footer">
-
 <span>On official duty assignment</span>
-
 </div>
-
 </div>
-
 <div class="kpi-card urgent-border">
-
 <div class="kpi-header">
-
 <span class="kpi-label">On Leave Notices</span>
-
 <div class="kpi-icon amber"><i data-lucide="calendar-off"></i></div>
-
 </div>
-
 <div class="kpi-body">
-
 <h3 class="counter" id="kpiLeave">0</h3>
-
 <span class="kpi-trend urgent"><i data-lucide="clock-3"></i> Active Leave Records</span>
-
 </div>
-
 <div class="kpi-footer">
-
 <span>Approved leave applications</span>
-
 </div>
-
 </div>
-
 <div class="kpi-card">
-
 <div class="kpi-header">
-
 <span class="kpi-label">Operational Divisions</span>
-
 <div class="kpi-icon purple"><i data-lucide="building-2"></i></div>
-
 </div>
-
 <div class="kpi-body">
-
 <h3 class="counter" id="kpiDepts">0</h3>
-
 <span class="kpi-trend positive"><i data-lucide="layers-3"></i> Division Units Active</span>
-
 </div>
-
 <div class="kpi-footer">
-
 <span>Plantilla organizational units</span>
-
 </div>
-
 </div>
-
 </section>
-
 <!-- WORKFORCE COMPOSITION STRIP -->
-
 <section class="dashboard-section" id="compositionSection">
-
 <div class="section-header">
-
 <div>
-
 <h2>Workforce Appointment Overview</h2>
-
 <p>Breakdown by plantilla appointment category and employment tenure.</p>
-
 </div>
-
 </div>
-
 <div class="module-control-grid">
-
 <div class="module-control-card">
-
 <div class="module-control-icon"><i data-lucide="shield-check"></i></div>
-
 <div><strong>Permanent</strong><span>Regular plantilla items</span></div>
-
 <b id="countPermanent">0</b>
-
 </div>
-
 <div class="module-control-card">
-
 <div class="module-control-icon"><i data-lucide="briefcase"></i></div>
-
 <div><strong>Casual</strong><span>Contractual plantilla</span></div>
-
 <b id="countCasual">0</b>
-
 </div>
-
 <div class="module-control-card">
-
 <div class="module-control-icon"><i data-lucide="file-check"></i></div>
-
 <div><strong>Job Order (JO)</strong><span>Project-based service</span></div>
-
 <b id="countJO">0</b>
-
 </div>
-
 <div class="module-control-card">
-
 <div class="module-control-icon"><i data-lucide="award"></i></div>
-
 <div><strong>Contract of Service</strong><span>Technical specialists</span></div>
-
 <b id="countCOS">0</b>
-
 </div>
-
 </div>
-
 </section>
-
 <!-- EMPLOYEE MASTERFILE DIRECTORY TABLE -->
-
 <section class="dashboard-section" id="directorySection">
-
 <div class="section-header">
-
 <div>
-
 <h2>Personnel Registry &amp; Directory</h2>
-
 <p>Filter, search, review, export, or edit employee masterfile information.</p>
-
 </div>
-
 <div class="table-actions">
-
 <span class="record-counter" id="recordCounter">Showing 0 of 0 Staff</span>
-
 </div>
-
 </div>
-
 <div class="card table-card">
-
 <!-- ADVANCED TOOLBAR -->
-
 <div class="employee-filter-bar">
-
 <div class="search-field">
-
 <i data-lucide="search"></i>
-
 <input autocomplete="off" id="searchInput" placeholder="Search by name, ID, position, division, email..." type="search"/>
-
 </div>
-
 <div class="filter-controls">
-
 <select aria-label="Filter employment type" class="input-sm" id="filterEmploymentType">
-
 <option value="">All Employment Types</option>
-
 <option value="PERMANENT">Permanent</option>
-
 <option value="CASUAL">Casual</option>
-
 <option value="JOB ORDER">Job Order</option>
-
 <option value="CONTRACT OF SERVICE">Contract of Service</option>
-
 <option value="TEMPORARY">Temporary</option>
-
 <option value="CASUAL_OR_JO">Casual / Job Order</option></select>
-
 <select aria-label="Filter division" class="input-sm" id="filterDepartment">
-
 <option value="">All Divisions</option>
-
 </select>
-
 <select aria-label="Filter duty status" class="input-sm" id="filterStatus">
-
 <option value="">All Duty Statuses</option>
-
 <option value="Active">Active</option>
-
 <option value="On Leave">On Leave</option>
-
 <option value="Inactive">Inactive</option>
-
 <option value="Separated">Separated</option>
-
 </select>
-
 <button class="btn btn-secondary btn-sm" id="resetFiltersBtn" type="button">
-
 <i data-lucide="rotate-ccw"></i> Reset
 
                 </button>
-
 </div>
-
 </div>
-
 <!-- FLOATING BATCH ACTION BAR -->
-
 <div class="batch-actions-bar" id="batchActionsBar" style="display: none;">
-
 <div class="batch-info">
-
 <span class="badge-count" id="selectedCountBadge">0 Selected</span>
-
 <span>Personnel records marked</span>
-
 </div>
-
 <div class="batch-buttons">
-
 <button class="btn btn-secondary btn-sm" id="batchExportBtn" type="button">
-
 <i data-lucide="download"></i> Export Selected
 
                 </button>
-
 <button class="btn btn-secondary btn-sm btn-danger" id="batchDeleteBtn" type="button">
-
 <i data-lucide="trash-2"></i> Delete Selected
 
                 </button>
-
 <button class="btn btn-secondary btn-sm" id="batchClearBtn" type="button">
 
                   Cancel
 
                 </button>
-
 </div>
-
 </div>
-
 <!-- TABLE -->
-
 <div class="table-responsive" id="employeeScrollBox" tabindex="0">
-
 <table class="data-table" id="employeeTable">
-
 <thead>
-
 <tr>
-
 <th width="40"><input aria-label="Select all employees" id="selectAllRows" type="checkbox"/></th>
-
 <th style="width: 130px;">Employee ID</th>
-
 <th>Employee Name</th>
-
 <th>Designation &amp; Item</th>
-
 <th>Employment</th>
-
 <th>Division / Unit</th>
-
 <th>Contact Details</th>
-
 <th>Duty Status</th>
-
 <th style="text-align: right; width: 220px;">Actions</th>
-
 </tr>
-
 </thead>
-
 <tbody id="employeeTableBody">
-
 <tr>
-
 <td class="empty-table-cell" colspan="9">Loading personnel records...</td>
-
 </tr>
-
 </tbody>
-
 </table>
-
 </div>
-
 <!-- TABLE FOOTER WITH PAGINATION -->
-
 <div class="table-footer">
-
 <span class="text-muted" id="tablePaginationInfo">Showing 0 of 0 staff</span>
-
 <div class="pagination" id="paginationControls">
-
 <button aria-label="Previous page" class="page-btn" disabled="" id="prevPageBtn" type="button">
-
 <i data-lucide="chevron-left"></i>
-
 </button>
-
 <div class="pagination-numbers" id="pageNumbers"></div>
-
 <button aria-label="Next page" class="page-btn" disabled="" id="nextPageBtn" type="button">
-
 <i data-lucide="chevron-right"></i>
-
 </button>
-
 </div>
-
 </div>
-
 </div>
-
 </section>
-
 <!-- FOOTER -->
-
 <footer class="admin-footer">
-
 <div>
-
 <p>© 2026 Provincial Government Environment and Natural Resources Office (PGENRO). All rights reserved.</p>
-
 </div>
-
 <div class="footer-links">
-
-<a href="admin.html#audit">Security audit</a>
-
+<a href="audittrail-admin.html">Security audit</a>
 <a href="admin.html#settings">Workspace preferences</a>
-
 <a href="Usermanagement.html">User management</a>
-
 </div>
-
 </footer>
-
 <footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
 </main>
-
 </div>
-
 </div>
-
 <!-- =========================================================
 
        ADD / EDIT EMPLOYEE MODAL
 
        ========================================================= -->
-
 <div aria-hidden="true" class="modal-backdrop" id="employeeFormModal">
-
 <div aria-labelledby="employeeModalTitle" aria-modal="true" class="modal-card" role="dialog">
-
 <div class="modal-header">
-
 <div>
-
 <span class="modal-kicker">Personnel Administration</span>
-
 <h2 id="employeeModalTitle">Add New Employee</h2>
-
 <p>Complete the employee details. Fields marked * are required.</p>
-
 </div>
-
 <button aria-label="Close form" class="modal-close" data-close="employeeFormModal" type="button">×</button>
-
 </div>
-
-<form id="employeeForm" autocomplete="off">
-<div id="employeeFormFeedback" class="form-feedback" role="status" aria-live="polite" hidden></div>
+<form autocomplete="off" id="employeeForm">
+<div aria-live="polite" class="form-feedback" hidden="" id="employeeFormFeedback" role="status"></div>
 <div class="employee-form-workspace">
-<aside class="employee-form-navigation" aria-label="Employee form sections">
-  <div class="employee-form-nav-heading"><span>EMPLOYEE DETAILS</span><p>Jump to a section</p></div>
-  <nav class="employee-form-section-links" aria-label="Sections"><button type="button" class="employee-section-link active" data-form-section="employee-section-personal" aria-controls="employee-section-personal" aria-current="location" title="Personal Information"><i data-lucide="id-card"></i><span>Personal</span><small>01</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-work" aria-controls="employee-section-work" title="Work Information"><i data-lucide="briefcase"></i><span>Work</span><small>02</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-benefits" aria-controls="employee-section-benefits" title="Government & Benefit Numbers"><i data-lucide="file-check-2"></i><span>Benefits</span><small>03</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-address" aria-controls="employee-section-address" title="Complete Address"><i data-lucide="building-2"></i><span>Address</span><small>04</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-family" aria-controls="employee-section-family" title="Family Background"><i data-lucide="users-round"></i><span>Family</span><small>05</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-contact" aria-controls="employee-section-contact" title="Contact Information"><i data-lucide="contact"></i><span>Contact</span><small>06</small></button><button type="button" class="employee-section-link" data-form-section="employee-section-education" aria-controls="employee-section-education" title="Educational Background"><i data-lucide="award"></i><span>Education</span><small>07</small></button></nav><div class="employee-form-completion"><div><strong>Required fields</strong><span id="employeeFormCompletionCount">0 / 5</span></div><progress id="employeeFormCompletion" max="5" value="0" aria-label="Required fields completed"></progress><p id="employeeFormCompletionText">Complete the required fields to save.</p></div>
+<aside aria-label="Employee form sections" class="employee-form-navigation">
+<div class="employee-form-nav-heading"><span>EMPLOYEE DETAILS</span><p>Jump to a section</p></div>
+<nav aria-label="Sections" class="employee-form-section-links"><button aria-controls="employee-section-personal" aria-current="location" class="employee-section-link active" data-form-section="employee-section-personal" title="Personal Information" type="button"><i data-lucide="id-card"></i><span>Personal</span><small>01</small></button><button aria-controls="employee-section-work" class="employee-section-link" data-form-section="employee-section-work" title="Work Information" type="button"><i data-lucide="briefcase"></i><span>Work</span><small>02</small></button><button aria-controls="employee-section-benefits" class="employee-section-link" data-form-section="employee-section-benefits" title="Government &amp; Benefit Numbers" type="button"><i data-lucide="file-check-2"></i><span>Benefits</span><small>03</small></button><button aria-controls="employee-section-address" class="employee-section-link" data-form-section="employee-section-address" title="Complete Address" type="button"><i data-lucide="building-2"></i><span>Address</span><small>04</small></button><button aria-controls="employee-section-family" class="employee-section-link" data-form-section="employee-section-family" title="Family Background" type="button"><i data-lucide="users-round"></i><span>Family</span><small>05</small></button><button aria-controls="employee-section-contact" class="employee-section-link" data-form-section="employee-section-contact" title="Contact Information" type="button"><i data-lucide="contact"></i><span>Contact</span><small>06</small></button><button aria-controls="employee-section-education" class="employee-section-link" data-form-section="employee-section-education" title="Educational Background" type="button"><i data-lucide="award"></i><span>Education</span><small>07</small></button></nav><div class="employee-form-completion"><div><strong>Required fields</strong><span id="employeeFormCompletionCount">0 / 5</span></div><progress aria-label="Required fields completed" id="employeeFormCompletion" max="5" value="0"></progress><p id="employeeFormCompletionText">Complete the required fields to save.</p></div>
 </aside>
-
 <div class="modal-body employee-record-form-body" id="employeeFormSections" tabindex="-1">
-
 <!-- PERSONAL -->
-
-<section class="form-section" id="employee-section-personal" aria-label="Personal Information">
-
-  <div class="form-section-title">
-
-    <i data-lucide="id-card"></i>
-
-    <div><h3>Personal Information</h3><p>Name, birth details, and personal information.</p></div>
-
-  </div>
-
-  <div class="form-grid form-grid-3">
-
-    <div class="form-group"><label for="empId">Employee ID <span>*</span></label><input class="form-control" id="empId" placeholder="e.g. 5653 or EMP-2026-001" required type="text"/></div>
-
-    <div class="form-group"><label for="empLastName">Last Name <span>*</span></label><input class="form-control" id="empLastName" placeholder="e.g. Dela Cruz" required type="text"/></div>
-
-    <div class="form-group"><label for="empFirstName">First Name <span>*</span></label><input class="form-control" id="empFirstName" placeholder="e.g. Juan" required type="text"/></div>
-
-    <div class="form-group"><label for="empMiddleName">Middle Name</label><input class="form-control" id="empMiddleName" placeholder="e.g. Santos" type="text"/></div>
-
-    <div class="form-group"><label for="empExtension">Extension Name</label><select class="form-control" id="empExtension"><option value="">None</option><option value="Jr.">Jr.</option><option value="Sr.">Sr.</option><option value="II">II</option><option value="III">III</option><option value="IV">IV</option><option value="V">V</option></select></div>
-
-    <div class="form-group"><label for="empGender">Gender</label><select class="form-control" id="empGender"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-
-    <div class="form-group"><label for="empDob">Date of Birth</label><input class="form-control" id="empDob" type="date"/></div>
-
-    <div class="form-group span-2"><label for="empPob">Birth Place</label><input class="form-control" id="empPob" placeholder="City / Municipality, Province" type="text"/></div>
-
-    <div class="form-group"><label for="empCivilStatus">Civil Status</label><select class="form-control" id="empCivilStatus"><option value="Single">Single</option><option value="Married">Married</option><option value="Widowed">Widowed</option><option value="Separated">Separated</option><option value="Annulled">Annulled</option></select></div>
-
-    <div class="form-group"><label for="empReligion">Religion</label><input class="form-control" id="empReligion" placeholder="Optional" type="text"/></div>
-
-    <div class="form-group"><label for="empBloodType">Blood Type</label><select class="form-control" id="empBloodType"><option value="">Unknown</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div>
-
-    <div class="form-group"><label for="empHeightCm">Height (cm)</label><input class="form-control" id="empHeightCm" min="0" step="0.1" placeholder="e.g. 165" type="number"/></div>
-
-    <div class="form-group"><label for="empWeightKg">Weight (kg)</label><input class="form-control" id="empWeightKg" min="0" step="0.1" placeholder="e.g. 60" type="number"/></div>
-
-  </div>
-</section>
-
-<!-- EMPLOYMENT -->
-
-<section class="form-section" id="employee-section-work" aria-label="Work Information">
-
-  <div class="form-section-title">
-
-    <i data-lucide="briefcase"></i>
-
-    <div><h3>Work Information</h3><p>Appointment, position, division, and compensation.</p></div>
-
-  </div>
-
-  <div class="form-grid form-grid-3">
-
-    <div class="form-group"><label for="empStatusType">Employment Status</label><select class="form-control" id="empStatusType"><option value="PERMANENT">PERMANENT</option><option value="CASUAL">CASUAL</option><option value="JOB ORDER">JOB ORDER</option><option value="CONTRACT OF SERVICE">CONTRACT OF SERVICE</option><option value="TEMPORARY">TEMPORARY</option></select></div>
-
-    <div class="form-group span-2"><label for="empDesignation">Designation / Position Title <span>*</span></label><input class="form-control" id="empDesignation" placeholder="e.g. Administrative Aide IV" required type="text"/></div>
-
-    <div class="form-group span-2"><label for="empDepartment">Division / Department <span>*</span></label><input class="form-control" id="empDepartment" placeholder="e.g. Administrative Division" required type="text"/></div>
-
-    <div class="form-group"><label for="empItemCode">Item No. / Plantilla Code</label><input class="form-control" id="empItemCode" placeholder="e.g. PENRO-1-001" type="text"/></div>
-
-    <div class="form-group"><label for="empDateEmployed">Date Employed</label><input class="form-control" id="empDateEmployed" type="date"/></div>
-
-    <div class="form-group"><label for="empDateAssumption">Date of Assumption</label><input class="form-control" id="empDateAssumption" type="date"/></div>
-
-    <div class="form-group"><label for="empDutyStatus">Duty Status</label><select class="form-control" id="empDutyStatus"><option value="Active">Active</option><option value="On Leave">On Leave</option><option value="Inactive">Inactive</option><option value="Separated">Separated</option></select></div>
-
-    <div class="form-group"><label for="empSalaryGrade">Salary Grade</label><input class="form-control" id="empSalaryGrade" placeholder="e.g. SG 18" type="text"/></div>
-
-    <div class="form-group"><label for="empStepNo">Step No.</label><input class="form-control" id="empStepNo" placeholder="e.g. 2" type="text"/></div>
-
-    <div class="form-group"><label for="empNosaDate">N.O.S.A. Date</label><input class="form-control" id="empNosaDate" title="Notice of Salary Adjustment date" type="date"/></div>
-
-    <div class="form-group"><label for="empBasicSalary">Basic Salary</label><input class="form-control" id="empBasicSalary" min="0" step="0.01" placeholder="0.00" type="number"/></div>
-
-    <div class="form-group span-2"><label for="empEligibility">Eligibility</label><input class="form-control" id="empEligibility" placeholder="Civil Service / board / professional eligibility" type="text"/></div>
-
-  </div>
-</section>
-
-<!-- GOVERNMENT NUMBERS -->
-
-<section class="form-section" id="employee-section-benefits" aria-label="Government & Benefit Numbers">
-
-  <div class="form-section-title">
-
-    <i data-lucide="file-check-2"></i>
-
-    <div><h3>Government & Benefit Numbers</h3><p>Government identification and benefit membership numbers.</p></div>
-
-  </div>
-
-  <div class="form-grid form-grid-2">
-
-    <div class="form-group"><label for="empTinNo">T.I.N. No.</label><input class="form-control" id="empTinNo" autocomplete="off" type="text"/></div>
-
-    <div class="form-group"><label for="empGsisBpNo">G.S.I.S. B.P. No.</label><input class="form-control" id="empGsisBpNo" autocomplete="off" type="text"/></div>
-
-    <div class="form-group"><label for="empPagibigNo">PAG-IBIG No.</label><input class="form-control" id="empPagibigNo" autocomplete="off" type="text"/></div>
-
-    <div class="form-group"><label for="empPhilhealthNo">PHILHEALTH No.</label><input class="form-control" id="empPhilhealthNo" autocomplete="off" type="text"/></div>
-
-  </div>
-</section>
-
-<!-- ADDRESS -->
-
-<section class="form-section" id="employee-section-address" aria-label="Complete Address">
-
-  <div class="form-section-title">
-
-    <i data-lucide="building-2"></i>
-
-    <div><h3>Complete Address</h3><p>House or street, barangay, municipality, and province.</p></div>
-
-  </div>
-
-  <div class="form-grid form-grid-3">
-
-    <div class="form-group span-2"><label for="empHouseStreetPurok">House No. / Street / Purok</label><input class="form-control" id="empHouseStreetPurok" type="text"/></div>
-
-    <div class="form-group"><label for="empBarangay">Barangay</label><input class="form-control" id="empBarangay" type="text"/></div>
-
-    <div class="form-group"><label for="empCityMunicipality">City / Municipality</label><input class="form-control" id="empCityMunicipality" type="text"/></div>
-
-    <div class="form-group"><label for="empProvince">Province</label><input class="form-control" id="empProvince" type="text"/></div>
-
-    <div class="form-group"><label for="empZipCode">Zip Code</label><input class="form-control" id="empZipCode" inputmode="numeric" type="text"/></div>
-
-    <div class="form-group full"><label for="empAddress">Additional / Complete Address</label><textarea class="form-control" id="empAddress" placeholder="Enter a complete address if the fields above are blank." rows="2"></textarea></div>
-
-  </div>
-</section>
-
-<!-- FAMILY -->
-
-<section class="form-section" id="employee-section-family" aria-label="Family Background">
-
-  <div class="form-section-title">
-
-    <i data-lucide="users-round"></i>
-
-    <div><h3>Family Background</h3><p>Spouse details, occupation, and contact information.</p></div>
-
-  </div>
-
-  <div class="form-grid form-grid-3">
-
-    <div class="form-group"><label for="empSpouseLastName">Spouse Last Name</label><input class="form-control" id="empSpouseLastName" type="text"/></div>
-
-    <div class="form-group"><label for="empSpouseFirstName">First Name</label><input class="form-control" id="empSpouseFirstName" type="text"/></div>
-
-    <div class="form-group"><label for="empSpouseMiddleName">Middle Name</label><input class="form-control" id="empSpouseMiddleName" type="text"/></div>
-
-    <div class="form-group"><label for="empSpouseExtension">Extension Name</label><input class="form-control" id="empSpouseExtension" placeholder="Jr., Sr., III, etc." type="text"/></div>
-
-    <div class="form-group span-2"><label for="empSpouseOccupation">Occupation</label><input class="form-control" id="empSpouseOccupation" type="text"/></div>
-
-    <div class="form-group span-2"><label for="empSpouseEmployer">Employer / Business Name</label><input class="form-control" id="empSpouseEmployer" type="text"/></div>
-
-    <div class="form-group"><label for="empSpouseContact">Contact No.</label><input class="form-control" id="empSpouseContact" type="tel"/></div>
-
-    <div class="form-group full"><label for="empSpouseEmail">Email Address</label><input class="form-control" id="empSpouseEmail" type="email"/></div>
-
-  </div>
-</section>
-
-<!-- CONTACT -->
-
-<section class="form-section" id="employee-section-contact" aria-label="Contact Information">
-
-  <div class="form-section-title">
-
-    <i data-lucide="contact"></i>
-
-    <div><h3>Contact Information</h3><p>Phone numbers, email address, and social profiles.</p></div>
-
-  </div>
-
-  <div class="form-grid form-grid-3">
-
-    <div class="form-group"><label for="empLandline">Landline No.</label><input class="form-control" id="empLandline" type="tel"/></div>
-
-    <div class="form-group"><label for="empMobile">Mobile No. 1</label><input class="form-control" id="empMobile" placeholder="09xx xxx xxxx" type="tel"/></div>
-
-    <div class="form-group"><label for="empMobile2">Mobile No. 2</label><input class="form-control" id="empMobile2" placeholder="Optional" type="tel"/></div>
-
-    <div class="form-group full"><label for="empEmail">Email Address</label><input class="form-control" id="empEmail" placeholder="name@example.com" type="email"/></div>
-
-    <div class="form-group"><label for="empFacebook">Facebook</label><input class="form-control" id="empFacebook" type="text"/></div>
-
-    <div class="form-group"><label for="empInstagram">Instagram</label><input class="form-control" id="empInstagram" type="text"/></div>
-
-    <div class="form-group"><label for="empTwitter">Twitter / X</label><input class="form-control" id="empTwitter" type="text"/></div>
-
-  </div>
-</section>
-
-<!-- EDUCATION -->
-
-<section class="form-section" id="employee-section-education" aria-label="Educational Background">
-
-  <div class="form-section-title">
-
-    <i data-lucide="award"></i>
-
-    <div><h3>Educational Background</h3><p>Highest education level and most recent school information.</p></div>
-
-  </div>
-
-  <div class="form-grid form-grid-2">
-
-    <div class="form-group"><label for="empEducationLevel">Level</label><input class="form-control" id="empEducationLevel" placeholder="e.g. Graduate School" type="text"/></div>
-
-    <div class="form-group"><label for="empCourse">Course</label><input class="form-control" id="empCourse" placeholder="e.g. Master in Management" type="text"/></div>
-
-    <div class="form-group"><label for="empLastSchool">Last School Attended</label><input class="form-control" id="empLastSchool" type="text"/></div>
-
-    <div class="form-group"><label for="empYearGraduated">Year Graduated</label><input class="form-control" id="empYearGraduated" inputmode="numeric" maxlength="4" placeholder="e.g. 2010" type="text"/></div>
-
-  </div>
-</section>
-
+<section aria-label="Personal Information" class="form-section" id="employee-section-personal">
+<div class="form-section-title">
+<i data-lucide="id-card"></i>
+<div><h3>Personal Information</h3><p>Name, birth details, and personal information.</p></div>
 </div>
-
+<div class="form-grid form-grid-3">
+<div class="form-group"><label for="empId">Employee ID <span>*</span></label><input class="form-control" id="empId" placeholder="e.g. 5653 or EMP-2026-001" required="" type="text"/></div>
+<div class="form-group"><label for="empLastName">Last Name <span>*</span></label><input class="form-control" id="empLastName" placeholder="e.g. Dela Cruz" required="" type="text"/></div>
+<div class="form-group"><label for="empFirstName">First Name <span>*</span></label><input class="form-control" id="empFirstName" placeholder="e.g. Juan" required="" type="text"/></div>
+<div class="form-group"><label for="empMiddleName">Middle Name</label><input class="form-control" id="empMiddleName" placeholder="e.g. Santos" type="text"/></div>
+<div class="form-group"><label for="empExtension">Extension Name</label><select class="form-control" id="empExtension"><option value="">None</option><option value="Jr.">Jr.</option><option value="Sr.">Sr.</option><option value="II">II</option><option value="III">III</option><option value="IV">IV</option><option value="V">V</option></select></div>
+<div class="form-group"><label for="empGender">Gender</label><select class="form-control" id="empGender"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
+<div class="form-group"><label for="empDob">Date of Birth</label><input class="form-control" id="empDob" type="date"/></div>
+<div class="form-group span-2"><label for="empPob">Birth Place</label><input class="form-control" id="empPob" placeholder="City / Municipality, Province" type="text"/></div>
+<div class="form-group"><label for="empCivilStatus">Civil Status</label><select class="form-control" id="empCivilStatus"><option value="Single">Single</option><option value="Married">Married</option><option value="Widowed">Widowed</option><option value="Separated">Separated</option><option value="Annulled">Annulled</option></select></div>
+<div class="form-group"><label for="empReligion">Religion</label><input class="form-control" id="empReligion" placeholder="Optional" type="text"/></div>
+<div class="form-group"><label for="empBloodType">Blood Type</label><select class="form-control" id="empBloodType"><option value="">Unknown</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div>
+<div class="form-group"><label for="empHeightCm">Height (cm)</label><input class="form-control" id="empHeightCm" min="0" placeholder="e.g. 165" step="0.1" type="number"/></div>
+<div class="form-group"><label for="empWeightKg">Weight (kg)</label><input class="form-control" id="empWeightKg" min="0" placeholder="e.g. 60" step="0.1" type="number"/></div>
+</div>
+</section>
+<!-- EMPLOYMENT -->
+<section aria-label="Work Information" class="form-section" id="employee-section-work">
+<div class="form-section-title">
+<i data-lucide="briefcase"></i>
+<div><h3>Work Information</h3><p>Appointment, position, division, and compensation.</p></div>
+</div>
+<div class="form-grid form-grid-3">
+<div class="form-group"><label for="empStatusType">Employment Status</label><select class="form-control" id="empStatusType"><option value="PERMANENT">PERMANENT</option><option value="CASUAL">CASUAL</option><option value="JOB ORDER">JOB ORDER</option><option value="CONTRACT OF SERVICE">CONTRACT OF SERVICE</option><option value="TEMPORARY">TEMPORARY</option></select></div>
+<div class="form-group span-2"><label for="empDesignation">Designation / Position Title <span>*</span></label><input class="form-control" id="empDesignation" placeholder="e.g. Administrative Aide IV" required="" type="text"/></div>
+<div class="form-group span-2"><label for="empDepartment">Division / Department <span>*</span></label><input class="form-control" id="empDepartment" placeholder="e.g. Administrative Division" required="" type="text"/></div>
+<div class="form-group"><label for="empItemCode">Item No. / Plantilla Code</label><input class="form-control" id="empItemCode" placeholder="e.g. PENRO-1-001" type="text"/></div>
+<div class="form-group"><label for="empDateEmployed">Date Employed</label><input class="form-control" id="empDateEmployed" type="date"/></div>
+<div class="form-group"><label for="empDateAssumption">Date of Assumption</label><input class="form-control" id="empDateAssumption" type="date"/></div>
+<div class="form-group"><label for="empDutyStatus">Duty Status</label><select class="form-control" id="empDutyStatus"><option value="Active">Active</option><option value="On Leave">On Leave</option><option value="Inactive">Inactive</option><option value="Separated">Separated</option></select></div>
+<div class="form-group"><label for="empSalaryGrade">Salary Grade</label><input class="form-control" id="empSalaryGrade" placeholder="e.g. SG 18" type="text"/></div>
+<div class="form-group"><label for="empStepNo">Step No.</label><input class="form-control" id="empStepNo" placeholder="e.g. 2" type="text"/></div>
+<div class="form-group"><label for="empNosaDate">N.O.S.A. Date</label><input class="form-control" id="empNosaDate" title="Notice of Salary Adjustment date" type="date"/></div>
+<div class="form-group"><label for="empBasicSalary">Basic Salary</label><input class="form-control" id="empBasicSalary" min="0" placeholder="0.00" step="0.01" type="number"/></div>
+<div class="form-group span-2"><label for="empEligibility">Eligibility</label><input class="form-control" id="empEligibility" placeholder="Civil Service / board / professional eligibility" type="text"/></div>
+</div>
+</section>
+<!-- GOVERNMENT NUMBERS -->
+<section aria-label="Government &amp; Benefit Numbers" class="form-section" id="employee-section-benefits">
+<div class="form-section-title">
+<i data-lucide="file-check-2"></i>
+<div><h3>Government &amp; Benefit Numbers</h3><p>Government identification and benefit membership numbers.</p></div>
+</div>
+<div class="form-grid form-grid-2">
+<div class="form-group"><label for="empTinNo">T.I.N. No.</label><input autocomplete="off" class="form-control" id="empTinNo" type="text"/></div>
+<div class="form-group"><label for="empGsisBpNo">G.S.I.S. B.P. No.</label><input autocomplete="off" class="form-control" id="empGsisBpNo" type="text"/></div>
+<div class="form-group"><label for="empPagibigNo">PAG-IBIG No.</label><input autocomplete="off" class="form-control" id="empPagibigNo" type="text"/></div>
+<div class="form-group"><label for="empPhilhealthNo">PHILHEALTH No.</label><input autocomplete="off" class="form-control" id="empPhilhealthNo" type="text"/></div>
+</div>
+</section>
+<!-- ADDRESS -->
+<section aria-label="Complete Address" class="form-section" id="employee-section-address">
+<div class="form-section-title">
+<i data-lucide="building-2"></i>
+<div><h3>Complete Address</h3><p>House or street, barangay, municipality, and province.</p></div>
+</div>
+<div class="form-grid form-grid-3">
+<div class="form-group span-2"><label for="empHouseStreetPurok">House No. / Street / Purok</label><input class="form-control" id="empHouseStreetPurok" type="text"/></div>
+<div class="form-group"><label for="empBarangay">Barangay</label><input class="form-control" id="empBarangay" type="text"/></div>
+<div class="form-group"><label for="empCityMunicipality">City / Municipality</label><input class="form-control" id="empCityMunicipality" type="text"/></div>
+<div class="form-group"><label for="empProvince">Province</label><input class="form-control" id="empProvince" type="text"/></div>
+<div class="form-group"><label for="empZipCode">Zip Code</label><input class="form-control" id="empZipCode" inputmode="numeric" type="text"/></div>
+<div class="form-group full"><label for="empAddress">Additional / Complete Address</label><textarea class="form-control" id="empAddress" placeholder="Enter a complete address if the fields above are blank." rows="2"></textarea></div>
+</div>
+</section>
+<!-- FAMILY -->
+<section aria-label="Family Background" class="form-section" id="employee-section-family">
+<div class="form-section-title">
+<i data-lucide="users-round"></i>
+<div><h3>Family Background</h3><p>Spouse details, occupation, and contact information.</p></div>
+</div>
+<div class="form-grid form-grid-3">
+<div class="form-group"><label for="empSpouseLastName">Spouse Last Name</label><input class="form-control" id="empSpouseLastName" type="text"/></div>
+<div class="form-group"><label for="empSpouseFirstName">First Name</label><input class="form-control" id="empSpouseFirstName" type="text"/></div>
+<div class="form-group"><label for="empSpouseMiddleName">Middle Name</label><input class="form-control" id="empSpouseMiddleName" type="text"/></div>
+<div class="form-group"><label for="empSpouseExtension">Extension Name</label><input class="form-control" id="empSpouseExtension" placeholder="Jr., Sr., III, etc." type="text"/></div>
+<div class="form-group span-2"><label for="empSpouseOccupation">Occupation</label><input class="form-control" id="empSpouseOccupation" type="text"/></div>
+<div class="form-group span-2"><label for="empSpouseEmployer">Employer / Business Name</label><input class="form-control" id="empSpouseEmployer" type="text"/></div>
+<div class="form-group"><label for="empSpouseContact">Contact No.</label><input class="form-control" id="empSpouseContact" type="tel"/></div>
+<div class="form-group full"><label for="empSpouseEmail">Email Address</label><input class="form-control" id="empSpouseEmail" type="email"/></div>
+</div>
+</section>
+<!-- CONTACT -->
+<section aria-label="Contact Information" class="form-section" id="employee-section-contact">
+<div class="form-section-title">
+<i data-lucide="contact"></i>
+<div><h3>Contact Information</h3><p>Phone numbers, email address, and social profiles.</p></div>
+</div>
+<div class="form-grid form-grid-3">
+<div class="form-group"><label for="empLandline">Landline No.</label><input class="form-control" id="empLandline" type="tel"/></div>
+<div class="form-group"><label for="empMobile">Mobile No. 1</label><input class="form-control" id="empMobile" placeholder="09xx xxx xxxx" type="tel"/></div>
+<div class="form-group"><label for="empMobile2">Mobile No. 2</label><input class="form-control" id="empMobile2" placeholder="Optional" type="tel"/></div>
+<div class="form-group full"><label for="empEmail">Email Address</label><input class="form-control" id="empEmail" placeholder="name@example.com" type="email"/></div>
+<div class="form-group"><label for="empFacebook">Facebook</label><input class="form-control" id="empFacebook" type="text"/></div>
+<div class="form-group"><label for="empInstagram">Instagram</label><input class="form-control" id="empInstagram" type="text"/></div>
+<div class="form-group"><label for="empTwitter">Twitter / X</label><input class="form-control" id="empTwitter" type="text"/></div>
+</div>
+</section>
+<!-- EDUCATION -->
+<section aria-label="Educational Background" class="form-section" id="employee-section-education">
+<div class="form-section-title">
+<i data-lucide="award"></i>
+<div><h3>Educational Background</h3><p>Highest education level and most recent school information.</p></div>
+</div>
+<div class="form-grid form-grid-2">
+<div class="form-group"><label for="empEducationLevel">Level</label><input class="form-control" id="empEducationLevel" placeholder="e.g. Graduate School" type="text"/></div>
+<div class="form-group"><label for="empCourse">Course</label><input class="form-control" id="empCourse" placeholder="e.g. Master in Management" type="text"/></div>
+<div class="form-group"><label for="empLastSchool">Last School Attended</label><input class="form-control" id="empLastSchool" type="text"/></div>
+<div class="form-group"><label for="empYearGraduated">Year Graduated</label><input class="form-control" id="empYearGraduated" inputmode="numeric" maxlength="4" placeholder="e.g. 2010" type="text"/></div>
+</div>
+</section>
+</div>
 </div>
 <div class="modal-actions employee-form-footer">
-  <p class="employee-form-footer-note"><span class="required-mark">*</span> Required fields</p>
-  <div class="employee-form-footer-buttons">
-    <button class="btn btn-ghost" id="clearEmployeeFormBtn" type="button"><i data-lucide="rotate-ccw"></i><span>Reset Form</span></button>
-    <button class="btn btn-secondary" data-close="employeeFormModal" type="button">Cancel</button>
-    <button class="btn btn-primary" id="saveEmployeeBtn" type="submit"><i data-lucide="save"></i><span>Save Employee</span></button>
-  </div>
+<p class="employee-form-footer-note"><span class="required-mark">*</span> Required fields</p>
+<div class="employee-form-footer-buttons">
+<button class="btn btn-ghost" id="clearEmployeeFormBtn" type="button"><i data-lucide="rotate-ccw"></i><span>Reset Form</span></button>
+<button class="btn btn-secondary" data-close="employeeFormModal" type="button">Cancel</button>
+<button class="btn btn-primary" id="saveEmployeeBtn" type="submit"><i data-lucide="save"></i><span>Save Employee</span></button>
 </div>
-
+</div>
 </form>
-
 </div>
-
 </div>
-
 <!-- =========================================================
 
        201 DOSSIER / PROFILE VIEW MODAL
 
        ========================================================= -->
-
 <div aria-hidden="true" class="modal-backdrop" id="profileModal">
-
 <div aria-labelledby="viewHeadingName" aria-modal="true" class="modal-card modal-profile" role="dialog">
-
 <div class="modal-header">
-
 <div>
-
 <span class="modal-kicker">Personnel Dossier</span>
-
 <h2>Employee 201 File</h2>
-
 </div>
-
 <button aria-label="Close dossier" class="modal-close" data-close="profileModal" type="button">×</button>
-
 </div>
-
 <div class="modal-body profile-body">
-
 <div class="profile-hero">
-
 <div class="profile-avatar-xl" id="viewAvatar">--</div>
-
 <div class="profile-hero-copy">
-
 <h2 id="viewHeadingName">Employee Name</h2>
-
 <div class="profile-meta">
-
 <span class="badge-status success" id="viewPillStatus"><span class="dot"></span> Active</span>
-
 <span class="id-tag" id="v_id">EMP-2026-000</span>
-
 </div>
-
 </div>
-
 </div>
-
-<div class="employee-record-tabs" role="tablist" aria-label="Employee record sections">
-
-  <button id="employeeRecordTab" class="employee-record-tab active" role="tab" aria-selected="true" aria-controls="employeeDetailsPanel" tabindex="0" type="button"><i data-lucide="id-card"></i><span class="employee-tab-label">Employee Record</span></button>
-
-  <button id="ceremonyTab" class="employee-record-tab" role="tab" aria-selected="false" aria-controls="ceremonyPanel" tabindex="-1" type="button"><i data-lucide="flag"></i><span class="employee-tab-label">Flag Ceremony</span> <span id="ceremonyTabCount" class="employee-tab-count">0</span></button>
-
-  <button id="uniformTab" class="employee-record-tab" role="tab" aria-selected="false" aria-controls="uniformPanel" tabindex="-1" type="button"><i data-lucide="shirt"></i><span class="employee-tab-label">Uniform Monitoring</span> <span id="uniformTabCount" class="employee-tab-count">0</span></button>
-
+<div aria-label="Employee record sections" class="employee-record-tabs" role="tablist">
+<button aria-controls="employeeDetailsPanel" aria-selected="true" class="employee-record-tab active" id="employeeRecordTab" role="tab" tabindex="0" type="button"><i data-lucide="id-card"></i><span class="employee-tab-label">Employee Record</span></button>
+<button aria-controls="ceremonyPanel" aria-selected="false" class="employee-record-tab" id="ceremonyTab" role="tab" tabindex="-1" type="button"><i data-lucide="flag"></i><span class="employee-tab-label">Flag Ceremony</span> <span class="employee-tab-count" id="ceremonyTabCount">0</span></button>
+<button aria-controls="uniformPanel" aria-selected="false" class="employee-record-tab" id="uniformTab" role="tab" tabindex="-1" type="button"><i data-lucide="shirt"></i><span class="employee-tab-label">Uniform Monitoring</span> <span class="employee-tab-count" id="uniformTabCount">0</span></button>
 </div>
-
-<div class="profile-sections employee-tab-panel" id="employeeDetailsPanel" role="tabpanel" aria-labelledby="employeeRecordTab">
-
+<div aria-labelledby="employeeRecordTab" class="profile-sections employee-tab-panel" id="employeeDetailsPanel" role="tabpanel">
 <section class="profile-section">
-
-  <div class="profile-section-heading"><i data-lucide="user-round"></i><h3>Personal Information</h3></div>
-
-  <div class="detail-grid">
-
-    <div><span>Full Name</span><strong id="v_name">—</strong></div>
-
-    <div><span>Date of Birth</span><strong id="v_dob">—</strong></div>
-
-    <div><span>Birth Place</span><strong id="v_pob">—</strong></div>
-
-    <div><span>Gender</span><strong id="v_gender">—</strong></div>
-
-    <div><span>Civil Status</span><strong id="v_civil">—</strong></div>
-
-    <div><span>Religion</span><strong id="v_religion">—</strong></div>
-
-    <div><span>Height</span><strong id="v_height">—</strong></div>
-
-    <div><span>Weight</span><strong id="v_weight">—</strong></div>
-
-    <div><span>Blood Type</span><strong id="v_blood">—</strong></div>
-
-  </div>
-
-</section>
-
-<section class="profile-section">
-
-  <div class="profile-section-heading"><i data-lucide="briefcase"></i><h3>Work Information</h3></div>
-
-  <div class="detail-grid">
-
-    <div><span>Designation</span><strong id="v_desig">—</strong></div>
-
-    <div><span>Employment Status</span><strong id="v_emp_status">—</strong></div>
-
-    <div><span>Duty Status</span><strong id="v_duty_status">—</strong></div>
-
-    <div><span>Division / Unit</span><strong id="v_dept">—</strong></div>
-
-    <div><span>Item No.</span><strong id="v_item">—</strong></div>
-
-    <div><span>Date Employed</span><strong id="v_date_employed">—</strong></div>
-
-    <div><span>Date of Assumption</span><strong id="v_date_assumption">—</strong></div>
-
-    <div><span>Salary Grade</span><strong id="v_salary_grade">—</strong></div>
-
-    <div><span>Step No.</span><strong id="v_step_no">—</strong></div>
-
-    <div><span>N.O.S.A. Date</span><strong id="v_nosa_date">—</strong></div>
-
-    <div><span>Basic Salary</span><strong id="v_basic_salary">—</strong></div>
-
-    <div><span>Eligibility</span><strong id="v_eligibility">—</strong></div>
-
-  </div>
-
-</section>
-
-<section class="profile-section">
-
-  <div class="profile-section-heading"><i data-lucide="file-check-2"></i><h3>Government & Benefit Numbers</h3></div>
-
-  <div class="detail-grid">
-
-    <div><span>T.I.N. No.</span><strong id="v_tin">—</strong></div>
-
-    <div><span>G.S.I.S. B.P. No.</span><strong id="v_gsis">—</strong></div>
-
-    <div><span>PAG-IBIG No.</span><strong id="v_pagibig">—</strong></div>
-
-    <div><span>PHILHEALTH No.</span><strong id="v_philhealth">—</strong></div>
-
-  </div>
-
-</section>
-
-<section class="profile-section">
-
-  <div class="profile-section-heading"><i data-lucide="building-2"></i><h3>Complete Address</h3></div>
-
-  <div class="detail-grid">
-
-    <div><span>House / Street / Purok</span><strong id="v_house">—</strong></div>
-
-    <div><span>Barangay</span><strong id="v_barangay">—</strong></div>
-
-    <div><span>City / Municipality</span><strong id="v_city">—</strong></div>
-
-    <div><span>Province</span><strong id="v_province">—</strong></div>
-
-    <div><span>Zip Code</span><strong id="v_zip">—</strong></div>
-
-    <div class="detail-wide"><span>Complete Address</span><strong id="v_address">—</strong></div>
-
-  </div>
-
-</section>
-
-<section class="profile-section">
-
-  <div class="profile-section-heading"><i data-lucide="users-round"></i><h3>Family Background</h3></div>
-
-  <div class="detail-grid">
-
-    <div class="detail-wide"><span>Name of Spouse</span><strong id="v_spouse_name">—</strong></div>
-
-    <div><span>Occupation</span><strong id="v_spouse_occupation">—</strong></div>
-
-    <div><span>Employer / Business</span><strong id="v_spouse_employer">—</strong></div>
-
-    <div><span>Contact No.</span><strong id="v_spouse_contact">—</strong></div>
-
-    <div class="detail-wide"><span>Email Address</span><strong id="v_spouse_email">—</strong></div>
-
-  </div>
-
-</section>
-
-<section class="profile-section">
-
-  <div class="profile-section-heading"><i data-lucide="contact"></i><h3>Contact Information</h3></div>
-
-  <div class="detail-grid">
-
-    <div><span>Landline No.</span><strong id="v_landline">—</strong></div>
-
-    <div><span>Mobile No. 1</span><strong id="v_mobile">—</strong></div>
-
-    <div><span>Mobile No. 2</span><strong id="v_mobile2">—</strong></div>
-
-    <div class="detail-wide"><span>Email Address</span><strong id="v_email">—</strong></div>
-
-    <div><span>Facebook</span><strong id="v_facebook">—</strong></div>
-
-    <div><span>Instagram</span><strong id="v_instagram">—</strong></div>
-
-    <div><span>Twitter / X</span><strong id="v_twitter">—</strong></div>
-
-  </div>
-
-</section>
-
-<section class="profile-section">
-
-  <div class="profile-section-heading"><i data-lucide="award"></i><h3>Educational Background</h3></div>
-
-  <div class="detail-grid">
-
-    <div><span>Level</span><strong id="v_education_level">—</strong></div>
-
-    <div><span>Course</span><strong id="v_course">—</strong></div>
-
-    <div><span>Year Graduated</span><strong id="v_year_graduated">—</strong></div>
-
-    <div class="detail-wide"><span>Last School Attended</span><strong id="v_last_school">—</strong></div>
-
-  </div>
-
-</section>
-
+<div class="profile-section-heading"><i data-lucide="user-round"></i><h3>Personal Information</h3></div>
+<div class="detail-grid">
+<div><span>Full Name</span><strong id="v_name">—</strong></div>
+<div><span>Date of Birth</span><strong id="v_dob">—</strong></div>
+<div><span>Birth Place</span><strong id="v_pob">—</strong></div>
+<div><span>Gender</span><strong id="v_gender">—</strong></div>
+<div><span>Civil Status</span><strong id="v_civil">—</strong></div>
+<div><span>Religion</span><strong id="v_religion">—</strong></div>
+<div><span>Height</span><strong id="v_height">—</strong></div>
+<div><span>Weight</span><strong id="v_weight">—</strong></div>
+<div><span>Blood Type</span><strong id="v_blood">—</strong></div>
 </div>
-
-<section id="ceremonyPanel" class="employee-tab-panel monitor-panel" role="tabpanel" aria-labelledby="ceremonyTab" hidden>
-
-  <div class="monitor-panel-heading"><div><h3>Flag Ceremony Monitoring</h3><p>Records for the employee shown above. Summary counts match the current filters.</p></div><button class="btn btn-secondary monitor-export" id="ceremonyExport" type="button"><i data-lucide="download"></i>Export CSV</button></div>
-
-  <div class="monitor-summary ceremony-summary" aria-live="polite"><div class="monitor-stat"><span>Present</span><strong id="ceremonySummary0">0</strong></div><div class="monitor-stat"><span>Absent</span><strong id="ceremonySummary1">0</strong></div><div class="monitor-stat"><span>O.B.</span><strong id="ceremonySummary2">0</strong></div><div class="monitor-stat"><span>Leave</span><strong id="ceremonySummary3">0</strong></div><div class="monitor-stat"><span>Late</span><strong id="ceremonySummary4">0</strong></div><div class="monitor-stat"><span>Total Counted</span><strong id="ceremonySummary5">0</strong></div></div>
-
-  <p class="monitor-summary-note">Total Counted = Present + O.B. + Leave + Late; absent records remain in the total records.</p>
-
-  <p id="ceremonyPrintScope" class="monitor-print-scope"></p>
-
-  <div class="monitor-layout">
-
-    <form id="ceremonyForm" class="monitor-editor">
-
-      <div class="monitor-editor-heading"><h4 id="ceremonyEditorTitle">Add Record</h4><span class="monitor-edit-tag" id="ceremonyEditTag" hidden>Editing</span></div>
-
-      <div id="ceremonyFeedback" class="form-feedback" role="status" aria-live="polite" hidden></div>
-<div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number</label><input class="form-control" id="ceremonyControl" type="text" placeholder="e.g. FC-2026-0001" maxlength="80" aria-describedby="ceremonyControlHelp"/><small class="field-help" id="ceremonyControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" type="date" required /></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" rows="3" maxlength="2000" placeholder="Optional notes"></textarea></div></div>
-
-      <div class="monitor-editor-actions"><button class="btn btn-primary" id="ceremonySave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="ceremonyClear" type="button">Clear</button></div>
-
-    </form>
-
-    <div class="monitor-report">
-
-      <form id="ceremonyFilters" class="monitor-filters"><div class="form-group"><label for="ceremonyFrom">From</label><input class="form-control" id="ceremonyFrom" type="date"  /></div><div class="form-group"><label for="ceremonyTo">To</label><input class="form-control" id="ceremonyTo" type="date"  /></div><div class="form-group"><label for="ceremonyFilterActivity">Activity</label><select class="form-control" id="ceremonyFilterActivity" ><option value="">05. All activities</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group"><label for="ceremonyFilterStatus">Status</label><select class="form-control" id="ceremonyFilterStatus" ><option value="">All statuses</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group full"><label for="ceremonySearch">Search</label><input class="form-control" id="ceremonySearch" type="search"  placeholder="Control number, date, activity, or remarks" maxlength="200"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
-
-      <p class="monitor-filter-error" id="ceremonyFilterError" role="status" hidden></p>
-
-      <div class="monitor-report-heading"><strong id="ceremonyRecordCount">0 records</strong><span>Newest date first</span></div>
-
-      <div class="monitor-table-scroll table-responsive" id="ceremonyTableRegion" role="region" aria-label="Flag Ceremony Monitoring records" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Status</th><th>Activity</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="ceremonyTableBody"></tbody></table></div>
-
-    </div>
-
-  </div>
-
 </section>
-
-<section id="uniformPanel" class="employee-tab-panel monitor-panel" role="tabpanel" aria-labelledby="uniformTab" hidden>
-
-  <div class="monitor-panel-heading"><div><h3>Prescribed Uniform Monitoring</h3><p>Records for the employee shown above. Summary counts match the current filters.</p></div><button class="btn btn-secondary monitor-export" id="uniformExport" type="button"><i data-lucide="download"></i>Export CSV</button></div>
-
-  <div class="monitor-summary uniform-summary" aria-live="polite"><div class="monitor-stat"><span>Yes — Compliant</span><strong id="uniformSummary0">0</strong></div><div class="monitor-stat"><span>No — Noncompliant</span><strong id="uniformSummary1">0</strong></div><div class="monitor-stat"><span>Total Records</span><strong id="uniformSummary2">0</strong></div><div class="monitor-stat"><span>Compliance Rate</span><strong id="uniformSummary3">0</strong></div></div>
-
-  <p class="monitor-summary-note">Compliance rate = Yes ÷ total matching records. All dates include both endpoints.</p>
-
-  <p id="uniformPrintScope" class="monitor-print-scope"></p>
-
-  <div class="monitor-layout">
-
-    <form id="uniformForm" class="monitor-editor">
-
-      <div class="monitor-editor-heading"><h4 id="uniformEditorTitle">Add Record</h4><span class="monitor-edit-tag" id="uniformEditTag" hidden>Editing</span></div>
-
-      <div id="uniformFeedback" class="form-feedback" role="status" aria-live="polite" hidden></div>
-<div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number</label><input class="form-control" id="uniformControl" type="text" placeholder="e.g. UM-2026-0001" maxlength="80" aria-describedby="uniformControlHelp"/><small class="field-help" id="uniformControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" type="date" required /></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" rows="3" maxlength="2000" placeholder="Optional notes"></textarea></div></div>
-
-      <div class="monitor-editor-actions"><button class="btn btn-primary" id="uniformSave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="uniformClear" type="button">Clear</button></div>
-
-    </form>
-
-    <div class="monitor-report">
-
-      <form id="uniformFilters" class="monitor-filters"><div class="form-group"><label for="uniformFrom">From</label><input class="form-control" id="uniformFrom" type="date"  /></div><div class="form-group"><label for="uniformTo">To</label><input class="form-control" id="uniformTo" type="date"  /></div><div class="form-group"><label for="uniformFilterStatus">Compliance</label><select class="form-control" id="uniformFilterStatus" ><option value="">All records</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformSearch">Search</label><input class="form-control" id="uniformSearch" type="search" placeholder="Control number, date, or remarks" maxlength="200"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
-
-      <p class="monitor-filter-error" id="uniformFilterError" role="status" hidden></p>
-
-      <div class="monitor-report-heading"><strong id="uniformRecordCount">0 records</strong><span>Newest date first</span></div>
-
-      <div class="monitor-table-scroll table-responsive" id="uniformTableRegion" role="region" aria-label="Prescribed Uniform Monitoring records" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Compliant</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="uniformTableBody"></tbody></table></div>
-
-    </div>
-
-  </div>
-
-</section>
-
+<section class="profile-section">
+<div class="profile-section-heading"><i data-lucide="briefcase"></i><h3>Work Information</h3></div>
+<div class="detail-grid">
+<div><span>Designation</span><strong id="v_desig">—</strong></div>
+<div><span>Employment Status</span><strong id="v_emp_status">—</strong></div>
+<div><span>Duty Status</span><strong id="v_duty_status">—</strong></div>
+<div><span>Division / Unit</span><strong id="v_dept">—</strong></div>
+<div><span>Item No.</span><strong id="v_item">—</strong></div>
+<div><span>Date Employed</span><strong id="v_date_employed">—</strong></div>
+<div><span>Date of Assumption</span><strong id="v_date_assumption">—</strong></div>
+<div><span>Salary Grade</span><strong id="v_salary_grade">—</strong></div>
+<div><span>Step No.</span><strong id="v_step_no">—</strong></div>
+<div><span>N.O.S.A. Date</span><strong id="v_nosa_date">—</strong></div>
+<div><span>Basic Salary</span><strong id="v_basic_salary">—</strong></div>
+<div><span>Eligibility</span><strong id="v_eligibility">—</strong></div>
 </div>
-
+</section>
+<section class="profile-section">
+<div class="profile-section-heading"><i data-lucide="file-check-2"></i><h3>Government &amp; Benefit Numbers</h3></div>
+<div class="detail-grid">
+<div><span>T.I.N. No.</span><strong id="v_tin">—</strong></div>
+<div><span>G.S.I.S. B.P. No.</span><strong id="v_gsis">—</strong></div>
+<div><span>PAG-IBIG No.</span><strong id="v_pagibig">—</strong></div>
+<div><span>PHILHEALTH No.</span><strong id="v_philhealth">—</strong></div>
+</div>
+</section>
+<section class="profile-section">
+<div class="profile-section-heading"><i data-lucide="building-2"></i><h3>Complete Address</h3></div>
+<div class="detail-grid">
+<div><span>House / Street / Purok</span><strong id="v_house">—</strong></div>
+<div><span>Barangay</span><strong id="v_barangay">—</strong></div>
+<div><span>City / Municipality</span><strong id="v_city">—</strong></div>
+<div><span>Province</span><strong id="v_province">—</strong></div>
+<div><span>Zip Code</span><strong id="v_zip">—</strong></div>
+<div class="detail-wide"><span>Complete Address</span><strong id="v_address">—</strong></div>
+</div>
+</section>
+<section class="profile-section">
+<div class="profile-section-heading"><i data-lucide="users-round"></i><h3>Family Background</h3></div>
+<div class="detail-grid">
+<div class="detail-wide"><span>Name of Spouse</span><strong id="v_spouse_name">—</strong></div>
+<div><span>Occupation</span><strong id="v_spouse_occupation">—</strong></div>
+<div><span>Employer / Business</span><strong id="v_spouse_employer">—</strong></div>
+<div><span>Contact No.</span><strong id="v_spouse_contact">—</strong></div>
+<div class="detail-wide"><span>Email Address</span><strong id="v_spouse_email">—</strong></div>
+</div>
+</section>
+<section class="profile-section">
+<div class="profile-section-heading"><i data-lucide="contact"></i><h3>Contact Information</h3></div>
+<div class="detail-grid">
+<div><span>Landline No.</span><strong id="v_landline">—</strong></div>
+<div><span>Mobile No. 1</span><strong id="v_mobile">—</strong></div>
+<div><span>Mobile No. 2</span><strong id="v_mobile2">—</strong></div>
+<div class="detail-wide"><span>Email Address</span><strong id="v_email">—</strong></div>
+<div><span>Facebook</span><strong id="v_facebook">—</strong></div>
+<div><span>Instagram</span><strong id="v_instagram">—</strong></div>
+<div><span>Twitter / X</span><strong id="v_twitter">—</strong></div>
+</div>
+</section>
+<section class="profile-section">
+<div class="profile-section-heading"><i data-lucide="award"></i><h3>Educational Background</h3></div>
+<div class="detail-grid">
+<div><span>Level</span><strong id="v_education_level">—</strong></div>
+<div><span>Course</span><strong id="v_course">—</strong></div>
+<div><span>Year Graduated</span><strong id="v_year_graduated">—</strong></div>
+<div class="detail-wide"><span>Last School Attended</span><strong id="v_last_school">—</strong></div>
+</div>
+</section>
+</div>
+<section aria-labelledby="ceremonyTab" class="employee-tab-panel monitor-panel" hidden="" id="ceremonyPanel" role="tabpanel">
+<div class="monitor-panel-heading"><div><h3>Flag Ceremony Monitoring</h3><p>Records for the employee shown above. Summary counts match the current filters.</p></div><button class="btn btn-secondary monitor-export" id="ceremonyExport" type="button"><i data-lucide="download"></i>Export CSV</button></div>
+<div aria-live="polite" class="monitor-summary ceremony-summary"><div class="monitor-stat"><span>Present</span><strong id="ceremonySummary0">0</strong></div><div class="monitor-stat"><span>Absent</span><strong id="ceremonySummary1">0</strong></div><div class="monitor-stat"><span>O.B.</span><strong id="ceremonySummary2">0</strong></div><div class="monitor-stat"><span>Leave</span><strong id="ceremonySummary3">0</strong></div><div class="monitor-stat"><span>Late</span><strong id="ceremonySummary4">0</strong></div><div class="monitor-stat"><span>Total Counted</span><strong id="ceremonySummary5">0</strong></div></div>
+<p class="monitor-summary-note">Total Counted = Present + O.B. + Leave + Late; absent records remain in the total records.</p>
+<p class="monitor-print-scope" id="ceremonyPrintScope"></p>
+<div class="monitor-layout">
+<form class="monitor-editor" id="ceremonyForm">
+<div class="monitor-editor-heading"><h4 id="ceremonyEditorTitle">Add Record</h4><span class="monitor-edit-tag" hidden="" id="ceremonyEditTag">Editing</span></div>
+<div aria-live="polite" class="form-feedback" hidden="" id="ceremonyFeedback" role="status"></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number</label><input aria-describedby="ceremonyControlHelp" class="form-control" id="ceremonyControl" maxlength="80" placeholder="e.g. FC-2026-0001" type="text"/><small class="field-help" id="ceremonyControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" required="" type="date"/></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required=""><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required=""><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
+<div class="monitor-editor-actions"><button class="btn btn-primary" id="ceremonySave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="ceremonyClear" type="button">Clear</button></div>
+</form>
+<div class="monitor-report">
+<form class="monitor-filters" id="ceremonyFilters"><div class="form-group"><label for="ceremonyFrom">From</label><input class="form-control" id="ceremonyFrom" type="date"/></div><div class="form-group"><label for="ceremonyTo">To</label><input class="form-control" id="ceremonyTo" type="date"/></div><div class="form-group"><label for="ceremonyFilterActivity">Activity</label><select class="form-control" id="ceremonyFilterActivity"><option value="">05. All activities</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group"><label for="ceremonyFilterStatus">Status</label><select class="form-control" id="ceremonyFilterStatus"><option value="">All statuses</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group full"><label for="ceremonySearch">Search</label><input class="form-control" id="ceremonySearch" maxlength="200" placeholder="Control number, date, activity, or remarks" type="search"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
+<p class="monitor-filter-error" hidden="" id="ceremonyFilterError" role="status"></p>
+<div class="monitor-report-heading"><strong id="ceremonyRecordCount">0 records</strong><span>Newest date first</span></div>
+<div aria-label="Flag Ceremony Monitoring records" class="monitor-table-scroll table-responsive" id="ceremonyTableRegion" role="region" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Status</th><th>Activity</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="ceremonyTableBody"></tbody></table></div>
+</div>
+</div>
+</section>
+<section aria-labelledby="uniformTab" class="employee-tab-panel monitor-panel" hidden="" id="uniformPanel" role="tabpanel">
+<div class="monitor-panel-heading"><div><h3>Prescribed Uniform Monitoring</h3><p>Records for the employee shown above. Summary counts match the current filters.</p></div><button class="btn btn-secondary monitor-export" id="uniformExport" type="button"><i data-lucide="download"></i>Export CSV</button></div>
+<div aria-live="polite" class="monitor-summary uniform-summary"><div class="monitor-stat"><span>Yes — Compliant</span><strong id="uniformSummary0">0</strong></div><div class="monitor-stat"><span>No — Noncompliant</span><strong id="uniformSummary1">0</strong></div><div class="monitor-stat"><span>Total Records</span><strong id="uniformSummary2">0</strong></div><div class="monitor-stat"><span>Compliance Rate</span><strong id="uniformSummary3">0</strong></div></div>
+<p class="monitor-summary-note">Compliance rate = Yes ÷ total matching records. All dates include both endpoints.</p>
+<p class="monitor-print-scope" id="uniformPrintScope"></p>
+<div class="monitor-layout">
+<form class="monitor-editor" id="uniformForm">
+<div class="monitor-editor-heading"><h4 id="uniformEditorTitle">Add Record</h4><span class="monitor-edit-tag" hidden="" id="uniformEditTag">Editing</span></div>
+<div aria-live="polite" class="form-feedback" hidden="" id="uniformFeedback" role="status"></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number</label><input aria-describedby="uniformControlHelp" class="form-control" id="uniformControl" maxlength="80" placeholder="e.g. UM-2026-0001" type="text"/><small class="field-help" id="uniformControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" required="" type="date"/></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required=""><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
+<div class="monitor-editor-actions"><button class="btn btn-primary" id="uniformSave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="uniformClear" type="button">Clear</button></div>
+</form>
+<div class="monitor-report">
+<form class="monitor-filters" id="uniformFilters"><div class="form-group"><label for="uniformFrom">From</label><input class="form-control" id="uniformFrom" type="date"/></div><div class="form-group"><label for="uniformTo">To</label><input class="form-control" id="uniformTo" type="date"/></div><div class="form-group"><label for="uniformFilterStatus">Compliance</label><select class="form-control" id="uniformFilterStatus"><option value="">All records</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformSearch">Search</label><input class="form-control" id="uniformSearch" maxlength="200" placeholder="Control number, date, or remarks" type="search"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
+<p class="monitor-filter-error" hidden="" id="uniformFilterError" role="status"></p>
+<div class="monitor-report-heading"><strong id="uniformRecordCount">0 records</strong><span>Newest date first</span></div>
+<div aria-label="Prescribed Uniform Monitoring records" class="monitor-table-scroll table-responsive" id="uniformTableRegion" role="region" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Compliant</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="uniformTableBody"></tbody></table></div>
+</div>
+</div>
+</section>
+</div>
 <div class="modal-actions">
-
 <button class="btn btn-secondary" id="printDossierBtn" type="button">
-
 <i data-lucide="printer"></i><span id="employeePrintLabel">Print Employee Record</span>
-
 </button>
-
 <button class="btn btn-primary" id="dossierEditBtn" type="button">
-
 <i data-lucide="pencil"></i><span>Edit Profile</span>
-
 </button>
-
 </div>
-
 </div>
-
 </div>
-
 <div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div>
-
-<div id="employeePrintArea" aria-hidden="true"></div>
-
+<div aria-hidden="true" id="employeePrintArea"></div>
 <!-- Shared System Scripts -->
-
-<script defer="" src="../shared/supabase.js?v=20261010-slide-confirm-v3"></script>
-
-<script defer="" src="employee-admin.js?v=20261010-slide-confirm-v3"></script>
-
-<div class="modal-overlay" id="workspaceJumpModal" aria-hidden="true">
-
-  <div class="modal-container workspace-jump-dialog" role="dialog" aria-modal="true" aria-labelledby="workspaceJumpTitle">
-
-    <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button type="button" id="workspaceJumpClose" aria-label="Close module search">×</button></div>
-
-    <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input id="workspaceJumpSearch" type="search" placeholder="Try memo, personnel, or inventory…" autocomplete="off" aria-controls="workspaceJumpResults"/></div>
-
-    <nav id="workspaceJumpResults" class="workspace-jump-results" aria-label="Matching modules"></nav>
-
-    <div class="workspace-jump-footer"><span id="workspaceJumpCount" aria-live="polite"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
-
-  </div>
-
+<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="employee-admin.js?v=20261011-navigation-pdf-v2"></script>
+<div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
+<div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
+<div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
+<div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
 </div>
-
+</div>
 </body>
-
 </html>
-

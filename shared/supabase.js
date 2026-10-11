@@ -67,13 +67,7 @@
     );
   }
 
-  const ADMIN_ROLES = new Set([
-    "admin",
-    "administrator",
-    "super admin",
-    "superadmin",
-    "system administrator"
-  ]);
+  const ADMIN_ROLES = new Set(['admin']);
 
   const ALLOWED_TABLES = new Set([
     "profiles",
@@ -595,7 +589,7 @@
             "",
           role:
             profile.role ||
-            "System Staff",
+            "User",
           accountType:
             profile.account_type ||
             "Standard User",

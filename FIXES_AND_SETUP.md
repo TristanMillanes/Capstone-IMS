@@ -1,5 +1,7 @@
 # PGENRO IMS — OCR and UI update
 
+For this archive's Admin/User correction, first follow `ADMIN_USER_SETUP.md`: run `supabase/ADMIN_USER_ACCESS_PATCH.sql`, deploy the updated `admin-users` Edge Function, then redeploy the application. The OCR and attachment instructions below still apply.
+
 Updated 4 October 2026. Use the complete application folder from this archive.
 
 ## Start or update the system

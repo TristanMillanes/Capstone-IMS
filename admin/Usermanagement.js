@@ -1,3 +1,4 @@
+/* User Management access and persistent role fix, 11 October 2026. */
 /* Module-owned runtime. Kept inside each module; no extra shared file required. */
 
 (() => {
@@ -89,6 +90,7 @@
   let currentIds = new Map(); const unread = [];
 
   function observeRecords(key, rows) {
+    window.PGENRO_Notifications?.scheduleRefresh();
 
     const ids = rows.map(r => String(r.id)).filter(Boolean); const prior = currentIds.get(key);
 
@@ -266,10 +268,13 @@
 
     const user = storage.get('pgenro_current_user',{}); if($('dropdownUserName'))$('dropdownUserName').textContent=user.fullName||user.full_name||user.name||'PGENRO Admin'; if($('dropdownUserEmail'))$('dropdownUserEmail').textContent=user.email||'Administrator Session';
 
-    if(document.body.dataset.adminPage !== 'admin.html') $('logoutBtn')?.addEventListener('click',async () => {
-
-      try { if(client()){const result=await client().auth.signOut();if(result?.error)throw result.error;} try{localStorage.removeItem('pgenro_current_user');sessionStorage.removeItem('pgenro_current_user');}catch{} location.href='../User/login.html'; }catch{toast('Sign out failed. Please try again.','error');}
-
+    $('logoutBtn')?.addEventListener('click',async event => {
+      event.preventDefault();
+      if (typeof window.PGENRO_API?.signOut !== 'function') {
+        toast('Sign out is unavailable. Reload the page and try again.','error');
+        return;
+      }
+      await window.PGENRO_API.signOut();
     });
 
   }
@@ -310,7 +315,7 @@
 
 /* ===== Page module ===== */
 /**
- * PGENRO IMS — User Management Controller
+ * PGENRO IMS â€” User Management Controller
  * Manages Account Authentication users and administrator-controlled PGENRO profiles.
  * Reads a protected Supabase registry; account changes use the admin-users Edge Function.
  */
@@ -318,7 +323,8 @@
   'use strict';
   const M=window.PGENRO_Module;let saving=false,acting=false,loadVersion=0,channel=null,adminId=null;
   const $ = id => document.getElementById(id);
-  let authSubscription = null, connecting = false, realtimeTimer = null, authVersion = 0, reconnectRequested = false;
+  let authSubscription = null, connecting = false, realtimeTimer = null, authVersion = 0, reconnectRequested = false, accessTimer = null;
+  let accountServiceReadyUntil = 0;
   const els = {};
   const state = {
     users: [],
@@ -327,6 +333,8 @@
     page: 1,
     pageSize: 8,
     editingId: null,
+    editingSnapshot: null,
+    pending: 0,
     db: null,
     online: false,
     loading: false,
@@ -344,10 +352,13 @@
       if (event.persisted) return;
       loadVersion++;
       clearTimeout(realtimeTimer);
+      clearInterval(accessTimer);
       if (channel) state.db?.removeChannel(channel);
       authSubscription?.unsubscribe();
     });
     window.addEventListener('pageshow', event => { if (event.persisted) connectDatabase(); });
+    window.addEventListener('focus', verifyCurrentAccess);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) verifyCurrentAccess(); });
     connectDatabase();
     renderIcons();
   }
@@ -361,7 +372,7 @@
       'closeUserModalBtn','userForm','userIdInput','fullNameInput','usernameInput',
       'emailInput','passRequiredStar','passwordInput','positionInput','contactInput','divisionSelect','roleSelect',
       'statusSelect','cancelModalBtn','saveUserBtn','toast','toastMessage','statPendingRequests',
-      'sidebarPendingAccBadge','sidebarOpenServicesBadge'
+      'sidebarPendingAccBadge','sidebarOpenServicesBadge','roleChangeHelp','userManagementFeedback'
     ].forEach(id => els[id] = $(id));
   }
   function bindShell() {
@@ -402,7 +413,7 @@
     });
   }
   function getClient() {
-    const existing = M.client();
+    const existing = M?.client?.();
     if (existing) return existing;
     if (typeof window.supabase?.createClient !== 'function') {
       throw Error('Supabase could not load. Check your connection and refresh.');
@@ -417,22 +428,83 @@
     );
     return window.pgenroSupabase;
   }
-  function directoryError(error) {
-    if (['PGRST202','42883','42P01','42703'].includes(error?.code)) {
-      return 'User directory setup is incomplete. Run the supplied Supabase schema, then refresh.';
+  // This page owns its session bridge so an older shared Super Admin gate
+  // cannot override the live database Admin/User check for this module.
+  window.PGENRO_API = {
+    async signOut(options = {}) {
+      if (options.confirm !== false && options.ask !== false && typeof window.PGENRO_ConfirmLogout === 'function') {
+        const confirmed = await window.PGENRO_ConfirmLogout(); if (!confirmed) return false;
+      }
+      try {
+        const result = await getClient().auth.signOut(); if (result?.error) throw result.error;
+        try { for (const storage of [localStorage, sessionStorage]) storage.removeItem('pgenro_current_user'); } catch {}
+        location.replace('../User/login.html'); return true;
+      } catch {
+        window.dispatchEvent(new Event('pgenro:logout-error'));
+        return false;
+      }
     }
-    if (error?.code === '42501') return 'Active Super Admin access is required for User Management.';
+  };
+  function directoryError(error) {
+    if (['PGRST202','PGRST204','42883','42P01','42703','42804'].includes(error?.code)) {
+      return 'Run the entire UserManagement_Admin_Role_Fix.sql in Supabase SQL Editor, then refresh this page.';
+    }
+    if (error?.code === '40001') return 'This account changed while you were editing it. Reopen it and review the current values.';
+    if (error?.code === '23505') return 'Email or username already belongs to another account.';
     return error?.message || 'The user directory could not load. Please refresh.';
   }
-  function clearDirectory() {
-    authVersion++;
-    loadVersion++;
+  function feedback(message = '', tone = 'error') {
+    const panel = els.userManagementFeedback;
+    if (!panel) return;
+    panel.textContent = message; panel.dataset.tone = tone; panel.hidden = !message;
+  }
+  function clearDirectory(message = 'Sign in with an active Admin account.') {
+    authVersion++; loadVersion++;
     state.users = []; state.filtered = []; state.selected.clear();
     state.page = 1; state.online = false; state.loading = false; adminId = null;
-    if (els.statPendingRequests) els.statPendingRequests.textContent = '—';
-    state.error = 'Sign in with an active administrator account.';
+    state.editingSnapshot = null; state.editingId = null; state.pending = 0;
+    setSaving(false); acting = false;
+    if (els.statPendingRequests) els.statPendingRequests.textContent = 'â€”';
+    state.error = message; feedback(message);
+    document.body.dataset.directoryState = 'unavailable';
+    clearInterval(accessTimer); accessTimer = null;
     if (channel) { state.db?.removeChannel(channel); channel = null; }
-    applyFilters();
+    document.querySelectorAll('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open').forEach(modal => {
+      modal.dataset.busy = 'false'; M.closeModal(modal.id);
+    });
+    els.userForm?.reset(); applyFilters();
+  }
+  async function readCurrentAccess() {
+    const identity = await state.db.auth.getUser();
+    if (identity.error || !identity.data?.user) {
+      throw Object.assign(Error('Your session expired. Sign in again.'), { code: 'UM_SIGN_IN' });
+    }
+    const response = await state.db.rpc('pgenro_um_context');
+    if (response.error) throw response.error;
+    const context = response.data;
+    if (!context || typeof context.authorized !== 'boolean') throw Error('The access service returned an invalid response. Run the updated SQL patch.');
+    if (!context.authorized) {
+      const reason = context.reason || 'INACTIVE';
+      const message = reason === 'PROFILE_MISSING' ? 'Your Auth account has no PGENRO profile. Run the updated SQL patch, then have an Admin review your account.'
+        : reason === 'USER' ? 'Your account uses the User workspace.' : 'Your account is inactive or suspended.';
+      throw Object.assign(Error(message), { code: `UM_${reason}` });
+    }
+    if (String(context.profile?.user_id) !== String(identity.data.user.id)) throw Error('The access response does not match your current account.');
+    return { user: identity.data.user, profile: context.profile };
+  }
+  function handleAccessFailure(error) {
+    clearDirectory(directoryError(error));
+    if (error?.code === 'UM_SIGN_IN') location.replace('../User/login.html');
+    else if (error?.code === 'UM_USER') location.replace('../User/homepage.html');
+  }
+  async function verifyCurrentAccess() {
+    if (!state.db || !adminId || connecting) return;
+    const generation = authVersion;
+    try {
+      const access = await readCurrentAccess();
+      if (generation !== authVersion) return;
+      if (access.user.id !== adminId) { clearDirectory('Checking the new accountâ€™s access.'); await connectDatabase(); }
+    } catch (error) { if (generation === authVersion) handleAccessFailure(error); }
   }
   async function refreshUsers() {
     if (!state.db || !adminId) return false;
@@ -441,137 +513,165 @@
     try {
       const rows = []; let offset = 0;
       while (true) {
-        const response = await state.db.rpc('pgenro_admin_list_users', { p_offset: offset, p_limit: 500 });
+        const response = await state.db.rpc('pgenro_um_directory', { p_offset: offset, p_limit: 500 });
         if (response.error) throw response.error;
         if (version !== loadVersion) return false;
-        if (!Array.isArray(response.data)) throw Error('The directory returned an invalid response.');
-        rows.push(...response.data);
-        if (response.data.length < 500) break;
-        offset += response.data.length;
+        const page = response.data;
+        if (!page || !Array.isArray(page.items) || page.offset !== offset || !Number.isFinite(page.total)) throw Error('The directory returned an invalid response. Run the updated SQL patch.');
+        rows.push(...page.items);
+        state.pending = Number(page.pending) || 0;
+        if (!page.hasMore) break;
+        if (!page.items.length) throw Error('The directory could not continue pagination. Refresh before making changes.');
+        offset += page.items.length;
       }
       if (version !== loadVersion) return false;
       state.users = [...new Map(rows.map(row => {
-        const user = normalizeUser(row.user_id || row.id, row);
-        return [user.id, user];
+        const user = normalizeUser(row.user_id || row.id, row); return [user.id, user];
       })).values()].sort(sortUsers);
       state.online = true;
-      state.selected = new Set([...state.selected].filter(id => state.users.some(user => user.id === id)));
-      ensureDivisionOptions();
+      state.selected = new Set([...state.selected].filter(id => state.users.some(user => user.id === id && id !== adminId)));
+      ensureDivisionOptions(); feedback();
+      if (els.statPendingRequests) els.statPendingRequests.textContent = String(state.pending);
       M.observeRecords('user accounts', state.users);
       return true;
     } catch (error) {
       if (version !== loadVersion) return false;
-      state.online = false;
-      state.error = directoryError(error);
-      // A revoked session must not retain another account's directory.
-      if (error?.code === '42501') { state.users = []; state.selected.clear(); adminId = null; }
-      showToast(state.error, 'error');
+      state.users = []; state.filtered = []; state.selected.clear(); state.online = false;
+      state.error = directoryError(error); feedback(state.error);
+      if (error?.code === '42501') clearDirectory(state.error);
       return false;
-    } finally {
-      if (version === loadVersion) { state.loading = false; applyFilters(); }
-    }
+    } finally { if (version === loadVersion) { state.loading = false; applyFilters(); } }
   }
   async function refreshPending() {
-    const actor = adminId;
-    if (!actor) return;
+    const actor = adminId; if (!actor) return;
     try {
-      const response = await state.db.rpc('pgenro_admin_pending_count');
-      if (actor === adminId && els.statPendingRequests) els.statPendingRequests.textContent = response.error ? '—' : String(response.data ?? 0);
-    } catch { if (actor === adminId && els.statPendingRequests) els.statPendingRequests.textContent = '—'; }
+      const response = await state.db.rpc('pgenro_um_directory', { p_offset: 0, p_limit: 1 });
+      if (actor !== adminId) return;
+      if (response.error?.code === '42501') { clearDirectory(directoryError(response.error)); return; }
+      if (els.statPendingRequests) els.statPendingRequests.textContent = response.error ? 'â€”' : String(response.data?.pending ?? 0);
+    } catch { if (actor === adminId && els.statPendingRequests) els.statPendingRequests.textContent = 'â€”'; }
   }
   async function connectDatabase(notify = false) {
     if (connecting) return;
     let generation = authVersion;
     connecting = true; state.loading = true; state.error = ''; render();
+    document.body.dataset.directoryState = 'loading';
     try {
-      const db = getClient();
-      const session = await db.auth.getUser();
-      if (generation !== authVersion) return;
-      if (session.error || !session.data?.user) {
-        clearDirectory();
-        throw Error('Sign in with an active administrator account.');
-      }
-      const user = session.data.user;
-      if (adminId && adminId !== user.id) { clearDirectory(); generation = authVersion; }
-      const authorized = await db.rpc('pgenro_is_admin');
-      if (generation !== authVersion) return;
-      if (authorized.error) throw authorized.error;
-      if (authorized.data !== true) {
-        clearDirectory();
-        throw Object.assign(Error('Active Super Admin access is required for User Management.'), { code: '42501' });
-      }
-      adminId = user.id; state.db = db;
+      state.db = getClient(); const db = state.db;
       if (!authSubscription) {
-        const registration = db.auth.onAuthStateChange((_event, next) => {
-          // Keep asynchronous Supabase work outside the Auth callback's lock.
-          if (!next?.user || (adminId && next.user.id !== adminId)) {
-            clearDirectory();
-            if (next?.user) {
-              if (connecting) reconnectRequested = true;
-              else setTimeout(() => connectDatabase(), 0);
-            }
-          }
+        const registration = db.auth.onAuthStateChange((event, next) => {
+          if (event === 'INITIAL_SESSION') return;
+          if (!next?.user) { clearDirectory(); location.replace('../User/login.html'); return; }
+          if (adminId && next.user.id !== adminId) clearDirectory('Checking the new accountâ€™s access.');
+          if (connecting) reconnectRequested = true; else setTimeout(() => connectDatabase(), 0);
         });
-        authSubscription = registration.data.subscription;
+        authSubscription = registration.data?.subscription;
       }
+      const access = await readCurrentAccess();
+      if (generation !== authVersion) return;
+      const { user, profile } = access;
+      if (adminId && adminId !== user.id) { clearDirectory(); generation = authVersion; }
+      adminId = user.id;
       const loaded = await refreshUsers();
       if (generation !== authVersion) return;
       if (loaded) {
-        await refreshPending();
-        if (generation !== authVersion) return;
+        document.body.dataset.directoryState = 'ready';
+        if ($('dropdownUserRole')) $('dropdownUserRole').textContent = 'Admin';
+        if ($('dropdownUserName')) $('dropdownUserName').textContent = profile.full_name || profile.username || user.email || 'Admin';
+        if ($('dropdownUserEmail')) $('dropdownUserEmail').textContent = user.email || '';
+        if (!accessTimer) accessTimer = setInterval(verifyCurrentAccess, 30000);
         if (notify) showToast('User registry refreshed.');
         if (!channel && typeof db.channel === 'function') {
-          const refresh = () => {
-            clearTimeout(realtimeTimer);
-            realtimeTimer = setTimeout(() => { if (adminId) refreshUsers(); }, 180);
-          };
+          const refresh = () => { clearTimeout(realtimeTimer); realtimeTimer = setTimeout(async () => {
+            await verifyCurrentAccess(); if (adminId) await refreshUsers();
+          }, 180); };
           channel = db.channel('admin-user-management')
             .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, refresh)
-            .on('postgres_changes', { event: '*', schema: 'public', table: 'access_requests' }, () => refreshPending())
-            .subscribe();
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'access_requests' }, () => refreshPending()).subscribe();
         }
-      }
-    } catch (error) {
-      state.online = false; state.error = directoryError(error);
-      showToast(state.error, 'error');
-    } finally {
+      } else if (generation === authVersion) clearDirectory(state.error || 'Unable to load the user directory.');
+    } catch (error) { handleAccessFailure(error); }
+    finally {
       connecting = false; state.loading = false; applyFilters();
       if (reconnectRequested) { reconnectRequested = false; setTimeout(() => connectDatabase(), 0); }
     }
   }
+  function accountServiceName() {
+    const name = window.PGENRO_ADMIN_FUNCTION || 'admin-users';
+    if (!/^[a-zA-Z0-9_-]+$/.test(name)) throw Error('The account service name is invalid. Use admin-users.');
+    return name;
+  }
+  function accountConnectionError() {
+    accountServiceReadyUntil = 0;
+    return Error(`Could not reach ${accountServiceName()}. Deploy the supplied Supabase Edge Function and check the website origin/CORS and network connection. Refresh the directory before retrying; this request was not confirmed.`);
+  }
+  async function checkAccountService() {
+    if (Date.now() < accountServiceReadyUntil) return;
+    const projectUrl = state.db?.supabaseUrl || window.PGENRO_SUPABASE?.url || 'https://zssrxubajhqryrwijyzm.supabase.co';
+    const url = `${String(projectUrl).replace(/\/+$/, '')}/functions/v1/${accountServiceName()}`;
+    let response;
+    // A simple GET exposes a missing function without sending account data or
+    // replaying a mutation when the browser blocks a CORS preflight response.
+    try { response = await fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'no-store' }); }
+    catch { throw accountConnectionError(); }
+    if (response.status === 404) throw Error(`The ${accountServiceName()} Edge Function is not deployed in this Supabase project. Deploy supabase/functions/admin-users/index.ts before creating accounts, changing credentials or suspending/activating users.`);
+    // Older deployed versions have no health route but do return readable
+    // HTTP responses. Keep them compatible; mutation authorization is intact.
+    if ([401,403,405].includes(response.status)) { accountServiceReadyUntil = Date.now() + 30000; return; }
+    let result;
+    try { result = await response.json(); } catch { throw accountConnectionError(); }
+    if (!response.ok || result?.success !== true || result?.service !== 'admin-users') {
+      throw Error(result?.error || 'The account service is unavailable. Redeploy the supplied admin-users Edge Function.');
+    }
+    accountServiceReadyUntil = Date.now() + 30000;
+  }
   async function invoke(action, payload) {
     if (!state.online || !adminId || !state.db) throw Error('Refresh and authorize the user registry before changing accounts.');
     const generation = authVersion;
+    try { await readCurrentAccess(); } catch (error) { handleAccessFailure(error); throw error; }
+    if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
     const session = await state.db.auth.getSession();
     if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
     const token = session.data?.session?.access_token;
     if (session.error || !token) { clearDirectory(); throw Error('Your session expired. Sign in again.'); }
-    const response = await state.db.functions.invoke(window.PGENRO_ADMIN_FUNCTION || 'admin-users', {
-      body: { action, ...payload }, headers: { Authorization: `Bearer ${token}` }
-    });
+    await checkAccountService();
+    if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
+    let response;
+    try {
+      response = await state.db.functions.invoke(accountServiceName(), {
+        body: { action, ...payload }, headers: { Authorization: `Bearer ${token}` }
+      });
+    } catch (error) {
+      if (/fetch|network|Failed to send|Load failed/i.test(error?.message || '')) throw accountConnectionError();
+      throw error;
+    }
     if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
     if (response.error) {
       let body = null;
       try { body = await response.error.context?.json(); } catch {}
       const status = response.error.context?.status;
-      if (status === 401 || status === 403) clearDirectory();
-      if (status === 404) throw Error('Deploy the supplied admin-users account service before changing accounts.');
+      if (!status && (response.error.name === 'FunctionsFetchError' || /Failed to send|Failed to fetch|NetworkError|Load failed/i.test(response.error.message || ''))) throw accountConnectionError();
+      if (status === 401 || status === 403) {
+        try { await readCurrentAccess(); } catch (error) { handleAccessFailure(error); throw error; }
+        throw Error(`The admin-users service rejected this request: ${body?.error || body?.message || response.error.message}. Check its Admin/User authorization and JWT configuration; your database Admin access is still valid.`);
+      }
+      if (status === 404 && (!body?.error && !body?.message || /function.*not found/i.test(body?.message || body?.error || ''))) throw Error('Deploy the existing admin-users Edge Function to create/delete Auth accounts or change email/password/status.');
       throw Error(body?.error || body?.message || response.error.message || 'The account service could not complete this action.');
     }
     const result = response.data;
-    if (!result || result.success !== true) throw Error(result?.error || 'The account service did not confirm this action.');
+    if (!result || (result.success !== true && result.ok !== true)) throw Error(result?.error || 'The account service did not confirm this action.');
+    if (result.warnings?.length) showToast(result.warnings.join(' '), 'warning');
     return result;
   }
   function canonicalRole(value) {
-    const role = String(value || '').trim().toLowerCase().replace(/_/g, ' ');
-    if (['admin','administrator','superadmin','super admin'].includes(role)) return 'Super Admin';
-    if (role === 'division head') return 'Division Head';
-    return 'System Staff';
+    return String(value || '').trim().toLowerCase() === 'admin' ? 'Admin' : 'User';
   }
   function canonicalStatus(raw) {
     const value = String(raw.status || '').trim().toLowerCase();
     if (['active','approved','enabled'].includes(value)) return 'Active';
     if (['suspended','banned'].includes(value)) return 'Suspended';
+    if (value === 'pending') return 'Pending';
+    if (value === 'rejected') return 'Rejected';
     if (value) return 'Inactive';
     return raw.is_active === false || raw.isActive === false ? 'Inactive' : 'Active';
   }
@@ -639,7 +739,7 @@
     const start = (state.page - 1) * state.pageSize;
     const pageRows = state.filtered.slice(start, start + state.pageSize);
     if (!pageRows.length) {
-      const title = state.loading ? 'Loading personnel accounts…' : state.error ? 'User directory unavailable' : 'No personnel accounts found';
+      const title = state.loading ? 'Loading personnel accountsâ€¦' : state.error ? 'User directory unavailable' : 'No personnel accounts found';
       const detail = state.loading ? 'Please wait while accounts are retrieved.' : state.error || (state.users.length ? 'Try changing the current filters.' : 'No Supabase Auth accounts are registered.');
       els.userTableBody.innerHTML = `<tr><td colspan="7"><div class="admin-empty-state"><i data-lucide="users-round"></i><strong>${html(title)}</strong><span>${html(detail)}</span></div></td></tr>`;
     } else {
@@ -656,9 +756,9 @@
     const selfDisabled = user.id === adminId ? 'disabled' : disabled;
     const initials = getInitials(user.fullName);
     const statusClass = /^(active|approved)$/i.test(user.status) ? 'active' : /suspend/i.test(user.status) ? 'suspended' : 'inactive';
-    const roleClass = /super admin/i.test(user.role) ? 'super-admin' : /division head/i.test(user.role) ? 'division-head' : 'system-staff';
+    const roleClass = user.role === 'Admin' ? 'admin' : 'user';
     return `<tr data-user-id="${attr(user.id)}">
-      <td><input type="checkbox" class="row-select" data-id="${attr(user.id)}" ${disabled} ${selected ? 'checked' : ''} aria-label="Select ${attr(user.fullName)}"></td>
+      <td><input type="checkbox" class="row-select" data-id="${attr(user.id)}" ${selfDisabled} ${selected ? 'checked' : ''} aria-label="Select ${attr(user.fullName)}"></td>
       <td><div class="user-cell"><div class="avatar-circle">${html(initials)}</div><div><strong>${html(user.fullName)}</strong><small>${html(user.email || user.username || 'No email')}</small></div></div></td>
       <td><span class="division-tag">${html(user.division)}</span>${user.position ? `<small>${html(user.position)}</small>` : ''}</td>
       <td><span class="role-badge-pill ${roleClass}">${html(user.role)}</span></td>
@@ -680,7 +780,7 @@
     old.querySelector('[data-page="next"]')?.addEventListener('click', () => { state.page++; render(); });
   }
   function updateSelectionControls() {
-    const visibleIds = state.filtered.slice((state.page - 1) * state.pageSize, state.page * state.pageSize).map(u => u.id);
+    const visibleIds = state.filtered.slice((state.page - 1) * state.pageSize, state.page * state.pageSize).filter(u => u.id !== adminId).map(u => u.id);
     const blocked = !state.online || acting || saving || state.loading;
     if (els.openAddUserModalBtn) els.openAddUserModalBtn.disabled = blocked;
     if (els.exportUsersBtn) els.exportUsersBtn.disabled = !state.online || state.loading;
@@ -699,7 +799,7 @@
   }
   function toggleSelectAll() {
     const visible = state.filtered.slice((state.page - 1) * state.pageSize, state.page * state.pageSize);
-    visible.forEach(u => els.selectAllCheckbox.checked ? state.selected.add(u.id) : state.selected.delete(u.id));
+    visible.filter(u => u.id !== adminId).forEach(u => els.selectAllCheckbox.checked ? state.selected.add(u.id) : state.selected.delete(u.id));
     render();
   }
   function handleRowSelection(e) {
@@ -720,6 +820,8 @@
   }
   function openModal(user = null) {
     if(saving || acting || !state.online)return;state.editingId = user?.id || null;
+    state.editingSnapshot = user ? { ...user } : null;
+    if (els.roleChangeHelp) els.roleChangeHelp.textContent = user?.id === adminId ? 'Use another Admin to change your own access role.' : 'Choose the final Admin or User role. Save Changes applies it to the account.';
     if (els.userIdInput) els.userIdInput.value = user?.id || '';
     if (els.fullNameInput) els.fullNameInput.value = user?.fullName || '';
     if (els.usernameInput) els.usernameInput.value = user?.username || '';
@@ -733,8 +835,20 @@
     if (els.positionInput) els.positionInput.value = user?.position || '';
     if (els.contactInput) els.contactInput.value = user?.contact || '';
     if (els.divisionSelect) els.divisionSelect.value = user?.division || '';
-    if (els.roleSelect) els.roleSelect.value = user?.role || 'System Staff';
-    if (els.statusSelect) els.statusSelect.value = ['Active','Inactive','Suspended'].includes(user?.status) ? user.status : 'Active';
+    if (els.roleSelect) els.roleSelect.value = user?.role || 'User';
+    if (els.statusSelect) els.statusSelect.value = ['Active','Inactive','Suspended','Pending','Rejected'].includes(user?.status) ? user.status : 'Active';
+    // Pending/Rejected are existing review states. Keeping that state does not
+    // invoke the account service or silently approve the registration.
+    const awaitingReview = ['Pending','Rejected'].includes(user?.status);
+    if (els.statusSelect) [...els.statusSelect.options].forEach(option => {
+      if (['Pending','Rejected'].includes(option.value)) {
+        option.disabled = option.value !== user?.status;
+        option.hidden = option.disabled;
+      }
+    });
+    if (els.emailInput) els.emailInput.disabled = awaitingReview;
+    if (els.passwordInput) els.passwordInput.disabled = awaitingReview;
+    if (awaitingReview && els.roleChangeHelp) els.roleChangeHelp.textContent = `This account is ${user.status}. Role/profile edits preserve that status. Choose Active to approve access before changing credentials.`;
     if (els.roleSelect) els.roleSelect.disabled = user?.id === adminId;
     if (els.statusSelect) els.statusSelect.disabled = user?.id === adminId;
     if (els.modalTitle) els.modalTitle.textContent = user ? 'Edit User Account' : 'Add New User Account';
@@ -744,12 +858,13 @@
     els.fullNameInput?.focus({preventScroll:true});
     renderIcons();
   }
-  function closeModal(){if(saving)return;M.closeModal('userModal');state.editingId=null;els.userForm?.reset();}
+  function closeModal(){if(saving)return;M.closeModal('userModal');state.editingId=null;state.editingSnapshot=null;els.userForm?.reset();}
   async function saveUser(e) {
     e.preventDefault();
     if(saving)return;
     if (!els.userForm?.reportValidity()) return;
-    const isEdit = Boolean(state.editingId);
+    const editingId = state.editingId, original = state.editingSnapshot;
+    const isEdit = Boolean(editingId);
     const password = els.passwordInput?.value || '';
     if ((!isEdit || password) && password.length < 8) {
       showToast('Password must contain at least 8 characters.', 'warning');
@@ -767,25 +882,60 @@
       position: els.positionInput?.value.trim() || '',
       contact: els.contactInput?.value.trim() || ''
     };
-    if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(userInput.username)) { showToast('Username must be 1–60 letters, numbers, dots, underscores or hyphens.', 'warning'); return; }
+    if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(userInput.username)) { showToast('Username must be 1â€“60 letters, numbers, dots, underscores or hyphens.', 'warning'); return; }
     if(state.users.some(u=>u.id!==state.editingId&&(u.email.toLowerCase()===userInput.email||u.username.toLowerCase()===userInput.username.toLowerCase()))){showToast('Email or username already exists.','warning');return;}
-    setSaving(true);
+    if (!['Admin','User'].includes(userInput.role)) { showToast('Choose Admin or User.', 'warning'); return; }
+    setSaving(true); feedback();
+    const generation = authVersion;
+    let committed = false;
     try {
-      const result = await invoke(isEdit ? 'update' : 'create', isEdit
-        ? { userId: state.editingId, user: userInput }
-        : { user: userInput });
-      const returned=result.user||{};const id=returned.user_id||returned.id||state.editingId;if(!id)throw Error('The administrator service did not confirm the created account. Refresh before trying again.');
-      const saved = normalizeUser(id,{...userInput,...returned});
-      upsertLocal(saved);
-      setSaving(false);closeModal();M.audit(isEdit?'EDIT_USER':'CREATE_USER',`Account ${userInput.email}`);
-      showToast(isEdit ? 'User account updated in Supabase.' : 'Supabase user account created.');
-    } catch (err) {
-      console.error(err);
+      let result;
+      if (isEdit) {
+        if (!original) throw Error('Reopen this account before saving.');
+        let expectedVersion = original.updatedAt || null;
+        const credentialOrStatusChange = userInput.email !== original.email.toLowerCase() || Boolean(password) || userInput.status !== original.status;
+        if (credentialOrStatusChange) {
+          const changed = await invoke('update', { userId: editingId, user: userInput });
+          expectedVersion = changed.user?.updated_at || changed.user?.updatedAt || null;
+        }
+        if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
+        const response = await state.db.rpc('pgenro_um_save_profile', {
+          p_user_id: editingId,
+          p_changes: { full_name: userInput.fullName, username: userInput.username, division: userInput.division,
+            role: userInput.role, position: userInput.position, contact: userInput.contact },
+          p_expected_updated_at: expectedVersion
+        });
+        if (response.error) throw response.error;
+        result = response.data;
+      } else result = await invoke('create', { user: userInput });
+      if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
+      if (!result || (result.success !== true && result.ok !== true)) throw Error(result?.error || 'The server did not confirm the saved account.');
+      const returned = result.user;
+      if (!returned || !(returned.user_id || returned.id) || returned.role !== userInput.role ||
+          (isEdit && String(returned.user_id || returned.id) !== editingId)) {
+        throw Error('The server did not confirm the selected role. Refresh and verify this account before retrying.');
+      }
+      const saved = normalizeUser(returned.user_id || returned.id, returned);
+      committed = true; upsertLocal(saved);
+      setSaving(false); closeModal();
+      M.audit(isEdit ? 'EDIT_USER' : 'CREATE_USER', `Account ${saved.email || saved.username}; role ${saved.role}`);
+      const loaded = await refreshUsers();
+      if (generation !== authVersion) return;
+      if (!loaded) {
+        feedback(`Account saved as ${saved.role}. The directory could not refresh; use Refresh to reload it.`, 'error');
+        showToast('Account saved. Refresh the directory to verify the latest list.', 'warning'); return;
+      }
+      const confirmed = state.users.find(user => user.id === saved.id);
+      if (!confirmed || confirmed.role !== userInput.role) throw Error('The saved role changed again or the account is no longer present. Reopen the current record.');
+      feedback(isEdit ? `Account updated. Saved role: ${confirmed.role}.` : `Account created. Saved role: ${confirmed.role}.`, 'success');
+      showToast(isEdit ? `Changes saved in Supabase. Role: ${confirmed.role}.` : 'Supabase user account created.');
+    } catch (error) {
+      if (generation !== authVersion) return;
+      if (error?.code === '42501') { await verifyCurrentAccess(); if (generation !== authVersion) return; }
       await refreshUsers();
-      showToast(`Unable to save account: ${err.message || 'Unknown error'}`, 'error');
-    } finally {
-      setSaving(false);
-    }
+      const message = `${committed ? 'Account was saved; verify the current record' : 'Unable to save account'}: ${directoryError(error)}`;
+      feedback(message); showToast(message, 'error');
+    } finally { setSaving(false); }
   }
   function upsertLocal(user) {
     const idx = state.users.findIndex(u => u.id === user.id);
@@ -805,7 +955,9 @@
         userId: user.id,
         status: next
       });
-      upsertLocal(normalizeUser(user.id, result.user || { ...user, status: next, is_active: !active }));
+      if (!await refreshUsers()) throw Error('The service responded, but the directory could not confirm the saved status. Refresh before retrying.');
+      const confirmed = state.users.find(item => item.id === user.id);
+      if (!confirmed || confirmed.status !== next) throw Error('The saved account status does not match the requested status. Check the admin-users service.');
       showToast(`${user.fullName} is now ${next}.`);
     } catch (err) {
       await refreshUsers();
@@ -818,11 +970,9 @@
     acting=true;render();
     try {
       await invoke('delete', { userId: user.id });
-      state.users = state.users.filter(u => u.id !== user.id);
-      state.selected.delete(user.id);
-      
-      applyFilters();
-      showToast('User account permanently removed.');
+      if (!await refreshUsers()) throw Error('The service responded, but deletion could not be verified. Refresh before retrying.');
+      if (state.users.some(item => item.id === user.id)) throw Error('The account still exists. Check the admin-users deletion service.');
+      state.selected.delete(user.id); applyFilters(); showToast('User account permanently removed.');
     } catch (err) {
       await refreshUsers();
       showToast(`Unable to delete account: ${err.message}`, 'error');
@@ -833,7 +983,9 @@
     if(!confirm(`Permanently delete ${users.length} selected accounts?`))return;
     acting=true;render();const removed=new Set(),errors=[];
     try{for(const user of users){try{await invoke('delete',{userId:user.id});removed.add(user.id);}catch(error){errors.push(`${user.fullName}: ${error.message}`);}}
-      state.users=state.users.filter(u=>!removed.has(u.id));removed.forEach(id=>state.selected.delete(id));applyFilters();
+      if (!await refreshUsers()) { showToast('Deletion requests completed, but the directory could not refresh. Reload before retrying.', 'warning'); return; }
+      for (const id of [...removed]) if (state.users.some(user => user.id === id)) { removed.delete(id); errors.push('An account still exists after the deletion response.'); }
+      removed.forEach(id=>state.selected.delete(id));applyFilters();
       if(removed.size)showToast(`${removed.size} accounts removed.`);if(errors.length)showToast(`${errors.length} failed. ${errors[0]}`,'error');M.audit('DELETE_USERS',`${removed.size} accounts removed`);
     }finally{acting=false;render();}
   }
@@ -845,12 +997,18 @@
     M.csv([headers,...data],`PGENRO_User_Registry_${M.today()}.csv`);
     showToast(`Exported ${rows.length} user record${rows.length === 1 ? '' : 's'}.`);
   }
+  const previousDisabled = new Map();
   function setSaving(value) {
-    saving=value;if(els.userModal)els.userModal.dataset.busy=String(value);
+    saving = value;
+    if (els.userModal) els.userModal.dataset.busy = String(value);
+    els.userForm?.querySelectorAll('input,select,button').forEach(control => {
+      if (value) { if (!previousDisabled.has(control)) previousDisabled.set(control, control.disabled); control.disabled = true; }
+      else if (previousDisabled.has(control)) { control.disabled = previousDisabled.get(control); previousDisabled.delete(control); }
+    });
     render();
     if (!els.saveUserBtn) return;
-    els.saveUserBtn.disabled = saving;
-    els.saveUserBtn.innerHTML = saving ? '<span class="spinner"></span> Saving...' : '<i data-lucide="save"></i> Save Account';
+    els.saveUserBtn.disabled = value;
+    els.saveUserBtn.innerHTML = value ? '<span class="spinner"></span> Saving...' : '<i data-lucide="save"></i> Save Account';
     renderIcons();
   }
   const showToast=M.toast;
@@ -909,7 +1067,7 @@
 
       active = -1;
 
-      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">↗</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try “memo”, “inventory”, or “users”.</p>';
+      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">â†—</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try â€œmemoâ€, â€œinventoryâ€, or â€œusersâ€.</p>';
 
       $('workspaceJumpCount').textContent = `${matches.length} destination${matches.length === 1 ? '' : 's'}`;
 
@@ -993,7 +1151,7 @@
 
       const update = () => {
 
-        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Working… Please wait before making more changes.' : '';
+        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Workingâ€¦ Please wait before making more changes.' : '';
 
         if (busy && !locked && form) { locked = true; wasInert = form.inert; focus = document.activeElement; form.inert = true; }
 
@@ -1077,7 +1235,7 @@
 
       const controls = document.createElement('div'); controls.className = 'workspace-table-controls'; controls.hidden = true;
 
-      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">←</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">→</button></div>`;
+      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">â†</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">â†’</button></div>`;
 
       region.after(controls); const [left,right] = controls.querySelectorAll('button');
 
@@ -1198,7 +1356,7 @@
       if (name !== currentSidebarIcon) {
         currentSidebarIcon = name;
         const icon = document.createElement('i'); icon.dataset.lucide = name;
-        sidebarToggle.replaceChildren(icon); renderIcons();
+        const label=document.createElement('span');label.className='navigation-button-label';label.textContent='Menu';sidebarToggle.replaceChildren(icon,label); renderIcons();
       }
       if (mobile) { sidebarToggle.setAttribute('aria-label', 'Close navigation'); sidebarToggle.title = 'Close navigation'; }
     }
@@ -1291,7 +1449,7 @@
   else initModernWorkspace();
 })();
 
-/* ===== PGENRO DEPTH MOTION · page-owned, short animations only ===== */
+/* ===== PGENRO DEPTH MOTION Â· page-owned, short animations only ===== */
 (() => {
   'use strict';
   function initDepthWorkspace() {
@@ -1341,7 +1499,7 @@
 })();
 /* ===== END PGENRO DEPTH MOTION ===== */
 
-/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT · module-owned presentation ===== */
+/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT Â· module-owned presentation ===== */
 (() => {
   'use strict';
   function initWorkspaceNavigation() {
@@ -1401,7 +1559,7 @@
       dialog.setAttribute('aria-busy', String(value));
       dialog.querySelector('[data-workspace-logout-cancel]').disabled = value;
       dialog.querySelector('[data-workspace-logout-confirm]').disabled = value;
-      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging out…' : 'Yes, log out';
+      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging outâ€¦' : 'Yes, log out';
     }
     function dismiss() {
       if (busy) return;
@@ -1435,7 +1593,7 @@
         <div class="workspace-logout-content">
           <div class="workspace-logout-heading"><span class="workspace-logout-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg></span><span class="workspace-logout-brand">PGENRO IMS<span>Secure workspace</span></span></div>
           <h2 id="workspaceLogoutTitle">Log out of your workspace?</h2>
-          <p id="workspaceLogoutDescription">You’ll need to sign in again to access your records and office modules.</p>
+          <p id="workspaceLogoutDescription">Youâ€™ll need to sign in again to access your records and office modules.</p>
           <p class="workspace-logout-error" role="alert"></p>
           <div class="workspace-logout-actions"><button type="button" class="workspace-logout-cancel" data-workspace-logout-cancel autofocus>Cancel</button><button type="button" class="workspace-logout-confirm" data-workspace-logout-confirm><span>Yes, log out</span></button></div>
         </div>`;
@@ -1487,3 +1645,233 @@
   else initWorkspaceNavigation();
 })();
 /* ===== END PGENRO SLIDE NAVIGATION AND LOGOUT ===== */
+
+/* PGENRO module notifications, 10 October 2026. */
+/* Module-owned notifications: copies live inside each workspace page script. */
+(() => {
+  'use strict';
+  if (window.PGENRO_Notifications) return;
+  const modules = {
+    communications:['Communications','admincommunication.html','communication.html'],
+    travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
+    office_memos:['Office Memos','officememo-admin.html','officememo.html'],
+    employees:['Employees','employee-admin.html','employee.html'],
+    inventory:['Inventory','invetoryadmin.html','inventory.html'],
+    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
+    service_requests:['Service Requests','serviceAdmin.html','service.html'],
+    ics_records:['Property Slips','ics-admin.html','ics.html'],
+    user_accounts:['User Management','Usermanagement.html',null],
+    account_requests:['Account Requests','requestacc.html',null]
+  };
+  const empty=()=>({total:0,counts:{},items:[],workspace:'user'});
+  let feed=empty(),status='loading',db,userId='',generation=0,loading=false,again=false,disposed=false;
+  let wrapper,button,panel,list,count,markAll,badge,channel,timer,debounce,authSubscription;
+  const element=(tag,className,text)=>{const el=document.createElement(tag);el.className=className||'';if(text!==undefined)el.textContent=text;return el;};
+  function destination(module){
+    const info=modules[module],admin=feed.workspace==='admin',file=info?.[admin?1:2];
+    return file?new URL(`../${admin?'admin':'User'}/${file}`,location.href).href:null;
+  }
+  function render(){
+    if(!button)return;
+    const total=Number(feed.total)||0;
+    badge.textContent=total>99?'99+':String(total);badge.hidden=!total;
+    count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
+    button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
+    list.replaceChildren();
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notificationsâ€¦'));
+    else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
+    else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
+    for(const item of feed.items||[]){
+      const href=destination(item.module);if(!href)continue;
+      const link=element('a','module-notification-item');link.href=href;link.dataset.notificationId=item.id;
+      const dot=element('span','module-notification-dot');dot.setAttribute('aria-hidden','true');
+      const copy=element('span','module-notification-copy');copy.append(element('strong','',modules[item.module][0]));
+      copy.append(element('span','module-notification-title',item.title||'New record added'));
+      const date=new Date(item.createdAt);copy.append(element('small','',Number.isNaN(date.getTime())?'New record':date.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})));
+      link.append(dot,copy);link.addEventListener('click',async event=>{
+        event.preventDefault();link.setAttribute('aria-busy','true');
+        try{await markRead({p_ids:[item.id]});}catch{/* The destination remains usable if marking read fails. */}
+        location.assign(href);
+      });list.append(link);
+    }
+    if(total>(feed.items||[]).length&&status==='ready')list.append(element('p','module-notification-more',`Showing the latest ${(feed.items||[]).length} new records`));
+    document.querySelectorAll('aside a[href], .sidebar a[href]').forEach(link=>{
+      const path=new URL(link.getAttribute('href'),location.href).pathname;
+      const module=Object.keys(modules).find(key=>destination(key)&&new URL(destination(key)).pathname===path);
+      let chip=link.querySelector('.module-new-badge');
+      if(!module){chip?.remove();return;}
+      const value=Number(feed.counts?.[module])||0;
+      if(!chip){chip=element('span','module-new-badge');link.append(chip);}
+      chip.dataset.module=module;chip.hidden=!value;chip.textContent=value>99?'99+':String(value);
+      chip.setAttribute('aria-label',`${value} new ${modules[module][0]} records`);
+    });
+    document.body.dataset.notificationsState=status;
+  }
+  function close(){if(!panel)return;panel.hidden=true;button.setAttribute('aria-expanded','false');}
+  function position(){
+    const rect=button.getBoundingClientRect(),width=Math.min(390,innerWidth-24);
+    panel.style.width=`${width}px`;panel.style.right=`${Math.min(Math.max(12,innerWidth-rect.right),innerWidth-width-12)}px`;
+    panel.style.top=`${Math.min(Math.max(12,rect.bottom+10),innerHeight-160)}px`;
+  }
+  async function refresh(){
+    if(disposed||!db||!userId)return;
+    if(loading){again=true;return;}
+    loading=true;const token=generation;
+    try{
+      const result=await db.rpc('pgenro_get_module_notifications',{p_limit:30});
+      if(token!==generation||disposed)return;
+      if(result.error)throw result.error;
+      const data=result.data;
+      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      feed=data;status='ready';render();
+    }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
+    finally{loading=false;if(again){again=false;scheduleRefresh();}}
+  }
+  function scheduleRefresh(){clearTimeout(debounce);debounce=setTimeout(refresh,250);}
+  async function markRead(args={}){
+    const result=await db.rpc('pgenro_mark_notifications_read',args);if(result.error)throw result.error;
+    await refresh();
+  }
+  async function attachSession(user){
+    if(disposed)return;
+    if(!user?.id){generation++;userId='';feed=empty();status='unavailable';close();render();if(channel)db.removeChannel(channel);channel=null;return;}
+    if(userId===user.id){scheduleRefresh();return;}
+    generation++;userId=user.id;feed=empty();status='loading';render();
+    if(channel)db.removeChannel(channel);
+    channel=db.channel(`pgenro-module-notifications-${user.id}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_module_notifications'},scheduleRefresh)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_notification_reads',filter:`user_id=eq.${user.id}`},scheduleRefresh)
+      .subscribe(state=>{if(state==='SUBSCRIBED')scheduleRefresh();});
+    await refresh();
+  }
+  function init(){
+    const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
+    document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
+    wrapper=element('div','module-notifications');button=element('button','module-notification-button');button.type='button';button.id='moduleNotificationButton';
+    button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','moduleNotificationPanel');
+    button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>';
+    badge=element('span','module-notification-badge');badge.hidden=true;button.append(badge);wrapper.append(button);
+    if(header.classList.contains('settings-topbar'))header.insertBefore(wrapper,header.lastElementChild);else header.prepend(wrapper);
+    panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
+    const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
+    count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
+    const closeBtn=element('button','module-notification-close','Ã—');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
+    markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
+    tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
+    button.addEventListener('click',()=>{const open=panel.hidden;close();if(open){panel.hidden=false;position();button.setAttribute('aria-expanded','true');closeBtn.focus();refresh();}});
+    document.addEventListener('click',event=>{if(!wrapper.contains(event.target)&&!panel.contains(event.target))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){close();button.focus();}});
+    window.addEventListener('resize',()=>{if(!panel.hidden)position();});
+    window.addEventListener('focus',scheduleRefresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRefresh();});
+    window.addEventListener('pageshow',event=>{if(event.persisted)scheduleRefresh();});
+    render();db=window.pgenroSupabase||window.PGENRO_DB?.client;
+    if(!db){status='unavailable';render();return;}
+    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
+    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
+    timer=setInterval(()=>{if(!document.hidden)refresh();},30000);
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
+  }
+  window.PGENRO_Notifications={refresh,scheduleRefresh};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+/* Page-owned layout helpers; do not change record permissions or data writes. */
+(() => {
+  'use strict';
+  function init() {
+    if (document.body.dataset.unifiedLayoutReady) return;
+    document.body.dataset.unifiedLayoutReady = 'true';
+    // A wide registry scrolls within its own region, including dynamically mounted tables.
+    function containTables() {
+      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
+        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
+        const region = document.createElement('div'); region.className = 'ui-table-scroll';
+        table.before(region); region.append(table);
+      });
+    }
+    containTables();
+    let tableFrame;
+    const insertedTables = new MutationObserver(records => {
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    });
+    insertedTables.observe(document.body, {childList:true,subtree:true});
+    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
+    // Account Settings and the module pages use one saved user appearance.
+    let appearanceObserver;
+    if (document.body.classList.contains('pgenro-user')) {
+      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
+      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+      function applyAppearance(theme) {
+        theme=theme==='dark'?'dark':'light';
+        if(html.dataset.theme!==theme)html.dataset.theme=theme;
+        const dark=theme==='dark';
+        if(button&&button.dataset.appearance!==theme) {
+          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
+          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
+        }
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
+      }
+      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
+      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
+      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
+      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
+      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
+      button?.addEventListener('click',()=>{
+        const theme=html.dataset.theme==='dark'?'light':'dark';
+        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
+        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
+        html.dataset.pgenroTheme=theme;applyAppearance(theme);
+      });
+      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
+    }
+    // The existing user page controls continue to open and close its module menu.
+    const sidebar = document.querySelector('.pgenro-user .sidebar');
+    if (sidebar) {
+      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
+      let previouslyOpen = false;
+      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
+      function desktopNavigation() {
+        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
+        collapsed=!media.matches&&collapsed;
+        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
+        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
+      }
+      menu?.addEventListener('click',event=>{
+        if(media.matches)return;
+        event.preventDefault();event.stopImmediatePropagation();
+        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
+        desktopNavigation();
+      },true);
+      function sync() {
+        const open = media.matches && sidebar.classList.contains('open');
+        sidebar.inert = media.matches && !open;
+        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
+        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
+        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
+        previouslyOpen = open;
+      }
+      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
+      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
+      let navigationFrame;
+      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
+      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
+      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
+      document.addEventListener('keydown',event=>{
+        if(!media.matches||!sidebar.classList.contains('open')) return;
+        if(event.key==='Escape') {menu?.click();return;}
+        if(event.key!=='Tab')return;
+        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
+        if(!items.length)return;
+        const first=items[0],last=items.at(-1);
+        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
+        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+

@@ -7,7 +7,7 @@
     set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
   };
   const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const uuid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const uuid = () => globalThis.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
   function toast(message, type = 'success') {
     let root = $('toastContainer');
@@ -44,6 +44,7 @@
   }
   let currentIds = new Map(); const unread = [];
   function observeRecords(key, rows) {
+    window.PGENRO_Notifications?.scheduleRefresh();
     const ids = rows.map(r => String(r.id)).filter(Boolean); const prior = currentIds.get(key);
     if (prior) {
       const added = ids.filter(id => !prior.has(id));
@@ -97,13 +98,68 @@
     if (response.error) throw response.error;
     if (response.data?.length !== ids.length) throw new Error('Some records could not be deleted. Refresh and check your database permissions.');
   }
-  async function audit(action, details) {
-    const event = {id:uuid(),action,details,module:document.title.split('|')[1]?.trim(),timestamp:new Date().toISOString(),created_at:new Date().toISOString()};
-    const cached = storage.get('pgenro_audit_log_fallback',[]); storage.set('pgenro_audit_log_fallback',[event,...(Array.isArray(cached) ? cached : [])].slice(0,500));
-    // Keep the page usable if the optional audit table is unavailable.
-    if (client()) { try { await readAuditShape(); const result = await client().from('audit_logs').insert(wrapped.get('audit_logs') ? {id:event.id,data:event} : event); if (result.error) console.warn('Audit retained locally:',result.error.message); } catch {} }
+  // Append-only dashboard/module audit writer. The audit page owns querying and display.
+  let auditColumns = null, auditShape = null;
+  async function audit(action, details, options = {}) {
+    const db = client();
+    const profile = storage.get('pgenro_current_user', {}) || {};
+    let actor = null;
+    try { actor = (await db?.auth?.getSession?.())?.data?.session?.user || null; } catch {}
+    const id = uuid(), timestamp = new Date().toISOString();
+    const normalized = String(action || 'SYSTEM_ACTIVITY').trim().toUpperCase().replace(/\s+/g, '_');
+    const event = {
+      id, eventId: id, timestamp, created_at: timestamp, createdAt: timestamp,
+      userId: actor?.id || profile.id || profile.userId || null,
+      userEmail: actor?.email || profile.email || '',
+      userName: profile.fullName || profile.full_name || profile.name || actor?.user_metadata?.full_name || 'System operator',
+      role: profile.role || 'Admin', activity: normalized, action: normalized,
+      actionType: normalized === 'LOGIN' ? 'login' : normalized === 'LOGOUT' ? 'logout' : 'activity',
+      module: options.module || document.title.split('|')[1]?.trim() || 'Admin Dashboard',
+      details: String(details || 'Activity recorded.'), ipAddress: options.ipAddress || 'Not captured', sessionStatus: options.status || 'Success'
+    };
+    const cached = storage.get('pgenro_audit_log_fallback', []);
+    storage.set('pgenro_audit_log_fallback', [event, ...(Array.isArray(cached) ? cached : [])].slice(0, 500));
+    window.dispatchEvent(new CustomEvent('pgenro:audit-recorded', { detail: event }));
+    if (!db) return event;
+    try {
+      if (auditShape === null) {
+        const probe = await db.from('audit_logs').select('*').limit(1);
+        if (probe.error) throw probe.error;
+        auditColumns = probe.data?.[0] ? new Set(Object.keys(probe.data[0])) : null;
+        if (auditColumns) auditShape = auditColumns.has('data');
+        else {
+          const shape = await db.from('audit_logs').select('data').limit(1);
+          auditShape = !shape.error;
+        }
+      }
+      if (auditShape) {
+        const result = await db.from('audit_logs').insert({ id, data: event });
+        if (result.error) throw result.error;
+      } else {
+        const flat = { ...event, user_id: event.userId, user_email: event.userEmail, user_name: event.userName,
+          action_type: event.actionType, ip_address: event.ipAddress, session_status: event.sessionStatus, status: event.sessionStatus,
+          metadata: event, description: event.details, email: event.userEmail };
+        const payload = auditColumns ? Object.fromEntries(Object.entries(flat).filter(([key]) => auditColumns.has(key))) : flat;
+        // Empty flat tables cannot reveal column names. Omit only columns explicitly rejected by PostgREST.
+        for (let attempt = 0; attempt <= Object.keys(flat).length; attempt++) {
+          const result = await db.from('audit_logs').insert(payload);
+          if (!result.error) { auditColumns = new Set(Object.keys(payload)); break; }
+          const message = String(result.error.message || '');
+          const missing = message.match(/Could not find the '([^']+)' column/i)?.[1]
+            || message.match(/column "([^"]+)".*does not exist/i)?.[1];
+          if (!missing || !(missing in payload)) throw result.error;
+          delete payload[missing];
+          if (!Object.keys(payload).length || attempt === Object.keys(flat).length) throw result.error;
+        }
+      }
+      event.remoteSaved = true;
+    } catch (error) {
+      event.remoteSaved = false;
+      console.warn('Audit event retained in this browser:', error.message || 'Audit table unavailable');
+    }
+    return event;
   }
-  async function readAuditShape() { if (!wrapped.has('audit_logs')) { const r = await client().from('audit_logs').select('data').limit(1); wrapped.set('audit_logs',!r.error); } }
+
   function initShell() {
     renderIcons(); renderNotifications();
     const sidebar = $('sidebar'); const mobile = $('mobileMenuBtn'); const collapse = $('sidebarCollapseBtn'); const backdrop = $('sidebarBackdrop');
@@ -132,8 +188,16 @@
     });
     document.querySelectorAll('.modal-overlay,.modal-backdrop').forEach(m => m.addEventListener('click',e => { if(e.target===m)closeModal(m.id); }));
     const user = storage.get('pgenro_current_user',{}); if($('dropdownUserName'))$('dropdownUserName').textContent=user.fullName||user.full_name||user.name||'PGENRO Admin'; if($('dropdownUserEmail'))$('dropdownUserEmail').textContent=user.email||'Administrator Session';
-    if(document.body.dataset.adminPage !== 'admin.html') $('logoutBtn')?.addEventListener('click',async () => {
-      try { if(client()){const result=await client().auth.signOut();if(result?.error)throw result.error;} try{localStorage.removeItem('pgenro_current_user');sessionStorage.removeItem('pgenro_current_user');}catch{} location.href='../User/login.html'; }catch{toast('Sign out failed. Please try again.','error');}
+    // The existing authentication gateway owns logout when available.
+    if (!window.PGENRO_API?.signOut) $('logoutBtn')?.addEventListener('click', async () => {
+      const confirmed = window.PGENRO_ConfirmLogout ? await window.PGENRO_ConfirmLogout() : confirm('Log out of your workspace?');
+      if (!confirmed) return;
+      try {
+        await audit('LOGOUT', 'Operator signed out of the administrative workspace.');
+        const result = await client()?.auth?.signOut?.(); if(result?.error) throw result.error;
+        try { localStorage.removeItem('pgenro_current_user'); sessionStorage.removeItem('pgenro_current_user'); } catch {}
+        location.href = '../User/login.html';
+      } catch { window.dispatchEvent(new Event('pgenro:logout-error')); toast('Sign out failed. Please try again.', 'error'); }
     });
   }
   // ICON_MAP is inserted while packaging, from the existing local Lucide subset.
@@ -160,9 +224,6 @@
   window.PGENRO_Module = {canStartAction,storage,escape,uuid,today,toast,csv,openModal,closeModal,observeRecords,renderIcons,read,write,remove,audit,client,unwrap};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initShell,{once:true});else initShell();
 })();
-
-(() => {
-
 
 /* ============================================================================
    PGENRO IMS — ADMIN CONTROL CENTER ENGINE
@@ -203,6 +264,7 @@
     if (!row || typeof row !== "object") return row;
     if (row.data && typeof row.data === "object" && !Array.isArray(row.data)) {
       return {
+        ...row,
         ...row.data,
         id: row.id ?? row.data.id,
         created_at: row.created_at ?? row.data.created_at,
@@ -246,8 +308,7 @@
       const batch = response.data || [];
       allRows.push(...batch);
       offset += batch.length;
-      if (typeof response.count === "number" && offset >= response.count) break;
-      if (!batch.length || batch.length < batchSize) break;
+      if (!batch.length || typeof response.count === "number" && offset >= response.count || typeof response.count !== "number" && batch.length < batchSize) break;
     }
 
     return allRows.map(unwrapRow);
@@ -374,26 +435,7 @@
      -------------------------------------------------------------------------- */
   const $ = (id) => document.getElementById(id);
 
-  // Local Lucide icon subset (ISC license), so navigation icons work without a CDN.
-  const iconNodes = {"panel-left-close":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m16 15-3-3 3-3"}]],"layout-dashboard":[["rect",{"width":"7","height":"9","x":"3","y":"3","rx":"1"}],["rect",{"width":"7","height":"5","x":"14","y":"3","rx":"1"}],["rect",{"width":"7","height":"9","x":"14","y":"12","rx":"1"}],["rect",{"width":"7","height":"5","x":"3","y":"16","rx":"1"}]],"arrow-left-right":[["path",{"d":"M8 3 4 7l4 4"}],["path",{"d":"M4 7h16"}],["path",{"d":"m16 21 4-4-4-4"}],["path",{"d":"M20 17H4"}]],"briefcase":[["path",{"d":"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"}],["rect",{"width":"20","height":"14","x":"2","y":"6","rx":"2"}]],"file-text":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],"users-round":[["path",{"d":"M18 21a8 8 0 0 0-16 0"}],["circle",{"cx":"10","cy":"8","r":"5"}],["path",{"d":"M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"}]],"boxes":[["path",{"d":"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"}],["path",{"d":"m7 16.5-4.74-2.85"}],["path",{"d":"m7 16.5 5-3"}],["path",{"d":"M7 16.5v5.17"}],["path",{"d":"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"}],["path",{"d":"m17 16.5-5-3"}],["path",{"d":"m17 16.5 4.74-2.85"}],["path",{"d":"M17 16.5v5.17"}],["path",{"d":"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"}],["path",{"d":"M12 8 7.26 5.15"}],["path",{"d":"m12 8 4.74-2.85"}],["path",{"d":"M12 13.5V8"}]],"clipboard-check":[["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1","ry":"1"}],["path",{"d":"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"}],["path",{"d":"m9 14 2 2 4-4"}]],"wrench":[["path",{"d":"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"}]],"file-check-2":[["path",{"d":"M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m14 20 2 2 4-4"}]],"user-cog":[["path",{"d":"M10 15H6a4 4 0 0 0-4 4v2"}],["path",{"d":"m14.305 16.53.923-.382"}],["path",{"d":"m15.228 13.852-.923-.383"}],["path",{"d":"m16.852 12.228-.383-.923"}],["path",{"d":"m16.852 17.772-.383.924"}],["path",{"d":"m19.148 12.228.383-.923"}],["path",{"d":"m19.53 18.696-.382-.924"}],["path",{"d":"m20.772 13.852.924-.383"}],["path",{"d":"m20.772 16.148.924.383"}],["circle",{"cx":"18","cy":"15","r":"3"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-plus":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}],["line",{"x1":"19","x2":"19","y1":"8","y2":"14"}],["line",{"x1":"22","x2":"16","y1":"11","y2":"11"}]],"shield-alert":[["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"M12 8v4"}],["path",{"d":"M12 16h.01"}]],"database-backup":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 12a9 3 0 0 0 5 2.69"}],["path",{"d":"M21 9.3V5"}],["path",{"d":"M3 5v14a9 3 0 0 0 6.47 2.88"}],["path",{"d":"M12 12v4h4"}],["path",{"d":"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"}]],"settings":[["path",{"d":"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"menu":[["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],"search":[["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],"bell":[["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"}],["path",{"d":"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"}]],"user-round":[["circle",{"cx":"12","cy":"8","r":"5"}],["path",{"d":"M20 21a8 8 0 0 0-16 0"}]],"users":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["path",{"d":"M16 3.128a4 4 0 0 1 0 7.744"}],["path",{"d":"M22 21v-2a4 4 0 0 0-3-3.87"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-check":[["path",{"d":"m16 11 2 2 4-4"}],["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"log-out":[["path",{"d":"m16 17 5-5-5-5"}],["path",{"d":"M21 12H9"}],["path",{"d":"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"}]],"chevron-right":[["path",{"d":"m9 18 6-6-6-6"}]],"trending-up":[["path",{"d":"M16 7h6v6"}],["path",{"d":"m22 7-8.5 8.5-5-5L2 17"}]],"alert-circle":[["circle",{"cx":"12","cy":"12","r":"10"}],["line",{"x1":"12","x2":"12","y1":"8","y2":"12"}],["line",{"x1":"12","x2":"12.01","y1":"16","y2":"16"}]],"check-circle-2":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"alert-triangle":[["path",{"d":"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"}],["path",{"d":"M12 9v4"}],["path",{"d":"M12 17h.01"}]],"chart-no-axes-combined":[["path",{"d":"M12 16v5"}],["path",{"d":"M16 14v7"}],["path",{"d":"M20 10v11"}],["path",{"d":"m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"}],["path",{"d":"M4 18v3"}],["path",{"d":"M8 14v7"}]],"download":[["path",{"d":"M12 15V3"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}],["path",{"d":"m7 10 5 5 5-5"}]],"activity":[["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],"circle-check":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"clock-3":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6h4"}]],"package-search":[["path",{"d":"M12 22V12"}],["path",{"d":"M20.27 18.27 22 20"}],["path",{"d":"M21 10.498V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l.98-.559"}],["path",{"d":"M3.29 7 12 12l8.71-5"}],["path",{"d":"m7.5 4.27 8.997 5.148"}],["circle",{"cx":"18.5","cy":"16.5","r":"2.5"}]],"lightbulb":[["path",{"d":"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"}],["path",{"d":"M9 18h6"}],["path",{"d":"M10 22h4"}]],"upload":[["path",{"d":"M12 3v12"}],["path",{"d":"m17 8-5-5-5 5"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}]],"file-up":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M12 12v6"}],["path",{"d":"m15 15-3-3-3 3"}]],"info":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 16v-4"}],["path",{"d":"M12 8h.01"}]],"rotate-ccw":[["path",{"d":"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}],["path",{"d":"M3 3v5h5"}]],"x":[["path",{"d":"M18 6 6 18"}],["path",{"d":"m6 6 12 12"}]],"external-link":[["path",{"d":"M15 3h6v6"}],["path",{"d":"M10 14 21 3"}],["path",{"d":"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"}]]};
-  function renderIcons() {
-    if (window.PGENRO_Module) { window.PGENRO_Module.renderIcons(); return; }
-    document.querySelectorAll("i[data-lucide]").forEach((placeholder) => {
-      const name = placeholder.getAttribute("data-lucide");
-      const nodes = iconNodes[name];
-      if (!nodes) return;
-      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-      for (const [key, value] of Object.entries({ viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", "stroke-width": "2", "stroke-linecap": "round", "stroke-linejoin": "round", "aria-hidden": "true", focusable: "false", class: "lucide " + (placeholder.getAttribute("class") || "") })) svg.setAttribute(key, value);
-      if (placeholder.getAttribute("style")) svg.setAttribute("style", placeholder.getAttribute("style"));
-      nodes.forEach(([tag, attributes]) => {
-        const child = document.createElementNS("http://www.w3.org/2000/svg", tag);
-        Object.entries(attributes).forEach(([key, value]) => child.setAttribute(key, value));
-        svg.appendChild(child);
-      });
-      placeholder.replaceWith(svg);
-    });
-  }
-
+  const renderIcons = () => window.PGENRO_Module.renderIcons();
 
   const safeJson = (raw, fallback = null) => {
     try {
@@ -458,12 +500,12 @@
 
   // Operational Modules Definition
   const activityModules = [
-    { key: "communications", label: "Communications", table: "communications", href: "admincommunication.html", color: "#2563eb" },
-    { key: "memos", label: "Office Memos", table: "office_memos", href: "officememo-admin.html", color: "#059669" },
-    { key: "travel", label: "Travel Orders", table: "travel_orders", href: "travelOR-admin.html", color: "#8b5cf6" },
-    { key: "visitors", label: "Visitors", table: "visitors", href: "visitors-admin.html", color: "#d97706" },
-    { key: "services", label: "Service Requests", table: "service_requests", href: "serviceAdmin.html", color: "#e05271" },
-    { key: "ics", label: "ICS Property Slips", table: "ics_records", href: "ics-admin.html", color: "#0891b2" }
+    { key: "communications", label: "Communications", table: "communications", href: "admincommunication.html", color: "#4b9da7" },
+    { key: "memos", label: "Office Memos", table: "office_memos", href: "officememo-admin.html", color: "#278560" },
+    { key: "travel", label: "Travel Orders", table: "travel_orders", href: "travelOR-admin.html", color: "#8b7ac7" },
+    { key: "visitors", label: "Visitors", table: "visitors", href: "visitors-admin.html", color: "#c79b46" },
+    { key: "services", label: "Service Requests", table: "service_requests", href: "serviceAdmin.html", color: "#ce7d78" },
+    { key: "ics", label: "ICS Property Slips", table: "ics_records", href: "ics-admin.html", color: "#7caa9f" }
   ];
 
   const moduleTableKeys = {
@@ -483,9 +525,6 @@
     Object.values(moduleTableKeys).map((k) => [k, { rows: null, source: "unavailable" }])
   );
 
-  let currentAuthLogs = [];
-  let remoteAuthLogs = [];
-  let localAuditLogs = [];
   let memosList = [];
   let analyticsRange = "90";
   let lastAnalyticsModel = null;
@@ -493,24 +532,17 @@
   let analyticsFrame = null;
   function scheduleAnalytics() {
     if (analyticsFrame !== null) return;
-    analyticsFrame = requestAnimationFrame(() => {
+    analyticsFrame = setTimeout(() => {
       analyticsFrame = null;
       updateChartsAndAnalytics();
-    });
+    }, 120);
   }
-
-  // Audit Log Pagination state
-  let auditCurrentPage = 1;
-  const auditPageSize = 25;
-  let selectedAuditIds = new Set();
-  let filteredAuditLogs = [];
-  let inspectorTrigger = null;
 
   /* --------------------------------------------------------------------------
      3. PROFILE & USER PREFERENCES
      -------------------------------------------------------------------------- */
   function updateProfileUI(profile = {}) {
-    const name = profile.fullName || profile.name || profile.displayName || "PGENRO Admin";
+    const name = profile.fullName || profile.full_name || profile.name || profile.displayName || "PGENRO Admin";
     const email = profile.email || "Administrator Session";
     const role = profile.role || "Administrator";
 
@@ -527,7 +559,7 @@
     if ($("showDbStatusToggle")) $("showDbStatusToggle").checked = prefs.showDb !== false;
 
     document.body.classList.toggle("compact-mode", Boolean(prefs.compact));
-    document.body.classList.add("hide-db-status");
+    document.body.classList.toggle("hide-db-status", prefs.showDb === false);
   }
 
   function savePreferences() {
@@ -544,316 +576,57 @@
     showToast("Preferences updated.");
   }
 
-  /* --------------------------------------------------------------------------
-     4. AUDIT TRAIL LOGGING & INSPECTION
-     -------------------------------------------------------------------------- */
-  const auditLocalKey = "pgenro_audit_log_fallback";
-
-  function auditDate(log) {
-    const raw = log?.timestamp || log?.createdAt || log?.created_at || log?.date || 0;
-    const d = raw?.toDate ? raw.toDate() : new Date(raw);
-    return Number.isNaN(d.getTime()) ? new Date(0) : d;
-  }
-
-  function auditKey(log) {
-    return String(
-      log?.eventId ||
-      log?.id ||
-      `${auditDate(log).getTime()}|${log?.userEmail || ""}|${log?.activity || ""}|${log?.details || ""}`
-    );
-  }
-
-  function loadLocalAuditLogs() {
-    localAuditLogs = safeJson(localStore.getItem(auditLocalKey), []);
-    if (!Array.isArray(localAuditLogs)) localAuditLogs = [];
-  }
-
-  function saveLocalAuditLogs() {
-    try {
-      localStore.setItem(auditLocalKey, JSON.stringify(localAuditLogs.slice(0, 300)));
-    } catch (e) {
-      console.warn("Local audit log storage limit reached", e);
-    }
-  }
-
-  function refreshAuditLogs() {
-    const unique = new Map();
-    [...remoteAuthLogs, ...localAuditLogs]
-      .sort((a, b) => auditDate(b) - auditDate(a))
-      .forEach((log) => {
-        const key = auditKey(log);
-        if (!unique.has(key)) unique.set(key, log);
-      });
-
-    currentAuthLogs = [...unique.values()].slice(0, 500);
-    applyAuditFilters();
-  }
-
-  async function logAudit(action, details, options = {}) {
-    const profile = safeJson(localStore.getItem("pgenro_current_user"), {}) || {};
-    const timestamp = new Date().toISOString();
-    const eventId = uuid();
-    const normalizedAction = String(action || "SYSTEM_ACTIVITY").trim().toUpperCase().replace(/\s+/g, "_");
-
-    const record = {
-      eventId,
-      timestamp,
-      createdAt: timestamp,
-      userId: profile.id || profile.userId || "admin",
-      userEmail: profile.email || "Administrator",
-      userName: profile.fullName || profile.name || "PGENRO Admin",
-      role: profile.role || "Administrator",
-      activity: normalizedAction,
-      action: normalizedAction,
-      actionType: normalizedAction === "LOGIN" ? "login" : normalizedAction === "LOGOUT" ? "logout" : "activity",
-      module: options.module || "Security Audit Trail",
-      details: String(details || "System activity recorded."),
-      ipAddress: options.ipAddress || "Not captured",
-      sessionStatus: options.status || "Success"
-    };
-
-    localAuditLogs.unshift(record);
-    saveLocalAuditLogs();
-    refreshAuditLogs();
-
-    try {
-      const dbRef = supabaseStore.realtimeStore().ref(`audit_logs/${eventId}`);
-      await dbRef.set(record);
-    } catch {
-      // Local log remains active
-    }
-    return record;
-  }
-
-  window.PGENRO_AUDIT = { log: logAudit, refresh: refreshAuditLogs };
-
-  /* --------------------------------------------------------------------------
-     5. AUDIT TABLE RENDERING & PAGINATION
-     -------------------------------------------------------------------------- */
-  function renderAuthLogs(logs) {
-    const tbody = $("auditTableBody");
-    const info = $("tablePaginationInfo");
-    const pagContainer = $("auditPaginationControls");
-    if (!tbody) return;
-
-    if (!logs.length) {
-      tbody.innerHTML = `<tr><td colspan="8" class="empty-table-cell">No matching user activity recorded.</td></tr>`;
-      if (info) info.textContent = "Showing 0 of 0 log entries";
-      if (pagContainer) pagContainer.innerHTML = "";
-      syncAuditSelection();
-      return;
-    }
-
-    const totalPages = Math.ceil(logs.length / auditPageSize);
-    auditCurrentPage = Math.min(Math.max(1, auditCurrentPage), totalPages);
-
-    const startIdx = (auditCurrentPage - 1) * auditPageSize;
-    const pageLogs = logs.slice(startIdx, startIdx + auditPageSize);
-
-    tbody.innerHTML = pageLogs.map((log) => {
-      const date = auditDate(log);
-      const action = String(log.activity || log.action || "ACTIVITY");
-      const name = log.userName || log.userEmail || "System Operator";
-      const email = log.userEmail || "Protected Account";
-      const status = String(log.sessionStatus || log.status || "Success");
-      const isSuccess = !/fail|error|denied|blocked/i.test(status);
-      const id = auditKey(log);
-      const checked = selectedAuditIds.has(id) ? "checked" : "";
-
-      return `
-        <tr tabindex="0" aria-label="Inspect audit event" data-audit-id="${escapeHTML(id)}" class="${checked ? "is-selected" : ""}">
-          <td class="audit-select-cell">
-            <input type="checkbox" class="row-checkbox" data-id="${escapeHTML(id)}" ${checked} aria-label="Select log entry">
-          </td>
-          <td class="font-mono text-muted" style="white-space: nowrap;">${escapeHTML(date.toLocaleString())}</td>
-          <td>
-            <div class="user-cell">
-              <div class="avatar-sm">${escapeHTML(name.slice(0, 2).toUpperCase())}</div>
-              <div>
-                <strong>${escapeHTML(name)}</strong>
-                <small>${escapeHTML(email)}</small>
-              </div>
-            </div>
-          </td>
-          <td>
-            <span class="badge-status ${isSuccess ? "success" : "urgent"}">
-              <span class="dot"></span>${escapeHTML(action.replace(/_/g, " "))}
-            </span>
-          </td>
-          <td class="audit-action-detail">
-            ${escapeHTML(log.details || log.description || "Activity recorded.")}
-            <span class="audit-source">${escapeHTML(log.module || "System")}</span>
-          </td>
-          <td><span class="table-tag">${escapeHTML(log.role || log.division || "Admin")}</span></td>
-          <td class="font-mono">${escapeHTML(log.ipAddress || "Session")}</td>
-          <td>
-            <span class="badge-status ${isSuccess ? "success" : "urgent"}">${escapeHTML(status)}</span>
-          </td>
-        </tr>
-      `;
-    }).join("");
-
-    if (info) {
-      info.textContent = `Showing ${startIdx + 1}–${Math.min(startIdx + auditPageSize, logs.length)} of ${logs.length} log entries`;
-    }
-
-    // Render Pagination Buttons
-    if (pagContainer) {
-      let buttonsHtml = `
-        <button class="audit-page-btn" id="auditPrevBtn" ${auditCurrentPage === 1 ? "disabled" : ""} type="button">‹ Prev</button>
-      `;
-      for (let p = 1; p <= totalPages; p++) {
-        if (p === 1 || p === totalPages || Math.abs(p - auditCurrentPage) <= 1) {
-          buttonsHtml += `<button class="audit-page-btn ${p === auditCurrentPage ? "active" : ""}" data-page="${p}" type="button">${p}</button>`;
-        } else if (p === 2 && auditCurrentPage > 3) {
-          buttonsHtml += `<span style="padding: 0 4px;">…</span>`;
-        } else if (p === totalPages - 1 && auditCurrentPage < totalPages - 2) {
-          buttonsHtml += `<span style="padding: 0 4px;">…</span>`;
-        }
-      }
-      buttonsHtml += `
-        <button class="audit-page-btn" id="auditNextBtn" ${auditCurrentPage === totalPages ? "disabled" : ""} type="button">Next ›</button>
-      `;
-      pagContainer.innerHTML = buttonsHtml;
-    }
-
-    // Attach Row Click Inspect Event
-    tbody.querySelectorAll("tr").forEach((row) => {
-      row.addEventListener("click", (event) => {
-        if (event.target.closest(".audit-select-cell")) return;
-        const id = row.getAttribute("data-audit-id");
-        const log = currentAuthLogs.find((l) => auditKey(l) === id);
-        if (log) openAuditInspector(log);
-      });
-      row.addEventListener("keydown", (event) => {
-        if (event.target === row && ["Enter", " "].includes(event.key)) {
-          event.preventDefault(); row.click();
-        }
-      });
-    });
-
-    // Checkbox selections
-    tbody.querySelectorAll(".row-checkbox").forEach((cb) => {
-      cb.addEventListener("change", (e) => {
-        const id = e.target.getAttribute("data-id");
-        if (e.target.checked) selectedAuditIds.add(id);
-        else selectedAuditIds.delete(id);
-        e.target.closest("tr").classList.toggle("is-selected", e.target.checked);
-        syncAuditSelection();
-      });
-    });
-
-    renderIcons();
-  }
-
-  function syncAuditSelection() {
-    const boxes = [...document.querySelectorAll(".row-checkbox")];
-    const selected = boxes.filter((box) => box.checked).length;
-    const all = $("selectAllRows");
-    if (all) {
-      all.checked = boxes.length > 0 && selected === boxes.length;
-      all.indeterminate = selected > 0 && selected < boxes.length;
-      all.disabled = !boxes.length;
-    }
-  }
-
-  function applyAuditFilters() {
-    const q = ($("tableSearchInput")?.value || "").toLowerCase().trim();
-    const type = $("auditTypeFilter")?.value || "all";
-
-    const filtered = currentAuthLogs.filter((log) => {
-      const action = String(log.activity || log.action || "");
-      const logType = log.actionType || (/login/i.test(action) ? "login" : /logout/i.test(action) ? "logout" : "activity");
-      if (type !== "all" && type !== logType) return false;
-      if (!q) return true;
-
-      const haystack = [
-        auditDate(log).toLocaleString(),
-        log.userName,
-        log.userEmail,
-        action,
-        log.details,
-        log.module,
-        log.role,
-        log.ipAddress,
-        log.sessionStatus
-      ].join(" ").toLowerCase();
-
-      return haystack.includes(q);
-    });
-
-    filteredAuditLogs = filtered;
-    selectedAuditIds = new Set([...selectedAuditIds].filter((id) => filtered.some((log) => auditKey(log) === id)));
-    renderAuthLogs(filtered);
-    syncAuditSelection();
-  }
-
-  // Audit Inspector Dialog
-  function openAuditInspector(log) {
-    const modal = $("auditDetailModal");
-    if (!modal) return;
-    $("modalEventTitle").textContent = String(log.activity || log.action || "Audit Event").replace(/_/g, " ");
-    $("modalEventTime").textContent = auditDate(log).toLocaleString();
-    $("modalEventStatus").textContent = log.sessionStatus || log.status || "Success";
-    $("modalEventUser").textContent = `${log.userName || "Admin"} (${log.userEmail || "No email"})`;
-    $("modalEventRole").textContent = log.role || log.division || "Administrator";
-    $("modalEventIp").textContent = log.ipAddress || "Client Session";
-    $("modalEventModule").textContent = log.module || "IMS Console";
-    $("modalEventAction").textContent = log.activity || log.action || "SYSTEM_ACTIVITY";
-    $("modalEventDetails").textContent = log.details || log.description || "No additional metadata recorded.";
-
-    inspectorTrigger = document.activeElement;
-    modal.classList.add("open");
-    document.body.classList.add("modal-open");
-    modal.setAttribute("aria-hidden", "false");
-    $("closeAuditModalBtn")?.focus();
-  }
-
-  function closeAuditInspector() {
-    const modal = $("auditDetailModal");
-    if (!modal) return;
-    if (!modal.classList.contains("open")) return;
-    modal.classList.remove("open");
-    document.body.classList.remove("modal-open");
-    modal.setAttribute("aria-hidden", "true");
-    inspectorTrigger?.focus();
-  }
+  // Recording stays available on the dashboard; reading and inspecting belong to Audit Trail.
+  const auditDate = row => {
+    const day = recordDay(row, 'memos'); return day === null ? new Date(0) : new Date(day * analyticsDayMs);
+  };
+  const logAudit = (action, details, options) => window.PGENRO_Module.audit(action, details, options);
+  window.PGENRO_AUDIT = { log: logAudit };
 
   /* --------------------------------------------------------------------------
      6. DATA ANALYTICS & CHART CONTROLLERS (WITH EXPANDED ACCURACY)
      -------------------------------------------------------------------------- */
+  const officeDateFormat=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'});
+  const moduleDateFields = {
+    communications: ['receivedDate', 'received_date', 'date_received', 'dateReceived', 'sentDate', 'sent_date', 'date_sent', 'letterDate', 'docDate', 'document_date'],
+    memos: ['memoDate', 'memo_date', 'dateIssued', 'date_issued', 'issuedDate', 'issued_date'],
+    travel: ['departureDate', 'departure_date', 'travelDate', 'travel_date', 'date_from', 'dateFrom', 'start_date', 'startDate'],
+    visitors: ['visitDate', 'visit_date', 'dateVisited', 'date_visited', 'time_in', 'timeIn', 'check_in', 'checkIn'],
+    services: ['requestDate', 'request_date', 'date_requested', 'dateRequested'],
+    ics: ['dateIssued', 'date_issued', 'issuedDate', 'issued_date', 'icsDate', 'ics_date']
+  };
   function recordDay(row, key) {
-    // High-accuracy fallback checking all potential timestamp fields across all modules
-    const fields = [
-      "date", "receivedDate", "date_received", "letterDate", "docDate",
-      "requestDate", "date_requested", "dateIssued", "memoDate",
-      "departureDate", "travelDate", "date_from", "dateFrom",
-      "dateAcquired", "time_in", "timeIn", "created_at", "createdAt", "timestamp"
-    ];
-
-    for (const f of fields) {
-      const raw = row?.[f];
-      if (!raw) continue;
-      let d;
-      if (typeof raw?.toDate === "function") d = raw.toDate();
-      else if (typeof raw === "string") {
-        // Keep natural-language dates intact; normalize only SQL-style timestamps.
-        d = new Date(/^\d{4}-\d{2}-\d{2} \d{2}:/.test(raw) ? raw.replace(" ", "T") : raw);
-        if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) d = new Date(`${raw}T00:00:00`);
-      } else if (raw instanceof Date) {
-        d = raw;
-      } else if (typeof raw === "number") {
-        d = new Date(raw > 1e11 ? raw : raw * 1000);
+    const fields = [...(moduleDateFields[key] || []), 'date', 'created_at', 'createdAt', 'timestamp'];
+    for (const field of fields) {
+      const raw = row?.[field];
+      if (raw === null || raw === undefined || raw === '') continue;
+      let date;
+      if (typeof raw?.toDate === 'function') date = raw.toDate();
+      else if (raw instanceof Date) date = raw;
+      else if (typeof raw === 'number') date = new Date(raw > 1e11 ? raw : raw * 1000);
+      else if (typeof raw === 'string') {
+        const text = raw.trim();
+        if (/^\d{1,2}:\d{2}/.test(text)) continue; // A time alone is not an activity date.
+        const plain = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+        if (plain) {
+          const [year, month, day] = plain.slice(1).map(Number);
+          const stamp = new Date(Date.UTC(year, month - 1, day));
+          if (stamp.getUTCFullYear() !== year || stamp.getUTCMonth() !== month - 1 || stamp.getUTCDate() !== day) continue;
+          return Math.floor(stamp.getTime() / analyticsDayMs);
+        }
+        date = new Date(/^\d{4}-\d{2}-\d{2} \d{2}:/.test(text) ? text.replace(' ', 'T') : text);
       }
-      if (d instanceof Date && !isNaN(d.getTime())) {
-        return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / analyticsDayMs);
-      }
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) continue;
+      // The office reports in Philippine calendar days, including UTC timestamps near midnight.
+      const parts = officeDateFormat.formatToParts(date);
+      const part = type => Number(parts.find(p => p.type === type)?.value);
+      return Math.floor(Date.UTC(part('year'), part('month') - 1, part('day')) / analyticsDayMs);
     }
     return null;
   }
 
   function serviceBucket(row) {
-    const s = String(row?.status || row?.serviceStatus || "").trim().toLowerCase();
+    const s = String(row?.status || row?.serviceStatus || row?.service_status || "").trim().toLowerCase();
     if (/archive/.test(s)) return "archived";
     if (/^(complete|completed|closed|resolved|done)$/.test(s)) return "completed";
     if (/progress|ongoing|processing/.test(s)) return "progress";
@@ -864,7 +637,7 @@
   function stockSummary(rows) {
     const res = { out: 0, low: 0, healthy: 0, unknown: 0 };
     for (const r of rows || []) {
-      const quantity = r.quantity ?? r.qty ?? r.stock;
+      const quantity = r.quantity ?? r.qty ?? r.stock ?? r.current_stock;
       const threshold = r.threshold ?? r.reorderLevel ?? r.minimumStock ?? r.reorder_level ?? r.minimum_stock;
       const q = quantity == null || String(quantity).trim() === "" ? NaN : Number(quantity);
       const th = threshold == null || String(threshold).trim() === "" ? NaN : Number(threshold);
@@ -879,7 +652,8 @@
 
   // Model builder with Personnel Division and Communications Flow calculations
   function buildAnalyticsModel(sources, range, now = new Date()) {
-    const today = Math.floor(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / analyticsDayMs);
+    const today = recordDay({ timestamp: now }, '');
+    const reportingYear = new Date(today * analyticsDayMs).getUTCFullYear();
     let earliest = today;
     const dated = {};
 
@@ -900,7 +674,7 @@
       };
     });
 
-    const start = range === "all" ? earliest : range === "year" ? Math.floor(Date.UTC(now.getFullYear(), 0, 1) / analyticsDayMs) : today - (range === "30" ? 29 : 89);
+    const start = range === "all" ? earliest : range === "year" ? Math.floor(Date.UTC(reportingYear, 0, 1) / analyticsDayMs) : today - (range === "30" ? 29 : 89);
     const days = Math.max(1, today - start + 1);
     const prevStart = start - days;
     const prevEnd = start - 1;
@@ -915,7 +689,9 @@
 
     const buckets = [];
     const bucketMap = new Map();
-    for (let day = start; day <= today; day++) {
+    for (let day = start; day <= today; day = bucketType === 'month'
+      ? Math.floor(Date.UTC(new Date(day * analyticsDayMs).getUTCFullYear(), new Date(day * analyticsDayMs).getUTCMonth() + 1, 1) / analyticsDayMs)
+      : day + (bucketType === 'week' ? 7 : 1)) {
       const k = keyFor(day);
       if (bucketMap.has(k)) continue;
       const d = new Date(day * analyticsDayMs);
@@ -965,7 +741,7 @@
     const divisionCounts = Object.create(null);
     const employeeRows = sources.employees?.rows || [];
     employeeRows.forEach((emp) => {
-      const division = String(emp.division || emp.department || emp.section || emp.office || "Unassigned").trim() || "Unassigned";
+      const division = String(emp.division || emp.division_name || emp.department || emp.section || emp.office || "Unassigned").trim() || "Unassigned";
       divisionCounts[division] = (divisionCounts[division] || 0) + 1;
     });
 
@@ -976,7 +752,7 @@
       return day !== null && day >= start && day <= today;
     });
     commRows.forEach((comm) => {
-      const type = String(comm.direction || comm.type || comm.documentType || "").trim().toLowerCase();
+      const type = String(comm.direction || comm.communicationType || comm.communication_type || comm.flow || comm.type || comm.documentType || comm.document_type || "").trim().toLowerCase();
       const status = String(comm.status || comm.action || "").toLowerCase();
       if (/internal|directive|memorandum|memo/.test(type)) commBreakdown.internal++;
       else if (/outgoing|outbound|^out$|send|sent|endorse/.test(type)) commBreakdown.outgoing++;
@@ -1013,128 +789,150 @@
     };
   }
 
-  // Chart Instances
-  let monthlyChartInstance, categoryChartInstance, statusChartInstance, personnelChartInstance, commChartInstance;
+  // Each canvas owns one chart and one dedicated, bounded resize container.
+  const chartInstances = new Map();
+  const chartFailures = new Set();
+  const chartTheme = () => document.documentElement.dataset.theme === "dark"
+    ? { text: "#a9c6bb", grid: "#294b3e", surface: "#142c23", total: "#ecf7f1", tip: "#071c14" }
+    : { text: "#71857a", grid: "#e8efe9", surface: "#ffffff", total: "#163d2b", tip: "#163d2b" };
 
-  function initCharts() {
-    if (!window.Chart) return;
-    const isReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const baseOpts = {
-      responsive: true,
-      maintainAspectRatio: false,
-      animation: isReduced ? false : { duration: 400 },
+  const doughnutTotal = {
+    id: "pgenroDoughnutTotal",
+    afterDraw(chart) {
+      if (chart.config.type !== "doughnut" || !chart.chartArea) return;
+      const arc = chart.getDatasetMeta(0).data[0];
+      if (!arc || arc.innerRadius < 28) return;
+      const total = chart.data.datasets[0].data.reduce((sum, n, i) =>
+        sum + (chart.getDataVisibility(i) ? Number(n) || 0 : 0), 0);
+      const ctx = chart.ctx, theme = chartTheme();
+      ctx.save(); ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = theme.total;
+      ctx.font = `750 ${Math.min(31, arc.innerRadius * .49)}px Inter, system-ui, sans-serif`;
+      ctx.fillText(new Intl.NumberFormat("en-PH", { notation: total >= 10000 ? "compact" : "standard" }).format(total), arc.x, arc.y - 6);
+      ctx.fillStyle = theme.text; ctx.font = "600 9px Inter, system-ui, sans-serif";
+      const filtered = chart.data.labels.some((_, index) => !chart.getDataVisibility(index));
+      ctx.fillText(filtered ? "VISIBLE RECORDS" : "TOTAL RECORDS", arc.x, arc.y + 17); ctx.restore();
+    }
+  };
+
+  function chartOptions({ horizontal = false, doughnut = false, legend = false } = {}) {
+    const theme = chartTheme();
+    // Fresh nested options for every instance prevent Chart.js mutation leaking across charts.
+    const result = {
+      responsive: true, maintainAspectRatio: false, resizeDelay: 0,
+      animation: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? false : { duration: 220 },
+      font: { family: "Inter, system-ui, sans-serif" },
+      interaction: { mode: doughnut ? "nearest" : "index", intersect: doughnut, axis: horizontal ? "y" : "x" },
+      layout: { padding: { top: 8, bottom: 2, left: 0, right: 8 } },
       plugins: {
-        legend: {
-          position: "bottom",
-          labels: { usePointStyle: true, boxWidth: 6, padding: 12, font: { size: 10, family: "Plus Jakarta Sans" } }
+        legend: { display: legend, position: "bottom", labels: { color: theme.text, usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7, padding: 13, font: { family: "Inter, system-ui, sans-serif", size: 10 } } },
+        tooltip: { backgroundColor: theme.tip, titleColor: "#fff", bodyColor: "#ddefe4", padding: 12, cornerRadius: 10, displayColors: true,
+          callbacks: { label(context) {
+            const value = doughnut ? context.parsed : horizontal ? context.parsed.x : context.parsed.y;
+            return `${context.dataset.label || context.label}: ${Number(value || 0).toLocaleString("en-PH")}`;
+          } }
         }
       }
     };
+    if (doughnut) { result.cutout = "74%"; return result; }
+    result.indexAxis = horizontal ? "y" : "x";
+    const numbers = { beginAtZero: true, suggestedMax: 1, border: { display: false }, grid: { color: theme.grid, drawTicks: false }, ticks: { precision: 0, padding: 8, color: theme.text, font: { size: 10 } } };
+    const labels = { border: { display: false }, grid: { display: false }, ticks: { autoSkip: !horizontal, maxRotation: 0, maxTicksLimit: horizontal ? 24 : 8, padding: 8, color: theme.text, font: { size: 10 } } };
+    result.scales = horizontal ? { x: numbers, y: labels } : { x: labels, y: numbers };
+    return result;
+  }
 
-    // 1. Monthly Record Trend Chart
-    if (!monthlyChartInstance && $("monthlyChart")) {
-      monthlyChartInstance = new window.Chart($("monthlyChart"), {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            { label: "Documents & ICS", borderColor: "#059669", backgroundColor: "rgba(5, 150, 105, 0.08)", data: [], fill: true },
-            { label: "Travel Orders", borderColor: "#8b5cf6", data: [] },
-            { label: "Visitors", borderColor: "#d97706", data: [] },
-            { label: "Service Requests", borderColor: "#e05271", data: [] }
-          ].map((ds) => ({ ...ds, tension: 0.3, borderWidth: 2, pointRadius: 2.5 }))
-        },
-        options: {
-          ...baseOpts,
-          scales: {
-            x: { grid: { display: false }, ticks: { maxRotation: 0, font: { size: 10 } } },
-            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#e2e8f0" } }
-          }
-        }
-      });
-    }
+  function lineArea(context) {
+    const { chart } = context, area = chart.chartArea;
+    if (!area) return "#27856018";
+    const gradient = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
+    gradient.addColorStop(0, "#27856036"); gradient.addColorStop(1, "#27856000"); return gradient;
+  }
 
-    // 2. Activity Distribution Doughnut
-    if (!categoryChartInstance && $("categoryChart")) {
-      categoryChartInstance = new window.Chart($("categoryChart"), {
-        type: "doughnut",
-        data: {
-          labels: activityModules.map((m) => m.label),
-          datasets: [{ data: [], backgroundColor: activityModules.map((m) => m.color), borderWidth: 2, borderColor: "#ffffff" }]
-        },
-        options: { ...baseOpts, cutout: "70%" }
-      });
-    }
+  function chartConfig(id) {
+    if (id === "monthlyChart") return {
+      type: "line", data: { labels: [], datasets: [
+        { label: "Documents & ICS", borderColor: "#278560", backgroundColor: lineArea, fill: true },
+        { label: "Travel orders", borderColor: "#8b7ac7" },
+        { label: "Visitors", borderColor: "#c79b46" },
+        { label: "Service requests", borderColor: "#ce7d78" }
+      ].map(ds => ({ ...ds, data: [], tension: .25, borderWidth: 2.3, pointRadius: 0, pointHoverRadius: 4, pointHitRadius: 12 })) },
+      options: chartOptions({ legend: true })
+    };
+    const donut = ["categoryChart", "commChart"].includes(id);
+    const labels = id === "categoryChart" ? activityModules.map(m => m.label)
+      : id === "commChart" ? ["Incoming", "Outgoing", "Internal", "Unclassified"]
+      : id === "statusChart" ? ["Completed", "In progress", "Pending", "Archived", "Other"] : [];
+    const colors = id === "categoryChart" ? activityModules.map(m => m.color)
+      : id === "commChart" ? ["#4b9da7", "#278560", "#8b7ac7", "#c79b46"]
+      : id === "statusChart" ? ["#278560", "#4b9da7", "#c79b46", "#94a3b8", "#b8c2bc"]
+      : ["#278560", "#4b9da7", "#8b7ac7", "#c79b46", "#ce7d78", "#7caa9f"];
+    return {
+      type: donut ? "doughnut" : "bar",
+      data: { labels, datasets: [{ label: id === "personnelChart" ? "Personnel" : "Records", data: [], backgroundColor: colors,
+        borderColor: chartTheme().surface, borderWidth: donut ? 3 : 0, borderRadius: donut ? 5 : 6, borderSkipped: false, maxBarThickness: 23, spacing: donut ? 2 : 0 }] },
+      options: chartOptions({ doughnut: donut, horizontal: !donut, legend: donut }),
+      plugins: donut ? [doughnutTotal] : []
+    };
+  }
 
-    // 3. Service Status Bar Chart
-    if (!statusChartInstance && $("statusChart")) {
-      statusChartInstance = new window.Chart($("statusChart"), {
-        type: "bar",
-        data: {
-          labels: ["Completed", "In Progress", "Pending", "Archived", "Other"],
-          datasets: [{ data: [], backgroundColor: ["#059669", "#2563eb", "#d97706", "#94a3b8", "#cbd5e1"], borderRadius: 4 }]
-        },
-        options: {
-          ...baseOpts,
-          indexAxis: "y",
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#e2e8f0" } },
-            y: { grid: { display: false }, ticks: { font: { size: 10 } } }
-          }
-        }
-      });
-    }
-
-    // 4. NEW: Personnel Distribution Chart
-    if (!personnelChartInstance && $("personnelChart")) {
-      personnelChartInstance = new window.Chart($("personnelChart"), {
-        type: "bar",
-        data: {
-          labels: [],
-          datasets: [{
-            label: "Personnel Count",
-            data: [],
-            backgroundColor: ["#059669", "#10b981", "#3b82f6", "#8b5cf6", "#f59e0b", "#64748b"],
-            borderRadius: 5
-          }]
-        },
-        options: {
-          ...baseOpts,
-          plugins: { legend: { display: false } },
-          scales: {
-            x: { grid: { display: false }, ticks: { font: { size: 9.5 } } },
-            y: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: "#e2e8f0" } }
-          }
-        }
-      });
-    }
-
-    // 5. NEW: Communications Flow Doughnut / Polar Chart
-    if (!commChartInstance && $("commChart")) {
-      commChartInstance = new window.Chart($("commChart"), {
-        type: "doughnut",
-        data: {
-          labels: ["Incoming", "Outgoing", "Internal", "Unclassified"],
-          datasets: [{
-            data: [],
-            backgroundColor: ["#2563eb", "#059669", "#6366f1", "#f59e0b"],
-            borderWidth: 2,
-            borderColor: "#ffffff"
-          }]
-        },
-        options: {
-          ...baseOpts,
-          cutout: "60%"
-        }
-      });
+  function initCharts() {
+    if (typeof window.Chart !== "function") return;
+    for (const id of ["monthlyChart", "categoryChart", "statusChart", "personnelChart", "commChart"]) {
+      const canvas = $(id);
+      if (!canvas || chartInstances.has(id) || chartFailures.has(id)) continue;
+      canvas.hidden = false;
+      canvas.parentElement.querySelector(".native-chart")?.remove();
+      try {
+        window.Chart.getChart?.(canvas)?.destroy();
+        chartInstances.set(id, new window.Chart(canvas, chartConfig(id)));
+      } catch (error) {
+        window.Chart.getChart?.(canvas)?.destroy();
+        chartFailures.add(id);
+        console.warn(`Chart ${id} uses its accessible fallback:`, error.message);
+      }
     }
   }
 
-  function updateChartsAndAnalytics() {
-    if (!monthlyChartInstance || !categoryChartInstance || !statusChartInstance || !personnelChartInstance || !commChartInstance) {
-      initCharts();
+  function updateDashboardCharts(model) {
+    initCharts();
+    for (const [id, chart] of chartInstances) {
+      const horizontal = ["statusChart", "personnelChart"].includes(id);
+      const doughnut = ["categoryChart", "commChart"].includes(id);
+      chart.options = chartOptions({ horizontal, doughnut, legend: doughnut || id === "monthlyChart" });
+      if (id === "monthlyChart") {
+        chart.data.labels = model.buckets.map(b => b.label);
+        ["documents", "travel", "visitors", "services"].forEach((key, i) => { chart.data.datasets[i].data = model.buckets.map(b => b[key]); });
+      } else if (id === "categoryChart") chart.data.datasets[0].data = model.breakdown.map(m => m.current);
+      else if (id === "statusChart") chart.data.datasets[0].data = Object.values(model.serviceStatuses);
+      else if (id === "commChart") chart.data.datasets[0].data = ["incoming", "outgoing", "internal", "unclassified"].map(key => model.commBreakdown[key]);
+      else {
+        const divisions = Object.entries(model.divisionCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+        chart.data.labels = divisions.map(([label]) => label);
+        chart.data.datasets[0].data = divisions.map(([, value]) => value);
+        chart.canvas.parentElement.style.height = `${Math.max(240, divisions.length * 33 + 32)}px`;
+        chart.options.scales.y.ticks.callback = function(value) {
+          const text = String(this.getLabelForValue(value));
+          return text.length > 28 ? `${text.slice(0, 27)}…` : text;
+        };
+      }
+      if (doughnut) chart.data.datasets[0].borderColor = chartTheme().surface;
+      // Realtime bursts and appearance changes must not queue five new animations.
+      chart.update("none");
     }
+  }
+
+  const chartAppearanceObserver = new MutationObserver(scheduleAnalytics);
+  chartAppearanceObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  window.addEventListener("pageshow", event => { if (event.persisted) { chartInstances.forEach(chart => chart.resize()); scheduleAnalytics(); } });
+  window.addEventListener("pagehide", event => {
+    if (event.persisted) return;
+    clearTimeout(analyticsFrame);
+    chartAppearanceObserver.disconnect();
+    chartInstances.forEach(chart => chart.destroy()); chartInstances.clear();
+  });
+
+  function updateChartsAndAnalytics() {
     const model = buildAnalyticsModel(analyticsSources, analyticsRange);
     lastAnalyticsModel = model;
 
@@ -1145,13 +943,16 @@
     const liveCount = Object.values(analyticsSources).filter((s) => s.source === "live").length;
     const pill = $("analyticsSourceStatus");
     if (pill) {
+      pill.hidden = false;
       const cachedCount = Object.values(analyticsSources).filter((s) => s.source === "cache").length;
       pill.textContent = liveCount > 0 ? `${liveCount} live · ${cachedCount} cached modules` : cachedCount ? `${cachedCount} cached modules` : "Data unavailable";
       pill.dataset.state = liveCount === 10 ? "live" : liveCount > 0 ? "partial" : "unavailable";
     }
 
     setText("analyticsVolume", model.availableCount ? model.total : "—");
-    setText("analyticsVolumeChange", model.total > 0 ? `${model.total} records in timeframe` : "No activity recorded");
+    setText("analyticsVolumeChange", !model.availableCount ? "Awaiting module data" : model.previous
+      ? `${model.total >= model.previous ? '+' : ''}${((model.total - model.previous) / model.previous * 100).toFixed(1)}% vs preceding period`
+      : model.total ? 'New activity vs preceding period' : 'No dated activity in this period');
     setText("analyticsCompletion", model.completion !== null ? `${model.completion.toFixed(1)}%` : "—");
     setText("analyticsCompletionDetail", model.serviceAvailable ? `${model.serviceStatuses.completed} of ${model.serviceTotal} completed` : "Awaiting service data");
     setText("analyticsBacklog", model.serviceAvailable ? model.openRequests : "—");
@@ -1159,65 +960,7 @@
     setText("analyticsStockAlerts", model.stockAvailable ? model.stock.out + model.stock.low : "—");
     setText("analyticsStockDetail", model.stockAvailable ? `${model.stock.out} out of stock · ${model.stock.low} low stock` : "Awaiting inventory");
 
-    // 1. Update Monthly Chart
-    if (monthlyChartInstance) {
-      monthlyChartInstance.data.labels = model.buckets.map((b) => b.label);
-      ["documents", "travel", "visitors", "services"].forEach((key, idx) => {
-        monthlyChartInstance.data.datasets[idx].data = model.buckets.map((b) => b[key]);
-      });
-      monthlyChartInstance.update();
-      $("analyticsTrendEmpty").hidden = model.total > 0;
-      if (model.total === 0) $("analyticsTrendEmpty").textContent = "No dated activity recorded in this period.";
-    }
-
-    // 2. Update Category Chart
-    if (categoryChartInstance) {
-      categoryChartInstance.data.datasets[0].data = model.breakdown.map((m) => m.current);
-      categoryChartInstance.update();
-      $("analyticsDistributionEmpty").hidden = model.total > 0;
-      if (model.total === 0) $("analyticsDistributionEmpty").textContent = "No distribution available.";
-    }
-
-    // 3. Update Service Status Chart
-    if (statusChartInstance) {
-      statusChartInstance.data.datasets[0].data = Object.values(model.serviceStatuses);
-      statusChartInstance.update();
-      $("analyticsServiceEmpty").hidden = model.serviceTotal > 0;
-      if (model.serviceTotal === 0) $("analyticsServiceEmpty").textContent = "No service requests in this period.";
-    }
-
-    // 4. Update Personnel Distribution Chart
-    if (personnelChartInstance) {
-      const divLabels = Object.keys(model.divisionCounts);
-      const divValues = Object.values(model.divisionCounts);
-      personnelChartInstance.data.labels = divLabels;
-      personnelChartInstance.data.datasets[0].data = divValues;
-      personnelChartInstance.update();
-
-      const emptyPersonnel = $("analyticsPersonnelEmpty");
-      if (emptyPersonnel) {
-        emptyPersonnel.hidden = model.employeeCount > 0;
-        if (model.employeeCount === 0) emptyPersonnel.textContent = "No employee records found.";
-      }
-    }
-
-    // 5. Update Communications Flow Chart
-    if (commChartInstance) {
-      const commValues = [
-        model.commBreakdown.incoming,
-        model.commBreakdown.outgoing,
-        model.commBreakdown.internal,
-        model.commBreakdown.unclassified
-      ];
-      commChartInstance.data.datasets[0].data = commValues;
-      commChartInstance.update();
-
-      const emptyComm = $("analyticsCommEmpty");
-      if (emptyComm) {
-        emptyComm.hidden = model.commTotal > 0;
-        if (model.commTotal === 0) emptyComm.textContent = "No communication records available.";
-      }
-    }
+    updateDashboardCharts(model);
 
     // Stock Breakdown Bars
     const stockContainer = $("analyticsStockBreakdown");
@@ -1281,8 +1024,8 @@
     }
 
     updateChartPresentation(model);
-    $("analyticsDataNote").textContent = `${model.missingDates} records without explicit timestamps were omitted from historical date aggregation.`;
-    $("exportAnalyticsBtn").disabled = !model.availableCount;
+    if ($("analyticsDataNote")) $("analyticsDataNote").textContent = `${model.missingDates} records without explicit timestamps were omitted from historical date aggregation.`;
+    if ($("exportAnalyticsBtn")) $("exportAnalyticsBtn").disabled = !model.availableCount;
   }
 
   // Native, dependency-free charts keep cached dashboards usable if the CDN fails.
@@ -1290,7 +1033,7 @@
     const canvas = $(canvasId);
     if (!canvas) return;
     let container = canvas.parentElement.querySelector(".native-chart");
-    if (window.Chart) {
+    if (chartInstances.has(canvasId)) {
       canvas.hidden = false;
       container?.remove();
       return;
@@ -1305,7 +1048,7 @@
     }
     if (trend) {
       const buckets = entries;
-      const colors = ["#059669", "#8b5cf6", "#d97706", "#e05271"];
+      const colors = ["#278560", "#8b7ac7", "#c79b46", "#ce7d78"];
       const keys = ["documents", "travel", "visitors", "services"];
       const labels = ["Documents & ICS", "Travel", "Visitors", "Services"];
       const maximum = Math.max(1, ...buckets.flatMap((b) => keys.map((key) => b[key])));
@@ -1321,7 +1064,7 @@
       return;
     }
     const maximum = Math.max(1, ...entries.map((entry) => entry.value));
-    container.innerHTML = entries.map((entry) => `<div class="native-chart-row"><div><span>${escapeHTML(entry.label)}</span><strong>${entry.value.toLocaleString()}</strong></div><div class="native-chart-track"><div class="native-chart-fill" style="width:${entry.value / maximum * 100}%;background:${entry.color || "#059669"}"></div></div></div>`).join("");
+    container.innerHTML = entries.map((entry) => `<div class="native-chart-row"><div><span>${escapeHTML(entry.label)}</span><strong>${entry.value.toLocaleString()}</strong></div><div class="native-chart-track"><div class="native-chart-fill" style="width:${entry.value / maximum * 100}%;background:${entry.color || "#278560"}"></div></div></div>`).join("");
   }
 
   function updateChartPresentation(model) {
@@ -1347,7 +1090,7 @@
     nativeChart("categoryChart", model.breakdown.map((mod) => ({ label: mod.label, value: mod.current, color: mod.color })));
     nativeChart("statusChart", Object.entries(model.serviceStatuses).map(([label, value]) => ({ label: label === "progress" ? "In progress" : label[0].toUpperCase() + label.slice(1), value })));
     nativeChart("personnelChart", Object.entries(model.divisionCounts).map(([label, value]) => ({ label, value })));
-    nativeChart("commChart", ["incoming", "outgoing", "internal", "unclassified"].map((key, i) => ({ label: key[0].toUpperCase() + key.slice(1), value: model.commBreakdown[key], color: ["#2563eb", "#059669", "#6366f1", "#f59e0b"][i] })));
+    nativeChart("commChart", ["incoming", "outgoing", "internal", "unclassified"].map((key, i) => ({ label: key[0].toUpperCase() + key.slice(1), value: model.commBreakdown[key], color: ["#4b9da7", "#278560", "#6366f1", "#f59e0b"][i] })));
   }
 
   function csvCell(value) {
@@ -1365,7 +1108,7 @@
       ["Reporting Period", `${new Date(m.start * analyticsDayMs).toISOString().slice(0, 10)} to ${new Date(m.end * analyticsDayMs).toISOString().slice(0, 10)}`],
       [],
       ["Module", "Current Period", "Previous Period", "Share %"],
-      ...m.breakdown.map((mod) => [mod.label, mod.current, mod.previous, m.total ? ((mod.current / m.total) * 100).toFixed(1) : 0]),
+      ...m.breakdown.map((mod) => [mod.label, mod.available ? mod.current : "Unavailable", mod.available ? mod.previous : "Unavailable", m.total ? ((mod.current / m.total) * 100).toFixed(1) : 0]),
       [],
       ["Personnel by Functional Division", "Headcount"],
       ...Object.entries(m.divisionCounts).map(([div, cnt]) => [div, cnt]),
@@ -1487,8 +1230,9 @@
         const raw = localStore.getItem(k);
         if (raw) {
           const parsed = safeJson(raw, null);
-          if (Array.isArray(parsed)) {
-            captureRows(modKey, parsed, "cache");
+          const rows = Array.isArray(parsed) ? parsed : parsed?.rows || parsed?.data || parsed?.records || parsed?.items;
+          if (Array.isArray(rows)) {
+            captureRows(modKey, rows, "cache");
             break;
           }
         }
@@ -1528,12 +1272,7 @@
         scheduleAnalytics();
       });
     });
-    const auditRef = supabaseStore.realtimeStore().ref("audit_logs");
-    subscriptions.push(auditRef);
-    auditRef.on("value", (snap) => {
-      remoteAuthLogs = Object.values(snap.val() || {});
-      refreshAuditLogs();
-    });
+
   }
 
   /* --------------------------------------------------------------------------
@@ -1557,8 +1296,8 @@
       { name: "Inventory Custodian Slips (ICS)", href: "ics-admin.html", icon: "file-check-2" },
       { name: "User Account Management", href: "Usermanagement.html", icon: "user-cog" },
       { name: "Account Requests Clearance", href: "requestacc.html", icon: "user-plus" },
-      { name: "Security Audit Trail", href: "#audit", icon: "shield-alert" },
-      { name: "System Backup & Recovery", href: "#backup", icon: "database-backup" },
+      { name: "Security Audit Trail", href: "audittrail-admin.html", icon: "shield-alert" },
+      { name: "System Backup & Recovery", href: "backup-admin.html", icon: "database-backup" },
       { name: "Workspace Preferences", href: "#settings", icon: "settings" }
     ];
 
@@ -1650,49 +1389,25 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  // Backups cover workspace records and preferences, excluding session identities.
-  const backupKeys = new Set([
-    "pgenro_admin_preferences", "pgenro_admin_sidebar", "pgenro_audit_log_fallback",
-    "communicationRecords", "pgenro_communications", "pgenro_admin_travel_orders_live_cache_v2", "travelOrders",
-    "pgenro_office_memos", "officeMemos", "pgenro_admin_employees", "employees",
-    "pgenro_admin_inventory_live_cache_v2", "inventoryRecords", "pgenro_visitors", "visitorRecords",
-    "pgenro_service_requests", "serviceRequests", "pgenro_ics_records", "icsRecords",
-    "pgenro_users", "users", "pgenro_access_requests", "accessRequests"
-  ]);
-
-  function validateBackup(backup) {
-    if (!backup || backup.meta?.system !== "PGENRO IMS" || !backup.storage || typeof backup.storage !== "object" || Array.isArray(backup.storage)) {
-      throw new Error("Choose a valid PGENRO IMS backup file.");
-    }
-    const entries = Object.entries(backup.storage).filter(([key]) => backupKeys.has(key));
-    if (!entries.length) throw new Error("The file contains no supported workspace records.");
-    for (const [key, value] of entries) {
-      if (typeof value !== "string") throw new Error(`Invalid value for ${key}.`);
-      if (key === "pgenro_admin_sidebar") {
-        if (!["collapsed", "expanded"].includes(value)) throw new Error("Invalid sidebar preference.");
-      } else {
-        const parsed = JSON.parse(value);
-        if (key === preferenceKey) {
-          if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Invalid preferences.");
-        } else if (!Array.isArray(parsed)) throw new Error(`Invalid record list for ${key}.`);
-      }
-    }
-    return entries;
-  }
-
   function showToast(message, type = "success") { window.PGENRO_Module.toast(message,type); }
 
   /* --------------------------------------------------------------------------
      10. INITIALIZATION & DOM EVENT BINDINGS
      -------------------------------------------------------------------------- */
   function initializeDashboard() {
+    // Existing module menus and bookmarks can still point at the old dashboard audit anchor.
+    const routeAuditAnchor = () => {
+      const destination = {'#audit':'audittrail-admin.html','#backup':'backup-admin.html'}[location.hash];
+      if (!destination) return false;
+      location.replace(destination); return true;
+    };
+    if (routeAuditAnchor()) return;
+    window.addEventListener('hashchange', routeAuditAnchor);
     // 1. Initialize Profile & Cache
     const localUser = safeJson(localStore.getItem("pgenro_current_user"), null);
     if (localUser) updateProfileUI(localUser);
 
     applyPreferences();
-    loadLocalAuditLogs();
-    refreshAuditLogs();
     loadLocalModuleCaches();
 
     // 2. Initialize Charts & Database
@@ -1700,7 +1415,7 @@
     initDatabaseSync();
     logAudit("PAGE_VISIT", "Opened the administrator dashboard.", { module: "Admin Dashboard" });
     window.addEventListener("storage", () => {
-      applyPreferences(); loadLocalAuditLogs(); refreshAuditLogs(); loadLocalModuleCaches();
+      applyPreferences(); loadLocalModuleCaches();
     });
     window.addEventListener("offline", () => {
       Object.values(analyticsSources).forEach((source) => { if (source.source === "live") source.source = "stale"; });
@@ -1708,85 +1423,20 @@
     });
     window.addEventListener("online", updateConnectionStatus);
 
+    $('refreshAnalyticsBtn')?.addEventListener('click', () => {
+      $('refreshAnalyticsBtn').disabled = true;
+      subscriptions.forEach(ref => ref.off()); subscriptions.length = 0;
+      loadLocalModuleCaches(); initDatabaseSync(); scheduleAnalytics();
+      setTimeout(() => { if ($('refreshAnalyticsBtn')) $('refreshAnalyticsBtn').disabled = false; }, 900);
+    });
     // 3. Command Palette
     setupCommandPalette();
 
     document.addEventListener("keydown", (e) => {
       if (e.key === "Escape") {
-        closeAuditInspector();
         $("searchPaletteDropdown")?.classList.remove("open");
         $("globalSearchInput")?.setAttribute("aria-expanded", "false");
       }
-    });
-
-    // 6. Audit Trail Search & Pagination Events
-    function resetAuditFilters() { auditCurrentPage = 1; applyAuditFilters(); }
-    $("tableSearchInput")?.addEventListener("input", resetAuditFilters);
-    $("auditTypeFilter")?.addEventListener("change", resetAuditFilters);
-
-    $("auditPaginationControls")?.addEventListener("click", (e) => {
-      const btn = e.target.closest(".audit-page-btn");
-      if (!btn || btn.disabled) return;
-      if (btn.id === "auditPrevBtn") auditCurrentPage--;
-      else if (btn.id === "auditNextBtn") auditCurrentPage++;
-      else if (btn.dataset.page) auditCurrentPage = Number(btn.dataset.page);
-      applyAuditFilters();
-      $("auditScrollBox")?.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    $("selectAllRows")?.addEventListener("change", (e) => {
-      const checked = e.target.checked;
-      document.querySelectorAll(".row-checkbox").forEach((cb) => {
-        cb.checked = checked;
-        const id = cb.getAttribute("data-id");
-        if (checked) selectedAuditIds.add(id);
-        else selectedAuditIds.delete(id);
-        cb.closest("tr").classList.toggle("is-selected", checked);
-      });
-    });
-
-    $("exportCsvBtn")?.addEventListener("click", () => {
-      if (!filteredAuditLogs.length) {
-        showToast("No audit logs available to export.", "warning");
-        return;
-      }
-      const logsToExport = selectedAuditIds.size
-        ? filteredAuditLogs.filter((l) => selectedAuditIds.has(auditKey(l)))
-        : filteredAuditLogs;
-
-      const rows = [
-        ["Timestamp", "User Account", "User Email", "Action", "Details", "Module", "Role", "IP Address", "Status"],
-        ...logsToExport.map((l) => [
-          auditDate(l).toISOString(),
-          l.userName || "System",
-          l.userEmail || "",
-          l.activity || l.action || "",
-          l.details || "",
-          l.module || "",
-          l.role || "",
-          l.ipAddress || "",
-          l.sessionStatus || "Success"
-        ])
-      ];
-
-      const csv = "\ufeff" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
-      downloadBlob(csv, `PGENRO_Audit_Trail_${new Date().toISOString().slice(0, 10)}.csv`, "text/csv;charset=utf-8;");
-      logAudit("EXPORT_AUDIT_CSV", `Exported ${logsToExport.length} audit logs to CSV file.`);
-      showToast(`Exported ${logsToExport.length} logs to CSV.`);
-    });
-
-    $("auditDetailModal")?.addEventListener("keydown", (event) => {
-      if (event.key !== "Tab") return;
-      const first = $("closeAuditModalBtn"), last = $("closeAuditModalBtn2");
-      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
-      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
-    });
-
-    // 7. Modal Inspector close buttons
-    $("closeAuditModalBtn")?.addEventListener("click", closeAuditInspector);
-    $("closeAuditModalBtn2")?.addEventListener("click", closeAuditInspector);
-    $("auditDetailModal")?.addEventListener("click", (e) => {
-      if (e.target === $("auditDetailModal")) closeAuditInspector();
     });
 
     // 8. Analytics Period & Export
@@ -1796,51 +1446,6 @@
     });
     $("exportAnalyticsBtn")?.addEventListener("click", exportAnalyticsToCSV);
 
-    // 9. Backup & Restore
-    $("downloadLocalBackupBtn")?.addEventListener("click", () => {
-      const backupData = {
-        meta: { system: "PGENRO IMS", version: "2026.1", exportedAt: new Date().toISOString() },
-        storage: {}
-      };
-      backupKeys.forEach((key) => {
-        const value = localStore.getItem(key);
-        if (value !== null) backupData.storage[key] = value;
-      });
-      if (!Object.keys(backupData.storage).length) { showToast("No local workspace records available to back up.", "warning"); return; }
-      downloadBlob(JSON.stringify(backupData, null, 2), `PGENRO_Local_Backup_${new Date().toISOString().slice(0, 10)}.json`, "application/json");
-      logAudit("DOWNLOAD_BACKUP", "Created full local browser backup archive.");
-      showToast("Backup file downloaded.");
-    });
-
-    $("restoreBackupInput")?.addEventListener("change", async (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-      try {
-        if (file.size > 20 * 1024 * 1024) throw new Error("Backup exceeds the 20 MB limit.");
-        const json = JSON.parse(await file.text());
-        const entries = validateBackup(json);
-        if (confirm("Restore this local backup archive? Existing matching cache keys will be replaced.")) {
-          const previous = new Map(entries.map(([key]) => [key, localStore.getItem(key)]));
-          try {
-            for (const [key, value] of entries) {
-              if (!localStore.setItem(key, value)) throw new Error("Browser storage is unavailable or full.");
-            }
-          } catch (error) {
-            previous.forEach((value, key) => value === null ? localStore.removeItem(key) : localStore.setItem(key, value));
-            throw error;
-          }
-          loadLocalAuditLogs();
-          logAudit("RESTORE_BACKUP", `Restored local backup from ${file.name}.`);
-          showToast("Backup restored. Reloading workspace...");
-          setTimeout(() => location.reload(), 1000);
-        }
-      } catch (err) {
-        showToast(`Restore failed: ${err.message}`, "error");
-      } finally {
-        e.target.value = "";
-      }
-    });
-
     // 10. Workspace Preferences
     $("compactModeToggle")?.addEventListener("change", savePreferences);
     $("showDbStatusToggle")?.addEventListener("change", savePreferences);
@@ -1848,21 +1453,6 @@
       localStore.removeItem(preferenceKey);
       applyPreferences();
       showToast("Workspace preferences reset to default.");
-    });
-
-    // 11. Sign Out
-    $("logoutBtn")?.addEventListener("click", async () => {
-      if (!confirm("Are you sure you want to sign out of the Administrator console?")) return;
-      try {
-        await logAudit("LOGOUT", "Operator signed out of administrative workspace.");
-        await supabaseStore.auth().signOut();
-      } catch (error) {
-        showToast("Sign out failed. Please try again.", "error");
-        return;
-      }
-      localStore.removeItem("pgenro_current_user");
-      try { sessionStorage.removeItem("pgenro_current_user"); } catch {}
-      window.location.href = "../User/login.html";
     });
 
     // Lucide Icons Render
@@ -1875,7 +1465,7 @@
   });
 })();
 
-})();
+
 
 /* Page-owned workspace interactions. No additional shared application file. */
 (() => {
@@ -2004,233 +1594,47 @@
 })();
 
 
-/* PGENRO Modern Workspace: page-owned appearance and presentation enhancements. */
+/* Appearance and navigation belong to this page; no extra shared UI script. */
 (() => {
   'use strict';
-  function initModernWorkspace() {
-    if (!document.querySelector('.page-heading-mark')) return;
-    const renderIcons = () => window.PGENRO_Module?.renderIcons?.();
-    const themeButton = document.getElementById('appearanceThemeBtn');
-    const themeSelect = document.getElementById('appearanceThemeSelect');
-    const preferenceKey = 'pgenro_admin_preferences';
-    const themeKey = 'pgenro_admin_theme';
-    function readPreferences() {
-      try { const value = JSON.parse(localStorage.getItem(preferenceKey) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
-      catch { return {}; }
-    }
-    function applyTheme(value, remember = false) {
+  function init() {
+    const M = window.PGENRO_Module;
+    const $ = id => document.getElementById(id);
+    const setTheme = (value, remember = false) => {
       const theme = value === 'dark' ? 'dark' : 'light';
       document.documentElement.dataset.theme = theme;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0f1d18' : '#f5f7f8');
-      if (remember) { try { localStorage.setItem(themeKey, theme); } catch {} }
-      if (themeButton) {
-        const label = theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance';
-        themeButton.setAttribute('aria-label', label);
-        themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
-        themeButton.title = label;
-        const icon = document.createElement('i');
-        icon.dataset.lucide = theme === 'dark' ? 'sun' : 'moon';
-        themeButton.replaceChildren(icon);
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0d2119' : '#f4f7f5');
+      if (remember) { try { localStorage.setItem('pgenro_admin_theme', theme); } catch {} }
+      const button = $('appearanceThemeBtn');
+      if (button) {
+        button.setAttribute('aria-pressed', String(theme === 'dark'));
+        button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance');
+        button.title = button.getAttribute('aria-label');
+        const icon = document.createElement('i'); icon.dataset.lucide = theme === 'dark' ? 'sun' : 'moon'; button.replaceChildren(icon);
       }
-      if (themeSelect) themeSelect.value = theme;
-      renderIcons();
-    }
-    applyTheme(document.documentElement.dataset.theme);
-    themeButton?.addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
-    themeSelect?.addEventListener('change', () => applyTheme(themeSelect.value, true));
-
-    function syncDensity() {
-      const compact = Boolean(readPreferences().compact);
-      document.body.classList.toggle('compact-mode', compact);
-      const existingToggle = document.getElementById('compactModeToggle');
-      if (existingToggle) existingToggle.checked = compact;
-      document.querySelectorAll('.modern-density-switch').forEach(button => {
-        button.setAttribute('aria-pressed', String(compact));
-        button.setAttribute('aria-label', compact ? 'Use comfortable table spacing' : 'Use compact table spacing');
-        button.title = compact ? 'Use comfortable table spacing' : 'Use compact table spacing';
-        button.querySelector('span').textContent = compact ? 'Compact' : 'Comfortable';
-      });
-    }
-    document.querySelectorAll('.main-content .data-table, .main-content .analytics-table').forEach(table => {
-      const wrapper = table.closest('.table-responsive, .table-wrap, .table-wrapper, .table-container, .analytics-table-scroll, .ws-table-scroll') || table;
-      if (wrapper.dataset.modernTable) return;
-      wrapper.dataset.modernTable = 'true';
-      const toolbar = document.createElement('div');
-      toolbar.className = 'modern-table-toolbar';
-      toolbar.innerHTML = '<span class="modern-table-toolbar-label"><i data-lucide="columns-3"></i>Registry view</span><button class="modern-density-switch" type="button" aria-pressed="false"><i data-lucide="rows-3"></i><span>Comfortable</span></button>';
-      wrapper.before(toolbar);
-      toolbar.querySelector('button').addEventListener('click', () => {
-        const preferences = readPreferences();
-        preferences.compact = !document.body.classList.contains('compact-mode');
-        try { localStorage.setItem(preferenceKey, JSON.stringify(preferences)); }
-        catch { return; }
-        syncDensity();
-      });
-    });
-    syncDensity();
-    document.getElementById('compactModeToggle')?.addEventListener('change', syncDensity);
-    document.getElementById('resetAdminPrefsBtn')?.addEventListener('click', () => {
-      try { localStorage.removeItem(themeKey); } catch {}
-      applyTheme('light'); syncDensity();
-    });
+      if ($('appearanceThemeSelect')) $('appearanceThemeSelect').value = theme;
+      M.renderIcons();
+    };
+    setTheme(document.documentElement.dataset.theme);
+    $('appearanceThemeBtn')?.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
+    $('appearanceThemeSelect')?.addEventListener('change', event => setTheme(event.target.value, true));
     window.addEventListener('storage', event => {
-      if (event.key === themeKey || event.key === null) applyTheme(event.newValue);
-      if (event.key === preferenceKey || event.key === null) syncDensity();
+      if (event.key === 'pgenro_admin_theme') setTheme(event.newValue);
+      if (event.key === 'pgenro_admin_preferences') document.body.classList.toggle('compact-mode', Boolean(M.storage.get(event.key, {}).compact));
     });
-
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebarCollapseBtn');
-    let currentSidebarIcon = '';
-    function syncSidebarIcon() {
-      if (!sidebar || !sidebarToggle) return;
-      const mobile = innerWidth <= 900;
-      const name = mobile ? 'x' : sidebar.classList.contains('collapsed') ? 'panel-left-open' : 'panel-left-close';
-      if (name !== currentSidebarIcon) {
-        currentSidebarIcon = name;
-        const icon = document.createElement('i'); icon.dataset.lucide = name;
-        sidebarToggle.replaceChildren(icon); renderIcons();
-      }
-      if (mobile) { sidebarToggle.setAttribute('aria-label', 'Close navigation'); sidebarToggle.title = 'Close navigation'; }
-    }
-    syncSidebarIcon();
-    const sidebarObserver = typeof MutationObserver === 'function' ? new MutationObserver(syncSidebarIcon) : null;
-    if (sidebar) sidebarObserver?.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
-    window.addEventListener('resize', syncSidebarIcon);
-
-    function enhanceEmptyStates() {
-      document.querySelectorAll('.main-content .data-table tbody tr:only-child td[colspan]').forEach(cell => {
-        if (cell.dataset.modernEmpty || cell.childElementCount) return;
-        const message = cell.textContent.trim();
-        if (!message || !/\b(no |not found|empty|waiting|loading|unavailable|failed|error)/i.test(message)) return;
-        cell.dataset.modernEmpty = 'true';
-        const content = document.createElement('div'); content.className = 'modern-empty-state';
-        const icon = document.createElement('i'); icon.dataset.lucide = /failed|error|unavailable/i.test(message) ? 'file-search' : 'inbox';
-        const copy = document.createElement('p'); copy.textContent = message;
-        content.append(icon, copy); cell.replaceChildren(content);
-      });
-    }
-    enhanceEmptyStates();
-    const profileName = document.getElementById('dropdownUserName');
-    const profileRole = document.getElementById('dropdownUserRole');
-    const buttonName = document.querySelector('.profile-button-name');
-    const buttonRole = document.querySelector('.profile-button-role');
-    function syncProfileCopy() {
-      if (buttonName && profileName) buttonName.textContent = profileName.textContent.trim() || 'PGENRO Admin';
-      if (buttonRole && profileRole) buttonRole.textContent = profileRole.textContent.trim() || 'Administrator';
-    }
-    syncProfileCopy();
-    const profileObserver = typeof MutationObserver === 'function' ? new MutationObserver(syncProfileCopy) : null;
-    if (profileName) profileObserver?.observe(profileName, { childList: true, characterData: true, subtree: true });
-    if (profileRole) profileObserver?.observe(profileRole, { childList: true, characterData: true, subtree: true });
-
-    // Keep the genuine seal when available; show an environmental symbol if missing.
-    const seal = document.querySelector('.logo-image');
-    function showSealFallback() {
-      if (!seal || !seal.parentElement) return;
-      seal.hidden = true;
-      const host = seal.parentElement;
-      host.classList.add('logo-fallback');
-      if (!host.querySelector('.logo-fallback-mark')) {
-        const mark = document.createElement('i');
-        mark.dataset.lucide = 'leaf';
-        mark.className = 'logo-fallback-mark';
-        host.append(mark);
-        renderIcons();
-      }
-    }
-    seal?.addEventListener('error', showSealFallback);
-    if (seal?.complete && !seal.naturalWidth) showSealFallback();
-    renderIcons();
-
-    // Table rows, OCR states and attachment controls create icons after page load.
-    const iconObserver = typeof MutationObserver === 'function' ? new MutationObserver(records => {
-      const hasIcons = records.some(record => [...record.addedNodes].some(node =>
-        node.nodeType === 1 && (node.matches('i[data-lucide]') || node.querySelector('i[data-lucide]'))
-      ));
-      if (hasIcons) renderIcons();
-      if (records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.matches('tr,tbody') || node.querySelector('tbody'))))) enhanceEmptyStates();
-    }) : null;
-    iconObserver?.observe(document.body, { childList: true, subtree: true });
-
-    // Nothing is hidden waiting for JavaScript or an observer to run.
-    const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    let entranceObserver;
-    function configureMotion() {
-      entranceObserver?.disconnect();
-      if (motion.matches || !('IntersectionObserver' in window)) return;
-      entranceObserver = new IntersectionObserver(entries => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          entry.target.classList.add('ui-entering');
-          entry.target.addEventListener('animationend', () => entry.target.classList.remove('ui-entering'), { once: true });
-          entranceObserver.unobserve(entry.target);
-        }
-      }, { threshold: 0.05 });
-      document.querySelectorAll('.main-content > :is(section, .card, .panel, .table-card, .memo-dashboard-grid, .visitor-filter-panel, .toolbar-container)').forEach(surface => {
-        if (!surface.matches('.page-header, .kpi-grid') && !surface.dataset.calmSeen) {
-          surface.dataset.calmSeen = 'true';
-          entranceObserver.observe(surface);
-        }
-      });
-    }
-    configureMotion();
-    motion.addEventListener?.('change', configureMotion);
-    window.addEventListener('pagehide', event => { if (!event.persisted) { entranceObserver?.disconnect(); profileObserver?.disconnect(); iconObserver?.disconnect(); sidebarObserver?.disconnect(); } });
+    const syncProfile = () => {
+      const name = $('dropdownUserName')?.textContent?.trim() || 'PGENRO Admin';
+      document.querySelectorAll('.profile-button-name').forEach(el => { el.textContent = name; });
+      const role = $('dropdownUserRole')?.textContent?.trim() || 'Administrator';
+      document.querySelectorAll('.profile-button-role').forEach(el => { el.textContent = role; });
+    };
+    const observer = new MutationObserver(syncProfile);
+    if ($('profileDropdown')) observer.observe($('profileDropdown'), { childList: true, subtree: true, characterData: true });
+    syncProfile();
+    window.addEventListener('pagehide', event => { if (!event.persisted) observer.disconnect(); });
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initModernWorkspace, { once: true });
-  else initModernWorkspace();
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true }); else init();
 })();
-
-/* ===== PGENRO DEPTH MOTION · page-owned, short animations only ===== */
-(() => {
-  'use strict';
-  function initDepthWorkspace() {
-    const body = document.body;
-    if (!body?.classList.contains('depth-workspace') || body.dataset.depthReady) return;
-    body.dataset.depthReady = 'true';
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-    document.querySelectorAll('main .kpi-card, main .stat-card, main .metric-card, main .module-control-card')
-      .forEach(card => card.classList.add('depth-tilt'));
-    let observer;
-    function configure() {
-      observer?.disconnect();
-      body.classList.toggle('depth-motion-paused', document.hidden || reduce.matches);
-      if (reduce.matches) {
-        document.querySelectorAll('.depth-entered').forEach(el => el.classList.remove('depth-entered'));
-        return;
-      }
-      if (!('IntersectionObserver' in window)) return;
-      observer = new IntersectionObserver(entries => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          const el = entry.target;
-          if (body.dataset.pageTransition === 'entering') { observer.unobserve(el); return; }
-          el.classList.add('depth-entered');
-          el.addEventListener('animationend', event => {
-            if (event.target === el) el.classList.remove('depth-entered');
-          }, {once: true});
-          observer.unobserve(el);
-        });
-      }, {threshold: .04});
-      document.querySelectorAll('.main-content > section, .main-content > .card, .main-content > .panel, .content-shell > section, .settings-panel.active')
-        .forEach((el, index) => {
-          if (el.dataset.depthSeen) return;
-          el.dataset.depthSeen = 'true';
-          el.style.setProperty('--depth-delay', `${Math.min(index, 3) * 40}ms`);
-          observer.observe(el);
-        });
-    }
-    configure();
-    reduce.addEventListener?.('change', configure);
-    document.addEventListener('visibilitychange', () => body.classList.toggle('depth-motion-paused', document.hidden || reduce.matches));
-    window.addEventListener('pagehide', () => observer?.disconnect());
-    window.addEventListener('pageshow', event => { if (event.persisted) configure(); });
-  }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initDepthWorkspace, {once: true});
-  else initDepthWorkspace();
-})();
-/* ===== END PGENRO DEPTH MOTION ===== */
-
 /* ===== PGENRO SLIDE NAVIGATION AND LOGOUT · module-owned presentation ===== */
 (() => {
   'use strict';
@@ -2377,3 +1781,234 @@
   else initWorkspaceNavigation();
 })();
 /* ===== END PGENRO SLIDE NAVIGATION AND LOGOUT ===== */
+
+/* PGENRO module notifications, 10 October 2026. */
+/* Module-owned notifications: copies live inside each workspace page script. */
+(() => {
+  'use strict';
+  if (window.PGENRO_Notifications) return;
+  const modules = {
+    communications:['Communications','admincommunication.html','communication.html'],
+    travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
+    office_memos:['Office Memos','officememo-admin.html','officememo.html'],
+    employees:['Employees','employee-admin.html','employee.html'],
+    inventory:['Inventory','invetoryadmin.html','inventory.html'],
+    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
+    service_requests:['Service Requests','serviceAdmin.html','service.html'],
+    ics_records:['Property Slips','ics-admin.html','ics.html'],
+    user_accounts:['User Management','Usermanagement.html',null],
+    account_requests:['Account Requests','requestacc.html',null]
+  };
+  const empty=()=>({total:0,counts:{},items:[],workspace:'user'});
+  let feed=empty(),status='loading',db,userId='',generation=0,loading=false,again=false,disposed=false;
+  let wrapper,button,panel,list,count,markAll,badge,channel,timer,debounce,authSubscription;
+  const element=(tag,className,text)=>{const el=document.createElement(tag);el.className=className||'';if(text!==undefined)el.textContent=text;return el;};
+  function destination(module){
+    const info=modules[module],admin=feed.workspace==='admin',file=info?.[admin?1:2];
+    return file?new URL(`../${admin?'admin':'User'}/${file}`,location.href).href:null;
+  }
+  function render(){
+    if(!button)return;
+    const total=Number(feed.total)||0;
+    badge.textContent=total>99?'99+':String(total);badge.hidden=!total;
+    count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
+    button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
+    list.replaceChildren();
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications…'));
+    else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
+    else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
+    for(const item of feed.items||[]){
+      const href=destination(item.module);if(!href)continue;
+      const link=element('a','module-notification-item');link.href=href;link.dataset.notificationId=item.id;
+      const dot=element('span','module-notification-dot');dot.setAttribute('aria-hidden','true');
+      const copy=element('span','module-notification-copy');copy.append(element('strong','',modules[item.module][0]));
+      copy.append(element('span','module-notification-title',item.title||'New record added'));
+      const date=new Date(item.createdAt);copy.append(element('small','',Number.isNaN(date.getTime())?'New record':date.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})));
+      link.append(dot,copy);link.addEventListener('click',async event=>{
+        event.preventDefault();link.setAttribute('aria-busy','true');
+        try{await markRead({p_ids:[item.id]});}catch{/* The destination remains usable if marking read fails. */}
+        location.assign(href);
+      });list.append(link);
+    }
+    if(total>(feed.items||[]).length&&status==='ready')list.append(element('p','module-notification-more',`Showing the latest ${(feed.items||[]).length} new records`));
+    document.querySelectorAll('aside a[href], .sidebar a[href]').forEach(link=>{
+      const path=new URL(link.getAttribute('href'),location.href).pathname;
+      const module=Object.keys(modules).find(key=>destination(key)&&new URL(destination(key)).pathname===path);
+      let chip=link.querySelector('.module-new-badge');
+      if(!module){chip?.remove();return;}
+      const value=Number(feed.counts?.[module])||0;
+      if(!chip){chip=element('span','module-new-badge');link.append(chip);}
+      chip.dataset.module=module;chip.hidden=!value;chip.textContent=value>99?'99+':String(value);
+      chip.setAttribute('aria-label',`${value} new ${modules[module][0]} records`);
+    });
+    document.body.dataset.notificationsState=status;
+  }
+  function close(){if(!panel)return;panel.hidden=true;button.setAttribute('aria-expanded','false');}
+  function position(){
+    const rect=button.getBoundingClientRect(),width=Math.min(390,innerWidth-24);
+    panel.style.width=`${width}px`;panel.style.right=`${Math.min(Math.max(12,innerWidth-rect.right),innerWidth-width-12)}px`;
+    panel.style.top=`${Math.min(Math.max(12,rect.bottom+10),innerHeight-160)}px`;
+  }
+  async function refresh(){
+    if(disposed||!db||!userId)return;
+    if(loading){again=true;return;}
+    loading=true;const token=generation;
+    try{
+      const result=await db.rpc('pgenro_get_module_notifications',{p_limit:30});
+      if(token!==generation||disposed)return;
+      if(result.error)throw result.error;
+      const data=result.data;
+      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      feed=data;status='ready';render();
+    }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
+    finally{loading=false;if(again){again=false;scheduleRefresh();}}
+  }
+  function scheduleRefresh(){clearTimeout(debounce);debounce=setTimeout(refresh,250);}
+  async function markRead(args={}){
+    const result=await db.rpc('pgenro_mark_notifications_read',args);if(result.error)throw result.error;
+    await refresh();
+  }
+  async function attachSession(user){
+    if(disposed)return;
+    if(!user?.id){generation++;userId='';feed=empty();status='unavailable';close();render();if(channel)db.removeChannel(channel);channel=null;return;}
+    if(userId===user.id){scheduleRefresh();return;}
+    generation++;userId=user.id;feed=empty();status='loading';render();
+    if(channel)db.removeChannel(channel);
+    channel=db.channel(`pgenro-module-notifications-${user.id}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_module_notifications'},scheduleRefresh)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_notification_reads',filter:`user_id=eq.${user.id}`},scheduleRefresh)
+      .subscribe(state=>{if(state==='SUBSCRIBED')scheduleRefresh();});
+    await refresh();
+  }
+  function init(){
+    const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
+    document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
+    wrapper=element('div','module-notifications');button=element('button','module-notification-button');button.type='button';button.id='moduleNotificationButton';
+    button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','moduleNotificationPanel');
+    button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>';
+    badge=element('span','module-notification-badge');badge.hidden=true;button.append(badge);wrapper.append(button);
+    if(header.classList.contains('settings-topbar'))header.insertBefore(wrapper,header.lastElementChild);else header.prepend(wrapper);
+    panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
+    const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
+    count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
+    const closeBtn=element('button','module-notification-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
+    markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
+    tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
+    button.addEventListener('click',()=>{const open=panel.hidden;close();if(open){panel.hidden=false;position();button.setAttribute('aria-expanded','true');closeBtn.focus();refresh();}});
+    document.addEventListener('click',event=>{if(!wrapper.contains(event.target)&&!panel.contains(event.target))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){close();button.focus();}});
+    window.addEventListener('resize',()=>{if(!panel.hidden)position();});
+    window.addEventListener('focus',scheduleRefresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRefresh();});
+    window.addEventListener('pageshow',event=>{if(event.persisted)scheduleRefresh();});
+    render();db=window.pgenroSupabase||window.PGENRO_DB?.client;
+    if(!db){status='unavailable';render();return;}
+    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
+    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
+    timer=setInterval(()=>{if(!document.hidden)refresh();},30000);
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
+  }
+  window.PGENRO_Notifications={refresh,scheduleRefresh};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+/* Page-owned layout helpers; do not change record permissions or data writes. */
+(() => {
+  'use strict';
+  function init() {
+    if (document.body.dataset.unifiedLayoutReady) return;
+    document.body.dataset.unifiedLayoutReady = 'true';
+    // A wide registry scrolls within its own region, including dynamically mounted tables.
+    function containTables() {
+      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
+        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
+        const region = document.createElement('div'); region.className = 'ui-table-scroll';
+        table.before(region); region.append(table);
+      });
+    }
+    containTables();
+    let tableFrame;
+    const insertedTables = new MutationObserver(records => {
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    });
+    insertedTables.observe(document.body, {childList:true,subtree:true});
+    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
+    // Account Settings and the module pages use one saved user appearance.
+    let appearanceObserver;
+    if (document.body.classList.contains('pgenro-user')) {
+      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
+      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+      function applyAppearance(theme) {
+        theme=theme==='dark'?'dark':'light';
+        if(html.dataset.theme!==theme)html.dataset.theme=theme;
+        const dark=theme==='dark';
+        if(button&&button.dataset.appearance!==theme) {
+          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
+          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
+        }
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
+      }
+      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
+      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
+      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
+      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
+      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
+      button?.addEventListener('click',()=>{
+        const theme=html.dataset.theme==='dark'?'light':'dark';
+        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
+        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
+        html.dataset.pgenroTheme=theme;applyAppearance(theme);
+      });
+      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
+    }
+    // The existing user page controls continue to open and close its module menu.
+    const sidebar = document.querySelector('.pgenro-user .sidebar');
+    if (sidebar) {
+      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
+      let previouslyOpen = false;
+      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
+      function desktopNavigation() {
+        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
+        collapsed=!media.matches&&collapsed;
+        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
+        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
+      }
+      menu?.addEventListener('click',event=>{
+        if(media.matches)return;
+        event.preventDefault();event.stopImmediatePropagation();
+        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
+        desktopNavigation();
+      },true);
+      function sync() {
+        const open = media.matches && sidebar.classList.contains('open');
+        sidebar.inert = media.matches && !open;
+        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
+        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
+        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
+        previouslyOpen = open;
+      }
+      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
+      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
+      let navigationFrame;
+      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
+      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
+      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
+      document.addEventListener('keydown',event=>{
+        if(!media.matches||!sidebar.classList.contains('open')) return;
+        if(event.key==='Escape') {menu?.click();return;}
+        if(event.key!=='Tab')return;
+        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
+        if(!items.length)return;
+        const first=items[0],last=items.at(-1);
+        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
+        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+

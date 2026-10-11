@@ -1,548 +1,293 @@
-// PGENRO IMS - Supabase Edge Function: admin-users
-// Deploy with:
-//   supabase functions deploy admin-users --project-ref zssrxubajhqryrwijyzm
-//
-// IMPORTANT:
-// SUPABASE_URL and a server-only Supabase secret are provided to hosted Edge
-// Functions. This function supports the current SUPABASE_SECRET_KEYS JSON
-// variable and the legacy SUPABASE_SERVICE_ROLE_KEY fallback. Never copy any
-// secret/service-role key into browser JavaScript.
-
-import { createClient } from "npm:@supabase/supabase-js@2";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Content-Type": "application/json"
+import { createClient } from 'npm:@supabase/supabase-js@2';
+// Account mutations run on the server with a verified caller and profile role.
+// SUPABASE_SERVICE_ROLE_KEY is built in; new SUPABASE_SECRET_KEYS is also supported.
+const TABLE = 'profiles';
+const allowedRoles = new Set(['Admin', 'User']);
+const allowedStatuses = new Set(['Active', 'Inactive', 'Suspended']);
+type ProfileInput = {
+  fullName: string; username: string; email: string; division: string;
+  role: string; status: string; position: string; contact: string; password?: string;
 };
-
-const ADMIN_ROLES = new Set([
-  "admin",
-  "administrator",
-  "super admin",
-  "superadmin",
-  "system administrator"
-]);
-
-const json = (body: unknown, status = 200) =>
-  new Response(JSON.stringify(body), { status, headers: corsHeaders });
-
-const cleanRole = (value: unknown) =>
-  String(value ?? "").trim().toLowerCase().replace(/\s+/g, " ");
-
-const isActiveStatus = (value: unknown) =>
-  ["active", "approved"].includes(String(value ?? "").trim().toLowerCase());
-
-
-function getProjectSecretKey() {
-  // Current Supabase projects expose secret keys as a JSON dictionary.
-  const current = Deno.env.get("SUPABASE_SECRET_KEYS");
-  if (current) {
-    try {
-      const parsed = JSON.parse(current) as Record<string, string>;
-      if (parsed?.default) return parsed.default;
-      const first = Object.values(parsed ?? {}).find(Boolean);
-      if (first) return first;
-    } catch (error) {
-      console.warn("Unable to parse SUPABASE_SECRET_KEYS; checking legacy key.", error);
-    }
-  }
-
-  // Kept for projects that still expose the legacy default secret.
-  return Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+class HttpError extends Error {
+  constructor(public status: number, message: string) { super(message); }
 }
-
-const authBanForStatus = (status: unknown) =>
-  isActiveStatus(status) ? "none" : "876000h"; // 100 years for disabled accounts
-
-const legacyUserPayload = (profile: Record<string, unknown>) => ({
-  fullName: profile.full_name ?? "",
-  username: profile.username ?? "",
-  email: profile.email ?? "",
-  contact: profile.contact ?? "",
-  position: profile.position ?? "",
-  division: profile.division ?? "",
-  role: profile.role ?? "System Staff",
-  accountType: profile.account_type ?? "Standard User",
-  status: isActiveStatus(profile.status) && profile.is_active ? "Active" : (profile.status ?? "Inactive"),
-  lastLogin: profile.last_login ?? "Never",
-  updatedAt: new Date().toISOString()
-});
-
-Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
-  if (req.method !== "POST") return json({ error: "Method not allowed." }, 405);
-
+function text(value: unknown, label: string, max = 200, required = false): string {
+  if (typeof value !== 'string') {
+    if (required || value != null) throw new HttpError(400, `${label} must be text.`);
+    return '';
+  }
+  const normalized = value.trim();
+  if ((required && !normalized) || normalized.length > max) throw new HttpError(400, `${label} is missing or too long.`);
+  return normalized;
+}
+function validateUser(raw: unknown, creating: boolean): ProfileInput {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new HttpError(400, 'User details are required.');
+  const u = raw as Record<string, unknown>;
+  const result: ProfileInput = {
+    fullName: text(u.fullName, 'Full name', 200, true),
+    username: text(u.username, 'Username', 60, true),
+    email: text(u.email, 'Email', 254, true).toLowerCase(),
+    division: text(u.division, 'Division', 200, true),
+    role: text(u.role, 'Role', 30, true), status: text(u.status, 'Status', 20, true),
+    position: text(u.position, 'Position'), contact: text(u.contact, 'Contact', 40),
+  };
+  if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(result.username)) throw new HttpError(400, 'Username must contain letters, numbers, dots, underscores or hyphens.');
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result.email)) throw new HttpError(400, 'Enter a valid email address.');
+  // Accept only the two canonical access roles from the Admin review form.
+  if (!allowedRoles.has(result.role) || !allowedStatuses.has(result.status)) throw new HttpError(400, 'Invalid role or status.');
+  if (u.password !== undefined && typeof u.password !== 'string') throw new HttpError(400, 'Password must be text.');
+  const password = u.password as string | undefined;
+  if ((creating || password) && (!password || password.length < 8 || password.length > 256)) {
+    throw new HttpError(400, 'Password must contain 8–256 characters.');
+  }
+  if (password) result.password = password;
+  return result;
+}
+function directoryFields(u: ProfileInput) {
+  return { full_name: u.fullName, username: u.username, email: u.email, division: u.division,
+    role: u.role, status: u.status, is_active: u.status === 'Active',
+    account_type: u.role === 'Admin' ? 'Administrator' : 'Standard User', position: u.position, contact: u.contact,
+    updated_at: new Date().toISOString() };
+}
+function displayMetadata(u: ProfileInput) {
+  return { full_name: u.fullName, fullName: u.fullName, name: u.fullName, username: u.username,
+    division: u.division, position: u.position, contact: u.contact };
+}
+function accessMetadata(role: string, status: string) {
+  return { pgenro_role: role, pgenro_status: status,
+    role: role === 'Admin' ? 'admin' : 'user' };
+}
+function requestedAccessRole(data: Record<string, any>): string {
+  const candidate = data.requestedRole || data.requested_role || data.requested_system || data.role;
+  return String(candidate || 'User').trim().toLowerCase() === 'admin' ? 'Admin' : 'User';
+}
+function serverKey(): string {
+  const keys = Deno.env.get('SUPABASE_SECRET_KEYS');
+  if (keys) {
+    try { const parsed = JSON.parse(keys); if (typeof parsed.default === 'string') return parsed.default; } catch { /* legacy fallback */ }
+  }
+  return Deno.env.get('SUPABASE_SECRET_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
+}
+function databaseError(error: { code?: string; message?: string }): HttpError {
+  if (error.code === '23505') return new HttpError(409, 'Email or username already exists. Refresh the directory before retrying.');
+  if (error.code === '23514') return new HttpError(409, error.message || 'Keep at least one active Admin.');
+  if (['42P01', '42703', 'PGRST205'].includes(error.code || '')) return new HttpError(503, 'Run ADMIN_USER_ACCESS_PATCH.sql in this Supabase project first.');
+  console.error('User directory database error:', error.code || 'unknown');
+  return new HttpError(500, 'The account profile could not be saved. Refresh and retry.');
+}
+function authError(error: { code?: string; status?: number; message?: string }): HttpError {
+  if (['email_exists', 'user_already_exists', 'email_address_not_authorized'].includes(error.code || '')) {
+    return new HttpError(409, 'This email is already registered or cannot be used. Check Authentication > Users.');
+  }
+  if (error.status === 404 || error.code === 'user_not_found') return new HttpError(404, 'This Auth user no longer exists. Refresh the directory.');
+  return new HttpError(error.status && error.status >= 400 && error.status < 500 ? error.status : 502,
+    error.message || 'Supabase Auth could not complete this account change.');
+}
+Deno.serve(async (req: Request) => {
+  const origin = req.headers.get('origin') || '';
+  const configuredOrigins = (Deno.env.get('PGENRO_ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const allowedOrigin = configuredOrigins.length ? configuredOrigins.includes(origin) : true;
+  const cors: Record<string, string> = {
+    'Access-Control-Allow-Origin': configuredOrigins.length ? (allowedOrigin ? origin : configuredOrigins[0]) : '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Vary': 'Origin',
+    'Cache-Control': 'no-store',
+  };
+  const respond = (body: unknown, status = 200) => new Response(JSON.stringify({ ok: (body as Record<string, unknown>)?.success === true, ...(body as Record<string, unknown>) }), {
+    status, headers: { ...cors, 'Content-Type': 'application/json' },
+  });
+  if (origin && !allowedOrigin) return respond({ success: false, error: 'This website origin is not allowed.' }, 403);
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+  if (req.method !== 'POST') return respond({ success: false, error: 'Use POST.' }, 405);
   try {
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const serviceKey = getProjectSecretKey();
-
-    if (!supabaseUrl || !serviceKey) {
-      return json({ error: "Edge Function Supabase secrets are not configured." }, 500);
+    const authorization = req.headers.get('authorization') || '';
+    if (!/^Bearer\s+\S+$/i.test(authorization)) throw new HttpError(401, 'Sign in with an active Admin account.');
+    const url = Deno.env.get('SUPABASE_URL') || '';
+    const key = serverKey();
+    if (!url || !key) throw new HttpError(503, 'The account service is missing its server configuration.');
+    const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+    // Validate with Auth, rather than trusting getSession(), a decoded JWT or localStorage.
+    const { data: identity, error: identityError } = await db.auth.getUser(authorization.replace(/^Bearer\s+/i, ''));
+    if (identityError || !identity.user) throw new HttpError(401, 'Your session expired or the Auth account no longer exists. Sign in again.');
+    const actor = identity.user;
+    const currentAccount = await db.auth.admin.getUserById(actor.id);
+    if (currentAccount.error || !currentAccount.data.user) throw new HttpError(401, 'Your Auth account is no longer available. Sign in again.');
+    const { data: administrator, error: administratorError } = await db.from(TABLE).select('*').eq('user_id', actor.id).maybeSingle();
+    if (administratorError) throw databaseError(administratorError);
+    if (!administrator || administrator.role !== 'Admin' || administrator.status !== 'Active' || administrator.is_active !== true
+      || (currentAccount.data.user.banned_until && new Date(currentAccount.data.user.banned_until).getTime() > Date.now())) {
+      throw new HttpError(403, 'Only an active Admin can manage user accounts.');
     }
+    let body: Record<string, unknown>;
+    try { body = await req.json(); } catch { throw new HttpError(400, 'Request body must be valid JSON.'); }
+    if (!body || typeof body !== 'object' || Array.isArray(body)) throw new HttpError(400, 'Request body must be an object.');
+    const action = body.action;
+    if (!['list', 'create', 'update', 'set_status', 'delete', 'approve_request', 'reject_request'].includes(String(action))) throw new HttpError(400, 'Unknown account action.');
 
-    const authHeader = req.headers.get("Authorization") ?? "";
-    const token = authHeader.replace(/^Bearer\s+/i, "").trim();
-    if (!token) return json({ error: "Missing authenticated session." }, 401);
-
-    const adminClient = createClient(supabaseUrl, serviceKey, {
-      auth: { autoRefreshToken: false, persistSession: false }
-    });
-
-    const { data: authData, error: authError } = await adminClient.auth.getUser(token);
-    if (authError || !authData.user) {
-      return json({ error: "Invalid or expired administrator session." }, 401);
-    }
-
-    const callerId = authData.user.id;
-    const { data: callerProfile, error: profileError } = await adminClient
-      .from("profiles")
-      .select("user_id,full_name,email,role,status,is_active")
-      .eq("user_id", callerId)
-      .maybeSingle();
-
-    if (
-      profileError ||
-      !callerProfile ||
-      !callerProfile.is_active ||
-      !isActiveStatus(callerProfile.status) ||
-      !ADMIN_ROLES.has(cleanRole(callerProfile.role))
-    ) {
-      return json({ error: "Administrator permission is required." }, 403);
-    }
-
-    const body = await req.json().catch(() => ({}));
-    const action = String(body?.action ?? "").trim();
-
-    const writeAudit = async (actionName: string, target: string, details: Record<string, unknown> = {}) => {
-      await adminClient.from("admin_logs").insert({
-        id: crypto.randomUUID(),
-        data: {
-          action: actionName,
-          performedBy: callerProfile.email ?? authData.user.email ?? callerId,
-          performedById: callerId,
-          targetUser: target,
-          details,
-          timestamp: new Date().toISOString()
-        }
-      });
+    // The profile is authoritative. Compatibility registries and audit history
+    // are synced after the Auth/profile operation succeeds; partial history
+    // failures are returned as warnings instead of encouraging duplicate writes.
+    const warnings: string[] = [];
+    const auxiliary = async (label: string, operation: () => PromiseLike<{error: unknown}>) => {
+      try { const result = await operation(); if (result.error) throw result.error; }
+      catch { warnings.push(`${label} could not be synchronized. Refresh and review the account history.`); }
     };
-
-    const syncLegacyRegistry = async (profile: Record<string, any>) => {
+    const audit = async (event: string, profile: Record<string, any>) => {
+      await auxiliary('Audit history', () => db.from('admin_logs').insert({id: crypto.randomUUID(), data: {
+        action: event, performedBy: administrator.email || actor.email || actor.id,
+        performedById: actor.id, targetUser: profile.email || profile.user_id,
+        details: {role: profile.role, status: profile.status}, timestamp: new Date().toISOString()
+      }}));
+    };
+    const syncProfile = async (profile: Record<string, any>) => {
       const uid = String(profile.user_id);
-      const userData = legacyUserPayload(profile);
-
-      await adminClient.from("users").upsert({
-        id: uid,
-        data: userData,
-        updated_at: new Date().toISOString()
-      }, { onConflict: "id" });
-
-      if (ADMIN_ROLES.has(cleanRole(profile.role)) && profile.is_active && isActiveStatus(profile.status)) {
-        await adminClient.from("admins").upsert({
-          id: uid,
-          data: {
-            fullName: profile.full_name ?? "",
-            email: profile.email ?? "",
-            role: profile.role,
-            status: "Active",
-            assignedBy: callerProfile.email ?? authData.user.email ?? "System Administrator",
-            updatedAt: new Date().toISOString()
-          },
-          updated_at: new Date().toISOString()
-        }, { onConflict: "id" });
-      } else {
-        await adminClient.from("admins").delete().eq("id", uid);
+      const data = {fullName: profile.full_name, username: profile.username, email: profile.email,
+        contact: profile.contact, position: profile.position, division: profile.division,
+        role: profile.role, accountType: profile.account_type, status: profile.status,
+        lastLogin: profile.last_login, updatedAt: new Date().toISOString()};
+      await auxiliary('Account registry', () => db.from('users').upsert({id:uid,data,updated_at:new Date().toISOString()}, {onConflict:'id'}));
+      await auxiliary('Admin registry', () => profile.role === 'Admin' && profile.is_active && profile.status === 'Active'
+        ? db.from('admins').upsert({id:uid,data,updated_at:new Date().toISOString()}, {onConflict:'id'})
+        : db.from('admins').delete().eq('id',uid));
+      const requests = await db.from('access_requests').select('id,data').contains('data',{uid});
+      if (requests.error) { warnings.push('Account updated, but request history could not be loaded.'); return; }
+      for (const row of requests.data || []) {
+        const next = {...row.data, ...data, uid, requestedRole:requestedAccessRole(row.data),
+          assignedRole:['Pending','Rejected'].includes(profile.status)?null:profile.role,
+          status: profile.status === 'Active' ? 'Approved' : profile.status,
+          ...(profile.status === 'Active' ? {approvedBy:administrator.email || actor.email,approvedAt:new Date().toISOString()} : {})};
+        delete next.password; delete next.confirmPassword;
+        await auxiliary('Request history', () => db.from('access_requests').update({data:next,updated_at:new Date().toISOString()}).eq('id',row.id));
       }
     };
-
-    const syncAccessRequestRegistry = async (profile: Record<string, any>) => {
-      const uid = String(profile.user_id);
-      const { data: rows, error } = await adminClient
-        .from("access_requests")
-        .select("id,data")
-        .contains("data", { uid });
-      if (error) throw error;
-
-      const profileStatus = String(profile.status ?? "Inactive");
-      const requestStatus = isActiveStatus(profileStatus) && profile.is_active
-        ? "Approved"
-        : profileStatus;
-
-      for (const row of rows ?? []) {
-        const current = row.data ?? {};
-        const next = {
-          ...current,
-          uid,
-          fullName: profile.full_name ?? current.fullName ?? "",
-          username: profile.username ?? current.username ?? "",
-          email: profile.email ?? current.email ?? "",
-          contact: profile.contact ?? current.contact ?? "",
-          position: profile.position ?? current.position ?? "",
-          division: profile.division ?? current.division ?? "",
-          role: profile.role ?? current.role ?? "System Staff",
-          accountType: profile.account_type ?? current.accountType ?? "Standard User",
-          status: requestStatus,
-          updatedAt: new Date().toISOString()
-        };
-        delete next.password;
-        delete next.confirmPassword;
-
-        const { error: updateError } = await adminClient
-          .from("access_requests")
-          .update({ data: next, updated_at: new Date().toISOString() })
-          .eq("id", row.id);
-        if (updateError) throw updateError;
-      }
-    };
-
-    if (action === "list") {
-      const { data: profiles, error } = await adminClient
-        .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return json({ ok: true, users: profiles ?? [] });
+    if (action === 'list') {
+      const listed = await db.from(TABLE).select('*').order('created_at',{ascending:false});
+      if (listed.error) throw databaseError(listed.error);
+      return respond({success:true,users:listed.data});
     }
-
-    if (action === "create") {
-      const input = body.user ?? {};
-      const email = String(input.email ?? "").trim().toLowerCase();
-      const password = String(input.password ?? "");
-      if (!email || !password || password.length < 8) {
-        return json({ error: "A valid email and password of at least 8 characters are required." }, 400);
+    let requestRow: {id: string; data: Record<string, any>} | null = null;
+    if (action === 'approve_request' || action === 'reject_request') {
+      const requestId = text(body.requestId,'Request ID',200,true);
+      const request = await db.from('access_requests').select('id,data').eq('id',requestId).maybeSingle();
+      if (request.error) throw databaseError(request.error);
+      if (!request.data) throw new HttpError(404,'This account request no longer exists.');
+      if (String(request.data.data?.status || '').toLowerCase() !== 'pending') throw new HttpError(409,'This request has already been reviewed. Refresh the request queue.');
+      requestRow = request.data;
+      const linkedId = text(requestRow.data.uid,'Linked Auth user ID',36,true);
+      if (body.userId && body.userId !== linkedId) throw new HttpError(400,'The user ID does not match this request.');
+      body.userId = linkedId;
+      if (action === 'reject_request') {
+        body.reason = text(body.reason || 'Request declined','Reason',1000);
+        body.remarks = text(body.remarks,'Remarks',2000);
       }
-
-      const requestedRole = String(input.role ?? "System Staff").trim() || "System Staff";
-      const status = String(input.status ?? "Active").trim() || "Active";
-      const active = isActiveStatus(status);
-
-      const { data: created, error: createError } = await adminClient.auth.admin.createUser({
-        email,
-        password,
-        email_confirm: true,
-        user_metadata: {
-          full_name: String(input.fullName ?? "").trim(),
-          username: String(input.username ?? "").trim(),
-          created_by_admin: true
-        }
+    }
+    if (action === 'create') {
+      const input = validateUser(body.user, true);
+      const exactUsername = input.username.replace(/([\\%_])/g, '\\$1');
+      const duplicate = await db.from(TABLE).select('user_id').ilike('username', exactUsername).limit(1);
+      if (duplicate.error) throw databaseError(duplicate.error);
+      if (duplicate.data?.length) throw new HttpError(409, 'This username already exists.');
+      const created = await db.auth.admin.createUser({
+        email: input.email, password: input.password, email_confirm: true,
+        user_metadata: {...displayMetadata(input), requested_role:input.role, created_by_admin: true}, app_metadata: accessMetadata(input.role, input.status),
+        ban_duration: input.status === 'Active' ? 'none' : '876000h',
       });
-      if (createError) throw createError;
-      if (!created.user) throw new Error("Supabase Auth did not return the created user.");
-
-      const uid = created.user.id;
-      const profile = {
-        user_id: uid,
-        full_name: String(input.fullName ?? "").trim() || email.split("@")[0],
-        email,
-        username: String(input.username ?? "").trim() || email.split("@")[0],
-        contact: String(input.contact ?? "").trim(),
-        position: String(input.position ?? "").trim(),
-        division: String(input.division ?? "").trim(),
-        role: requestedRole,
-        account_type: ADMIN_ROLES.has(cleanRole(requestedRole)) ? "Administrator" : "Standard User",
-        status,
-        is_active: active,
-        updated_at: new Date().toISOString()
-      };
-
-      const { data: saved, error: saveError } = await adminClient
-        .from("profiles")
-        .upsert(profile, { onConflict: "user_id" })
-        .select()
-        .single();
-      if (saveError) throw saveError;
-
-      const { error: authStatusError } = await adminClient.auth.admin.updateUserById(uid, {
-        ban_duration: authBanForStatus(saved.status)
-      });
-      if (authStatusError) throw authStatusError;
-
-      await syncLegacyRegistry(saved);
-
-      // The auth trigger creates a Pending request for every new Auth user.
-      // Accounts created directly by an administrator are immediately marked
-      // Approved so they do not remain in the pending review queue.
-      const { data: directRequests } = await adminClient
-        .from("access_requests")
-        .select("id,data")
-        .contains("data", { uid });
-
-      for (const row of directRequests ?? []) {
-        const next = {
-          ...(row.data ?? {}),
-          role: saved.role,
-          accountType: saved.account_type,
-          status: "Approved",
-          reason: row.data?.reason || "Account created directly by administrator.",
-          approvedAt: new Date().toISOString(),
-          approvedBy: callerProfile.email ?? authData.user.email ?? "System Administrator"
-        };
-        delete next.password;
-        delete next.confirmPassword;
-        await adminClient
-          .from("access_requests")
-          .update({ data: next, updated_at: new Date().toISOString() })
-          .eq("id", row.id);
+      if (created.error) throw authError(created.error);
+      if (!created.data.user) throw new HttpError(502, 'Auth did not confirm the new account. Refresh before retrying.');
+      const userId = created.data.user.id;
+      const saved = await db.from(TABLE).upsert({ user_id: userId, ...directoryFields(input) }, { onConflict: 'user_id' }).select('*').single();
+      if (saved.error) {
+        // Roll back only the Auth user created by this request.
+        const rollback = await db.auth.admin.deleteUser(userId);
+        if (rollback.error) throw new HttpError(500, 'Auth created the account, but its profile could not be saved or rolled back. Check Authentication > Users and refresh before retrying.');
+        throw databaseError(saved.error);
       }
-
-      await syncAccessRequestRegistry(saved);
-      await writeAudit("CREATE_USER", email, { role: saved.role, status: saved.status });
-      return json({ ok: true, user: saved });
+      await syncProfile(saved.data);
+      await audit('CREATE_USER',saved.data);
+      return respond({ success: true, user: saved.data, warnings });
     }
-
-    if (action === "update") {
-      const userId = String(body.userId ?? "").trim();
-      const input = body.user ?? {};
-      if (!userId) return json({ error: "userId is required." }, 400);
-
-      const authUpdates: Record<string, unknown> = {};
-      if (input.email) authUpdates.email = String(input.email).trim().toLowerCase();
-      if (input.password) {
-        const password = String(input.password);
-        if (password.length < 8) return json({ error: "Password must be at least 8 characters." }, 400);
-        authUpdates.password = password;
+    const userId = text(body.userId, 'User ID', 36, true);
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(userId)) throw new HttpError(400, 'Invalid Auth user ID.');
+    const existingAuth = await db.auth.admin.getUserById(userId);
+    if (existingAuth.error) throw authError(existingAuth.error);
+    if (!existingAuth.data.user) throw new HttpError(404, 'This Auth user no longer exists. Refresh the directory.');
+    const existing = await db.from(TABLE).select('*').eq('user_id', userId).maybeSingle();
+    if (existing.error) throw databaseError(existing.error);
+    if (!existing.data) throw new HttpError(409, 'The Auth account exists but its personnel profile is missing. Run ADMIN_USER_ACCESS_PATCH.sql again.');
+    const before = existing.data;
+    if (action === 'delete') {
+      if (userId === actor.id) throw new HttpError(409, 'You cannot delete your own Admin account.');
+      const deleted = await db.auth.admin.deleteUser(userId);
+      if (deleted.error) throw authError(deleted.error);
+      await auxiliary('Account registry', () => db.from('users').delete().eq('id',userId));
+      await auxiliary('Admin registry', () => db.from('admins').delete().eq('id',userId));
+      await audit('DELETE_USER',before);
+      return respond({ success: true, userId, warnings }); // FK cascade removes the profile row.
+    }
+    let fields: Record<string, unknown>;
+    let authChanges: Record<string, unknown>;
+    if (action === 'approve_request' || action === 'reject_request') {
+      if (userId === actor.id) throw new HttpError(409,'Use another Admin to review your own access.');
+      if (before.status !== 'Pending' || before.is_active) throw new HttpError(409,'This account is no longer pending. Refresh before reviewing it.');
+      const approving = action === 'approve_request';
+      const role = approving ? text(body.role,'Role',30,true) : before.role;
+      if (!allowedRoles.has(role)) throw new HttpError(400,'Choose Admin or User.');
+      const status = approving ? 'Active' : 'Rejected';
+      fields = {role,status,is_active:approving,account_type:role==='Admin'?'Administrator':'Standard User',updated_at:new Date().toISOString()};
+      authChanges = {ban_duration:approving?'none':'876000h', ...(approving?{email_confirm:true}:{}),
+        app_metadata:{...existingAuth.data.user.app_metadata,...accessMetadata(role,status)}};
+    } else if (action === 'set_status') {
+      if (userId === actor.id) throw new HttpError(409, 'Use another Admin to change your own access.');
+      const status = text(body.status, 'Status', 20, true);
+      if (!allowedStatuses.has(status)) throw new HttpError(400, 'Invalid account status.');
+      fields = { status, is_active: status === 'Active', updated_at: new Date().toISOString() };
+      authChanges = { ban_duration: status === 'Active' ? 'none' : '876000h',
+        app_metadata: { ...existingAuth.data.user.app_metadata, ...accessMetadata(before.role, status) } };
+    } else {
+      const input = validateUser(body.user, false);
+      if (userId === actor.id && (input.role !== before.role || input.status !== before.status)) {
+        throw new HttpError(409, 'Use another Admin to change your own role or status.');
       }
-      authUpdates.user_metadata = {
-        full_name: String(input.fullName ?? "").trim(),
-        username: String(input.username ?? "").trim()
-      };
-
-      const { error: authUpdateError } = await adminClient.auth.admin.updateUserById(userId, authUpdates);
-      if (authUpdateError) throw authUpdateError;
-
-      const current = await adminClient.from("profiles").select("*").eq("user_id", userId).single();
-      if (current.error) throw current.error;
-
-      const role = String(input.role ?? current.data.role ?? "System Staff").trim();
-      const status = String(input.status ?? current.data.status ?? "Active").trim();
-
-      if (
-        userId === callerId &&
-        (!ADMIN_ROLES.has(cleanRole(role)) || !isActiveStatus(status))
-      ) {
-        return json({ error: "You cannot remove your own active administrator access." }, 400);
-      }
-
-      const profileUpdate = {
-        full_name: String(input.fullName ?? current.data.full_name ?? "").trim(),
-        email: String(input.email ?? current.data.email ?? "").trim().toLowerCase(),
-        username: String(input.username ?? current.data.username ?? "").trim(),
-        contact: String(input.contact ?? current.data.contact ?? "").trim(),
-        position: String(input.position ?? current.data.position ?? "").trim(),
-        division: String(input.division ?? current.data.division ?? "").trim(),
-        role,
-        account_type: ADMIN_ROLES.has(cleanRole(role)) ? "Administrator" : "Standard User",
-        status,
-        is_active: isActiveStatus(status),
-        updated_at: new Date().toISOString()
-      };
-
-      const { data: saved, error: saveError } = await adminClient
-        .from("profiles")
-        .update(profileUpdate)
-        .eq("user_id", userId)
-        .select()
-        .single();
-      if (saveError) throw saveError;
-
-      const { error: authStatusError } = await adminClient.auth.admin.updateUserById(userId, {
-        ban_duration: authBanForStatus(saved.status)
-      });
-      if (authStatusError) throw authStatusError;
-
-      await syncLegacyRegistry(saved);
-      await syncAccessRequestRegistry(saved);
-      await writeAudit("UPDATE_USER", saved.email ?? userId, { role: saved.role, status: saved.status });
-      return json({ ok: true, user: saved });
+      fields = directoryFields(input);
+      authChanges = { email: input.email, email_confirm: true,
+        user_metadata: { ...existingAuth.data.user.user_metadata, ...displayMetadata(input) },
+        app_metadata: { ...existingAuth.data.user.app_metadata, ...accessMetadata(input.role, input.status) },
+        ban_duration: input.status === 'Active' ? 'none' : '876000h' };
+      if (input.password) authChanges.password = input.password;
     }
-
-    if (action === "set_status") {
-      const userId = String(body.userId ?? "").trim();
-      const status = String(body.status ?? "").trim();
-      if (!userId || !status) return json({ error: "userId and status are required." }, 400);
-      if (userId === callerId && !isActiveStatus(status)) {
-        return json({ error: "You cannot suspend or deactivate your own administrator account." }, 400);
-      }
-
-      const { data: saved, error } = await adminClient
-        .from("profiles")
-        .update({
-          status,
-          is_active: isActiveStatus(status),
-          updated_at: new Date().toISOString()
-        })
-        .eq("user_id", userId)
-        .select()
-        .single();
-      if (error) throw error;
-
-      const { error: authStatusError } = await adminClient.auth.admin.updateUserById(userId, {
-        ban_duration: authBanForStatus(status)
-      });
-      if (authStatusError) throw authStatusError;
-
-      await syncLegacyRegistry(saved);
-      await syncAccessRequestRegistry(saved);
-      await writeAudit("SET_USER_STATUS", saved.email ?? userId, { status });
-      return json({ ok: true, user: saved });
+    // Guarded profile write comes first, so the final active Admin cannot be
+    // disabled before the SQL trigger checks the directory.
+    const changed = await db.from(TABLE).update(fields).eq('user_id', userId).eq('updated_at', before.updated_at).select('*').maybeSingle();
+    if (changed.error) throw databaseError(changed.error);
+    if (!changed.data) throw new HttpError(409, 'Another operation changed this profile. Refresh before saving again.');
+    const authUpdate = await db.auth.admin.updateUserById(userId, authChanges);
+    if (authUpdate.error) {
+      const rollback = await db.from(TABLE).update({ full_name: before.full_name,
+        username: before.username, email: before.email, division: before.division,
+        role: before.role, status: before.status, is_active: before.is_active, account_type: before.account_type, position: before.position,
+        contact: before.contact, updated_at: new Date().toISOString() }).eq('user_id', userId)
+        .eq('updated_at', changed.data.updated_at).select('user_id');
+      if (rollback.error || rollback.data?.length !== 1) throw new HttpError(500, 'Auth rejected the change and the directory rollback failed. Refresh and review the account before retrying.');
+      throw authError(authUpdate.error);
     }
-
-    if (action === "delete") {
-      const userId = String(body.userId ?? "").trim();
-      if (!userId) return json({ error: "userId is required." }, 400);
-      if (userId === callerId) return json({ error: "You cannot delete your own administrator account." }, 400);
-
-      const profile = await adminClient.from("profiles").select("email").eq("user_id", userId).maybeSingle();
-      const target = profile.data?.email ?? userId;
-
-      await adminClient.from("users").delete().eq("id", userId);
-      await adminClient.from("admins").delete().eq("id", userId);
-
-      const { error } = await adminClient.auth.admin.deleteUser(userId, false);
-      if (error) throw error;
-
-      await writeAudit("DELETE_USER", target, {});
-      return json({ ok: true });
+    const saved = { ...changed.data, email: authUpdate.data.user?.email || changed.data.email };
+    await syncProfile(saved);
+    let reviewedRequest = null;
+    if (requestRow) {
+      reviewedRequest = {...requestRow.data,requestedRole:requestedAccessRole(requestRow.data),
+        assignedRole:action==='approve_request'?saved.role:null,role:saved.role,accountType:saved.account_type,
+        status:action==='approve_request'?'Approved':'Rejected',
+        ...(action==='reject_request'?{declineReason:text(body.reason || 'Request declined','Reason',1000),
+          declineRemarks:text(body.remarks,'Remarks',2000),declinedAt:new Date().toISOString(),declinedBy:administrator.email || actor.email}:
+          {approvedAt:new Date().toISOString(),approvedBy:administrator.email || actor.email})};
+      delete reviewedRequest.password; delete reviewedRequest.confirmPassword;
+      await auxiliary('Request review', () => db.from('access_requests').update({data:reviewedRequest,updated_at:new Date().toISOString()}).eq('id',requestRow!.id));
     }
-
-    if (action === "approve_request") {
-      const requestId = String(body.requestId ?? "").trim();
-      const requestedRole = String(body.role ?? "System Staff").trim() || "System Staff";
-      if (!requestId) return json({ error: "requestId is required." }, 400);
-
-      const { data: requestRow, error: requestError } = await adminClient
-        .from("access_requests")
-        .select("id,data")
-        .eq("id", requestId)
-        .single();
-      if (requestError) throw requestError;
-
-      const requestData = requestRow.data ?? {};
-      const userId = String(body.userId ?? requestData.uid ?? "").trim();
-      if (!userId) return json({ error: "The request is not linked to a Supabase Auth user." }, 400);
-
-      const { error: confirmError } = await adminClient.auth.admin.updateUserById(userId, {
-        email_confirm: true,
-        ban_duration: "none",
-        user_metadata: {
-          full_name: requestData.fullName ?? requestData.name ?? "",
-          username: requestData.username ?? String(requestData.email ?? "").split("@")[0]
-        }
-      });
-      if (confirmError) throw confirmError;
-
-      const profilePatch = {
-        full_name: requestData.fullName ?? requestData.name ?? "",
-        email: String(requestData.email ?? "").toLowerCase(),
-        username: requestData.username ?? String(requestData.email ?? "").split("@")[0],
-        contact: requestData.contact ?? "",
-        position: requestData.position ?? "",
-        division: requestData.division ?? "",
-        role: requestedRole,
-        account_type: ADMIN_ROLES.has(cleanRole(requestedRole)) ? "Administrator" : "Standard User",
-        status: "Active",
-        is_active: true,
-        updated_at: new Date().toISOString()
-      };
-
-      const { data: profile, error: profileSaveError } = await adminClient
-        .from("profiles")
-        .update(profilePatch)
-        .eq("user_id", userId)
-        .select()
-        .single();
-      if (profileSaveError) throw profileSaveError;
-
-      const nextRequest = {
-        ...requestData,
-        role: requestedRole,
-        accountType: profilePatch.account_type,
-        status: "Approved",
-        approvedAt: new Date().toISOString(),
-        approvedBy: callerProfile.email ?? authData.user.email ?? "System Administrator"
-      };
-      delete nextRequest.password;
-      delete nextRequest.confirmPassword;
-
-      const { error: requestSaveError } = await adminClient
-        .from("access_requests")
-        .update({ data: nextRequest, updated_at: new Date().toISOString() })
-        .eq("id", requestId);
-      if (requestSaveError) throw requestSaveError;
-
-      await syncLegacyRegistry(profile);
-      await writeAudit("APPROVE_ACCOUNT_REQUEST", profile.email ?? userId, {
-        requestId,
-        role: requestedRole
-      });
-      return json({ ok: true, user: profile, request: nextRequest });
-    }
-
-    if (action === "reject_request") {
-      const requestId = String(body.requestId ?? "").trim();
-      if (!requestId) return json({ error: "requestId is required." }, 400);
-
-      const { data: requestRow, error: requestError } = await adminClient
-        .from("access_requests")
-        .select("id,data")
-        .eq("id", requestId)
-        .single();
-      if (requestError) throw requestError;
-
-      const requestData = requestRow.data ?? {};
-      const userId = String(body.userId ?? requestData.uid ?? "").trim();
-      const reason = String(body.reason ?? "Request declined").trim();
-      const remarks = String(body.remarks ?? "").trim();
-
-      if (userId) {
-        const { error: banError } = await adminClient.auth.admin.updateUserById(userId, {
-          ban_duration: "876000h"
-        });
-        if (banError) throw banError;
-
-        await adminClient
-          .from("profiles")
-          .update({
-            status: "Rejected",
-            is_active: false,
-            updated_at: new Date().toISOString()
-          })
-          .eq("user_id", userId);
-
-        await adminClient.from("users").delete().eq("id", userId);
-        await adminClient.from("admins").delete().eq("id", userId);
-      }
-
-      const nextRequest = {
-        ...requestData,
-        status: "Rejected",
-        declineReason: reason,
-        declineRemarks: remarks,
-        declinedAt: new Date().toISOString(),
-        declinedBy: callerProfile.email ?? authData.user.email ?? "System Administrator"
-      };
-      delete nextRequest.password;
-      delete nextRequest.confirmPassword;
-
-      const { error: requestSaveError } = await adminClient
-        .from("access_requests")
-        .update({ data: nextRequest, updated_at: new Date().toISOString() })
-        .eq("id", requestId);
-      if (requestSaveError) throw requestSaveError;
-
-      await writeAudit("DECLINE_ACCOUNT_REQUEST", requestData.email ?? userId ?? requestId, {
-        requestId,
-        reason,
-        remarks
-      });
-      return json({ ok: true, request: nextRequest });
-    }
-
-    return json({ error: `Unsupported admin action: ${action || "(empty)"}` }, 400);
+    await audit(String(action).toUpperCase(),saved);
+    return respond({ success: true, user: saved, request: reviewedRequest, warnings });
   } catch (error) {
-    console.error("admin-users error:", error);
-    return json({ error: error instanceof Error ? error.message : "Unexpected server error." }, 500);
+    const known = error instanceof HttpError;
+    if (!known) console.error('Account service error:', error instanceof Error ? error.name : 'unknown');
+    return respond({ success: false, error: known ? error.message : 'The account service could not complete this action. Refresh and retry.' }, known ? error.status : 500);
   }
 });

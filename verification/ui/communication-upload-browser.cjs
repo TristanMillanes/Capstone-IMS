@@ -136,7 +136,7 @@ async function run(name,fn){await fn();scenarios.push({scenario:name,result:'PAS
  await run('Profile-based administrator guard blocks direct writes after role change',async()=>{
   const {page,context}=await open('communicationType',1440);
   const result=await page.evaluate(async()=>{
-   window.__db.profiles[0].role='System Staff';window.__db.profiles[0].account_type='USER';
+   window.__db.profiles[0].role='User';window.__db.profiles[0].account_type='USER';
    const before=window.__mutations.length;
    try{await window.PGENRO_Module.write('communications',{type:'Incoming',subject:'Blocked'});return {blocked:false};}
    catch(error){return {blocked:error.code==='PGENRO_ADMIN_REQUIRED',message:error.message,writes:window.__mutations.length-before};}
