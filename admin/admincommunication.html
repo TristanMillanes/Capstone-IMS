@@ -1,576 +1,871 @@
 <!DOCTYPE html>
 
 <html data-css-scope="admin-communication" lang="en">
+
 <head>
-<!-- Optional OCR service. Start OCR.py for full local extraction. Browser fallback is automatic. -->
+
+<!-- Start User/OCR.py. /ocr works behind a reverse proxy. For another host, set this meta URL to that server's /ocr endpoint. Localhost pages also try http://127.0.0.1:5000/ocr. -->
+
 <meta content="/ocr" name="pgenro-ocr-endpoint"/>
+
 <meta charset="utf-8"/>
+<meta content="20261012-general-sender-v11" name="pgenro-communication-build"/>
+
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+
 <title>PGENRO IMS | Communications Log Admin</title>
+
 <meta content="#f5f7f8" name="theme-color"/>
+
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+
 <!-- Google Fonts -->
+
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
+
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'"/>
+
 <!-- Lucide Icons -->
-<!-- Icons are rendered locally by this module. -->
+
+<!-- Inline SVG icons remain visible while scripts or the database are loading. -->
+
 <!-- External Stylesheets -->
-<link href="admincommunication.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+
+<link href="admincommunication.css?v=20261012-general-sender-v11" rel="stylesheet"/>
+
 </head>
+
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin">
+
 <div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+
 <div class="app-layout">
+
 <!-- SIDEBAR NAVIGATION -->
+
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
+
 <div class="sidebar-header">
+
 <a class="logo-area" href="admin.html">
+
 <div class="logo-icon">
+
 <img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
+
 </div>
+
 <div class="logo-text">
+
 <h2>PGENRO IMS</h2>
+
 <span>Administrative workspace</span>
+
 </div>
+
 </a>
 
-<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="x" class="lucide lucide-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div>
+
 <nav aria-label="Administrator navigation" class="sidebar-nav">
+
 <div class="nav-group">
+
 <span class="nav-label">Workspace</span>
+
 <ul>
-<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+
+<li><a class="nav-item" href="admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="layout-dashboard" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Dashboard</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Office operations</span>
+
 <ul>
-<li><a aria-current="page" class="nav-item active" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
-<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
-<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
-<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
-<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
-<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
+
+<li><a aria-current="page" class="nav-item active" href="admincommunication.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="arrow-left-right" class="lucide lucide-arrow-left-right"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg><span>Communications</span></a></li>
+
+<li><a class="nav-item" href="travelOR-admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="briefcase" class="lucide lucide-briefcase"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg><span>Travel Orders</span></a></li>
+
+<li><a class="nav-item" href="officememo-admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="file-text" class="lucide lucide-file-text"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><span>Office Memos</span></a></li>
+
+<li><a class="nav-item" href="employee-admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="users-round" class="lucide lucide-users-round"><path d="M18 21a8 8 0 0 0-16 0"></path><circle cx="10" cy="8" r="5"></circle><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path></svg><span>Employees</span></a></li>
+
+<li><a class="nav-item" href="invetoryadmin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="boxes" class="lucide lucide-boxes"><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path d="M7 16.5v5.17"></path><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path d="M17 16.5v5.17"></path><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path d="M12 13.5V8"></path></svg><span>Inventory</span></a></li>
+
+<li><a class="nav-item" href="visitors-admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="clipboard-check" class="lucide lucide-clipboard-check"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg><span>Visitors</span></a></li>
+
+<li><a class="nav-item" href="serviceAdmin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="wrench" class="lucide lucide-wrench"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg><span>Service Requests</span></a></li>
+
+<li><a class="nav-item" href="ics-admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="file-check-2" class="lucide lucide-file-check-2"><path d="M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="m14 20 2 2 4-4"></path></svg><span>Property slips</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Administration</span>
+
 <ul>
-<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
+
+<li><a class="nav-item" href="Usermanagement.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="user-cog" class="lucide lucide-user-cog"><path d="M10 15H6a4 4 0 0 0-4 4v2"></path><path d="m14.305 16.53.923-.382"></path><path d="m15.228 13.852-.923-.383"></path><path d="m16.852 12.228-.383-.923"></path><path d="m16.852 17.772-.383.924"></path><path d="m19.148 12.228.383-.923"></path><path d="m19.53 18.696-.382-.924"></path><path d="m20.772 13.852.924-.383"></path><path d="m20.772 16.148.924.383"></path><circle cx="18" cy="15" r="3"></circle><circle cx="9" cy="7" r="4"></circle></svg><span>User Management</span></a></li>
+
+<li><a class="nav-item" href="requestacc.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="user-plus" class="lucide lucide-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" x2="19" y1="8" y2="14"></line><line x1="22" x2="16" y1="11" y2="11"></line></svg><span>Account Requests</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Workspace tools</span>
+
 <ul>
-<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
-<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
-<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
+
+<li><a class="nav-item" href="audittrail-admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="shield-alert" class="lucide lucide-shield-alert"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span>Audit trail</span></a></li>
+
+<li><a class="nav-item" href="backup-admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="database-backup" class="lucide lucide-database-backup"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 12a9 3 0 0 0 5 2.69"></path><path d="M21 9.3V5"></path><path d="M3 5v14a9 3 0 0 0 6.47 2.88"></path><path d="M12 12v4h4"></path><path d="M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"></path></svg><span>Backups</span></a></li>
+
+<li><a class="nav-item" href="admin.html#settings"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="settings" class="lucide lucide-settings"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Preferences</span></a></li>
+
 </ul>
+
 </div>
+
 </nav>
-<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+
+<div class="sidebar-workspace-note"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="leaf" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+
 </aside>
+
 <div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+
 <!-- MAIN WRAPPER -->
+
 <div class="main-wrapper">
+
 <!-- TOPBAR -->
+
 <header class="topbar">
+
 <div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-<i data-lucide="panel-left-close"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="panel-left-close" class="lucide lucide-panel-left-close"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m16 15-3-3 3-3"></path></svg>
+
 <span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-<i data-lucide="menu"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="menu" class="lucide lucide-menu"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+
 </button>
-<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Communications</span></a>
+
+<a class="topbar-module" href="admin.html" title="Open dashboard"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="leaf" class="lucide lucide-leaf"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Communications</span></a>
 
 <div class="global-search" role="search">
-<i class="search-icon" data-lucide="search"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-search search-icon" data-lucide="search"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+
 <input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search communication records…" spellcheck="false" type="text"/>
-<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="layout-dashboard" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Modules</span><kbd>K</kbd></button>
+
 <!-- Search Quick Palette -->
+
 </div>
+
 </div>
+
 <div class="topbar-right">
-<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
+
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="moon" class="lucide lucide-moon"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button>
+
 <!-- Notification Button & Drawer -->
+
 <div class="notification-wrapper">
+
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
-<i data-lucide="bell"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="bell" class="lucide lucide-bell"><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
+
 <span class="notification-ping" id="notifPing" style="display: none;"></span>
+
 </button>
+
 <div class="notification-dropdown" id="notificationDropdown">
+
 <div class="notification-header">
+
 <h3>Notifications</h3>
+
 <span class="badge-count" id="notifBadgeCount">0 Unread</span>
+
 </div>
+
 <div class="notification-list" id="notificationList">
+
 <div class="empty-notif-state">No new notifications</div>
+
 </div>
+
 </div>
+
 </div>
+
 <div class="v-divider"></div>
+
 <!-- Profile Menu -->
+
 <div class="profile-menu" id="profileMenu">
+
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
-<div class="profile-avatar"><i data-lucide="user-round"></i></div>
-<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+
+<div class="profile-avatar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="user-round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg></div>
+
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-down profile-chevron" data-lucide="chevron-down"><path d="m6 9 6 6 6-6"></path></svg>
+
 </button>
+
 <div class="profile-dropdown" id="profileDropdown">
+
 <div class="profile-dropdown-header">
-<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+
+<div class="profile-avatar big"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="user-round" class="lucide lucide-user-round"><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg></div>
+
 <div class="profile-dropdown-copy">
+
 <h3 id="dropdownUserName">PGENRO Admin</h3>
+
 <p id="dropdownUserEmail">Administrator Session</p>
+
 <span class="role-badge" id="dropdownUserRole">Administrator</span>
+
 </div>
+
 </div>
+
 <div class="dropdown-links">
-<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
-<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
-<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
-<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
+
+<a href="admin.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="layout-dashboard" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Executive Dashboard</span></a>
+
+<a href="Usermanagement.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="users" class="lucide lucide-users"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><span>User Management</span></a>
+
+<a href="requestacc.html"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="user-check" class="lucide lucide-user-check"><path d="m16 11 2 2 4-4"></path><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg><span>Account Requests</span></a>
+
+<a href="admin.html#settings"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="settings" class="lucide lucide-settings"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Workspace Preferences</span></a>
+
 </div>
+
 <div class="dropdown-footer">
-<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+
+<button class="logout-btn" id="logoutBtn" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="log-out" class="lucide lucide-log-out"><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path></svg><span>Sign Out</span></button>
+
 </div>
+
 </div>
+
 </div>
+
 </div>
+
 </header>
+
 <!-- MAIN CONTENT -->
+
 <main class="main-content" id="adminMainContent" tabindex="-1">
+
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
+
 <!-- BREADCRUMB & HEADER -->
+
 <section class="page-header communication-page-header depth-hero">
+
 <div class="header-title">
-<div aria-hidden="true" class="page-heading-mark"><i data-lucide="arrow-left-right"></i></div>
+
+<div aria-hidden="true" class="page-heading-mark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="arrow-left-right" class="lucide lucide-arrow-left-right"><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg></div>
+
 <div class="breadcrumb">
+
 <span>Admin Console</span>
-<i data-lucide="chevron-right"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="chevron-right" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg>
+
 <span class="active">Communications Log</span>
+
 </div>
+
 <h1>Communications</h1>
+
 <p>Keep incoming and outgoing documents organized, searchable, and easy to follow.</p>
+
 </div>
+
 <div class="header-actions communication-header-actions">
+
 <button class="btn btn-secondary" id="exportCommunicationsBtn" title="Export the currently filtered records to CSV" type="button">
-<i data-lucide="download"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="download" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>
+
 <span>Export CSV</span>
+
 </button>
+
 <button class="btn btn-secondary" id="syncCommunicationsBtn" title="Refresh records from Supabase" type="button">
-<i data-lucide="refresh-cw"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="refresh-cw" class="lucide lucide-refresh-cw"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M8 16H3v5"></path></svg>
+
 <span>Refresh</span>
+
 </button>
+
 <button class="btn btn-primary" id="openEncodingModalBtn" type="button">
-<i data-lucide="plus-circle"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="plus-circle" class="lucide lucide-plus-circle"><circle cx="12" cy="12" r="10"></circle><path d="M8 12h8"></path><path d="M12 8v8"></path></svg>
+
 <span>New Communication</span>
+
 </button>
+
 </div>
+
 <div aria-hidden="true" class="depth-scene">
+
 <span class="depth-orbit"></span><span class="depth-orb"></span>
+
 <div class="depth-stack">
+
 <span class="depth-sheet depth-sheet-back"></span>
+
 <span class="depth-sheet depth-sheet-middle"></span>
+
 <span class="depth-sheet depth-sheet-front">
+
 <span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
+
 <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
+
 </span>
+
 </div><span class="depth-scene-dot"></span>
+
 </div>
+
 </section>
+
 <!-- KPI SUMMARY GRID -->
+
 <section class="kpi-grid">
+
 <div class="kpi-card">
+
 <div class="kpi-header">
+
 <span class="kpi-label">Total Communications</span>
-<div class="kpi-icon emerald"><i data-lucide="database"></i></div>
+
+<div class="kpi-icon emerald"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="database" class="lucide lucide-database"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 5V19A9 3 0 0 0 21 19V5"></path><path d="M3 12A9 3 0 0 0 21 12"></path></svg></div>
+
 </div>
+
 <div class="kpi-body">
+
 <h3 class="counter" id="kpiTotalRecords">0</h3>
-<span class="kpi-trend positive"><i data-lucide="layers"></i> Total Registered</span>
+
+<span class="kpi-trend positive"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="layers" class="lucide lucide-layers"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"></path><path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"></path><path d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"></path></svg> Total Registered</span>
+
 </div>
+
 </div>
+
 <div class="kpi-card">
+
 <div class="kpi-header">
+
 <span class="kpi-label">Incoming Letters</span>
-<div class="kpi-icon blue"><i data-lucide="arrow-down-left"></i></div>
+
+<div class="kpi-icon blue"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="arrow-down-left" class="lucide lucide-arrow-down-left"><path d="M17 7 7 17"></path><path d="M17 17H7V7"></path></svg></div>
+
 </div>
+
 <div class="kpi-body">
+
 <h3 class="counter" id="kpiIncomingCount">0</h3>
-<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> External &amp; Internal</span>
+
+<span class="kpi-trend positive"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="check-circle-2" class="lucide lucide-check-circle-2"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg> External &amp; Internal</span>
+
 </div>
+
 </div>
+
 <div class="kpi-card">
+
 <div class="kpi-header">
+
 <span class="kpi-label">Outgoing Letters</span>
-<div class="kpi-icon purple"><i data-lucide="arrow-up-right"></i></div>
+
+<div class="kpi-icon purple"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="arrow-up-right" class="lucide lucide-arrow-up-right"><path d="M7 7h10v10"></path><path d="M7 17 17 7"></path></svg></div>
+
 </div>
+
 <div class="kpi-body">
+
 <h3 class="counter" id="kpiOutgoingCount">0</h3>
-<span class="kpi-trend positive"><i data-lucide="send"></i> Released Docs</span>
+
+<span class="kpi-trend positive"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="send" class="lucide lucide-send"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg> Released Docs</span>
+
 </div>
+
 </div>
+
 <div class="kpi-card urgent-border">
+
 <div class="kpi-header">
+
 <span class="kpi-label">Pending Action</span>
-<div class="kpi-icon amber"><i data-lucide="clock"></i></div>
+
+<div class="kpi-icon amber"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="clock" class="lucide lucide-clock"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg></div>
+
 </div>
+
 <div class="kpi-body">
+
 <h3 class="counter" id="kpiPendingCount">0</h3>
-<span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Needs Resolution</span>
+
+<span class="kpi-trend urgent"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="alert-circle" class="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg> Needs Resolution</span>
+
 </div>
+
 </div>
+
 </section>
+
 <!-- DATA TABLE CARD -->
+
 <section aria-labelledby="recordsTitle" class="card communication-records">
+
 <div class="communication-table-tools">
+
 <div aria-label="Filter by communication direction" class="filter-tab-bar" role="group">
+
 <button aria-pressed="true" class="filter-tab active" data-type="All" type="button">All records</button>
+
 <button aria-pressed="false" class="filter-tab" data-type="Incoming" type="button">Incoming</button>
+
 <button aria-pressed="false" class="filter-tab" data-type="Outgoing" type="button">Outgoing</button>
+
 </div>
+
 <div class="section-header communication-section-header">
+
 <div>
+
 <h2 id="recordsTitle">Document Records</h2>
+
 <p>Search and filter your communication records.</p>
+
 </div>
+
 <div class="table-actions">
+
 <select aria-label="Filter records by status" class="input-sm communication-status-filter" id="statusFilter">
+
 <option value="All">All Statuses</option>
+
 <option value="Pending">Pending</option>
+
 <option value="Received">Received</option>
+
 <option value="Forwarded">Forwarded</option>
+
 <option value="Released">Released</option>
+
 <option value="Archived">Archived</option>
+
 </select>
+
 <input aria-label="Search document records" class="input-sm" id="tableSearchInput" placeholder="Search table..." type="text"/>
+
 </div>
+
 </div>
+
 </div>
+
 <div aria-live="polite" class="communication-bulk-bar" hidden="" id="bulkSelectionBar">
+
 <div class="communication-bulk-summary">
-<i data-lucide="list-checks"></i>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="list-checks" class="lucide lucide-list-checks"><path d="M13 5h8"></path><path d="M13 12h8"></path><path d="M13 19h8"></path><path d="m3 17 2 2 4-4"></path><path d="m3 7 2 2 4-4"></path></svg>
+
 <strong id="selectedCountText">0 records selected</strong>
+
 </div>
+
 <div class="communication-bulk-actions">
+
 <button class="btn btn-sm btn-secondary" id="bulkArchiveBtn" type="button">
-<i data-lucide="archive"></i><span>Archive Selected</span>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="archive" class="lucide lucide-archive"><rect width="20" height="5" x="2" y="3" rx="1"></rect><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path><path d="M10 12h4"></path></svg><span>Archive Selected</span>
+
 </button>
+
 <button class="btn btn-sm btn-danger" id="bulkDeleteBtn" type="button">
-<i data-lucide="trash-2"></i><span>Delete Selected</span>
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="trash-2" class="lucide lucide-trash-2"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><span>Delete Selected</span>
+
 </button>
+
 <button class="btn btn-sm btn-secondary" id="clearSelectionBtn" type="button">Clear</button>
+
 </div>
+
 </div>
+
 <div aria-label="Communication records; scroll horizontally for more columns" class="table-responsive" role="region" tabindex="0">
+
 <table class="data-table">
+
 <thead>
+
 <tr>
+
 <th width="40"><input aria-label="Select all visible records" id="selectAllRows" type="checkbox"/></th>
+
 <th>Control No. &amp; Type</th>
+
 <th>Date</th>
+
 <th>Office</th>
+
 <th>Subject / Particulars</th>
+
 <th>Attachment</th>
+
 <th>Status</th>
+
 <th class="communication-actions-column" width="130">Actions</th>
+
 </tr>
+
 </thead>
+
 <tbody id="communicationTableBody">
+
 <tr>
+
 <td class="empty-table-cell" colspan="8">Loading communication records...</td>
+
 </tr>
+
 </tbody>
+
 </table>
+
 </div>
+
 <div class="table-footer">
+
 <span class="text-muted" id="tablePaginationInfo">Showing 0 entries</span>
+
 <div class="pagination"><button aria-label="Previous page" class="page-btn" id="commPrevPage" type="button">Previous</button><span id="commPageLabel">Page 1 of 1</span><button aria-label="Next page" class="page-btn" id="commNextPage" type="button">Next</button></div></div>
+
 </section>
+
 <!-- FOOTER -->
+
 <footer class="admin-footer">
+
 <div>
+
 <p>© 2026 Provincial Government Environment and Natural Resources Office (PGENRO).</p>
+
 </div>
+
 <div class="footer-links">
+
 <a href="audittrail-admin.html">Security &amp; Audit</a>
+
 <a href="admin.html#settings">Workspace Preferences</a>
+
 <a href="backup-admin.html">Backup &amp; Recovery</a>
+
 </div>
+
 </footer>
+
 <footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
+
 </main>
+
 </div>
+
 </div>
-<!-- ENCODING & DIRECT GOOGLE DRIVE UPLOAD MODAL -->
-<div aria-hidden="true" class="modal-overlay" id="encodingModal">
-<div aria-labelledby="modalTitle" aria-modal="true" class="modal-container communication-encoding-modal" role="dialog">
-<div class="modal-header communication-modal-header">
-<div class="communication-modal-heading">
-<div aria-hidden="true" class="communication-modal-icon">
-<i data-lucide="file-text"></i>
+
+<!-- Communication encoder. OCR starts on selection; saving remains an explicit action. -->
+<div class="modal-overlay" id="encodingModal" aria-hidden="true">
+  <div class="modal-container communication-encoding-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <header class="modal-header communication-modal-header">
+      <div class="communication-modal-heading">
+        <div class="communication-modal-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="file-text" class="lucide lucide-file-text"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></div>
+        <div class="communication-modal-copy">
+          <span class="encoder-eyebrow">Communications workspace</span>
+          <h2 id="modalTitle">New Communication Record</h2>
+          <p>Upload a document, review the detected details, then save.</p>
+        </div>
+      </div>
+      <button class="modal-close-btn" id="closeEncodingModalBtn" type="button" aria-label="Close communication form"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="x" class="lucide lucide-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+    </header>
+    <form id="communicationForm">
+      <div class="modal-body communication-modal-body" id="encodingModalBody">
+        <input id="editIndex" type="hidden" value=""/>
+        <aside class="encoder-document-column" aria-label="Document and automatic reading">
+          <section class="encoder-upload-panel" aria-labelledby="uploadPanelTitle">
+            <div class="encoder-upload-header">
+              <div class="encoder-upload-title-wrap">
+                <div class="encoder-upload-icon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="scan-text" class="lucide lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 8h8"></path><path d="M7 12h10"></path><path d="M7 16h6"></path></svg></div>
+                <div><span class="encoder-eyebrow">01 · Upload</span><h3 id="uploadPanelTitle">Read your document</h3></div>
+              </div>
+              <span class="encoder-auto-chip">Automatic</span>
+            </div>
+            <p class="encoder-upload-description">All pages are read. Detected details fill the form without replacing your manual edits.</p>
+            <div class="encoder-upload-workspace" id="filePickerState">
+              <div class="encoder-file-picker" id="communicationDropZone">
+                <div class="encoder-file-icon" id="filePickerIcon" aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="file-up" class="lucide lucide-file-up"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M12 12v6"></path><path d="m15 15-3-3-3 3"></path></svg></div>
+                <div class="encoder-file-copy">
+                  <strong id="fileNameDisplay">Choose a document</strong>
+                  <span id="fileMetaDisplay">PDF, images, Word, Excel, PowerPoint or text · Max 50 MB</span>
+                  <div class="encoder-file-actions">
+                    <input id="documentFileInput" class="document-file-input" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff,.docx,.txt,.csv,.xlsx,.pptx" aria-label="Attach a document for automatic reading"/>
+                    <button id="browseDocumentBtn" class="file-picker-button" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="folder-open" class="lucide lucide-folder-open"><path d="m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"></path></svg><span>Browse file</span></button>
+                    <button id="removeDocumentBtn" class="file-picker-button remove-btn" type="button" style="display:none"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="trash-2" class="lucide lucide-trash-2"><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg><span>Remove</span></button>
+                  </div>
+                  <small class="encoder-drop-hint">Or drop one document here</small>
+                </div>
+              </div>
+              <div class="encoder-ocr-action">
+                <div class="encoder-reader-heading"><span class="encoder-reader-dot" aria-hidden="true"></span><strong id="ocrStateLabel" role="status" aria-live="polite">Ready for a document</strong></div>
+                <p id="ocrActionSubtext">Reading starts automatically when you select a file.</p>
+                <div class="encoder-reader-buttons">
+                  <button class="btn-ocr" id="runOcrBtn" type="button" disabled><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="scan-text" class="lucide lucide-scan-text"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><path d="M7 8h8"></path><path d="M7 12h10"></path><path d="M7 16h6"></path></svg><span>Read again</span></button>
+                  <div class="ocr-stop-controls" id="ocrStopControls" hidden><button class="file-picker-button" id="cancelOcrBtn" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="x" class="lucide lucide-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg><span>Stop reading</span></button></div>
+                </div>
+              </div>
+            </div>
+            <div class="upload-progress-box" id="encodingUploadProgressBox">
+              <div class="upload-progress-copy"><span class="upload-status-text" id="encodingUploadStatusText" role="status" aria-live="polite">Preparing document…</span><span class="upload-progress-hint">You can edit or replace the file.</span></div>
+              <div class="progress-bar-sm" id="communicationOcrProgress" role="progressbar" aria-label="Document reading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="fill emerald" id="encodingProgressBar" style="width:0%"></div></div>
+            </div>
+            <div class="file-preview-card" id="filePreviewContainer" style="display:none">
+              <div class="file-preview-header">
+                <div class="file-preview-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="eye" class="lucide lucide-eye"><path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Document preview</span><span class="preview-badge" id="previewBadge">READY</span></div>
+                <div class="file-preview-actions"><a class="btn btn-sm btn-secondary" id="previewOpenExternalBtn" href="#" target="_blank" rel="noopener noreferrer" style="display:none"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="external-link" class="lucide lucide-external-link"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg><span>Open file</span></a></div>
+              </div>
+              <div class="file-preview-body" id="filePreviewBody"></div>
+            </div>
+          </section>
+          <section class="encoder-review-panel" aria-label="Reading summary">
+            <span class="encoder-eyebrow">Detection summary</span>
+            <p id="communicationInlineNotice" class="encoder-inline-notice" role="status" aria-live="polite" hidden></p>
+            <p id="ocrFieldSummary" role="status" aria-live="polite">Detected fields will appear here after reading.</p>
+            <p class="ocr-review-note" id="communicationOcrReview" role="status" hidden></p>
+            <div class="form-group" id="ocrSignatoryGroup" hidden>
+              <label for="ocrSignatorySelect">Choose the sender / signatory</label>
+              <select class="form-control" id="ocrSignatorySelect"><option value="">Choose the originating person…</option></select>
+              <small>Confirm the originating person against the printed name. Uncertain names require your selection; handwriting alone may need manual entry.</small>
+            </div>
+          </section>
+        </aside>
+        <div class="encoder-fields-column">
+          <section class="encoder-section encoder-details-section" aria-labelledby="communicationDetailsHeading">
+            <div class="encoder-section-heading"><div><span class="encoder-eyebrow">02 · Review</span><h3 id="communicationDetailsHeading">Record details</h3></div><span class="encoder-required-note"><span>*</span> Required</span></div>
+            <p class="document-destination" id="documentDestination" role="status" aria-live="polite">Save destination: Communications.</p>
+            <p class="communication-memo-review" id="communicationMemoReview" role="status" hidden></p>
+            <div class="form-grid encoder-meta-grid">
+              <div class="form-group"><label for="typeSelect">Communication type <span class="required-mark">*</span></label><select class="form-control" id="typeSelect" required><option value="">Select type</option><option value="Incoming">Incoming</option><option value="Outgoing">Outgoing</option></select></div>
+              <div class="form-group"><label for="controlNoInput"><span id="controlFieldLabel">Control number</span> <span class="required-mark">*</span></label><input class="form-control" id="controlNoInput" type="text" placeholder="Printed number or generated reference" required/><small class="field-hint">A reference is generated when no printed number is found.</small></div>
+              <div class="form-group"><label for="docTypeSelect">Document type <span class="required-mark">*</span></label><select class="form-control" id="docTypeSelect" required><option value="">Select document type</option><option value="Office Order">Office Order</option><option value="Special Order">Special Order</option><option value="Travel Order">Travel Order</option><option value="Memorandum">Memorandum</option><option value="Request Letter">Request Letter</option><option value="Endorsement Letter">Endorsement Letter</option><option value="Transmittal Letter">Transmittal Letter</option><option value="Response Letter">Response Letter</option><option value="Notice of Meeting">Notice of Meeting</option><option value="Invitation">Invitation</option><option value="Report">Report</option><option value="Letter">Letter</option><option value="Other Communication">Other Communication</option></select></div>
+              <div class="form-group"><label for="dateInput"><span id="dateFieldLabel">Date received</span> <span class="required-mark">*</span></label><input class="form-control" id="dateInput" type="date" required/></div>
+              <div class="form-group"><label for="statusSelect">Status <span class="required-mark">*</span></label><select class="form-control" id="statusSelect" required><option value="">Select status</option><option value="Pending">Pending</option><option value="Received">Received</option><option value="Forwarded">Forwarded</option><option value="Released">Released</option><option value="Archived">Archived</option></select></div>
+            </div>
+          </section>
+          <section class="encoder-section encoder-content-section" aria-labelledby="communicationContentHeading">
+            <div class="encoder-section-heading"><div><h3 id="communicationContentHeading">People and particulars</h3><p>Confirm the details against the attached document.</p></div></div>
+            <div class="form-grid encoder-content-grid">
+              <div class="form-group full-width"><label for="officeInput"><span id="officeFieldLabel">Received from</span> <span class="required-mark" id="officeRequiredMark">*</span></label><textarea class="form-control compact-textarea" id="officeInput" rows="2" placeholder="Originating person or printed signatory" required></textarea></div>
+              <div class="form-group memo-routing-field" id="memoRecipientGroup" hidden><label for="memoRecipientInput">Addressed to <span class="required-mark">*</span></label><textarea class="form-control compact-textarea" id="memoRecipientInput" rows="2" placeholder="Memo recipient or personnel"></textarea></div>
+              <div class="form-group memo-routing-field" id="memoIssuerGroup" hidden><label for="memoIssuerInput">Issued by</label><input class="form-control" id="memoIssuerInput" type="text" placeholder="Issuing office or signatory"/></div>
+              <div class="form-group full-width"><label for="subjectInput">Subject / particulars <span class="required-mark">*</span></label><textarea class="form-control feature-textarea" id="subjectInput" rows="3" placeholder="Full subject of the communication" required></textarea></div>
+              <div class="form-group"><label for="actionTakenInput">Action taken / date forwarded</label><textarea class="form-control compact-textarea" id="actionTakenInput" rows="2" placeholder="e.g. Forwarded to Admin Division"></textarea></div>
+              <div class="form-group"><label for="remarksInput">Remarks</label><textarea class="form-control compact-textarea" id="remarksInput" rows="2" placeholder="Additional notes (optional)"></textarea></div>
+            </div>
+          </section>
+        </div>
+        <details class="encoder-ocr-result">
+          <summary class="encoder-result-heading"><span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="file-search" class="lucide lucide-file-search"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><circle cx="11.5" cy="14.5" r="2.5"></circle><path d="M13.3 16.3 15 18"></path></svg> Extracted document text</span><span class="ocr-stats-chip" id="ocrStatsChip" style="display:none">0 characters</span></summary>
+          <label for="ocrTextInput" class="encoder-text-label">Review or correct the readable text from every page.</label>
+          <textarea class="form-control ocr-result-textarea" id="ocrTextInput" rows="8" placeholder="Extracted text will appear automatically after reading the file."></textarea>
+        </details>
+      </div>
+      <footer class="modal-actions communication-modal-actions">
+        <div class="modal-action-note"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="shield-check" class="lucide lucide-shield-check"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg><span>Review the detected fields. Your record is saved only when you select Save.</span></div>
+        <div class="modal-action-buttons"><button class="btn btn-secondary" id="cancelEncodingBtn" type="button">Cancel</button><button class="btn btn-primary" id="saveRecordBtn" type="submit"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="cloud-upload" class="lucide lucide-cloud-upload"><path d="M12 13v8"></path><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="m8 17 4-4 4 4"></path></svg><span>Save Record</span></button></div>
+      </footer>
+    </form>
+  </div>
 </div>
-<div class="communication-modal-copy">
-<h2 id="modalTitle">Encoding Communication Record</h2>
-<p>Enter communication details and attach a document for text extraction.</p>
-</div>
-</div>
-<button aria-label="Close encoding form" class="modal-close-btn" id="closeEncodingModalBtn" type="button">
-<i data-lucide="x"></i>
-</button>
-</div>
-<div class="ocr-stop-controls" hidden="" id="ocrStopControls"><button class="btn btn-secondary" id="cancelOcrBtn" type="button">Stop reading</button></div>
-<form id="communicationForm">
-<div class="modal-body communication-modal-body" id="encodingModalBody">
-<input id="editIndex" type="hidden" value=""/>
-<section class="encoder-section encoder-details-section">
-<div class="encoder-section-heading">
-<div>
-<span class="encoder-eyebrow">Communication details</span>
-<h3>Record information</h3>
-</div>
-<span class="encoder-required-note"><span>*</span> Required fields</span>
-</div>
-<p aria-live="polite" class="document-destination" id="documentDestination" role="status">Save destination: Communications.</p>
-<p aria-live="polite" class="communication-memo-review" hidden="" id="communicationMemoReview" role="status"></p>
-<div class="form-grid encoder-meta-grid">
-<div class="form-group">
-<label for="typeSelect"><i data-lucide="arrow-left-right"></i> Communication Type <span class="required-mark">*</span></label>
-<select class="form-control" id="typeSelect" required="">
-<option value="">Select Type</option>
-<option value="Incoming">Incoming</option>
-<option value="Outgoing">Outgoing</option>
-</select>
-</div>
-<div class="form-group">
-<label for="controlNoInput"><i data-lucide="hash"></i> Control No. <span class="required-mark">*</span></label>
-<input class="form-control" id="controlNoInput" placeholder="Enter the printed control number" required="" type="text"/>
-</div>
-<div class="form-group">
-<label for="docTypeSelect"><i data-lucide="files"></i> Document Type <span class="required-mark">*</span></label>
-<select class="form-control" id="docTypeSelect" required="">
-<option value="">Select Document Type</option>
-<option value="Office Order">Office Order</option>
-<option value="Special Order">Special Order</option>
-<option value="Travel Order">Travel Order</option>
-<option value="Memorandum">Memorandum</option>
-<option value="Request Letter">Request Letter</option>
-<option value="Endorsement Letter">Endorsement Letter</option>
-<option value="Transmittal Letter">Transmittal Letter</option>
-<option value="Response Letter">Response Letter</option>
-<option value="Notice of Meeting">Notice of Meeting</option>
-<option value="Invitation">Invitation</option>
-<option value="Report">Report</option>
-<option value="Other Communication">Other Communication</option>
-</select>
-</div>
-<div class="form-group">
-<label for="dateInput"><i data-lucide="calendar-days"></i> Date Received / Released <span class="required-mark">*</span></label>
-<input class="form-control" id="dateInput" required="" type="date"/>
-</div>
-<div class="form-group">
-<label for="statusSelect"><i data-lucide="circle-dot"></i> Status <span class="required-mark">*</span></label>
-<select class="form-control" id="statusSelect" required="">
-<option value="">Select Status</option>
-<option value="Pending">Pending</option>
-<option value="Received">Received</option>
-<option value="Forwarded">Forwarded</option>
-<option value="Released">Released</option>
-<option value="Archived">Archived</option>
-</select>
-</div>
-</div>
-</section>
-<section class="encoder-section encoder-content-section">
-<div class="form-grid encoder-content-grid">
-<div class="form-group full-width">
-<label for="officeInput"><i data-lucide="building-2"></i> Received From / Recipient Office <span class="required-mark">*</span></label>
-<textarea class="form-control compact-textarea" id="officeInput" placeholder="e.g. Juan Dela Cruz (sender/signatory) or recipient office" required=""></textarea>
-</div>
-<div class="form-group memo-routing-field" hidden="" id="memoRecipientGroup">
-<label for="memoRecipientInput">Addressed To <span class="required-mark">*</span></label>
-<textarea class="form-control compact-textarea" id="memoRecipientInput" placeholder="Memo recipient or personnel"></textarea>
-</div>
-<div class="form-group memo-routing-field" hidden="" id="memoIssuerGroup">
-<label for="memoIssuerInput">Issued By</label>
-<input class="form-control" id="memoIssuerInput" placeholder="Issuing office or signatory" type="text"/>
-</div>
-<div class="form-group">
-<label for="subjectInput"><i data-lucide="file-text"></i> Subject Matter / Particulars <span class="required-mark">*</span></label>
-<textarea class="form-control feature-textarea" id="subjectInput" placeholder="Enter full subject details here..." required=""></textarea>
-</div>
-<div class="form-group">
-<label for="actionTakenInput"><i data-lucide="calendar-check-2"></i> Date Forwarded / Action Taken</label>
-<textarea class="form-control feature-textarea" id="actionTakenInput" placeholder="e.g. Forwarded to Admin Division for review"></textarea>
-</div>
-<div class="form-group full-width">
-<label for="remarksInput"><i data-lucide="message-circle"></i> Remarks</label>
-<textarea class="form-control compact-textarea" id="remarksInput" placeholder="Additional notes or references (optional)..."></textarea>
-</div>
-</div>
-</section>
-<!-- ATTACHMENT & LIVE PREVIEW PANEL -->
-<section aria-labelledby="uploadPanelTitle" class="encoder-upload-panel">
-<div class="encoder-upload-header">
-<div class="encoder-upload-title-wrap">
-<div class="encoder-upload-icon"><i data-lucide="paperclip"></i></div>
-<div>
-<h3 id="uploadPanelTitle">Attach Soft Copy Document</h3>
-<p>Extract document text, then review the detected fields. Memorandums save to Office Memos with their attachment.</p>
-</div>
-</div>
-<div class="gdrive-status-badge">
-<i data-lucide="cloud"></i>
-<span>Browser attachment storage</span>
-</div>
-</div>
-<div class="encoder-upload-workspace" id="filePickerState">
-<div class="encoder-file-picker">
-<div class="encoder-file-icon" id="filePickerIcon"><i data-lucide="file-up"></i></div>
-<div class="encoder-file-copy">
-<strong id="fileNameDisplay">Choose a document file</strong>
-<span id="fileMetaDisplay">PDF, PNG, JPG, JPEG, WEBP, DOCX, TXT • Max 50 MB</span>
-<div class="encoder-file-actions">
-<input accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff,.docx,.txt,.csv,.xlsx,.pptx" class="document-file-input" id="documentFileInput" type="file"/>
-<button class="file-picker-button" id="browseDocumentBtn" type="button">
-<i data-lucide="folder-open"></i>
-<span>Browse File</span>
-</button>
-<button class="file-picker-button remove-btn" id="removeDocumentBtn" style="display: none;" type="button">
-<i data-lucide="trash"></i>
-<span>Remove</span>
-</button>
-</div>
-</div>
-</div>
-<div aria-hidden="true" class="encoder-upload-divider"></div>
-<div class="encoder-ocr-action">
-<button class="btn-ocr" disabled="" id="runOcrBtn" type="button">
-<i data-lucide="scan-text"></i>
-<span>Read Full Document</span>
-</button>
-<p id="ocrActionSubtext">Select a document to read all pages, body text, and the printed signatory.</p>
-</div>
-</div>
-<!-- DYNAMIC LIVE PREVIEW CONTAINER INSIDE ENCODING MODAL -->
-<div class="file-preview-card" id="filePreviewContainer" style="display: none;">
-<div class="file-preview-header">
-<div class="file-preview-title">
-<i data-lucide="eye"></i>
-<span>Attached File Preview</span>
-<span class="preview-badge" id="previewBadge">READY</span>
-</div>
-<div class="file-preview-actions">
-<a class="btn btn-sm btn-secondary" href="#" id="previewOpenExternalBtn" rel="noopener noreferrer" style="display:none;" target="_blank">
-<i data-lucide="external-link"></i>
-<span>Open Full File</span>
-</a>
-</div>
-</div>
-<div class="file-preview-body" id="filePreviewBody"></div>
-</div>
-<div aria-live="polite" class="upload-progress-box" id="encodingUploadProgressBox">
-<div class="upload-progress-copy">
-<span class="upload-status-text" id="encodingUploadStatusText">Processing document...</span>
-<span class="upload-progress-hint">Please keep this dialog open.</span>
-</div>
-<div class="progress-bar-sm"><div class="fill emerald" id="encodingProgressBar" style="width:0%;"></div></div>
-</div>
-</section>
-<!-- OCR RESULT AREA -->
-<p aria-live="polite" class="ocr-review-note" hidden="" id="communicationOcrReview" role="status"></p>
-<div class="form-group" hidden="" id="ocrSignatoryGroup">
-<label for="ocrSignatorySelect">Review detected signatories</label>
-<select class="form-control" id="ocrSignatorySelect"><option value="">Choose the sender / signatory…</option></select>
-<small>Select the person who sent or signed the letter to fill Received From.</small>
-</div>
-<section class="encoder-ocr-result">
-<div class="encoder-result-heading">
-<div>
-<i data-lucide="file-search"></i>
-<span>Extracted Document Text (OCR Result)</span>
-<span class="ocr-stats-chip" id="ocrStatsChip" style="display: none;">0 characters</span>
-</div>
-<span>Review and edit before saving</span>
-</div>
-<textarea class="form-control ocr-result-textarea" id="ocrTextInput" placeholder="Click Read Full Document to extract all readable text from the selected file..."></textarea>
-</section>
-</div>
-<div class="modal-actions communication-modal-actions">
-<div class="modal-action-note">
-<i data-lucide="shield-check"></i>
-<span>Review required fields before saving. Saved attachments are available to approved accounts on any device.</span>
-</div>
-<div class="modal-action-buttons">
-<button class="btn btn-secondary" id="cancelEncodingBtn" type="button">Cancel</button>
-<button class="btn btn-primary" id="saveRecordBtn" type="submit">
-<i data-lucide="cloud-upload"></i>
-<span>Save Record</span>
-</button>
-</div>
-</div>
-</form>
-</div>
-</div>
+
 <!-- VIEW OCR TEXT MODAL -->
+
 <div aria-hidden="true" class="modal-overlay" id="viewOcrModal">
+
 <div aria-labelledby="ocrViewerTitle" aria-modal="true" class="modal-container modal-sm" role="dialog">
+
 <div class="modal-header">
+
 <h2 id="ocrViewerTitle">Extracted Document Text</h2>
+
 <button aria-label="Close extracted text" class="modal-close-btn" id="closeViewOcrModalBtn" type="button">×</button>
+
 </div>
+
 <div class="modal-body">
+
 <p class="ocr-file-name" id="viewOcrFileName"></p>
+
 <textarea class="form-control ocr-content-view" id="viewOcrContent" readonly=""></textarea>
+
 </div>
+
 </div>
+
 </div>
+
 <!-- DEDICATED DOCUMENT VIEWER & DOWNLOAD MODAL -->
+
 <div aria-hidden="true" class="modal-overlay" id="viewDocumentModal">
+
 <div aria-labelledby="docViewerTitle" aria-modal="true" class="modal-container document-viewer-modal-dialog" role="dialog">
+
 <div class="modal-header doc-viewer-header">
+
 <div class="doc-viewer-heading">
-<div class="doc-viewer-icon"><i data-lucide="file-text"></i></div>
+
+<div class="doc-viewer-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="file-text" class="lucide lucide-file-text"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></div>
+
 <div class="doc-viewer-titles"><h2 id="docViewerTitle">Document Viewer</h2><p class="doc-viewer-sub" id="docViewerSubtitle">Document attachment preview</p></div>
+
 </div>
-<button aria-label="Close document viewer" class="modal-close-btn" id="closeDocViewerBtn" type="button"><i data-lucide="x"></i></button>
+
+<button aria-label="Close document viewer" class="modal-close-btn" id="closeDocViewerBtn" type="button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="x" class="lucide lucide-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+
 </div>
+
 <div class="modal-body doc-viewer-body" id="docViewerBody">
+
 <div class="pdf-viewer-box">
+
 <div class="pdf-preview-toolbar" hidden="" id="commPdfToolbar">
+
 <div class="pdf-page-controls"><button aria-label="Previous PDF page" id="commPdfPrevPage" type="button">←</button><span aria-live="polite" id="commPdfPageLabel" role="status">Page 1</span><button aria-label="Next PDF page" id="commPdfNextPage" type="button">→</button></div>
+
 <label for="commPdfZoom">Zoom<select id="commPdfZoom"><option value="fit">Fit width</option><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.25">125%</option><option value="1.5">150%</option><option value="2">200%</option></select></label>
+
 <span class="pdf-preview-status" id="commPdfRenderStatus" role="status"></span>
+
 </div>
+
 <div aria-label="Document preview; scroll to view the page" class="pdf-preview-stage" hidden="" id="commPdfStage" tabindex="0">
+
 <canvas aria-label="PDF page" hidden="" id="commPdfCanvas" role="img"></canvas>
+
 <img alt="Communication attachment" hidden="" id="docViewerImage"/>
+
 <pre hidden="" id="docViewerText"></pre>
+
 </div>
-<div class="doc-viewer-fallback" id="docViewerFallback"><i class="no-pdf-icon" data-lucide="file-text"></i><h3>Attachment preview</h3><p>Preparing the document preview.</p></div>
+
+<div class="doc-viewer-fallback" id="docViewerFallback"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-file-text no-pdf-icon" data-lucide="file-text"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><h3>Attachment preview</h3><p>Preparing the document preview.</p></div>
+
 </div>
+
 </div>
+
 <div class="modal-footer modal-actions">
-<a class="btn btn-secondary" download="document" hidden="" id="docViewerDownloadBtn"><i data-lucide="download"></i>Download Document</a>
-<a class="btn btn-secondary" hidden="" id="docViewerExternalBtn" rel="noopener noreferrer" target="_blank"><i data-lucide="external-link"></i>Open in new tab</a>
+
+<a class="btn btn-secondary" download="document" hidden="" id="docViewerDownloadBtn"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="download" class="lucide lucide-download"><path d="M12 15V3"></path><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><path d="m7 10 5 5 5-5"></path></svg>Download Document</a>
+
+<a class="btn btn-secondary" hidden="" id="docViewerExternalBtn" rel="noopener noreferrer" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="external-link" class="lucide lucide-external-link"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>Open in new tab</a>
+
 <button class="btn btn-primary" id="dismissDocViewerBtn" type="button">Close</button>
+
 </div>
+
 </div>
+
 </div>
+
 <!-- Scripts -->
-<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer="" src="admincommunication.js?v=20261011-navigation-pdf-v2"></script>
+
+<!-- Start the local interface before external database dependencies. -->
+<script defer="" src="admincommunication.js?v=20261012-general-sender-v11"></script>
+
+<!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
+<script id="communicationSupabaseGateway" type="application/json" data-src="../shared/supabase.js?v=20261012-general-sender-v11" data-load-state="pending"></script>
+<script>
+(() => {
+  const marker = document.getElementById('communicationSupabaseGateway');
+  let started = false;
+  function finish(state, eventName) {
+    marker.dataset.loadState = state;
+    marker.dispatchEvent(new Event(eventName));
+    window.dispatchEvent(new Event('pgenro:backend-loaded'));
+  }
+  function loadGateway() {
+    if (started) return;
+    started = true;
+    const gateway = document.createElement('script');
+    gateway.src = marker.dataset.src;
+    gateway.async = true;
+    gateway.onload = () => finish('loaded', 'load');
+    gateway.onerror = () => finish('error', 'error');
+    document.head.append(gateway);
+  }
+  if (window.supabase?.createClient || window.pgenroSupabase || window.PGENRO_DB?.client) {
+    loadGateway();
+  } else {
+    const sdk = document.createElement('script');
+    sdk.id = 'communicationSupabaseSdk';
+    sdk.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+    sdk.async = true;
+    sdk.onload = loadGateway;
+    sdk.onerror = () => finish('error', 'error');
+    document.head.append(sdk);
+  }
+})();
+</script>
+
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
+
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
+
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
+
 <div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+
 <nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
+
 <div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
+
 </div>
+
 </div>
+
 </body>
+
 </html>

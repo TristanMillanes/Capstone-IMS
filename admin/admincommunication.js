@@ -10,6 +10,8 @@
   const uuid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
   function toast(message, type = 'success') {
+    const inline=$('communicationInlineNotice');
+    if(inline&&$('encodingModal')?.classList.contains('open')){inline.textContent=message;inline.dataset.type=type;inline.hidden=false;return;}
     let root = $('toastContainer');
     if (!root) { root = document.createElement('div'); root.id = 'toastContainer'; root.className = 'toast-container'; root.setAttribute('aria-live','polite'); document.body.append(root); }
     const limit = innerWidth <= 600 ? 1 : 3;
@@ -76,6 +78,36 @@
     preferredCommunicationFormat=communicationFormats.get('type')||communicationFormats.values().next().value||preferredCommunicationFormat;
   }
   const client = () => window.pgenroSupabase || window.PGENRO_DB?.client || null;
+  // Presentation starts independently; database actions still wait for the gateway.
+  let backendPromise, backendAnnounced = false;
+  function announceBackend() {
+    if (!backendAnnounced && client()) { backendAnnounced = true; queueMicrotask(() => window.dispatchEvent(new Event('pgenro:backend-ready'))); }
+  }
+  function waitForBackend() {
+    if (client()) { announceBackend(); return Promise.resolve('live'); }
+    const gateway = document.getElementById('communicationSupabaseGateway');
+    if (!gateway) return Promise.resolve('local');
+    if (backendPromise) return backendPromise;
+    backendPromise = new Promise(resolve => {
+      let settled = false, poll;
+      const finish = state => { if (!settled) { settled = true; clearTimeout(poll); clearTimeout(deadline); resolve(state); } };
+      const check = () => {
+        if (client()) {
+          finish('live');
+          announceBackend();
+        } else if (gateway.dataset.loadState === 'error') finish('unavailable');
+        else if (!settled) { clearTimeout(poll); poll = setTimeout(check, 100); }
+      };
+      const deadline = setTimeout(() => finish('unavailable'), 8000);
+      gateway.addEventListener('load', () => { check(); setTimeout(check, 100); });
+      gateway.addEventListener('error', check);
+      window.addEventListener('pgenro:backend-loaded', check);
+      window.addEventListener('focus', check);
+      window.addEventListener('pagehide', event => { if (!event.persisted) finish('unavailable'); });
+      check();
+    });
+    return backendPromise;
+  }
   const unwrap = (row,table=null) => {
     if(!row.data||typeof row.data!=='object'||Array.isArray(row.data))return row;
     const base={...row.data,id:row.id,created_at:row.created_at ?? row.data.created_at,updated_at:row.updated_at ?? row.data.updated_at};
@@ -193,7 +225,7 @@
   }
   async function readAuditShape() { if (!wrapped.has('audit_logs')) { const r = await client().from('audit_logs').select('data').limit(1); wrapped.set('audit_logs',!r.error); } }
   function initShell() {
-    renderIcons(); renderNotifications();
+    renderIcons(); observeIcons(); renderNotifications();
     const sidebar = $('sidebar'); const mobile = $('mobileMenuBtn'); const collapse = $('sidebarCollapseBtn'); const backdrop = $('sidebarBackdrop');
     function closeMobile() { sidebar?.classList.remove('mobile-open'); backdrop?.classList.remove('active'); backdrop?.setAttribute('aria-hidden','true'); document.body.classList.remove('mobile-nav-open'); mobile?.setAttribute('aria-expanded','false'); if (innerWidth <= 900 && sidebar) sidebar.inert = true; }
     function sync() {
@@ -221,31 +253,60 @@
     document.querySelectorAll('.modal-overlay,.modal-backdrop').forEach(m => m.addEventListener('click',e => { if(e.target===m)closeModal(m.id); }));
     const user = storage.get('pgenro_current_user',{}); if($('dropdownUserName'))$('dropdownUserName').textContent=user.fullName||user.full_name||user.name||'PGENRO Admin'; if($('dropdownUserEmail'))$('dropdownUserEmail').textContent=user.email||'Administrator Session';
     if(document.body.dataset.adminPage !== 'admin.html') $('logoutBtn')?.addEventListener('click',async () => {
-      try { if(client()){const result=await client().auth.signOut();if(result?.error)throw result.error;} try{localStorage.removeItem('pgenro_current_user');sessionStorage.removeItem('pgenro_current_user');}catch{} location.href='../User/login.html'; }catch{toast('Sign out failed. Please try again.','error');}
+      try { if(await waitForBackend()==='unavailable')throw new Error('Database connection unavailable.');if(client()){const result=await client().auth.signOut();if(result?.error)throw result.error;} try{localStorage.removeItem('pgenro_current_user');sessionStorage.removeItem('pgenro_current_user');}catch{} location.href='../User/login.html'; }catch{toast('Sign out failed. Please try again.','error');}
     });
   }
   // ICON_MAP is inserted while packaging, from the existing local Lucide subset.
   const icons = {"activity":[["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],"alert-circle":[["circle",{"cx":"12","cy":"12","r":"10"}],["line",{"x1":"12","x2":"12","y1":"8","y2":"12"}],["line",{"x1":"12","x2":"12.01","y1":"16","y2":"16"}]],"alert-triangle":[["path",{"d":"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"}],["path",{"d":"M12 9v4"}],["path",{"d":"M12 17h.01"}]],"archive":[["rect",{"width":"20","height":"5","x":"2","y":"3","rx":"1"}],["path",{"d":"M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"}],["path",{"d":"M10 12h4"}]],"archive-restore":[["rect",{"width":"20","height":"5","x":"2","y":"3","rx":"1"}],["path",{"d":"M4 8v11a2 2 0 0 0 2 2h2"}],["path",{"d":"M20 8v11a2 2 0 0 1-2 2h-2"}],["path",{"d":"m9 15 3-3 3 3"}],["path",{"d":"M12 12v9"}]],"arrow-down-left":[["path",{"d":"M17 7 7 17"}],["path",{"d":"M17 17H7V7"}]],"arrow-left":[["path",{"d":"m12 19-7-7 7-7"}],["path",{"d":"M19 12H5"}]],"arrow-left-right":[["path",{"d":"M8 3 4 7l4 4"}],["path",{"d":"M4 7h16"}],["path",{"d":"m16 21 4-4-4-4"}],["path",{"d":"M20 17H4"}]],"arrow-right":[["path",{"d":"M5 12h14"}],["path",{"d":"m12 5 7 7-7 7"}]],"arrow-up-down":[["path",{"d":"m21 16-4 4-4-4"}],["path",{"d":"M17 20V4"}],["path",{"d":"m3 8 4-4 4 4"}],["path",{"d":"M7 4v16"}]],"arrow-up-right":[["path",{"d":"M7 7h10v10"}],["path",{"d":"M7 17 17 7"}]],"award":[["path",{"d":"m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"}],["circle",{"cx":"12","cy":"8","r":"6"}]],"badge":[["path",{"d":"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"}]],"badge-check":[["path",{"d":"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"}],["path",{"d":"m9 12 2 2 4-4"}]],"bar-chart-3":[["path",{"d":"M3 3v16a2 2 0 0 0 2 2h16"}],["path",{"d":"M18 17V9"}],["path",{"d":"M13 17V5"}],["path",{"d":"M8 17v-3"}]],"bell":[["path",{"d":"M10.268 21a2 2 0 0 0 3.464 0"}],["path",{"d":"M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"}]],"boxes":[["path",{"d":"M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"}],["path",{"d":"m7 16.5-4.74-2.85"}],["path",{"d":"m7 16.5 5-3"}],["path",{"d":"M7 16.5v5.17"}],["path",{"d":"M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"}],["path",{"d":"m17 16.5-5-3"}],["path",{"d":"m17 16.5 4.74-2.85"}],["path",{"d":"M17 16.5v5.17"}],["path",{"d":"M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"}],["path",{"d":"M12 8 7.26 5.15"}],["path",{"d":"m12 8 4.74-2.85"}],["path",{"d":"M12 13.5V8"}]],"briefcase":[["path",{"d":"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"}],["rect",{"width":"20","height":"14","x":"2","y":"6","rx":"2"}]],"briefcase-business":[["path",{"d":"M12 12h.01"}],["path",{"d":"M16 6V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"}],["path",{"d":"M22 13a18.15 18.15 0 0 1-20 0"}],["rect",{"width":"20","height":"14","x":"2","y":"6","rx":"2"}]],"building-2":[["path",{"d":"M10 12h4"}],["path",{"d":"M10 8h4"}],["path",{"d":"M14 21v-3a2 2 0 0 0-4 0v3"}],["path",{"d":"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"}],["path",{"d":"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"}]],"calendar":[["path",{"d":"M8 2v4"}],["path",{"d":"M16 2v4"}],["rect",{"width":"18","height":"18","x":"3","y":"4","rx":"2"}],["path",{"d":"M3 10h18"}]],"calendar-arrow-down":[["path",{"d":"m14 18 4 4 4-4"}],["path",{"d":"M16 2v4"}],["path",{"d":"M18 14v8"}],["path",{"d":"M21 11.354V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7.343"}],["path",{"d":"M3 10h18"}],["path",{"d":"M8 2v4"}]],"calendar-arrow-up":[["path",{"d":"m14 18 4-4 4 4"}],["path",{"d":"M16 2v4"}],["path",{"d":"M18 22v-8"}],["path",{"d":"M21 11.343V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h9"}],["path",{"d":"M3 10h18"}],["path",{"d":"M8 2v4"}]],"calendar-check-2":[["path",{"d":"M8 2v4"}],["path",{"d":"M16 2v4"}],["path",{"d":"M21 14V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8"}],["path",{"d":"M3 10h18"}],["path",{"d":"m16 20 2 2 4-4"}]],"calendar-clock":[["path",{"d":"M16 14v2.2l1.6 1"}],["path",{"d":"M16 2v4"}],["path",{"d":"M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"}],["path",{"d":"M3 10h5"}],["path",{"d":"M8 2v4"}],["circle",{"cx":"16","cy":"16","r":"6"}]],"calendar-days":[["path",{"d":"M8 2v4"}],["path",{"d":"M16 2v4"}],["rect",{"width":"18","height":"18","x":"3","y":"4","rx":"2"}],["path",{"d":"M3 10h18"}],["path",{"d":"M8 14h.01"}],["path",{"d":"M12 14h.01"}],["path",{"d":"M16 14h.01"}],["path",{"d":"M8 18h.01"}],["path",{"d":"M12 18h.01"}],["path",{"d":"M16 18h.01"}]],"calendar-off":[["path",{"d":"M4.2 4.2A2 2 0 0 0 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 1.82-1.18"}],["path",{"d":"M21 15.5V6a2 2 0 0 0-2-2H9.5"}],["path",{"d":"M16 2v4"}],["path",{"d":"M3 10h7"}],["path",{"d":"M21 10h-5.5"}],["path",{"d":"m2 2 20 20"}]],"calendar-range":[["rect",{"width":"18","height":"18","x":"3","y":"4","rx":"2"}],["path",{"d":"M16 2v4"}],["path",{"d":"M3 10h18"}],["path",{"d":"M8 2v4"}],["path",{"d":"M17 14h-6"}],["path",{"d":"M13 18H7"}],["path",{"d":"M7 14h.01"}],["path",{"d":"M17 18h.01"}]],"car-front":[["path",{"d":"m21 8-2 2-1.5-3.7A2 2 0 0 0 15.646 5H8.4a2 2 0 0 0-1.903 1.257L5 10 3 8"}],["path",{"d":"M7 14h.01"}],["path",{"d":"M17 14h.01"}],["rect",{"width":"18","height":"8","x":"3","y":"10","rx":"2"}],["path",{"d":"M5 18v2"}],["path",{"d":"M19 18v2"}]],"chart-no-axes-combined":[["path",{"d":"M12 16v5"}],["path",{"d":"M16 14v7"}],["path",{"d":"M20 10v11"}],["path",{"d":"m22 3-8.646 8.646a.5.5 0 0 1-.708 0L9.354 8.354a.5.5 0 0 0-.707 0L2 15"}],["path",{"d":"M4 18v3"}],["path",{"d":"M8 14v7"}]],"check":[["path",{"d":"M20 6 9 17l-5-5"}]],"check-check":[["path",{"d":"M18 6 7 17l-5-5"}],["path",{"d":"m22 10-7.5 7.5L13 16"}]],"check-circle-2":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"chevron-down":[["path",{"d":"m6 9 6 6 6-6"}]],"chevron-left":[["path",{"d":"m15 18-6-6 6-6"}]],"chevron-right":[["path",{"d":"m9 18 6-6-6-6"}]],"circle-check":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"circle-dot":[["circle",{"cx":"12","cy":"12","r":"10"}],["circle",{"cx":"12","cy":"12","r":"1"}]],"clipboard-check":[["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1","ry":"1"}],["path",{"d":"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"}],["path",{"d":"m9 14 2 2 4-4"}]],"clipboard-list":[["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1","ry":"1"}],["path",{"d":"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"}],["path",{"d":"M12 11h4"}],["path",{"d":"M12 16h4"}],["path",{"d":"M8 11h.01"}],["path",{"d":"M8 16h.01"}]],"clipboard-pen-line":[["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1"}],["path",{"d":"M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-.5"}],["path",{"d":"M16 4h2a2 2 0 0 1 1.73 1"}],["path",{"d":"M8 18h1"}],["path",{"d":"M21.378 12.626a1 1 0 0 0-3.004-3.004l-4.01 4.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"}]],"clock":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6l4 2"}]],"clock-3":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6h4"}]],"cloud":[["path",{"d":"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"}]],"cloud-upload":[["path",{"d":"M12 13v8"}],["path",{"d":"M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"}],["path",{"d":"m8 17 4-4 4 4"}]],"coins":[["path",{"d":"M13.744 17.736a6 6 0 1 1-7.48-7.48"}],["path",{"d":"M15 6h1v4"}],["path",{"d":"m6.134 14.768.866-.5 2 3.464"}],["circle",{"cx":"16","cy":"8","r":"6"}]],"contact":[["path",{"d":"M16 2v2"}],["path",{"d":"M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"}],["path",{"d":"M8 2v2"}],["circle",{"cx":"12","cy":"11","r":"3"}],["rect",{"x":"3","y":"4","width":"18","height":"18","rx":"2"}]],"database":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 5V19A9 3 0 0 0 21 19V5"}],["path",{"d":"M3 12A9 3 0 0 0 21 12"}]],"database-backup":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 12a9 3 0 0 0 5 2.69"}],["path",{"d":"M21 9.3V5"}],["path",{"d":"M3 5v14a9 3 0 0 0 6.47 2.88"}],["path",{"d":"M12 12v4h4"}],["path",{"d":"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"}]],"download":[["path",{"d":"M12 15V3"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}],["path",{"d":"m7 10 5 5 5-5"}]],"edit-3":[["path",{"d":"M13 21h8"}],["path",{"d":"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"}]],"external-link":[["path",{"d":"M15 3h6v6"}],["path",{"d":"M10 14 21 3"}],["path",{"d":"M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"}]],"eye":[["path",{"d":"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"file-badge":[["path",{"d":"M13 22h5a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v3.3"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m7.69 16.479 1.29 4.88a.5.5 0 0 1-.698.591l-1.843-.849a1 1 0 0 0-.879.001l-1.846.85a.5.5 0 0 1-.692-.593l1.29-4.88"}],["circle",{"cx":"6","cy":"14","r":"3"}]],"file-check":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m9 15 2 2 4-4"}]],"file-check-2":[["path",{"d":"M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m14 20 2 2 4-4"}]],"file-plus-2":[["path",{"d":"M11.35 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v5.35"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M14 19h6"}],["path",{"d":"M17 16v6"}]],"file-search":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["circle",{"cx":"11.5","cy":"14.5","r":"2.5"}],["path",{"d":"M13.3 16.3 15 18"}]],"file-spreadsheet":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M8 13h2"}],["path",{"d":"M14 13h2"}],["path",{"d":"M8 17h2"}],["path",{"d":"M14 17h2"}]],"file-text":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],"file-up":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M12 12v6"}],["path",{"d":"m15 15-3-3-3 3"}]],"file-x-2":[["path",{"d":"M11 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v5"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m15 17 5 5"}],["path",{"d":"m20 17-5 5"}]],"files":[["path",{"d":"M15 2h-4a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8"}],["path",{"d":"M16.706 2.706A2.4 2.4 0 0 0 15 2v5a1 1 0 0 0 1 1h5a2.4 2.4 0 0 0-.706-1.706z"}],["path",{"d":"M5 7a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h8a2 2 0 0 0 1.732-1"}]],"flag":[["path",{"d":"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"}]],"folder-open":[["path",{"d":"m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2"}]],"git-branch":[["path",{"d":"M15 6a9 9 0 0 0-9 9V3"}],["circle",{"cx":"18","cy":"6","r":"3"}],["circle",{"cx":"6","cy":"18","r":"3"}]],"hash":[["line",{"x1":"4","x2":"20","y1":"9","y2":"9"}],["line",{"x1":"4","x2":"20","y1":"15","y2":"15"}],["line",{"x1":"10","x2":"8","y1":"3","y2":"21"}],["line",{"x1":"16","x2":"14","y1":"3","y2":"21"}]],"id-card":[["path",{"d":"M16 10h2"}],["path",{"d":"M16 14h2"}],["path",{"d":"M6.17 15a3 3 0 0 1 5.66 0"}],["circle",{"cx":"9","cy":"11","r":"2"}],["rect",{"x":"2","y":"5","width":"20","height":"14","rx":"2"}]],"info":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 16v-4"}],["path",{"d":"M12 8h.01"}]],"landmark":[["path",{"d":"M10 18v-7"}],["path",{"d":"M11.12 2.198a2 2 0 0 1 1.76.006l7.866 3.847c.476.233.31.949-.22.949H3.474c-.53 0-.695-.716-.22-.949z"}],["path",{"d":"M14 18v-7"}],["path",{"d":"M18 18v-7"}],["path",{"d":"M3 22h18"}],["path",{"d":"M6 18v-7"}]],"layers":[["path",{"d":"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"}],["path",{"d":"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"}],["path",{"d":"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"}]],"layers-3":[["path",{"d":"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"}],["path",{"d":"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"}],["path",{"d":"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"}]],"layout-dashboard":[["rect",{"width":"7","height":"9","x":"3","y":"3","rx":"1"}],["rect",{"width":"7","height":"5","x":"14","y":"3","rx":"1"}],["rect",{"width":"7","height":"9","x":"14","y":"12","rx":"1"}],["rect",{"width":"7","height":"5","x":"3","y":"16","rx":"1"}]],"leaf":[["path",{"d":"M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"}],["path",{"d":"M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"}]],"lightbulb":[["path",{"d":"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"}],["path",{"d":"M9 18h6"}],["path",{"d":"M10 22h4"}]],"list-checks":[["path",{"d":"M13 5h8"}],["path",{"d":"M13 12h8"}],["path",{"d":"M13 19h8"}],["path",{"d":"m3 17 2 2 4-4"}],["path",{"d":"m3 7 2 2 4-4"}]],"list-filter":[["path",{"d":"M2 5h20"}],["path",{"d":"M6 12h12"}],["path",{"d":"M9 19h6"}]],"list-filter-x":[["path",{"d":"M3 5h18M6 12h9M9 19h3M17 16l5 5M22 16l-5 5"}]],"loader-2":[["path",{"d":"M21 12a9 9 0 1 1-6.219-8.56"}]],"loader-circle":[["path",{"d":"M21 12a9 9 0 1 1-6.219-8.56"}]],"log-out":[["path",{"d":"m16 17 5-5-5-5"}],["path",{"d":"M21 12H9"}],["path",{"d":"M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"}]],"mail":[["path",{"d":"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"}],["rect",{"x":"2","y":"4","width":"20","height":"16","rx":"2"}]],"map-pin":[["path",{"d":"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"}],["circle",{"cx":"12","cy":"10","r":"3"}]],"map-pinned":[["path",{"d":"M18 8c0 3.613-3.869 7.429-5.393 8.795a1 1 0 0 1-1.214 0C9.87 15.429 6 11.613 6 8a6 6 0 0 1 12 0"}],["circle",{"cx":"12","cy":"8","r":"2"}],["path",{"d":"M8.714 14h-3.71a1 1 0 0 0-.948.683l-2.004 6A1 1 0 0 0 3 22h18a1 1 0 0 0 .948-1.316l-2-6a1 1 0 0 0-.949-.684h-3.712"}]],"menu":[["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],"message-circle":[["path",{"d":"M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"}]],"package":[["path",{"d":"M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"}],["path",{"d":"M12 22V12"}],["polyline",{"points":"3.29 7 12 12 20.71 7"}],["path",{"d":"m7.5 4.27 9 5.15"}]],"package-search":[["path",{"d":"M12 22V12"}],["path",{"d":"M20.27 18.27 22 20"}],["path",{"d":"M21 10.498V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.729l7 4a2 2 0 0 0 2 .001l.98-.559"}],["path",{"d":"M3.29 7 12 12l8.71-5"}],["path",{"d":"m7.5 4.27 8.997 5.148"}],["circle",{"cx":"18.5","cy":"16.5","r":"2.5"}]],"panel-left-close":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m16 15-3-3 3-3"}]],"panel-left-open":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m14 9 3 3-3 3"}]],"paperclip":[["path",{"d":"m16 6-8.414 8.586a2 2 0 0 0 2.829 2.829l8.414-8.586a4 4 0 1 0-5.657-5.657l-8.379 8.551a6 6 0 1 0 8.485 8.485l8.379-8.551"}]],"pencil":[["path",{"d":"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"}],["path",{"d":"m15 5 4 4"}]],"philippine-peso":[["path",{"d":"M20 11H4"}],["path",{"d":"M20 7H4"}],["path",{"d":"M7 21V4a1 1 0 0 1 1-1h4a1 1 0 0 1 0 12H7"}]],"phone":[["path",{"d":"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"}]],"pin":[["path",{"d":"M12 17v5"}],["path",{"d":"M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"}]],"plus":[["path",{"d":"M5 12h14"}],["path",{"d":"M12 5v14"}]],"plus-circle":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M8 12h8"}],["path",{"d":"M12 8v8"}]],"printer":[["path",{"d":"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"}],["path",{"d":"M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"}],["rect",{"x":"6","y":"14","width":"12","height":"8","rx":"1"}]],"receipt-text":[["path",{"d":"M13 16H8"}],["path",{"d":"M14 8H8"}],["path",{"d":"M16 12H8"}],["path",{"d":"M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"}]],"refresh-cw":[["path",{"d":"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}],["path",{"d":"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"}],["path",{"d":"M8 16H3v5"}]],"rotate-ccw":[["path",{"d":"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}],["path",{"d":"M3 3v5h5"}]],"route":[["circle",{"cx":"6","cy":"19","r":"3"}],["path",{"d":"M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"}],["circle",{"cx":"18","cy":"5","r":"3"}]],"rows-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M21 9H3"}],["path",{"d":"M21 15H3"}]],"save":[["path",{"d":"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"}],["path",{"d":"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"}],["path",{"d":"M7 3v4a1 1 0 0 0 1 1h7"}]],"scan-text":[["path",{"d":"M3 7V5a2 2 0 0 1 2-2h2"}],["path",{"d":"M17 3h2a2 2 0 0 1 2 2v2"}],["path",{"d":"M21 17v2a2 2 0 0 1-2 2h-2"}],["path",{"d":"M7 21H5a2 2 0 0 1-2-2v-2"}],["path",{"d":"M7 8h8"}],["path",{"d":"M7 12h10"}],["path",{"d":"M7 16h6"}]],"search":[["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],"search-x":[["path",{"d":"m13.5 8.5-5 5"}],["path",{"d":"m8.5 8.5 5 5"}],["circle",{"cx":"11","cy":"11","r":"8"}],["path",{"d":"m21 21-4.3-4.3"}]],"send":[["path",{"d":"M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"}],["path",{"d":"m21.854 2.147-10.94 10.939"}]],"settings":[["path",{"d":"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"shield-alert":[["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"M12 8v4"}],["path",{"d":"M12 16h.01"}]],"shield-check":[["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"m9 12 2 2 4-4"}]],"shield-x":[["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"m14.5 9.5-5 5"}],["path",{"d":"m9.5 9.5 5 5"}]],"shirt":[["path",{"d":"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"}]],"square-pen":[["path",{"d":"M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"}],["path",{"d":"M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"}]],"table":[["path",{"d":"M12 3v18"}],["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M3 9h18"}],["path",{"d":"M3 15h18"}]],"tag":[["path",{"d":"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"}],["circle",{"cx":"7.5","cy":"7.5","r":".5","fill":"currentColor"}]],"tags":[["path",{"d":"M13.172 2a2 2 0 0 1 1.414.586l6.71 6.71a2.4 2.4 0 0 1 0 3.408l-4.592 4.592a2.4 2.4 0 0 1-3.408 0l-6.71-6.71A2 2 0 0 1 6 9.172V3a1 1 0 0 1 1-1z"}],["path",{"d":"M2 7v6.172a2 2 0 0 0 .586 1.414l6.71 6.71a2.4 2.4 0 0 0 3.191.193"}],["circle",{"cx":"10.5","cy":"6.5","r":".5","fill":"currentColor"}]],"trash":[["path",{"d":"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"}],["path",{"d":"M3 6h18"}],["path",{"d":"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"}]],"trash-2":[["path",{"d":"M10 11v6"}],["path",{"d":"M14 11v6"}],["path",{"d":"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"}],["path",{"d":"M3 6h18"}],["path",{"d":"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"}]],"trending-up":[["path",{"d":"M16 7h6v6"}],["path",{"d":"m22 7-8.5 8.5-5-5L2 17"}]],"upload":[["path",{"d":"M12 3v12"}],["path",{"d":"m17 8-5-5-5 5"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}]],"upload-cloud":[["path",{"d":"M12 13v8"}],["path",{"d":"M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"}],["path",{"d":"m8 17 4-4 4 4"}]],"user":[["path",{"d":"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}],["circle",{"cx":"12","cy":"7","r":"4"}]],"user-check":[["path",{"d":"m16 11 2 2 4-4"}],["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-cog":[["path",{"d":"M10 15H6a4 4 0 0 0-4 4v2"}],["path",{"d":"m14.305 16.53.923-.382"}],["path",{"d":"m15.228 13.852-.923-.383"}],["path",{"d":"m16.852 12.228-.383-.923"}],["path",{"d":"m16.852 17.772-.383.924"}],["path",{"d":"m19.148 12.228.383-.923"}],["path",{"d":"m19.53 18.696-.382-.924"}],["path",{"d":"m20.772 13.852.924-.383"}],["path",{"d":"m20.772 16.148.924.383"}],["circle",{"cx":"18","cy":"15","r":"3"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-plus":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}],["line",{"x1":"19","x2":"19","y1":"8","y2":"14"}],["line",{"x1":"22","x2":"16","y1":"11","y2":"11"}]],"user-round":[["circle",{"cx":"12","cy":"8","r":"5"}],["path",{"d":"M20 21a8 8 0 0 0-16 0"}]],"user-round-check":[["path",{"d":"M2 21a8 8 0 0 1 13.292-6"}],["circle",{"cx":"10","cy":"8","r":"5"}],["path",{"d":"m16 19 2 2 4-4"}]],"user-x":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}],["line",{"x1":"17","x2":"22","y1":"8","y2":"13"}],["line",{"x1":"22","x2":"17","y1":"8","y2":"13"}]],"users":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["path",{"d":"M16 3.128a4 4 0 0 1 0 7.744"}],["path",{"d":"M22 21v-2a4 4 0 0 0-3-3.87"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"users-round":[["path",{"d":"M18 21a8 8 0 0 0-16 0"}],["circle",{"cx":"10","cy":"8","r":"5"}],["path",{"d":"M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"}]],"wallet-cards":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M3 9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2"}],["path",{"d":"M3 11h3c.8 0 1.6.3 2.1.9l1.1.9c1.6 1.6 4.1 1.6 5.7 0l1.1-.9c.5-.5 1.3-.9 2.1-.9H21"}]],"wrench":[["path",{"d":"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"}]],"x":[["path",{"d":"M18 6 6 18"}],["path",{"d":"m6 6 12 12"}]],"x-circle":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m15 9-6 6"}],["path",{"d":"m9 9 6 6"}]],"sun":[["circle",{"cx":"12","cy":"12","r":"4"}],["path",{"d":"M12 2v2"}],["path",{"d":"M12 20v2"}],["path",{"d":"m4.93 4.93 1.41 1.41"}],["path",{"d":"m17.66 17.66 1.41 1.41"}],["path",{"d":"M2 12h2"}],["path",{"d":"M20 12h2"}],["path",{"d":"m6.34 17.66-1.41 1.41"}],["path",{"d":"m19.07 4.93-1.41 1.41"}]],"moon":[["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]],"columns-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"M15 3v18"}]],"inbox":[["polyline",{"points":"22 12 16 12 14 15 10 15 8 12 2 12"}],["path",{"d":"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"}]]};
   const aliases = {'eye':'search','pencil':'file-text','save':'file-check-2','cloud-upload':'file-up','plus-circle':'user-plus','database':'database-backup','hash':'file-text','files':'file-text','folder-open':'briefcase','file-search':'search','scan-text':'file-text','paperclip':'file-text','trash':'trash-2','shield-check':'shield-alert','calendar-days':'calendar','clock-3':'clock','contact':'user-round','building-2':'briefcase','printer':'file-text','file-spreadsheet':'file-text'};
-  function renderIcons() {
-    document.querySelectorAll('i[data-lucide]').forEach(el => {
-      const name = el.dataset.lucide;
+  const renderedIcons = new WeakMap();
+  const iconSelector = 'i[data-lucide],span[data-lucide],svg[data-lucide]';
+  function renderIcons(root = document, options = {}) {
+    if (!root?.querySelectorAll) root = document;
+    const elements = [...(root.matches?.(iconSelector) ? [root] : []), ...root.querySelectorAll(iconSelector)];
+    for (const el of elements) {
+      const name = String(el.getAttribute('data-lucide') || '').trim();
+      if (renderedIcons.get(el) === name && el.childElementCount && !options.attrs) continue;
       const nodes = icons[name] || icons[aliases[name]] || icons['file-text'];
-      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-      const attrs = { viewBox: '0 0 24 24', width: 20, height: 20, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.8, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true', focusable: 'false' };
+      const isSvg = el.namespaceURI === 'http://www.w3.org/2000/svg' && el.localName === 'svg';
+      const svg = isSvg ? el : document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const original = Object.fromEntries([...el.attributes].map(attr => [attr.name, attr.value]));
+      const attrs = { viewBox: '0 0 24 24', width: 20, height: 20, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.8, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true', focusable: 'false', ...options.attrs, ...original };
+      // Keep IDs, data attributes, labels and dimensions used by other controls.
+      if ((original['aria-label'] || original['aria-labelledby']) && !original['aria-hidden']) { delete attrs['aria-hidden']; attrs.role ||= 'img'; }
       for (const [key, value] of Object.entries(attrs)) svg.setAttribute(key, value);
-      svg.setAttribute('class', 'lucide lucide-' + name + ' ' + el.className);
-      if (el.hasAttribute('style')) svg.setAttribute('style', el.getAttribute('style'));
+      const classes = String(original.class || '').split(/\s+/).filter(value => value && value !== 'lucide' && !/^lucide-/.test(value));
+      svg.setAttribute('class', ['lucide', 'lucide-' + name, ...classes, options.attrs?.class || ''].filter(Boolean).join(' '));
+      svg.setAttribute('data-lucide', name);
+      svg.replaceChildren();
       for (const [tag, attributes] of nodes) {
         const node = document.createElementNS(svg.namespaceURI, tag);
         for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
         svg.append(node);
       }
-      el.replaceWith(svg);
-    });
+      renderedIcons.set(svg, name);
+      if (!isSvg) el.replaceWith(svg);
+    }
   }
+  let iconObserver;
+  function observeIcons() {
+    if (iconObserver || !document.body || typeof MutationObserver !== 'function') return;
+    iconObserver = new MutationObserver(records => {
+      for (const record of records) {
+        if (record.type === 'attributes') renderIcons(record.target);
+        else {
+          if (record.target.matches?.(iconSelector) && !record.target.childElementCount) renderIcons(record.target);
+          for (const node of record.addedNodes) if (node.nodeType === 1) renderIcons(node);
+        }
+      }
+    });
+    iconObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['data-lucide'] });
+  }
+  // Older page scripts can still call lucide.createIcons without a CDN dependency.
+  window.lucide ||= {};
+  window.lucide.createIcons ||= (options = {}) => renderIcons(options.root || document, options);
   const canStartAction = () => !document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]');
-  window.PGENRO_Module = {canStartAction,normalizeCommunicationType,storage,escape,uuid,today,toast,csv,openModal,closeModal,observeRecords,renderIcons,read,write,remove,audit,client,unwrap};
+  window.PGENRO_Module = {canStartAction,normalizeCommunicationType,storage,escape,uuid,today,toast,csv,openModal,closeModal,observeRecords,renderIcons,read,write,remove,audit,client,unwrap,waitForBackend};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initShell,{once:true});else initShell();
 })();
 
@@ -268,9 +329,11 @@
   let memoRegistryRows=M.storage.get('pgenro_office_memos',[]);
   function newMemoControlNo(){const prefix=`MEMO-${new Date().getFullYear()}-`;const highest=Math.max(0,...(Array.isArray(memoRegistryRows)?memoRegistryRows:[]).map(m=>String(m.memoNo||m.controlNo||'').startsWith(prefix)?Number(String(m.memoNo||m.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
   const commOcrValues=new Map(),commManualFields=new Set();
+  const ocrFormIds=new Set([...Object.values(fieldInputs),'memoRecipientInput','memoIssuerInput']);
+  const readerClientId=M.uuid().replace(/[^A-Za-z0-9_-]/g,'');
+  let ocrTask=null,pendingRead=null,ocrActive=false,lastOcrForm=null;
   const memoInputs={memoNo:'controlNoInput',date:'dateInput',addressedTo:'memoRecipientInput',issuedBy:'memoIssuerInput',subject:'subjectInput'};
-  for(const id of [...Object.values(memoInputs),'officeInput'])$(id).addEventListener('input',()=>commManualFields.add(id));
-  $('docTypeSelect').addEventListener('input',()=>commManualFields.add('docTypeSelect'));
+  for(const id of ocrFormIds)$(id).addEventListener('input',()=>{delete $(id).dataset.senderSelection;commManualFields.add(id);setFieldState(id,'edited','Your manual edit is kept.');});
   const isMemo=()=>$('docTypeSelect').value==='Memorandum';
   function updateDestination() {
    const memo=isMemo();
@@ -279,89 +342,202 @@
    $('memoRecipientGroup').hidden=$('memoIssuerGroup').hidden=!memo;
    $('memoRecipientInput').required=memo;
    $('officeInput').required=!memo;
+   $('officeRequiredMark').hidden=memo;
+   $('officeFieldLabel').textContent=memo?'Sender / signatory':$('typeSelect').value==='Outgoing'?'Recipient office':'Received from';
+   $('officeInput').placeholder=$('typeSelect').value==='Outgoing'?'Person or office receiving this communication':'Originating person or printed signatory';
+   $('dateFieldLabel').textContent=memo?'Date issued':$('typeSelect').value==='Outgoing'?'Date released':'Date received';
+   $('controlFieldLabel').textContent=memo?'Memo number':'Control number';
    if(!editing&&memo&&(!$('controlNoInput').value||$('controlNoInput').value===newControlNo()))$('controlNoInput').value=newMemoControlNo();
    if(!memo&&!$('controlNoInput').value)$('controlNoInput').value=newControlNo();
    $('saveRecordBtn').querySelector('span').textContent=routeCommitted?'Finish Move to Office Memos':memo?'Save to Office Memos':editing?'Save Changes':'Save Record';
   }
   $('docTypeSelect').addEventListener('change',()=>{detectedMemo=false;updateDestination();});
 /* Sender detection reads every page, including signature blocks. */
-function parseCorrespondence(rawText='',signatureRegion=false) {
- rawText=String(rawText||'').replace(/^((?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards))[,.:]\s+(?=[A-ZÀ-Þ])/gim,'$1,\n');
- const tidy=s=>String(s||'').normalize('NFC').replace(/[\u00a0\t]+/g,' ').replace(/\s+/g,' ').trim();
- const entries=[];
- for(const [p,page] of String(rawText||'').replace(/\r/g,'').split('\f').entries()){
-  const top=page.split('\n').map(tidy).filter(Boolean).slice(0,8);
-  if(p&&top.some(line=>/^(?:ANNEX|APPENDIX|ATTACHMENT|ENCLOSURE)\b|^(?:(?:PG\s*ENRO|PGENRO)\s+)?(?:OFFICE\s+)?(?:MEMORANDUM|MEMO|REQUEST LETTER|OFFICE ORDER)\b/i.test(line)))break;
-  let excluded=false;
-  page.split('\n').forEach((s,l)=>{const text=tidy(s);if(/^(?:CC\s*:|COPY\s+(?:TO|FURNISHED)|ANNEX\b|APPENDIX\b|ATTACHMENTS?\s*:|ENCLOSURES?\s*:)/i.test(text))excluded=true;if(text)entries.push({text,page:p+1,line:l+1,excluded});});
+function primaryDocumentPages(rawText='') {
+ const pages=String(rawText||'').replace(/\r/g,'').split('\f');
+ const boundary=pages.findIndex((page,i)=>i&&page.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,6).some(s=>/^(?:ANNEX|APPENDIX|ATTACHMENT|ENCLOSURE)(?:\s+[A-Z0-9IVX.-]+)?\s*[:.â€”-]?$/i.test(s)));
+ return boundary<0?pages:pages.slice(0,boundary);
+}
+const correspondenceClosing=/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards|regards|cordially|lubos\s+na\s+gumagalang|sumasainyo|thank\s+you(?:\s+very\s+much)?|for\s+your\s+(?:compliance|information(?:\s+and\s+(?:appropriate\s+action|compliance|guidance))?|guidance(?:\s+and\s+(?:compliance|appropriate\s+action))?))\s*[,.:!]?$/i;
+const correspondenceRole=/\b(?:PGDH|PGENRO|ENRO|OIC|officer|director|chief|mayor|governor|administrator|supervisor|manager|secretary|secretariat|convener|convenor|focal\s+person|head|president|chairperson|chairman|coordinator|principal|teacher|engineer|treasurer|representative|proprietor|owner|student|applicant|dean|professor|specialist|staff|assistant|councilor|registrar|librarian|consultant|aide|clerk|accountant|auditor|analyst|superintendent|rector|pastor|lawyer|pangulo|kalihim|tagapangulo|kagawad|kapitan|punong\s+barangay)\b|^[A-Z]{2,}[#?]?(?:[-/][A-Z]{2,})+$/i;
+const correspondenceLabel=/^(?:signed(?:\s+by)?|signatory|written\s+by|authored\s+by|issued\s+by|notice\s+from|convened\s+by|submitted\s+by|prepared\s+by|approved\s+by|noted\s+by|certified\s+by|recommending\s+approval|respectfully\s+submitted\s+by|name\s+of\s+(?:sender|signatory)|nilagdaan\s+ni|inihanda\s+ni|inaprubahan\s+ni)\s*[:\uff1a-]?\s*(.*)$/i;
+const correspondenceBody=/^(?:DEAR|GREETINGS|SIR|MADAM|MA'AM|TO\s+WHOM|PLEASE|KINDLY|THIS\s+(?:IS|HAS|WILL|REFERS)|WE\s+(?:ARE|WILL|WOULD|REQUEST)|I\s+(?:AM|WOULD)|YOU\s+ARE|THE\s+UNDERSIGNED|IN\s+(?:LIGHT\s+OF|CONNECTION\s+WITH)|PURSUANT\s+TO|FOR\s+YOUR\s+(?:INFORMATION|COMPLIANCE)|SINCERELY|RESPECTFULLY|MAGANDANG\s+(?:ARAW|UMAGA|HAPON)|MAHAL\s+NA|MANGYARING|PAKIUSAP|KAMI\s+(?:AY|PO)|AKO\s+(?:AY|PO)|KAUGNAY|LUBOS\s+NA\s+GUMAGALANG)\b/i;
+const tidyCorrespondence=s=>String(s||'').normalize('NFC').replace(/\s+/g,' ').trim();
+/* Printed sender detection. Kept inside this module to match OCR.py. */
+const senderFields='RECEIVED\\s+FROM|FROM|SENDER|MULA(?:\\s+(?:KAY|SA))?|SENT\\s+BY|ORIGINATOR|ORIGINATED\\s+BY|AUTHOR|AUTHORED\\s+BY|WRITTEN\\s+BY|ISSUED\\s+BY|NOTICE\\s+FROM|CONVENED\\s+BY|TRANSMITTED\\s+BY|ENDORSED\\s+BY|REQUESTED\\s+BY';
+const senderField=new RegExp(`^(?:${senderFields})(?:\\s*[:ï¼š;â€“â€”-]\\s*|[ \\t]+)(.*)$`,'i');
+const senderBare=new RegExp(`^(?:${senderFields})\\s*[:ï¼š;]?$`,'i');
+const senderMark=/^(?:\(\s*(?:s\.?g\.?d\.?|signed|signature)\s*\)|s\.?g\.?d\.?|\/s\/|e[- ]?signed(?:\s+by)?|digitally\s+signed\s+by|signed\s+(?:by|electronically\s+by)|signature\s+(?:over\s+printed\s+name|of)|printed\s+name|pangalan\s+at\s+lagda|nilagdaan\s+ni)\s*[:ï¼š,â€“â€”-]?\s*(.*)$/i;
+const senderContact=/^(?:TEL(?:EPHONE)?|PHONE|CONTACT|MOBILE|FAX|WWW\.|E-?MAIL|PAGE\b|REV\.?\s+NO|DOCUMENT\s+CODE)|@|https?:\/\//i;
+const senderNonName=/\b(?:national|environment|natural|resources|college|school|university|institute|institution|foundation|corporation|company|association|cooperative|agency|committee|secretariat|team|unit|bureau|commission|authority|republic|province|provincial|municipal|regional|district|government|office|department|division|subject|memorandum|notice|meeting|report|document|reference|control|end|signature|remarks|status|dear|thank|please|request|hereby|attached|enclosed|address|telephone|email|contact|mobile|fax|street|road|avenue|barangay|brgy|city|municipality|center|centre|metro|disaster|risk|management|operations|services|council|members|participants|personnel|regards|copy|cc|page|for|to|from|education|health|planning|workshop|agenda|attendance|schedule|venue|date|time|location|activity|program|event|safety|training|session|annual|quarterly|project|inc|ltd|everyone|see|you|all|welcome|regards|regarding|compliance|information|attention)\b/i;
+const senderTitles='Mr|Mrs|Ms|Miss|Dr|Dra|Atty|Attorney|Engr|Engineer|EnP|Hon|Prof|Professor|Rev|Fr|Bro|Sis|Gov|Governor|Mayor|Dir|Director|Capt|Col|Gen|Lt|Major';
+const senderCredentials='Ph\\.?D\\.?|Ed\\.?D\\.?|DPA|DMD|M\\.?D\\.?|MBA|MPA|MAEd|MSc|MA|MS|CPA|RN|LPT|RGC|RMT|RPh|RCE|RME|REE|CESO(?:\\s+[IVX]+)?|EnP|LLB|JD';
+const senderHeaderLabels='SUBJECT(?:\\s+MATTER)?|SUBJ(?:EC[TIL1]|\\.)?|SUB3ECT|RE|REGARDING|PAKSA|ADDRESSED\\s+TO|MEMORANDUM\\s+FOR|RECIPIENT(?:\\s+OFFICE)?|RECEIVED\\s+FROM|SENDER|FROM|MULA(?:\\s+(?:KAY|SA))?|PARA(?:\\s+(?:KAY|SA))?|ISSUED\\s+BY|ISSUING\\s+OFFICE|ORIGINATING\\s+OFFICE|SIGNATORY|DATE\\s+(?:RECEIVED|RELEASED|ISSUED)|(?:RECEIVED|RELEASED)\\s+DATE|DATED|DATE|TO|T0|FOR|PETSA|THROUGH|THRU|CC|ATTACHMENTS?|ENCLOSURES?|(?:DOCUMENT\\s+)?(?:CONTROL|TRACKING)(?:\\s*(?:NO\\.?|NUMBER|#))?|REFERENCE(?:\\s+(?:NO\\.?|NUMBER))?|REF(?:\\.?\\s*(?:NO\\.?|NUMBER))?|DOCUMENT\\s+TYPE|COMMUNICATION\\s+TYPE|DIRECTION|STATUS|ACTION\\s+TAKEN|DATE\\s+FORWARDED|REMARKS';
+const senderHeaderField=new RegExp(`^(${senderHeaderLabels})\\s*(?:[:ï¼š;]|[â€“â€”-])\\s*(.*)$`,'i');
+const senderHeaderBare=new RegExp(`^(?:${senderHeaderLabels})\\s*[:ï¼š;]?\\s*$`,'i');
+const senderMemoHeading=/^(?:[A-Z][A-Z0-9&./-]*\s+){0,6}(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\s+(?:ORDER|CIRCULAR))?(?:\s+(?:N[O0]\.?|NUMBER|FOR|SERIES)\b.*|\s*[:#.-]?\s*\d.*)?$/i;
+function splitSignatureNameRole(value) {
+ const s=tidyCorrespondence(value),paren=s.match(/\s*\(([^()]*)\)\s*$/);
+ const labelledRole=s.match(/^([^:ï¼š]{2,65})\s*[:ï¼š]\s*(.+)$/);if(labelledRole&&correspondenceRole.test(labelledRole[1]))return [labelledRole[2].trim(),labelledRole[1].trim()];
+ if(paren&&correspondenceRole.test(paren[1]))return [s.slice(0,paren.index).trim(),paren[1].trim()];
+ const separators=[...s.matchAll(/\s*[|,]\s*|\s+[-â€“â€”]\s+/g)];
+ for(let i=0;i<separators.length;i++){
+  const m=separators[i],end=separators[i+1]?.index??s.length,start=m.index+m[0].length;
+  if(correspondenceRole.test(s.slice(start,end)))return [s.slice(0,m.index).trim(),s.slice(start).trim()];
  }
- const closing=/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards|regards|cordially|lubos\s+na\s+gumagalang|sumasainyo|for\s+your\s+(?:compliance|information\s+and\s+compliance|guidance\s+and\s+compliance))\s*[,.:!]?$/i;
- const role=/\b(?:PGDH|PGENRO|ENRO|officer|director|chief|mayor|governor|administrator|supervisor|manager|secretary|head|president|chairperson|chairman|coordinator|principal|teacher|engineer|treasurer|representative|proprietor|owner|student|applicant|dean|professor|specialist|staff|assistant|councilor|punong\s+barangay)\b/i;
- const label=/^(?:signed(?:\s+by)?|signatory|submitted\s+by|prepared\s+by|approved\s+by|noted\s+by|certified\s+by|recommending\s+approval|respectfully\s+submitted\s+by|name\s+of\s+(?:sender|signatory))\s*[:：-]?\s*(.*)$/i;
- function name(value) {
-  let s=tidy(value).replace(/^(?:\(\s*sgd\.?\s*\)|sgd\.?|\/s\/|by\s*:)\s*/i,'').replace(/^[|:_\-]+|[|:_\-]+$/g,'').trim();
-  s=s.split(/\s+[—–]\s+/)[0].split(/\s*[|,]\s*(?=(?:Municipal|Provincial|City|Assistant|Acting|Department|Division|Regional|District|School|Officer|Director|Chief|Mayor|Governor|President|Secretary|Head|PGDH|PGENRO)\b)/i)[0].replace(/^(Atty|Engr|Dr|EnP|Hon|Mr|Mrs|Ms|Prof)\.(?=[A-Z])/,'$1. ');
-  if(s.length<4||s.length>100||/[\d@:/;!?()]/.test(s)||/\b(?:republic|province|government|office|department|division|subject|memorandum|dear|thank|please|request|hereby|attached|enclosed|address|telephone|email|received|copy|cc|page|for|to|from)\b/i.test(s))return '';
-  const base=s.replace(/^(?:(?:Mr|Mrs|Ms|Miss|Dr|Dra|Atty|Engr|EnP|Hon|Prof|Rev|Fr|Bro|Sis)\.?\s+)+/i,'').replace(/,?\s+(?:Ph\.?D\.?|M\.?D\.?|MBA|CPA|RN|LPT|CESO(?:\s+[IVX]+)?|EnP)(?:[,\s].*)?$/i,'');
-  const words=base.match(/[\p{L}][\p{L}.'’\-]*/gu)||[];
-  if(words.length<2||words.length>8||role.test(base))return '';
-  // Names may contain lower-case particles (de la, del, van, etc.).
-  if(words.some(w=>!(/^(?:de|del|dela|la|las|los|da|dos|di|du|van|von|bin|al|y|jr\.?|sr\.?|II|III|IV)$/i.test(w)||/^\p{Lu}/u.test(w))))return '';
-  if(words.filter(w=>w.replace(/[^\p{L}]/gu,'').length>1).length<2)return '';
-  return s.replace(/\.{2,}/g,'.').replace(/(?<=\s)([A-Z])(?=\s)/g,'$1.');
+ const trailingRole=s.match(/\s+(?:(?:Acting|Assistant|Deputy|Municipal|Provincial|City|Regional|District|Division|Department|Administrative|School|General|Executive|Senior|Junior)\s+)*(?:PGDH(?:[-/][A-Z]+)?|PGENRO|ENRO|OIC|Officer|Director|Chief|Manager|Mayor|Governor|President|Secretary|Chairperson|Chairman|Coordinator|Principal|Superintendent|Engineer|Treasurer|Administrator|Clerk|Aide|Registrar|Librarian|Head)\b/i);
+ if(trailingRole&&s.slice(0,trailingRole.index).trim().split(/\s+/).length>=2)return [s.slice(0,trailingRole.index).trim(),s.slice(trailingRole.index).trim()];
+ return [s,''];
+}
+function senderNameKey(value) {
+ return String(value).replace(new RegExp(`^(?:(?:${senderTitles})\\.?\\s+)+`,'i'),'').replace(new RegExp(`,?\\s+(?:${senderCredentials})(?:[,\\s].*)?$`,'i'),'').normalize('NFC').toLocaleLowerCase().replace(/[^\p{L}\p{N}_]/gu,'');
+}
+function senderInkSpacing(value) {
+ // Keep readable letters; restore only the boundary before a middle initial.
+ return value.replace(/(?<=\p{L})\s*[?*|_~]+\s*(?=[A-Z]\.\s*\p{L})/gu,' ');
+}
+function printedSenderName(value,contextual=false) {
+ let s=tidyCorrespondence(value),mark=s.match(senderMark);if(mark)s=mark[1];
+ s=s.replace(/^by\s*:\s*/i,'').replace(/^[|:_\-\s"â€œâ€]+|[|:_\-\s"â€œâ€]+$/g,'');
+ [s]=splitSignatureNameRole(s);const inkCleanup=contextual&&senderInkSpacing(s)!==s;if(contextual)s=senderInkSpacing(s);s=s.replace(new RegExp(`^(${senderTitles})\\.(?=\\p{L})`,'iu'),'$1. ');
+ if(s.length<4||s.length>120||/[\d@:/;!?()]/.test(s)||correspondenceBody.test(s)||correspondenceClosing.test(s))return '';
+ let base=s.replace(new RegExp(`^(?:(?:${senderTitles})\\.?\\s+)+`,'i'),'').replace(new RegExp(`,?\\s+(?:${senderCredentials})(?:[,\\s].*)?$`,'i'),'');
+ if(senderNonName.test(base)||correspondenceRole.test(base))return '';
+ const words=base.replace(/,/g,' ').trim().split(/\s+/),particles=new Set(['de','del','dela','la','las','los','da','dos','di','du','van','von','bin','al','y','san','santa']),suffixes=new Set(['jr','sr','ii','iii','iv','v']);
+ if(words.length<2||words.length>9)return '';
+ const particle=w=>particles.has(w.toLocaleLowerCase().replace(/\./g,''))||suffixes.has(w.toLocaleLowerCase().replace(/\./g,''));
+ // Mixed lowercase debris is not a reliable printed name. Keep uniformly lowercase labeled names.
+ if((!contextual||inkCleanup||base!==base.toLocaleLowerCase())&&words.some(w=>!particle(w)&&!/^\p{Lu}/u.test(w)))return '';
+ const lengths=words.map(w=>(w.match(/\p{L}/gu)||[]).length),substantive=words.map((w,i)=>particle(w)?-1:i).filter(i=>i>=0);
+ const initials=substantive.length&&lengths[substantive.at(-1)]>1&&substantive.slice(0,-1).every(i=>lengths[i]===1);
+ if(substantive.length<2||(substantive.filter(i=>lengths[i]>1).length<2&&!initials)||words.some(w=>!/^[\p{L}.'â€™-]+$/u.test(w)))return '';
+ return s.replace(/\.{2,}/g,'.').replace(/(?<=\s)([A-Z])(?=\s)/g,'$1.');
+}
+function senderEntries(rawText) {
+ rawText=String(rawText||'').replace(/^((?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards|lubos\s+na\s+gumagalang))[,.:][ \t]+(?=\p{L})/gimu,'$1,\n');
+ const entries=[];let excluded=false;
+ for(const [p,page] of primaryDocumentPages(rawText).entries()){
+  page.split('\n').forEach((raw,line)=>{
+   raw=raw.replace(new RegExp(`[ \\t]{2,}(?=(?:${senderHeaderLabels}|${senderFields})\\s*[:ï¼š;])`,'gi'),'\n');
+   for(const cell of raw.split('\n')){
+    if(/^\s*(?:CC\s*:|COPY\s+(?:TO|FURNISHED)|ANNEX\b|APPENDIX\b|ATTACHMENTS?\s*:|ENCLOSURES?\s*:)/i.test(cell))excluded=true;
+    const text=tidyCorrespondence(cell);if(text)entries.push({text,raw:cell.trim(),page:p+1,line:line+1,excluded});
+   }
+  });
  }
- const candidates=[],pageCounts=new Map(),positions=[];
- entries.forEach(e=>{positions.push(pageCounts.get(e.page)||0);pageCounts.set(e.page,(pageCounts.get(e.page)||0)+1);});
+ return entries;
+}
+function senderBodyLine(value) {
+ if(correspondenceClosing.test(value)||senderHeaderField.test(value)||senderHeaderBare.test(value)||correspondenceLabel.test(value)||senderMark.test(value))return false;
+ if(correspondenceBody.test(value))return true;
+ const words=value.split(/\s+/);return Boolean(((words.length>=6&&/[.!?]$/.test(value))||words.length>=10)&&/\p{Ll}/u.test(value)&&!correspondenceRole.test(value));
+}
+function scanPrintedSignatories(rawText='',signatureRegion=false) {
+ const entries=senderEntries(rawText),candidates=[],consumed=new Set();
+ const firstBody=entries.findIndex(e=>senderBodyLine(e.text)),greeting=entries.findIndex(e=>/^DEAR\b|^(?:SIR|MADAM|MA.AM)\s*[:,]/i.test(e.text));
+ const compact=entries.length>0&&entries.length<=6&&!entries.some(e=>senderHeaderField.test(e.text)||senderHeaderBare.test(e.text)||correspondenceBody.test(e.text)||parseMemoDate(e.text));
+ function roleAt(index,step,page){
+  const parts=[];
+  for(let j=index;step>0?j<index+step*3:j>index+step*3;j+=step){
+   if(j<0||j>=entries.length)break;
+   const e=entries[j],s=e.text;
+   if(e.page!==page||e.excluded||senderHeaderField.test(s)||senderHeaderBare.test(s)||correspondenceLabel.test(s)||senderMark.test(s)||correspondenceBody.test(s)||correspondenceClosing.test(s)||printedSenderName(s)||senderContact.test(s))break;
+   if(s.length>120||s.split(/\s+/).length>18||/\d{3}/.test(s)||(s.split(/\s+/).length>7&&/[.!?]$/.test(s)))break;
+   if(step>0)parts.push(s);else parts.unshift(s);if(correspondenceRole.test(parts.join(' ')))return parts.join(' ');
+  }
+  return '';
+ }
+ function add(name,role,entry,score,kind,evidence,inkCleanup=false){
+  const candidate={name,role,page:entry.page,line:entry.line,score,kind,evidence,inkCleanup,confidence:inkCleanup?'low':score>=100?'high':'medium'},key=senderNameKey(name),prior=candidates.find(c=>senderNameKey(c.name)===key);
+  if(!prior)candidates.push(candidate);else if(score>prior.score)Object.assign(prior,candidate);
+ }
  for(let i=0;i<entries.length;i++){
-  const entry=entries[i];if(entry.excluded)continue;const m=entry.text.match(label),n=name(m?.[1]||entry.text);if(!n)continue;
-  const before=entries.slice(Math.max(0,i-6),i).filter(e=>!e.excluded);
-  const marker=[...before].reverse().find(e=>label.test(e.text));
-  const nearClosing=before.some(e=>closing.test(e.text));
-  const inline=entry.text.match(/\s*[|,]\s*((?:Municipal|Provincial|City|Assistant|Acting|Department|Division|Regional|District|School|Officer|Director|Chief|Mayor|Governor|President|Secretary|Head|PGDH|PGENRO)\b.*)$/i);
-  const next=inline?.[1]||(entries[i+1]?.page===entry.page?entries[i+1].text:'');
-  const hasRole=role.test(next)&&!/^dear\b/i.test(next);
-  const position=positions[i]/Math.max(1,pageCounts.get(entry.page));
-  const immediateMarker=marker&&before.slice(-2).includes(marker);
-  let score=m?120:nearClosing?110:immediateMarker?100:hasRole&&(signatureRegion||position>.45)?75:0;
-  if(/^(?:prepared|noted|certified|recommending)\b/i.test(m?entry.text:marker?.text||''))score=60;
-  if(!score)continue;
-  const candidate={name:n,role:hasRole?next:'',page:entry.page,line:entry.line,score,evidence:[nearClosing?before.find(e=>closing.test(e.text))?.text:'',entry.text,hasRole?next:''].filter(Boolean).join('\n')};
-  const prior=candidates.find(c=>c.name.toLocaleLowerCase()===n.toLocaleLowerCase());if(!prior)candidates.push(candidate);else if(score>prior.score)Object.assign(prior,candidate);
+  const entry=entries[i];if(entry.excluded||consumed.has(i))continue;
+  const s=entry.text,field=entry.raw.match(senderField),bare=senderBare.test(s),label=s.match(correspondenceLabel),mark=s.match(senderMark);
+  const explicit=Boolean((field||bare)&&(firstBody<0||i<firstBody||/^(?:AUTHOR|AUTHORED|WRITTEN|ISSUED|NOTICE|CONVENED)\b/i.test(s)));
+  let anchor=null;
+  for(let j=i-1;j>Math.max(-1,i-7);j--){
+   const previous=entries[j];if(previous.page!==entry.page||previous.excluded)break;
+   if(correspondenceClosing.test(previous.text)||correspondenceLabel.test(previous.text)||senderMark.test(previous.text)){anchor=previous;break;}
+   if(printedSenderName(previous.text)||senderHeaderField.test(previous.text)||correspondenceBody.test(previous.text)||previous.text.split(/\s+/).length>18)break;
+  }
+  const context=Boolean(explicit||label||mark||anchor);let rawName=explicit?(field?.[1]||''):label?label[1]:mark?mark[1]:entry.raw,index=i;
+  if((explicit||label||mark)&&!rawName){index=i+1;if(index>=entries.length||entries[index].page!==entry.page||entries[index].excluded||senderHeaderField.test(entries[index].text)||correspondenceLabel.test(entries[index].text))continue;rawName=entries[index].text;}
+  if(explicit&&!printedSenderName(rawName,true)){
+   for(let probe=index+1;probe<Math.min(entries.length,index+5);probe++){
+    const e=entries[probe];if(e.page!==entry.page||e.excluded||senderHeaderField.test(e.text)||senderHeaderBare.test(e.text)||correspondenceBody.test(e.text)||correspondenceClosing.test(e.text)||correspondenceLabel.test(e.text))break;
+    if(printedSenderName(e.text,true)){index=probe;rawName=e.text;break;}
+   }
+  }
+  const columns=rawName.split(/[ \t]{2,}|\s+\|\s+/),columnNames=columns.map(part=>printedSenderName(part,context||signatureRegion||(firstBody>=0&&index>firstBody)));
+  if(columns.length>1&&columnNames.every(Boolean)&&(context||signatureRegion||(firstBody>=0&&index>firstBody))){columnNames.forEach((columnName,column)=>add(columnName,'',entries[index],explicit?130:anchor?110:78,explicit?'explicit-sender':'footer-name',s,senderInkSpacing(columns[column])!==columns[column]));if(index!==i)consumed.add(index);continue;}
+  const [inlineName,inlineRole]=splitSignatureNameRole(rawName),nearbyRole=inlineRole||roleAt(index+1,1,entry.page)||roleAt(index-1,-1,entry.page);
+  let name=printedSenderName(rawName,context||Boolean(nearbyRole)||signatureRegion),nextIndex=index+1;
+  if(nextIndex<entries.length&&entries[nextIndex].page===entry.page&&!entries[nextIndex].excluded){
+   const surname=entries[nextIndex],shortSurname=surname.text.split(/\s+/).length===1||/^(?:DE|DEL|DELA|VAN|VON)\s+\S+$/i.test(surname.text);
+   if(shortSurname&&!correspondenceRole.test(surname.text)&&!senderHeaderField.test(surname.text)&&!correspondenceLabel.test(surname.text)&&inlineName.split(/\s+/).length<=3&&roleAt(nextIndex+1,1,entry.page)){
+    const joined=printedSenderName(inlineName+' '+surname.text,context);if(joined){name=joined;nextIndex++;consumed.add(index+1);}
+   }
+  }
+  if(!name)continue;
+  const role=inlineRole||roleAt(nextIndex,1,entry.page)||roleAt(index-1,-1,entry.page);
+  if(!context){
+   if((greeting>=0&&index<greeting)||(firstBody>=0&&index<firstBody))continue;
+   const laterHeader=entries.slice(nextIndex,nextIndex+8).some(e=>!e.excluded&&e.page===entry.page&&(senderHeaderField.test(e.text)||senderHeaderBare.test(e.text)||senderMemoHeading.test(e.text)||/^NOTICE\s+OF\s+MEETING\b/i.test(e.text)||parseMemoDate(e.text)));
+   if(firstBody<0&&laterHeader)continue;
+   const previousField=entries.slice(0,index).reverse().find(e=>e.page===entry.page&&(senderHeaderField.test(e.text)||senderHeaderBare.test(e.text))),fieldIndex=entries.indexOf(previousField);
+   if(previousField&&/^(?:TO|T0|FOR|PARA|RECIPIENT|ADDRESSED|SUBJECT|SUBJ|PAKSA|THRU|THROUGH|ATTN|ATTENTION)\b/i.test(previousField.text)&&index-fieldIndex<=8&&!entries.slice(fieldIndex+1,index).some(e=>correspondenceBody.test(e.text)||e.text.split(/\s+/).length>6||(/[.!?]$/.test(e.text)&&!printedSenderName(e.text)))&&entry.line-previousField.line<=index-fieldIndex)continue;
+  }
+  const meaningfulAfter=entries.slice(nextIndex).filter(e=>!e.excluded&&!senderContact.test(e.text)&&!/^[-_=\s]+$/.test(e.text)),contentBefore=(firstBody>=0&&index>firstBody)||entries.slice(0,index).some(e=>senderHeaderField.test(e.text)||senderHeaderBare.test(e.text));
+  let score,kind;
+  if(explicit){score=130;kind='explicit-sender';}
+  else if(label||(mark&&mark[1])||(anchor&&senderMark.test(anchor.text))){score=120;kind='signature';}
+  else if(anchor){score=110;kind='signature';}
+  else if(role&&(contentBefore||signatureRegion||compact)){score=90;kind='signature';}
+  else if((!meaningfulAfter.length||meaningfulAfter.every(e=>printedSenderName(e.text)))&&(contentBefore||signatureRegion||compact)&&!role){score=78;kind='footer-name';}
+  else continue;
+  const markerText=label?s:anchor?.text||'';
+  if(/^(?:prepared|submitted|respectfully\s+submitted|inihanda)\b/i.test(markerText)){score=85;kind='prepared-by';}
+  else if(/^(?:noted|certified|recommending)\b/i.test(markerText)){score=55;kind='supporting';}
+  else if(/^(?:approved|inaprubahan)\b/i.test(markerText)){score=65;kind='approval';}
+  const inkCleanup=senderInkSpacing(inlineName)!==inlineName,proof=[...new Set([explicit||label||mark?s:anchor?.text||'',inkCleanup?inlineName:name,role].filter(Boolean))].join('\n');
+  add(name,role,entries[index],score,kind,proof,inkCleanup);if(index!==i)consumed.add(index);
  }
  candidates.sort((a,b)=>b.score-a.score||a.page-b.page||a.line-b.line);
- const primary=candidates.filter(c=>c.score===candidates[0]?.score),signatory=primary.length===1?primary[0]:null;
- function labeled(pattern){
-  for(let i=0;i<entries.length;i++){
-   const e=entries[i];if(e.page!==1)continue;
-   if(closing.test(e.text)||/^(?:dear|please|kindly|pursuant|this (?:is|letter)|I (?:am|would|respectfully)|we (?:are|would|request))\b/i.test(e.text))break;
-   const m=e.text.match(pattern);if(!m)continue;
-   let value=tidy(m[1]||'');if(!value){const next=entries[i+1];if(next?.page===e.page&&!/^(?:to|from|date|subject|dear|thru|through)\b/i.test(next.text))value=next.text;}
-   if(value)return {value,page:e.page,line:e.line};
-  }return {value:'',page:null,line:null};
- }
- let sender=labeled(/^(?:from|sender|received\s+from|issued\s+by|issuing\s+office|originating\s+office)\s*[:：-]\s*(.*)$/i);
- let recipient=labeled(/^(?:to|t0|for|addressed\s+to|recipient(?:\s+office)?|memorandum\s+for)\s*[:：-]\s*(.*)$/i);
- if(typeof parseDocumentHeader==='function'){const h=parseDocumentHeader(rawText);sender={value:h.sender===h.signatory?(signatory?.name||''):h.sender};recipient={value:h.addressedTo};}
- if(!recipient.value){
-  const lines=String(rawText).split('\f')[0].split('\n').map(tidy),greeting=lines.findIndex(line=>/^Dear\b|^(?:Sir|Madam|Ma.am)\s*[:,]/i.test(line));
-  if(greeting>=0){const block=lines.slice(Math.max(0,greeting-8),greeting),start=block.findIndex(line=>name(line));
-   if(start>=0&&block.slice(start+1).some(line=>role.test(line)||/\b(?:OFFICE|DEPARTMENT|DIVISION|UNIVERSITY|COLLEGE|SCHOOL)\b/i.test(line)))recipient={value:block.slice(start).filter(line=>line&&!/^(?:SUBJECT|DATE|FROM|TO|CONTROL|REF)\s*:/i.test(line)).join(' ')};
-  }
- }
- return {signatory:signatory?.name||'',signatoryRole:signatory?.role||'',signatoryCandidates:candidates,receivedFrom:signatory?.name||(!primary.length?sender.value:''),sender:sender.value,recipient:recipient.value,fieldEvidence:{receivedFrom:signatory?.evidence||sender.value},needsReview:primary.length>1?['receivedFrom']:[]};
+ const eligible=candidates.filter(c=>c.kind!=='supporting'),primary=eligible.filter(c=>eligible[0].score-c.score<10),selected=primary.length===1?primary[0]:null;
+ return {entries,candidates,primary,selected,signatory:selected};
 }
+function parseCorrespondence(rawText='',signatureRegion=false) {
+ const header=parseDocumentHeader(rawText),scan=scanPrintedSignatories(rawText,signatureRegion),selected=scan.selected;
+ const received=selected?.name||'',proof=selected?.evidence||'',source=selected?.kind||(scan.primary.length?'ambiguous':'missing'),reasons=[];
+ let review=Boolean(selected&&(selected.inkCleanup||['footer-name','prepared-by','approval'].includes(source)||selected.score<90));
+ if(selected?.inkCleanup)reasons.push('Signature ink affected the spacing of the printed name. Confirm the name against the document.');
+ if(selected&&source==='explicit-sender'&&scan.candidates.some(c=>c.kind==='signature'&&senderNameKey(c.name)!==senderNameKey(received))){review=true;reasons.push('The sender field and a printed signatory name differ. Confirm the originating person.');}
+ if(source==='ambiguous')reasons.push('Several possible senders were found. Choose the originating person.');
+ else if(!received)reasons.push('No readable sender name was identified. A signature alone cannot establish a personâ€™s name.');
+ else if(source==='footer-name')reasons.push('An unlabeled printed name was found. Confirm that this person sent the document.');
+ else if(['prepared-by','approval'].includes(source))reasons.push(`A ${source==='prepared-by'?'preparer':'approver'} was found. Confirm the originating person.`);
+ let recipient=header.addressedTo;
+ if(!recipient){
+  const lines=String(rawText).split('\f')[0].split('\n').map(tidyCorrespondence),greeting=lines.findIndex(line=>/^Dear\b|^(?:Sir|Madam|Ma.am)\s*[:,]/i.test(line));
+  if(greeting>=0){const block=lines.slice(Math.max(0,greeting-8),greeting),start=block.findIndex(line=>printedSenderName(line));if(start>=0&&block.slice(start+1).some(line=>correspondenceRole.test(line)||/\b(?:OFFICE|DEPARTMENT|DIVISION|UNIVERSITY|COLLEGE|SCHOOL)\b/i.test(line)))recipient=block.slice(start).filter(line=>line&&!/^(?:DATE|SUBJECT|FROM|CONTROL)\s*:/i.test(line)).join(' ');}
+ }
+ return {signatory:received,signatoryRole:selected?.role||'',signatoryCandidates:scan.candidates,receivedFrom:received,receivedFromSource:source,receivedFromNeedsReview:!received||review,senderConfidence:selected?.confidence||'unknown',senderReviewReasons:reasons,sender:header.sender,recipient,
+  issuedBy:received||header.issuedBy,issuedBySource:received?source:undefined,fieldEvidence:{receivedFrom:proof},needsReview:(!received||review)?['receivedFrom']:[]};
+}
+
 /* End sender detection. */
 
 /* Memo document parser: identical page-owned code in Communications and Office Memos. */
 function parseMemoDocument(rawText='') {
- const labels='SUBJECT MATTER|SUBJECT|SUBJ|RE|ADDRESSED TO|MEMORANDUM FOR|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE|REF|CONTROL NO\\.?|REMARKS';
- const normalize=s=>String(s||'').replace(/\u00a0/g,' ').replace(/[–—−]/g,'-').replace(/[：]/g,':').replace(/[ \t]+/g,' ').trim();
- const text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/[：]/g,':');
+ const labels='SUBJECT MATTER|SUBJECT|SUBJ|PAKSA|RE|ADDRESSED TO|MEMORANDUM FOR|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE|REF|CONTROL NO\\.?|REMARKS';
+ const normalize=s=>String(s||'').replace(/\u00a0/g,' ').replace(/[\u2013\u2014\u2212]/g,'-').replace(/[\uff1a]/g,':').replace(/[ \t]+/g,' ').trim();
+ const text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/[\uff1a]/g,':');
  const lines=text.replace(new RegExp(`[ \\t]{2,}(?=(?:${labels})\\s*:)`,'gi'),'\n').split('\n').map(normalize);
  const labelPattern=new RegExp(`^(${labels})\\s*(?::|[-])\\s*(.*)$`,'i');
  const bodyLine=/^(?:dear\b|sir\b|madam\b|respectfully\b|please\b|kindly\b|you are\b|this (?:is|memo|memorandum)\b|pursuant\b|in (?:connection|view|compliance)\b|for your (?:information|compliance|guidance)\b|\d+\.\s)/i;
  const header=lines.map((line,index)=>({line,index})).filter(x=>x.line).slice(0,60);
- const boundary=header.findIndex(x=>bodyLine.test(x.line)||/^(?:SUBJECT(?: MATTER)?|SUBJ|RE)\s*[:\-]/i.test(x.line));
+ const boundary=header.findIndex(x=>bodyLine.test(x.line)||/^(?:SUBJECT(?: MATTER)?|SUBJ|PAKSA|RE)\s*[:\-]/i.test(x.line));
  const title=/^(?:OFFICE\s+)?(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO)(?:\s+(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*[A-Z0-9 /._,-]*|\s+FOR\s*:?.*|\s*[:#.-]?\s*\d[\d /._,-]*)?\s*$/i;
  const titleText=line=>line.replace(/MEM0RANDUM/gi,'MEMORANDUM');
  const heading=header.find((x,i)=>(boundary<0||i<boundary)&&title.test(titleText(x.line)));
@@ -388,7 +564,7 @@ function parseMemoDocument(rawText='') {
   const number=numberText.match(/(?:^(?:OFFICE\s+)?(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO)\s+(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*|^(?:N[O0]\.?|NUMBER|CONTROL\s+(?:NO\.?|NUMBER))\s*[:#.-]?\s*)([A-Z0-9][A-Z0-9/._-]*)/im)||headingText.match(/^(?:OFFICE\s+)?(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO)\s*[:#.-]?\s*(\d[\d/._-]*)/i);
   if(number){fields.memoNo=number[1];const series=numberText.match(/(?:[,;]\s*s\.?\s*|\bseries\s+of\s+)(\d{4})\b/i);if(series)fields.memoNo+=`, s. ${series[1]}`;evidence.memoNo=heading.index+1;}
  }
- for(const [key,names] of Object.entries({addressedTo:'TO|T0|FOR|ADDRESSED TO|MEMORANDUM FOR',issuedBy:'FROM|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY',subject:'SUBJECT|SUBJECT MATTER|SUBJ|RE'})){
+ for(const [key,names] of Object.entries({addressedTo:'TO|T0|FOR|PARA(?: KAY| SA)?|ADDRESSED TO|MEMORANDUM FOR',issuedBy:'FROM|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY',subject:'SUBJECT|SUBJECT MATTER|SUBJ|PAKSA|RE'})){
   const result=field(names);fields[key]=result.value;evidence[key]=result.line;
  }
  const dateField=field('DATE|DATE ISSUED|DATED',1);
@@ -398,7 +574,7 @@ function parseMemoDocument(rawText='') {
  return fields;
 }
 function parseMemoDate(value='') {
- const months={jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,aug:8,august:8,sep:9,sept:9,september:9,oct:10,october:10,nov:11,november:11,dec:12,december:12};
+ const months={jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,aug:8,august:8,sep:9,sept:9,september:9,oct:10,october:10,nov:11,november:11,dec:12,december:12,enero:1,pebrero:2,marso:3,abril:4,mayo:5,hunyo:6,hulyo:7,agosto:8,setyembre:9,septiyembre:9,oktubre:10,nobyembre:11,disyembre:12};
  const text=String(value||'').trim();let year,month,day,match;
  if((match=text.match(/\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b/)))[,year,month,day]=match;
  else if((match=text.match(/\b([A-Za-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/i))){month=months[match[1].toLowerCase()];day=match[2];year=match[3];}
@@ -409,22 +585,35 @@ function parseMemoDate(value='') {
  if(date.getUTCFullYear()!==Number(year)||date.getUTCMonth()+1!==Number(month)||date.getUTCDate()!==Number(day))return '';
  return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
 }
+function letterheadOffice(lines) {
+ lines=lines.map(line=>String(line).trim()).filter(Boolean);
+ const generic=/^(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY)$/i,offices=[];
+ const continuation=line=>line===line.toUpperCase()&&!/^(?:SUBJECT|DATE|FROM|TO|FOR|CONTROL|REPUBLIC|PROVINCE\b|NOTICE|MEETING|MEMORANDUM|MEMO\b|OFFICE\s+ORDER|SPECIAL\s+ORDER|REV\.?\s+NO)/i.test(line)&&!/@|https?:|\d/.test(line);
+ for(let i=0;i<lines.length;i++){
+  const line=lines[i];if(!/\b(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY)\b/i.test(line)||/\b(?:ORDER|MEMORANDUM)\b|@|https?:/i.test(line))continue;
+  const parts=[line];
+  if(generic.test(line)){for(const previous of lines.slice(Math.max(0,i-2),i).reverse()){if(!continuation(previous))break;parts.unshift(previous);}}
+  else if(/\b(?:OF|THE|AND|FOR)$/i.test(line)){for(const following of lines.slice(i+1,i+3)){if(!continuation(following))break;parts.push(following);if(!/\b(?:OF|THE|AND|FOR)$/i.test(following))break;}}
+  const value=parts.join(' ');if(!generic.test(value))offices.push(value);
+ }
+ return offices.at(-1)||'';
+}
 function parseDocumentHeader(rawText='') {
- const labels='SUBJECT MATTER|SUBJECT|SUBJ|RE|ADDRESSED TO|MEMORANDUM FOR|RECIPIENT OFFICE|RECEIVED FROM|SENDER|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|DATE RECEIVED|RECEIVED DATE|DATE RELEASED|RELEASED DATE|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE(?: NO\\.?| NUMBER)?|REF(?: NO\\.?)?|CONTROL (?:NO\\.?|NUMBER)|REMARKS';
- const labelRe=new RegExp(`^(${labels})\\s*(?::|[–—-])\\s*(.*)$`,'i'),bareRe=new RegExp(`^(?:${labels})\\s*$`,'i');
- const bodyRe=/^(?:dear\b|sir\b|madam\b|respectfully\b|sincerely\b|please\b|kindly\b|you are\b|this (?:is|memo|memorandum|office|letter)\b|pursuant\b|in (?:connection|view|compliance|light)\b|for your (?:information|compliance|guidance)\b|we (?:are|would|request)\b|I (?:am|would|respectfully)\b|attached (?:is|are)\b|relative to\b|\d+\.\s)/i;
+ const labels='SUBJECT MATTER|SUBJECT|SUBJ|PAKSA|RE|ADDRESSED TO|MEMORANDUM FOR|RECIPIENT OFFICE|RECEIVED FROM|SENDER|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|MULA(?: KAY| SA)?|PARA(?: KAY| SA)?|PETSA|DATE RECEIVED|RECEIVED DATE|DATE RELEASED|RELEASED DATE|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE(?: NO\\.?| NUMBER)?|REF(?: NO\\.?)?|CONTROL (?:NO\\.?|NUMBER)|REMARKS';
+ const labelRe=new RegExp(`^(${labels})\\s*(?::|[\u2013\u2014-])\\s*(.*)$`,'i'),bareRe=new RegExp(`^(?:${labels})\\s*$`,'i');
+ const bodyRe=/^(?:magandang (?:araw|umaga|hapon)\b|mahal na\b|mangyaring\b|pakiusap\b|kami (?:ay|po)\b|ako (?:ay|po)\b|kaugnay\b|lubos na gumagalang\b|dear\b|sir\b|madam\b|respectfully\b|sincerely\b|please\b|kindly\b|you are\b|this (?:is|memo|memorandum|office|letter)\b|pursuant\b|in (?:connection|view|compliance|light)\b|for your (?:information|compliance|guidance)\b|we (?:are|would|request)\b|I (?:am|would|respectfully)\b|attached (?:is|are)\b|relative to\b|\d+\.\s)/i;
  const dateLine=/^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4}|[A-Za-z]+\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}|\d{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\.?,?\s+\d{4})\s*$/i;
- const prefix='(?:(?:PG\\s*ENRO|PGENRO|PROVINCIAL ENRO)\\s+)?';
+ const prefix='(?:[A-Z][A-Z0-9&./-]*\\s+){0,6}';
  const memoRe=new RegExp(`^${prefix}(?:OFFICE\\s+)?(?:MEMORANDUM(?:\\s+(?:ORDER|CIRCULAR))?|MEMO)(?:\\s+(?:N[O0]\\.?|NUMBER)\\s*[:#.-]?\\s*[A-Z0-9 /._,-]*|\\s+FOR\\s*:?.*|\\s*[:#.-]?\\s*\\d[\\d /._,-]*)?\\s*$`,'i');
  const types=['Office Order','Special Order','Travel Order','Request Letter','Endorsement Letter','Transmittal Letter','Response Letter','Notice of Meeting','Invitation','Report'];
- let text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/：/g,':');
+ let text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/\uff1a/g,':');
  const lines=[];
  text.split('\n').forEach((raw,index)=>{
-  raw=raw.replace(/^(?:SUBJECI|SUB3ECT|SUBIECT)\s*(?=[:\-])/i,'SUBJECT').replace(new RegExp(`^(${labels})[ \\t]{2,}(?=\\S)`,'i'),'$1: ');
+  raw=raw.replace(/^(?:SUBJECI|SUB3ECT|SUBIECT)\s*(?=[:\-])/i,'SUBJECT').replace(new RegExp(`^(${labels})[ \\t]{2,}(?=[^\\s:\uff1a;\u2013\u2014-])`,'i'),'$1: ');
   raw.split(new RegExp(`[ \\t]{2,}(?=(?:${labels})\\s*:)`,'i')).forEach(line=>lines.push({text:line.replace(/[ \t]+/g,' ').trim(),number:index+1}));
  });
  let header=lines.slice(0,Math.min(100,lines.findIndex(x=>bodyRe.test(x.text))<0?lines.length:lines.findIndex(x=>bodyRe.test(x.text))));
- const subjectIndex=header.findIndex(x=>/^(?:SUBJECT(?: MATTER)?|SUBJ|RE)\s*(?::|[–—-]|$)/i.test(x.text));
+ const subjectIndex=header.findIndex(x=>/^(?:SUBJECT(?: MATTER)?|SUBJ|PAKSA|RE)\s*(?::|[\u2013\u2014-]|$)/i.test(x.text));
  if(subjectIndex>=0){
   let content=!!header[subjectIndex].text.match(labelRe)?.[2];
   for(let i=subjectIndex+1;i<header.length;i++){
@@ -450,6 +639,7 @@ function parseDocumentHeader(rawText='') {
    const parts=match?.[2]?[match[2]]:[];let j=i+1;
    while(j<Math.min(header.length,i+1+limit)){
     const next=header[j].text;
+    if(/^[:\uff1a;|]+$/.test(next)){j++;continue;}
     if(!next){
      let probe=j+1;while(probe<header.length&&!header[probe].text&&probe-j<=2)probe++;
      if(probe<header.length&&probe-j<=2&&(!parts.length||(/^(?:FOR|OF|ON|AND|OR|WITH|REGARDING|DURING)\b/i.test(header[probe].text)&&!bodyRe.test(header[probe].text)&&!labelRe.test(header[probe].text)))){j=probe;continue;}
@@ -466,23 +656,24 @@ function parseDocumentHeader(rawText='') {
   const block=header.slice(heading,heading+5);const end=block.findIndex((x,i)=>i&&(labelRe.test(x.text)||bareRe.test(x.text)));
   const numberText=block.slice(0,end<0?block.length:end).map(x=>x.text).join('\n');
   const number=numberText.match(/\b(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*([A-Z0-9][A-Z0-9/._-]*)/i)||block[0].text.match(/(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO|ORDER)\s*[:#.-]?\s*(\d[\d/._-]*)/i);
-  if(number){const series=numberText.match(/(?:[,;]\s*s\.?\s*|\bseries(?:\s+of)?\s+)(\d{4})\b/i);result.controlNo=number[1]+(series?`, s. ${series[1]}`:'');result.evidence.controlNo=header[heading].number;if(result.isMemo){result.memoNo=result.controlNo;result.evidence.memoNo=header[heading].number;}}
+  if(number&&/\d/.test(number[1])){const series=numberText.match(/(?:[,;]\s*s\.?\s*|\bseries(?:\s+of)?\s+)(\d{4})\b/i);result.controlNo=number[1]+(series?`, s. ${series[1]}`:'');result.evidence.controlNo=header[heading].number;if(result.isMemo){result.memoNo=result.controlNo;result.evidence.memoNo=header[heading].number;}}
  }
  const printed=field('CONTROL (?:NO\\.?|NUMBER)',1),reference=printed.value?printed:field('REFERENCE(?: NO\\.?| NUMBER)?|REF(?: NO\\.?)?',1);
  if((printed.value||!result.controlNo)&&/^[A-Z0-9][A-Z0-9/._-]*(?:,?\s*s\.?\s*\d{4})?$/i.test(reference.value)){result.controlNo=reference.value;result.evidence.controlNo=reference.line;if(result.isMemo&&!result.memoNo)result.memoNo=reference.value;}
- for(const[key,names]of Object.entries({addressedTo:'TO|T0|FOR|ADDRESSED TO|MEMORANDUM FOR|RECIPIENT OFFICE',issuedBy:'FROM|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY',sender:'RECEIVED FROM|FROM|SENDER|ORIGINATING OFFICE|ISSUING OFFICE',subject:'SUBJECT|SUBJECT MATTER|SUBJ|RE',signatory:'SIGNATORY'})){
+ for(const[key,names]of Object.entries({addressedTo:'TO|T0|FOR|PARA(?: KAY| SA)?|ADDRESSED TO|MEMORANDUM FOR|RECIPIENT OFFICE',issuedBy:'FROM|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY',sender:'RECEIVED FROM|FROM|MULA(?: KAY| SA)?|SENDER|ORIGINATING OFFICE|ISSUING OFFICE',subject:'SUBJECT|SUBJECT MATTER|SUBJ|PAKSA|RE',signatory:'SIGNATORY'})){
   const f=field(names);result[key]=f.value;result.evidence[key]=f.line;result.fieldEvidence[key]=f.text;
  }
  const explicitSender=result.sender;
  if(!result.sender){
   const firstLabel=header.findIndex(x=>labelRe.test(x.text)||bareRe.test(x.text)),firstDate=header.findIndex(x=>dateLine.test(x.text));
   const top=header.slice(0,Math.min(heading<0?header.length:heading,subjectIndex<0?header.length:subjectIndex,firstLabel<0?header.length:firstLabel,firstDate<0?header.length:firstDate,20));
-  const office=top.filter(x=>/\b(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY)\b/i.test(x.text)&&!types.some(name=>x.text.toLowerCase().includes(name.toLowerCase()))&&!/^(?:email|tel|contact|www\.|https?:)/i.test(x.text)).at(-1);
-  if(office){result.sender=office.text;result.evidence.sender=office.number;}
+  const office=letterheadOffice(top.map(x=>x.text));
+  if(office){result.sender=office;result.fieldEvidence.sender=office;}
  }
+ if(/^(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY)$/i.test(result.sender))result.sender='';
  const author=printedHeaderSignatory(rawText);
- if(author.name){result.signatory=author.name;if(!explicitSender)result.sender=author.name;if(!result.issuedBy)result.issuedBy=author.name;}
- for(const[key,names]of Object.entries({date:'DATE|DATE ISSUED|DATED',receivedDate:'DATE RECEIVED|RECEIVED DATE',releasedDate:'DATE RELEASED|RELEASED DATE'})){
+ if(author.name){result.signatory=author.name;if(!result.issuedBy)result.issuedBy=author.name;}
+ for(const[key,names]of Object.entries({date:'DATE|DATE ISSUED|DATED|PETSA',receivedDate:'DATE RECEIVED|RECEIVED DATE',releasedDate:'DATE RELEASED|RELEASED DATE'})){
   const f=field(names,1);if(f.value){result[key]=parseMemoDate(f.value);result.evidence[key]=f.line;result.fieldEvidence[key]=f.text;if(!result[key])result.warnings.push('The printed date is invalid or ambiguous. Enter it manually.');}
  }
  if(!result.evidence.date){const standalone=header.find(x=>dateLine.test(x.text));if(standalone){result.date=parseMemoDate(standalone.text);result.evidence.date=standalone.number;}}
@@ -491,41 +682,15 @@ function parseDocumentHeader(rawText='') {
  result.needsReview=['controlNo','date','addressedTo','subject','sender'].filter(key=>!result[key]);
  return result;
 }
-function printedHeaderSignatory(rawText=''){
- rawText=String(rawText||'').replace(/^((?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards))[,.:]\s+(?=[A-ZÀ-Þ])/gim,'$1,\n');
- const closing=/^(?:respectfully(?: yours| submitted)?|sincerely(?: yours)?|very truly yours|yours(?: truly| sincerely| faithfully)?|truly yours|best regards|kind regards|for your (?:compliance|information and compliance|guidance and compliance))\s*[,.;:!]*$/i;
- const role=/\b(?:PGDH|PGADH|PGENRO|PG\s*ENRO|OFFICER|DIRECTOR|CHIEF|MAYOR|GOVERNOR|ADMINISTRATOR|SUPERVISOR|MANAGER|SECRETARY|PRESIDENT|DEAN|PRINCIPAL|HEAD|COORDINATOR)\b/i;
- const stop=/^(?:cc\s*:|copy (?:furnished|to)|enclosures?\s*:|attachments?\s*:|annex\b|appendix\b|prepared by\b|reviewed by\b|approved by\b|recommending approval\b|ground floor\b|email\b|tel\b|www\.|https?:)|@/i;
- const pages=String(rawText||'').replace(/\r/g,'').split('\f'),lines=[];
- for(let p=0;p<pages.length;p++){
-  const page=pages[p].split('\n').map(s=>s.replace(/[ \t]+/g,' ').trim());
-  if(p&&page.filter(Boolean).slice(0,8).some(s=>/^(?:ANNEX|APPENDIX|ATTACHMENT|ENCLOSURE)\b|^(?:(?:PG\s*ENRO|PGENRO)\s+)?(?:OFFICE\s+)?(?:MEMORANDUM|MEMO|REQUEST LETTER|OFFICE ORDER)\b/i.test(s)))break;
-  lines.push(...page);
- }
- const candidates=[];
- for(let i=0;i<lines.length;i++){
-  if(!closing.test(lines[i]))continue;
-  const block=[];for(const s of lines.slice(i+1,i+15)){if(stop.test(s))break;if(s)block.push(s);}
-  for(let j=0;j<Math.min(6,block.length);j++){
-   const name=block[j].replace(/\.{2,}/g,'.').replace(/\b([A-Z])(?=\s)/g,'$1.').replace(/^[ |;:'‘’"“”]+|[ |;:'‘’"“”]+$/g,'');
-   if(role.test(name)||name.length<7||name.length>110||/[\d:!?@/]/.test(name)||/\b(?:REPUBLIC|PROVINCE|GOVERNMENT|OFFICE|DEPARTMENT|DIVISION|PERSONNEL|SUBJECT|ORDER|COMPLIANCE|DIRECTOR|MAYOR|CHIEF|GOVERNOR|SECRETARY|MANAGER|PLEASE|THANK|SHOULD|MUST|REQUEST)\b/i.test(name))continue;
-   const words=name.match(/[\p{L}][\p{L}.'’\-]*/gu)||[],designation=block[j+1]||'';
-   if(words.length<2||words.length>12||words.filter(w=>w.replace(/[^\p{L}]/gu,'').length>=2).length<2)continue;
-   if(name!==name.toUpperCase()&&!(words.every(w=>/^\p{Lu}/u.test(w)||/^(?:de|del|dela|la|van|von)$/i.test(w))&&role.test(designation)))continue;
-   if(!candidates.includes(name))candidates.push(name);
-  }
- }
- return {name:candidates.length===1?candidates[0]:''};
+function printedHeaderSignatory(rawText='') {
+ const signatory=scanPrintedSignatories(rawText).signatory;
+ return signatory?{name:signatory.name,line:signatory.line,page:signatory.page}:{name:'',line:null,page:null};
 }
-
-/* End memo document parser. */
-
-/* Printed heading and letter-purpose extraction for native text/browser reads. */
 function parseLetterDetails(rawText=''){
- const rules={"headings":[["Memorandum",{"pattern":"^(?:OFFICE\\s+)?(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\\s+(?:ORDER|CIRCULAR))?(?:\\s+(?:N[O0]\\.?|NUMBER|FOR|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Travel Order",{"pattern":"^(?:REVISED\\s+)?TRAVEL\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Special Order",{"pattern":"^SPECIAL\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Office Order",{"pattern":"^(?:OFFICE|ADMINISTRATIVE)\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Notice of Meeting",{"pattern":"^(?:NOTICE\\s+OF\\s+(?:A\\s+)?MEETING|MEETING\\s+NOTICE)(?:\\s*[:\\-].*)?$","flags":"i"}],["Request Letter",{"pattern":"^(?:REQUEST\\s+LETTER|LETTER\\s+OF\\s+REQUEST)(?:\\s*[:\\-].*)?$","flags":"i"}],["Endorsement Letter",{"pattern":"^(?:ENDORSEMENT(?:\\s+LETTER)?|LETTER\\s+OF\\s+ENDORSEMENT)(?:\\s*[:\\-].*)?$","flags":"i"}],["Transmittal Letter",{"pattern":"^(?:TRANSMITTAL(?:\\s+LETTER)?|LETTER\\s+OF\\s+TRANSMITTAL)(?:\\s*[:\\-].*)?$","flags":"i"}],["Response Letter",{"pattern":"^(?:RESPONSE|REPLY)\\s+LETTER(?:\\s*[:\\-].*)?$","flags":"i"}],["Invitation",{"pattern":"^(?:INVITATION(?:\\s+LETTER)?|LETTER\\s+OF\\s+INVITATION)(?:\\s*[:\\-].*)?$","flags":"i"}],["Report",{"pattern":"^(?:(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT|NARRATIVE)\\s+){0,2}REPORT(?:\\s*[:\\-].*)?$","flags":"i"}]],"subjectRules":[["Request Letter",{"pattern":"(?:^(?:REQUEST(?:ING)?(?:\\s+(?:FOR|TO))?|APPLICATION\\s+FOR|REQUISITION\\s+FOR|PURCHASE\\s+REQUEST)\\b|\\b(?:EQUIPMENT|SUPPLY|SUPPLIES|FUNDING|ASSISTANCE|PURCHASE|PERMISSION|APPROVAL|DOCUMENT|RECORDS|FINANCIAL|BUDGET|SPONSORSHIP)\\s+REQUEST\\b)","flags":"i"}],["Notice of Meeting",{"pattern":"^(?:NOTICE\\s+OF\\s+(?:A\\s+)?MEETING|MEETING\\s+NOTICE|(?:STAFF|PERSONNEL|COORDINATION|REGULAR|SPECIAL)\\s+MEETING)\\b","flags":"i"}],["Invitation",{"pattern":"^INVITATION\\b","flags":"i"}],["Endorsement Letter",{"pattern":"^ENDORSEMENT\\b","flags":"i"}],["Transmittal Letter",{"pattern":"^(?:TRANSMITTAL\\b|(?:SUBMISSION|FORWARDING)\\s+OF\\b)","flags":"i"}],["Response Letter",{"pattern":"^(?:RESPONSE|REPLY)\\s+TO\\b","flags":"i"}],["Report",{"pattern":"^(?:(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT|NARRATIVE)\\s+){0,2}REPORT\\b","flags":"i"}]],"bodyRules":[["Response Letter",{"pattern":"\\b(?:in\\s+(?:response|reply)\\s+to|respond(?:ing)?\\s+to|reply(?:ing)?\\s+to)\\b","flags":"i"}],["Invitation",{"pattern":"\\b(?:invite\\s+(?:you|your|the)|inviting\\s+(?:you|your|the)|extend\\s+(?:an?|our)\\s+invitation)\\b","flags":"i"}],["Endorsement Letter",{"pattern":"\\b(?:(?:we|I)\\s+(?:(?:hereby|respectfully)\\s+)?endorse|endorsing\\s+(?:the|this|Mr|Ms|Dr))\\b","flags":"i"}],["Transmittal Letter",{"pattern":"\\b(?:(?:we|I)\\s+(?:(?:hereby|respectfully|are)\\s+)?(?:transmit|forward|submit|transmitting|forwarding|submitting)|herewith\\s+(?:transmitted|submitted|forwarded)|transmittal\\s+of)\\b","flags":"i"}],["Request Letter",{"pattern":"\\b(?:request(?:ing)?\\s+(?:for|to|your|the|a|an|permission|approval|assistance|funding|technical\\s+assistance)|application\\s+for)\\b","flags":"i"}],["Notice of Meeting",{"pattern":"\\b(?:please\\s+be\\s+informed|inform\\s+(?:you|all)|notify\\s+(?:you|all))\\b[^.!?]{0,180}\\bmeeting\\b","flags":"i"}],["Report",{"pattern":"\\b(?:report\\s+on|(?:monthly|annual|accomplishment|activity|inspection|progress|incident)\\s+report)\\b","flags":"i"}]],"subjectLabel":{"pattern":"^(?:SUBJECT(?:\\s+(?:MATTER|OF\\s+(?:THE\\s+)?LETTER))?|SUBJEC[TIL1]|SUB3ECT|SUBJ\\.?|RE|REGARDING|PAKSA)(?:\\s*[:;\\-–—]\\s*|\\s+|$)(.*)$","flags":"i"},"fieldLabel":{"pattern":"^(?:DATE(?:\\s+(?:ISSUED|RECEIVED|RELEASED))?|DATED|TO|T0|FOR|FROM|SENDER|THRU|THROUGH|CC|ATTACHMENTS?|ENCLOSURES?|REFERENCE|REF\\.?|CONTROL(?:\\s+(?:NO\\.?|NUMBER))?|ISSUED\\s+BY|SIGNATORY|REMARKS|N[O0]\\.?|NUMBER)\\s*[:;\\-]","flags":"i"},"salutation":{"pattern":"^(?:DEAR\\b|SIR\\s*[,!:]|MADAM\\s*[,!:]|MA'AM\\s*[,!:]|TO\\s+WHOM\\s+IT\\s+MAY\\s+CONCERN)","flags":"i"},"closing":{"pattern":"^(?:(?:VERY\\s+)?(?:YOURS\\s+)?(?:SINCERELY|RESPECTFULLY|FAITHFULLY|TRULY)|YOURS\\s+(?:TRULY|FAITHFULLY|SINCERELY)|BEST\\s+REGARDS|KIND\\s+REGARDS|LUBOS\\s+NA\\s+GUMAGALANG|SIGNED\\s+BY|PREPARED\\s+BY|APPROVED\\s+BY)\\b","flags":"i"},"body":{"pattern":"^(?:DEAR\\b|GREETINGS\\b|GOOD\\s+(?:DAY|MORNING|AFTERNOON)\\b|PLEASE\\b|KINDLY\\b|WE\\b|I\\s+(?:AM|WOULD|HEREBY|WRITE|RESPECTFULLY)\\b|MAY\\s+(?:WE|I)\\b|THIS\\s+(?:IS|LETTER|REFERS|HAS|WILL)\\b|YOU\\s+ARE\\b|THE\\s+(?:UNDERSIGNED|ATTACHED|PURPOSE)\\b|ATTACHED\\s+(?:IS|ARE|HEREWITH)\\b|IN\\s+(?:CONNECTION|VIEW|LIGHT)\\b|WITH\\s+REFERENCE\\b|PURSUANT\\b|FOR\\s+YOUR\\s+(?:INFORMATION|COMPLIANCE|GUIDANCE)\\b)","flags":"i"},"titlePurpose":{"pattern":"^(?:REQUEST\\s+(?:FOR|TO)|INVITATION\\s+(?:TO|FOR)|ENDORSEMENT\\s+(?:OF|FOR)|TRANSMITTAL\\s+OF|RESPONSE\\s+TO|REPLY\\s+TO|NOTICE\\s+OF\\s+MEETING|(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT)\\s+REPORT)\\b","flags":"i"}};
+ const rules={"headings":[["Memorandum",{"pattern":"^(?:OFFICE\\s+)?(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\\s+(?:ORDER|CIRCULAR))?(?:\\s+(?:N[O0]\\.?|NUMBER|FOR|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Travel Order",{"pattern":"^(?:REVISED\\s+)?TRAVEL\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Special Order",{"pattern":"^SPECIAL\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Office Order",{"pattern":"^(?:OFFICE|ADMINISTRATIVE)\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Notice of Meeting",{"pattern":"^(?:NOTICE\\s+OF\\s+(?:A\\s+)?MEETING|MEETING\\s+NOTICE)(?:\\s*[:\\-].*)?$","flags":"i"}],["Request Letter",{"pattern":"^(?:REQUEST\\s+LETTER|LETTER\\s+OF\\s+REQUEST)(?:\\s*[:\\-].*)?$","flags":"i"}],["Endorsement Letter",{"pattern":"^(?:ENDORSEMENT(?:\\s+LETTER)?|LETTER\\s+OF\\s+ENDORSEMENT)(?:\\s*[:\\-].*)?$","flags":"i"}],["Transmittal Letter",{"pattern":"^(?:TRANSMITTAL(?:\\s+LETTER)?|LETTER\\s+OF\\s+TRANSMITTAL)(?:\\s*[:\\-].*)?$","flags":"i"}],["Response Letter",{"pattern":"^(?:RESPONSE|REPLY)\\s+LETTER(?:\\s*[:\\-].*)?$","flags":"i"}],["Invitation",{"pattern":"^(?:INVITATION(?:\\s+LETTER)?|LETTER\\s+OF\\s+INVITATION)(?:\\s*[:\\-].*)?$","flags":"i"}],["Report",{"pattern":"^(?:(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT|NARRATIVE)\\s+){0,2}REPORT(?:\\s*[:\\-].*)?$","flags":"i"}]],"subjectRules":[["Request Letter",{"pattern":"(?:^(?:REQUEST(?:ING)?(?:\\s+(?:FOR|TO))?|APPLICATION\\s+FOR|REQUISITION\\s+FOR|PURCHASE\\s+REQUEST)\\b|\\b(?:EQUIPMENT|SUPPLY|SUPPLIES|FUNDING|ASSISTANCE|PURCHASE|PERMISSION|APPROVAL|DOCUMENT|RECORDS|FINANCIAL|BUDGET|SPONSORSHIP)\\s+REQUEST\\b)","flags":"i"}],["Notice of Meeting",{"pattern":"^(?:NOTICE\\s+OF\\s+(?:A\\s+)?MEETING|MEETING\\s+NOTICE|(?:STAFF|PERSONNEL|COORDINATION|REGULAR|SPECIAL)\\s+MEETING)\\b","flags":"i"}],["Invitation",{"pattern":"^INVITATION\\b","flags":"i"}],["Endorsement Letter",{"pattern":"^ENDORSEMENT\\b","flags":"i"}],["Transmittal Letter",{"pattern":"^(?:TRANSMITTAL\\b|(?:SUBMISSION|FORWARDING)\\s+OF\\b)","flags":"i"}],["Response Letter",{"pattern":"^(?:RESPONSE|REPLY)\\s+TO\\b","flags":"i"}],["Report",{"pattern":"^(?:(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT|NARRATIVE)\\s+){0,2}REPORT\\b","flags":"i"}]],"bodyRules":[["Response Letter",{"pattern":"\\b(?:in\\s+(?:response|reply)\\s+to|respond(?:ing)?\\s+to|reply(?:ing)?\\s+to)\\b","flags":"i"}],["Invitation",{"pattern":"\\b(?:invite\\s+(?:you|your|the)|inviting\\s+(?:you|your|the)|extend\\s+(?:an?|our)\\s+invitation)\\b","flags":"i"}],["Endorsement Letter",{"pattern":"\\b(?:(?:we|I)\\s+(?:(?:hereby|respectfully)\\s+)?endorse|endorsing\\s+(?:the|this|Mr|Ms|Dr))\\b","flags":"i"}],["Transmittal Letter",{"pattern":"\\b(?:(?:we|I)\\s+(?:(?:hereby|respectfully|are)\\s+)?(?:transmit|forward|submit|transmitting|forwarding|submitting)|herewith\\s+(?:transmitted|submitted|forwarded)|transmittal\\s+of)\\b","flags":"i"}],["Request Letter",{"pattern":"\\b(?:request(?:ing)?\\s+(?:for|to|your|the|a|an|permission|approval|assistance|funding|technical\\s+assistance)|application\\s+for)\\b","flags":"i"}],["Notice of Meeting",{"pattern":"\\b(?:please\\s+be\\s+informed|inform\\s+(?:you|all)|notify\\s+(?:you|all))\\b[^.!?]{0,180}\\bmeeting\\b","flags":"i"}],["Report",{"pattern":"\\b(?:report\\s+on|(?:monthly|annual|accomplishment|activity|inspection|progress|incident)\\s+report)\\b","flags":"i"}]],"subjectLabel":{"pattern":"^(?:SUBJECT(?:\\s+(?:MATTER|OF\\s+(?:THE\\s+)?LETTER))?|SUBJEC[TIL1]|SUB3ECT|SUBJ\\.?|RE|REGARDING|PAKSA)(?:\\s*[:;\\-\u2013\u2014]\\s*|\\s+|$)(.*)$","flags":"i"},"fieldLabel":{"pattern":"^(?:DATE(?:\\s+(?:ISSUED|RECEIVED|RELEASED))?|DATED|TO|T0|FOR|FROM|SENDER|THRU|THROUGH|CC|ATTACHMENTS?|ENCLOSURES?|REFERENCE|REF\\.?|CONTROL(?:\\s+(?:NO\\.?|NUMBER))?|ISSUED\\s+BY|SIGNATORY|REMARKS|N[O0]\\.?|NUMBER)\\s*[:;\\-]","flags":"i"},"salutation":{"pattern":"^(?:DEAR\\b|SIR\\s*[,!:]|MADAM\\s*[,!:]|MA'AM\\s*[,!:]|TO\\s+WHOM\\s+IT\\s+MAY\\s+CONCERN)","flags":"i"},"closing":{"pattern":"^(?:(?:VERY\\s+)?(?:YOURS\\s+)?(?:SINCERELY|RESPECTFULLY|FAITHFULLY|TRULY)|YOURS\\s+(?:TRULY|FAITHFULLY|SINCERELY)|BEST\\s+REGARDS|KIND\\s+REGARDS|LUBOS\\s+NA\\s+GUMAGALANG|SIGNED\\s+BY|PREPARED\\s+BY|APPROVED\\s+BY)\\b","flags":"i"},"body":{"pattern":"^(?:DEAR\\b|GREETINGS\\b|GOOD\\s+(?:DAY|MORNING|AFTERNOON)\\b|PLEASE\\b|KINDLY\\b|WE\\b|I\\s+(?:AM|WOULD|HEREBY|WRITE|RESPECTFULLY)\\b|MAY\\s+(?:WE|I)\\b|THIS\\s+(?:IS|LETTER|REFERS|HAS|WILL)\\b|YOU\\s+ARE\\b|THE\\s+(?:UNDERSIGNED|ATTACHED|PURPOSE)\\b|ATTACHED\\s+(?:IS|ARE|HEREWITH)\\b|IN\\s+(?:CONNECTION|VIEW|LIGHT)\\b|WITH\\s+REFERENCE\\b|PURSUANT\\b|FOR\\s+YOUR\\s+(?:INFORMATION|COMPLIANCE|GUIDANCE)\\b)","flags":"i"},"titlePurpose":{"pattern":"^(?:REQUEST\\s+(?:FOR|TO)|INVITATION\\s+(?:TO|FOR)|ENDORSEMENT\\s+(?:OF|FOR)|TRANSMITTAL\\s+OF|RESPONSE\\s+TO|REPLY\\s+TO|NOTICE\\s+OF\\s+MEETING|(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT)\\s+REPORT)\\b","flags":"i"}};
  const header=parseDocumentHeader(rawText),first=String(rawText||'').replace(/\r/g,'').split('\f')[0],lines=first.split('\n').map(s=>s.trim());
  const regex=key=>new RegExp(rules[key].pattern,rules[key].flags||'i');
- const greeting=lines.findIndex(line=>regex('salutation').test(line));
+ const greeting=lines.findIndex(line=>regex('salutation').test(line)||/^(?:magandang (?:araw|umaga|hapon)|mahal na)\b/i.test(line));
  let opening='';
  if(greeting>=0){const parts=[];for(const line of lines.slice(greeting+1,greeting+24)){
   if(!line){if(parts.length)break;continue;}
@@ -537,11 +702,12 @@ function parseLetterDetails(rawText=''){
  const top=lines.slice(0,greeting>=0?greeting:lines.findIndex(line=>regex('body').test(line))<0?60:lines.findIndex(line=>regex('body').test(line)));
  if(!subject){const title=top.find(line=>regex('titlePurpose').test(line));if(title){subject=title;subjectSource='heading';}}
  if(!subject&&/\b(?:request(?:ing)?|invite|invitation|endorse|endorsement|transmit|transmittal|submit|forward|respond|response|reply|inform|report)\b/i.test(opening)){
-  const sentence=opening.match(/^.*?[.!?](?=\s+[A-Z]|$)/)?.[0]||opening;subject=sentence.length<=240?sentence:sentence.slice(0,240).replace(/\s+\S*$/,'')+'…';subjectSource='body';
+  const sentence=opening.match(/^.*?[.!?](?=\s+[A-Z]|$)/)?.[0]||opening;subject=sentence.length<=240?sentence:sentence.slice(0,240).replace(/\s+\S*$/,'')+'\u2026';subjectSource='body';
  }
  if(!documentType){for(const [type,rule] of rules.headings){if(top.some(line=>new RegExp(rule.pattern,rule.flags).test(line))){documentType=type;documentTypeSource='heading';break;}}}
  if(!documentType&&subjectSource!=='body'){for(const [type,rule] of rules.subjectRules){if(new RegExp(rule.pattern,rule.flags).test(subject)){documentType=type;documentTypeSource='subject';break;}}}
  if(!documentType){for(const [type,rule] of rules.bodyRules){if(new RegExp(rule.pattern,rule.flags).test(opening)){documentType=type;documentTypeSource='body';break;}}}
+ if(!documentType&&greeting>=0&&/\b(?:humihiling|hinihiling|pakiusap)\b/i.test(first)){documentType='Request Letter';documentTypeSource='body';}
  if(!documentType&&first.trim()){documentType=greeting>=0?'Letter':'Other Communication';documentTypeSource='fallback';}
  return {subject,subjectSource,documentType,documentTypeSource,isMemo:header.isMemo,needsReview:[...(subjectSource==='body'||!subject?['subject']:[]),...(['body','subject','fallback'].includes(documentTypeSource)?['documentType']:[])]};
 }
@@ -621,10 +787,10 @@ function parseLetterDetails(rawText=''){
    selected=new Set([...selected].filter(id=>records.some(r=>String(r.id)===id)));
    $('communicationTableBody').innerHTML=visible.length?visible.map(r=>`<tr data-id="${esc(r.id)}" class="${selected.has(String(r.id))?'selected-row':''}">
     <td><input class="row-checkbox" type="checkbox" data-id="${esc(r.id)}" ${selected.has(String(r.id))?'checked':''} aria-label="Select ${esc(r.controlNo)}"></td>
-    <td><strong>${esc(r.controlNo||'—')}</strong><span class="employee-sub">${esc(r.type||'—')} · ${esc(r.docType||'—')}</span></td>
-    <td>${esc(r.date||'—')}</td><td class="communication-office">${esc(r.office||'—')}</td><td class="communication-subject">${esc(r.subject||'—')}</td>
-    <td>${r.attachmentId||r.fileUrl?`<button class="btn btn-sm btn-secondary" data-action="file" data-id="${esc(r.id)}" title="View attached document"><i data-lucide="paperclip"></i> View file</button><span class="employee-sub">${esc(r.fileName||'Document')}</span>`:'—'}</td>
-    <td><span class="badge-status ${r.status==='Pending'?'urgent':'success'}">${esc(r.status||'—')}</span></td>
+    <td><strong>${esc(r.controlNo||'\u2014')}</strong><span class="employee-sub">${esc(r.type||'\u2014')} \xb7 ${esc(r.docType||'\u2014')}</span></td>
+    <td>${esc(r.date||'\u2014')}</td><td class="communication-office">${esc(r.office||'\u2014')}</td><td class="communication-subject">${esc(r.subject||'\u2014')}</td>
+    <td>${r.attachmentId||r.fileUrl?`<button class="btn btn-sm btn-secondary" data-action="file" data-id="${esc(r.id)}" title="View attached document"><i data-lucide="paperclip"></i> View file</button><span class="employee-sub">${esc(r.fileName||'Document')}</span>`:'\u2014'}</td>
+    <td><span class="badge-status ${r.status==='Pending'?'urgent':'success'}">${esc(r.status||'\u2014')}</span></td>
     <td><div class="actions"><button class="btn-action" data-action="edit" data-id="${esc(r.id)}" aria-label="Edit ${esc(r.controlNo)}" title="Edit record"><i data-lucide="pencil"></i></button><button class="btn-action" data-action="ocr" data-id="${esc(r.id)}" aria-label="View extracted text for ${esc(r.controlNo)}" title="View extracted text"><i data-lucide="file-search"></i></button><button class="btn-action delete" data-action="delete" data-id="${esc(r.id)}" aria-label="Delete ${esc(r.controlNo)}" title="Delete record"><i data-lucide="trash-2"></i></button></div></td></tr>`).join(''):`<tr><td colspan="8" class="empty-table-cell">${records.length?'No records match the current filters.':'No communication records available.'}</td></tr>`;
    $('tablePaginationInfo').textContent=`Showing ${rows.length?(page-1)*size+1:0} to ${Math.min(page*size,rows.length)} of ${rows.length} records`;
    $('commPageLabel').textContent=`Page ${page} of ${pages}`;$('commPrevPage').disabled=page===1;$('commNextPage').disabled=page===pages;
@@ -635,7 +801,10 @@ function parseLetterDetails(rawText=''){
   }
   async function load() {
    const version=++generation;
-   try {if(!M.client()){mode='local';const cached=M.storage.get(cacheKey,M.storage.get('communicationRecords',[]));records=(Array.isArray(cached)?cached:[]).map(normalize);}
+   try {
+    const connection=await M.waitForBackend();if(version!==generation)return false;
+    if(connection==='unavailable'&&!M.client())throw new Error('Database connection unavailable.');
+    if(!M.client()){mode='local';const cached=M.storage.get(cacheKey,M.storage.get('communicationRecords',[]));records=(Array.isArray(cached)?cached:[]).map(normalize);}
     else {const rows=await M.read(table);if(version!==generation)return false;mode='live';records=rows.map(normalize);M.storage.set(cacheKey,records);}
     M.observeRecords('communications',records);render();return true;
    }catch(error){if(version!==generation)return false;mode='unavailable';const cached=M.storage.get(cacheKey,[]);records=(Array.isArray(cached)?cached:[]).map(normalize);render();M.toast('Records could not refresh. Cached records are available; saving requires a database connection.','error');return false;}
@@ -653,9 +822,27 @@ function parseLetterDetails(rawText=''){
   }
   function newControlNo() {const prefix=`COMM-${new Date().getFullYear()}-`;const highest=Math.max(0,...records.map(r=>String(r.controlNo||'').startsWith(prefix)?Number(String(r.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
   function releasePreview() {if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}}
-  function resetFile(remove=false) {ocrGeneration++;file=null;attachment=null;if(remove)remoteAttachmentRemoved=true;$('documentFileInput').value='';releasePreview();$('fileNameDisplay').textContent='Choose a document file';$('fileMetaDisplay').textContent='PDF, images, DOCX, TXT • Max 50 MB';$('removeDocumentBtn').style.display='none';$('runOcrBtn').disabled=true;$('filePreviewContainer').style.display='none';$('filePreviewBody').replaceChildren();}
+  function clearAutoDetectedFields() {
+   for(const[id,value]of commOcrValues)if($(id).value===value&&!commManualFields.has(id))$(id).value='';
+   commOcrValues.clear();detectedMemo=false;lastOcrMetadata=null;lastOcrWarnings=[];lastOcrForm=null;
+   $('communicationMemoReview').hidden=$('communicationOcrReview').hidden=$('ocrSignatoryGroup').hidden=true;
+   $('ocrTextInput').value='';commManualFields.delete('ocrTextInput');$('ocrStatsChip').style.display='none';
+   for(const id of ocrFormIds)if(!commManualFields.has(id))setFieldState(id,'');
+   $('ocrFieldSummary').textContent='Detected fields will appear here after reading.';
+   if(!editing){if(!$('dateInput').value&&!commManualFields.has('dateInput'))$('dateInput').value=M.today();if(!$('statusSelect').value&&!commManualFields.has('statusSelect'))$('statusSelect').value='Pending';}
+   updateDestination();
+  }
+  function resetFile(remove=false) {
+   ocrGeneration++;pendingRead=null;cancelDocumentRead('removed');file=null;attachment=null;
+   if(remove){remoteAttachmentRemoved=true;clearAutoDetectedFields();}
+   $('documentFileInput').value='';releasePreview();$('fileNameDisplay').textContent='Choose a document';$('fileMetaDisplay').textContent='PDF, images, Word, Excel, PowerPoint or text \xb7 Max 50 MB';
+   $('removeDocumentBtn').style.display='none';$('runOcrBtn').disabled=true;$('filePreviewContainer').style.display='none';$('filePreviewBody').replaceChildren();
+   setReaderState('idle','Ready for a document');$('ocrActionSubtext').textContent='Reading starts automatically when you select a file.';
+   $('encodingUploadProgressBox').classList.remove('active');$('ocrStopControls').hidden=true;
+  }
   function setPreview(blob) {
    releasePreview();previewUrl=URL.createObjectURL(blob);const root=$('filePreviewBody');root.replaceChildren();let node;
+   root.classList.toggle('is-text-document',!blob.type.startsWith('image/')&&!(blob.type==='application/pdf'||/\.pdf$/i.test(blob.name||'')));
    if(blob.type.startsWith('image/')){node=document.createElement('img');node.alt='Attached document preview';node.src=previewUrl;}
    else if(blob.type==='application/pdf'||/\.pdf$/i.test(blob.name||'')){
     node=document.createElement('div');node.className='communication-pdf-preview-card';
@@ -664,11 +851,12 @@ function parseLetterDetails(rawText=''){
     button.addEventListener('click',()=>viewFile({previewBlob:blob,fileName:blob.name||'Communication.pdf',fileType:blob.type,controlNo:$('controlNoInput').value,subject:$('subjectInput').value},true));
     node.append(label,button);
    }
-   else {node=document.createElement('p');node.textContent='Open or download this file to view it in its original application.';}
+   else {node=document.createElement('p');node.textContent='Document attached. Readable text appears below after extraction.';}
    root.append(node);$('filePreviewContainer').style.display='block';$('previewOpenExternalBtn').href=previewUrl;$('previewOpenExternalBtn').style.display='inline-flex';
   }
   async function openEditor(id=null) {
-   if(busy)return;routeCommitted=false;remoteAttachmentRemoved=false;detectedMemo=false;commOcrValues.clear();commManualFields.clear();$('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcrMetadata=null;lastOcrWarnings=[];
+   if(busy)return;pendingRead=null;cancelDocumentRead('closed');routeCommitted=false;remoteAttachmentRemoved=false;detectedMemo=false;commOcrValues.clear();commManualFields.clear();$('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcrMetadata=null;lastOcrWarnings=[];lastOcrForm=null;
+   for(const id of ocrFormIds)setFieldState(id,'');$('ocrFieldSummary').textContent='Detected fields will appear here after reading.';$('communicationInlineNotice').hidden=true;
    for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=false;
    $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=false;
    editing=id;$('communicationForm').reset();resetFile();$('editIndex').value=id||'';$('modalTitle').textContent=id?'Edit Communication Record':'New Communication Record';$('saveRecordBtn').querySelector('span').textContent=id?'Save Changes':'Save Record';
@@ -680,7 +868,12 @@ function parseLetterDetails(rawText=''){
      const option=document.createElement('option');option.value=r.docType;option.textContent=r.docType;option.dataset.existingType='true';docTypeSelect.append(option);
     }
     for(const[key,input]of Object.entries(fieldInputs))$(input).value=r[key]||'';
-    attachment=r.attachmentId?{id:r.attachmentId,name:r.fileName,type:r.fileType}:null;if(attachment){$('fileNameDisplay').textContent=attachment.name||'Existing attachment';$('fileMetaDisplay').textContent='Previously attached file';$('removeDocumentBtn').style.display='inline-flex';}
+    attachment=r.attachmentId||r.fileUrl?{id:r.attachmentId||null,name:r.fileName,type:r.fileType}:null;
+    if(attachment){
+     $('fileNameDisplay').textContent=attachment.name||'Existing attachment';$('fileMetaDisplay').textContent='Previously attached file';$('removeDocumentBtn').style.display='inline-flex';
+     const root=$('filePreviewBody');root.classList.add('is-text-document');const button=document.createElement('button');button.type='button';button.className='btn btn-secondary';button.textContent='View existing document';button.addEventListener('click',()=>viewFile(r,true));root.replaceChildren(button);$('filePreviewContainer').style.display='block';
+     const remote=safeCommunicationAttachment(r.fileUrl);$('previewOpenExternalBtn').style.display=remote?'inline-flex':'none';if(remote)$('previewOpenExternalBtn').href=remote;
+    }
    }
    else {$('dateInput').value=M.today();$('controlNoInput').value=newControlNo();$('typeSelect').value='Incoming';$('statusSelect').value='Pending';}
    const memo=detectMemo(r?.ocrText||'');if(memo){$('memoRecipientInput').value=memo.addressedTo;$('memoIssuerInput').value=memo.issuedBy;}
@@ -694,24 +887,31 @@ function parseLetterDetails(rawText=''){
      M.toast('This memo is already saved in Office Memos. Finish Move will remove the original communication.','warning');
     }
    }catch{}
-   updateDestination();M.openModal('encodingModal');
+   updateDestination();syncOcrControls();M.openModal('encodingModal');
   }
   // IndexedDB retains large attachments without exhausting localStorage.
   let dbPromise;
   function attachmentDB(){if(!dbPromise)dbPromise=new Promise((resolve,reject)=>{const req=indexedDB.open('pgenro_communication_attachments',1);req.onupgradeneeded=()=>req.result.createObjectStore('files');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(new Error('Attachment storage is unavailable.'));});return dbPromise;}
   async function attachmentIO(action,id,value){const db=await attachmentDB();return new Promise((resolve,reject)=>{const tx=db.transaction('files',action==='get'?'readonly':'readwrite');const req=action==='put'?tx.objectStore('files').put(value,id):action==='delete'?tx.objectStore('files').delete(id):tx.objectStore('files').get(id);let result;req.onsuccess=()=>result=req.result;tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(new Error('Could not store the attachment. Browser storage may be full.'));tx.onabort=()=>reject(new Error('Attachment storage was interrupted.'));});}
-  $('documentFileInput').addEventListener('change',()=>{
-   const chosen=$('documentFileInput').files[0];if(!chosen)return;if(chosen.size>50*1024*1024){M.toast('Choose a file no larger than 50 MB.','warning');$('documentFileInput').value='';return;}
+  function selectDocument(chosen) {
+   if(!chosen||busy||routeCommitted)return;if(chosen.size>50*1024*1024){M.toast('Choose a file no larger than 50 MB.','warning');$('documentFileInput').value='';return;}
+   if(!chosen.size){M.toast('This file is empty. Choose another document.','warning');$('documentFileInput').value='';return;}
    if(!/\.(pdf|png|jpe?g|webp|bmp|tiff?|docx|txt|csv|xlsx|pptx)$/i.test(chosen.name)){M.toast('Unsupported attachment type.','warning');$('documentFileInput').value='';return;}
-   for(const[id,value]of commOcrValues)if($(id).value===value&&!commManualFields.has(id))$(id).value='';commOcrValues.clear();
-   if(detectedMemo){$('docTypeSelect').value='';detectedMemo=false;}
-   $('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcrMetadata=null;lastOcrWarnings=[];
-   $('ocrTextInput').value='';$('ocrStatsChip').style.display='none';updateDestination();
-   ocrGeneration++;file=chosen;attachment=null;$('fileNameDisplay').textContent=chosen.name;$('fileMetaDisplay').textContent=`${(chosen.size/1024/1024).toFixed(2)} MB`;$('removeDocumentBtn').style.display='inline-flex';$('runOcrBtn').disabled=false;$('ocrActionSubtext').textContent='Read all pages, the letter body, and the printed signatory. Review the detected fields before saving.';setPreview(chosen);
-  });
+   ocrGeneration++;cancelDocumentRead('replaced');clearAutoDetectedFields();
+   $('communicationInlineNotice').hidden=true;
+   file=chosen;attachment=null;$('fileNameDisplay').textContent=chosen.name;$('fileMetaDisplay').textContent=`${(chosen.size/1024/1024).toFixed(2)} MB \xb7 ${chosen.name.split('.').pop().toUpperCase()}`;
+   $('removeDocumentBtn').style.display='inline-flex';setPreview(chosen);scheduleDocumentRead();
+  }
+  $('documentFileInput').addEventListener('change',()=>selectDocument($('documentFileInput').files[0]));
+  const dropZone=$('communicationDropZone');
+  dropZone.addEventListener('dragover',event=>{event.preventDefault();if(!busy&&!routeCommitted)dropZone.classList.add('is-dragging');});
+  dropZone.addEventListener('dragleave',event=>{if(!dropZone.contains(event.relatedTarget))dropZone.classList.remove('is-dragging');});
+  dropZone.addEventListener('drop',event=>{event.preventDefault();dropZone.classList.remove('is-dragging');if(event.dataTransfer.files.length!==1){M.toast('Choose one document at a time.','warning');return;}selectDocument(event.dataTransfer.files[0]);});
   $('browseDocumentBtn').addEventListener('click',()=>$('documentFileInput').click());$('removeDocumentBtn').addEventListener('click',()=>resetFile(true));
   $('communicationForm').addEventListener('submit',async e=>{
-   e.preventDefault();if(busy||!$('communicationForm').reportValidity())return;
+   e.preventDefault();if(busy)return;
+   if(ocrActive||pendingRead){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
+   if(!$('communicationForm').reportValidity())return;
    const payload=Object.fromEntries(Object.entries(fieldInputs).map(([k,id])=>[k,$(id).value.trim()]));if(!isMemo()&&records.some(r=>String(r.id)!==String(editing)&&String(r.controlNo||'').trim().toLowerCase()===payload.controlNo.toLowerCase()))return M.toast('This control number already exists. Use a unique number.','warning');
    let newAttachment=null,newRemoteUrl='';const priorAttachment=records.find(r=>String(r.id)===String(editing))?.attachmentId;
    try {requireWrite();busy=true;$('encodingModal').dataset.busy='true';$('saveRecordBtn').disabled=true;$('runOcrBtn').disabled=true;
@@ -825,7 +1025,7 @@ function parseLetterDetails(rawText=''){
     const previous=commPreview.renderPromise;
     commPdfPageLabel.textContent=`Page ${pageNumber} of ${documentPdf.numPages}`;
     commPdfPrevPage.disabled=pageNumber<=1;commPdfNextPage.disabled=pageNumber>=documentPdf.numPages;
-    commPdfRenderStatus.textContent='Rendering page…';commPdfStage.setAttribute('aria-busy','true');
+    commPdfRenderStatus.textContent='Rendering page\u2026';commPdfStage.setAttribute('aria-busy','true');
     commPreview.renderPromise=(async()=>{
       await previous.catch(()=>{});
       if(!communicationPreviewIsCurrent(generation)||version!==commPreview.renderVersion)return;
@@ -920,8 +1120,8 @@ function parseLetterDetails(rawText=''){
     cleanupCommunicationViewer();returnToEncoding=fromEditor;
     const filename=String(r.fileName||r.previewBlob?.name||'document').replace(/[\\/\u0000-\u001f\u007f]/g,'_');
     $('docViewerTitle').textContent=r.controlNo?`Communication ${r.controlNo}`:'Document Viewer';
-    $('docViewerSubtitle').textContent=[r.subject,filename].filter(Boolean).join(' · ');
-    showCommunicationPreviewState('Loading attachment…','Preparing the document preview.');
+    $('docViewerSubtitle').textContent=[r.subject,filename].filter(Boolean).join(' \xb7 ');
+    showCommunicationPreviewState('Loading attachment\u2026','Preparing the document preview.');
     M.openModal('viewDocumentModal');
     const version=commPreview.generation;
     if(remote&&/^(?:https?:|blob:)/i.test(remote))setCommunicationAttachmentLinks(remote,filename);
@@ -978,60 +1178,86 @@ function pdfTextLines(items){
  const rows=[];
  for(const item of items){if(!item.str?.trim())continue;const y=item.transform[5],height=Math.abs(item.height||item.transform[3]||12);let row=rows.find(r=>Math.abs(r.y-y)<Math.max(2,height*.25));if(!row){row={y,height,items:[]};rows.push(row);}row.items.push(item);}
  rows.sort((a,b)=>b.y-a.y);const lines=[];const gaps=rows.slice(1).map((r,i)=>rows[i].y-r.y).sort((a,b)=>a-b),typical=gaps[Math.floor(gaps.length/2)]||0;
- rows.forEach((row,index)=>{if(index&&rows[index-1].y-row.y>Math.max(Math.max(rows[index-1].height,row.height)*1.7,typical*1.6))lines.push('');lines.push(row.items.sort((a,b)=>a.transform[4]-b.transform[4]).map(x=>x.str).join('  '));});
+ rows.forEach((row,index)=>{
+  if(index&&rows[index-1].y-row.y>Math.max(Math.max(rows[index-1].height,row.height)*1.7,typical*1.6))lines.push('');
+  let line='',previous=null;
+  for(const item of row.items.sort((a,b)=>a.transform[4]-b.transform[4])){
+   if(previous){
+    const gap=item.transform[4]-(previous.transform[4]+Math.abs(previous.width||0));
+    // PDF.js splits words for font changes and kerning, not just table columns.
+    const separator=gap>Math.max(8,row.height*.8)?'  ':/\s$/.test(line)||/^\s/.test(item.str)?'':gap>Math.max(.5,row.height*.08)?' ':'';
+    line+=separator;
+   }
+   line+=item.str;previous=item;
+  }
+  lines.push(line);
+ });
  return lines.join('\n');
 }
-function mergeDocumentText(base,extra){
- const keys=new Set(String(base||'').split('\n').map(s=>s.toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,''))),lines=[];
- for(const line of String(extra||'').split('\n')){const key=line.toLocaleLowerCase().replace(/[^\p{L}\p{N}]/gu,'');if(key&&!keys.has(key)){keys.add(key);lines.push(line);}}
- return String(base||'')+(lines.length?'\n\n'+lines.join('\n'):'');
+function supplementSenderEvidence(base,extra,signatureRegion=false){
+ base=String(base||'');const existing=parseCorrespondence(base);
+ if(existing.receivedFrom||existing.receivedFromSource==='ambiguous')return base;
+ const candidates=scanPrintedSignatories(extra,signatureRegion).primary,evidence=candidates.map(c=>c.evidence).join('\n\n');
+ if(!evidence)return base;
+ if(candidates.every(c=>c.kind==='explicit-sender'))return evidence+'\n\n'+base;
+ const tail=base.match(/^\s*(?:CC\s*:|COPY\s+(?:TO|FURNISHED)|ANNEX\b|APPENDIX\b|ATTACHMENTS?\s*:|ENCLOSURES?\s*:)/im),at=tail?tail.index:base.length;
+ return base.slice(0,at).trimEnd()+'\n\n'+evidence+'\n\n'+base.slice(at);
+}
+function choosePdfPageText(native,scanned,preferNative=false){
+ native=String(native||'');scanned=String(scanned||'');if(!scanned.trim())return native;
+ if(preferNative&&(native.match(/\w+/g)||[]).length>=(scanned.match(/\w+/g)||[]).length*.8)return supplementSenderEvidence(native,scanned);
+ return preferNative?supplementSenderEvidence(scanned,native):scanned;
 }
 
 const readerResults=new WeakMap();
-const readerRuntime={worker:null,promise:null,logger:null,idle:null,operation:null};
+const readerRuntime={worker:null,promise:null,logger:null,idle:null,operation:null,owner:null,workerToken:null,stopping:null};
 function notifyReaderCancel(op){
  if(!op?.requestId||!op.endpoint)return;
+ if(op.notifiedRequest===op.requestId)return;op.notifiedRequest=op.requestId;
  const url=new URL(op.endpoint,location.href);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/cancel');
  fetch(url.href,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestId:op.requestId}),keepalive:true}).catch(()=>{});
 }
-function cancelDocumentRead(){
+function cancelDocumentRead(reason='stopped'){
  const op=readerRuntime.operation;if(!op)return;
- op.cancelled=true;op.controller?.abort();notifyReaderCancel(op);
+ if(op.cancelled)return;op.cancelled=true;op.reason=reason;op.controller?.abort();notifyReaderCancel(op);
  op.reject?.(new Error('Reading stopped. Your draft is kept; you can retry.'));
- stopReaderWorker();
+ stopReaderWorker(op);
 }
-async function readWithCancellation(source,progress){
- const op={cancelled:false,controller:null,requestId:null,endpoint:null,reject:null};readerRuntime.operation=op;
+async function readWithCancellation(source,progress,stillCurrent=()=>true){
+ await readerRuntime.stopping;
+ if(!stillCurrent())throw Error('Reading stopped. Your draft is kept; you can retry.');
+ const op={cancelled:false,controller:null,requestId:null,endpoint:null,reject:null,notifiedRequest:null};readerRuntime.operation=op;
  const stopped=new Promise((_,reject)=>op.reject=reject);
- try{return await Promise.race([extractDocument(source,progress),stopped]);}
- finally{if(readerRuntime.operation===op)readerRuntime.operation=null;}
+ const deadline=setTimeout(()=>{op.cancelled=true;op.reason='timeout';op.controller?.abort();notifyReaderCancel(op);stopReaderWorker(op);op.reject?.(new Error('Reading reached the time limit. Your draft is kept; retry or choose a smaller document.'));},180000);
+ try{return await Promise.race([extractDocument(source,progress,op),stopped]);}
+ finally{clearTimeout(deadline);if(readerRuntime.operation===op)readerRuntime.operation=null;}
 }
-async function stopReaderWorker(){
+async function stopReaderWorker(operation=null){
+ if(operation&&readerRuntime.owner!==operation)return;
  clearTimeout(readerRuntime.idle);const worker=readerRuntime.worker;
- readerRuntime.worker=null;readerRuntime.promise=null;readerRuntime.logger=null;
- if(worker)try{await worker.terminate();}catch{}
+ readerRuntime.worker=null;readerRuntime.promise=null;readerRuntime.logger=null;readerRuntime.owner=null;readerRuntime.workerToken=null;
+ if(worker){
+  let timer;const stopping=Promise.race([Promise.resolve().then(()=>worker.terminate()).catch(()=>{}),new Promise(resolve=>timer=setTimeout(resolve,1500))]);
+  readerRuntime.stopping=stopping;try{await stopping;}finally{clearTimeout(timer);if(readerRuntime.stopping===stopping)readerRuntime.stopping=null;}
+ }
 }
 window.addEventListener('pagehide',()=>{cancelDocumentRead();stopReaderWorker();});
-async function extractDocument(source,progress=()=>{}){
- const operation=readerRuntime.operation,checkRead=()=>{if(operation?.cancelled)throw Error('Reading stopped. Your draft is kept; you can retry.');};
+async function extractDocument(source,progress=()=>{},operation=readerRuntime.operation){
+ const checkRead=()=>{if(operation?.cancelled)throw Error(operation.reason==='timeout'?'Reading reached the time limit. Retry or choose a smaller document.':'Reading stopped. Your draft is kept; you can retry.');};
  const started=performance.now(),previous=readerResults.get(source);
- if(previous){progress('Using the document already read…',98);return {...previous,cacheHit:true,durationMs:Math.round(performance.now()-started)};}
- const remember=result=>{checkRead();const finished={...result,metadata:{...parseLetterDetails(result.text),...(result.metadata||{})},durationMs:Math.round(performance.now()-started)};readerResults.set(source,finished);return finished;};
+ if(previous){progress('Using the document already read\u2026',98);return {...previous,cacheHit:true,durationMs:Math.round(performance.now()-started)};}
+ const remember=result=>{checkRead();const finished={...result,metadata:result.formSchemaVersion===1?result.metadata||{}:{...parseLetterDetails(result.text),...(result.metadata||{})},durationMs:Math.round(performance.now()-started)};readerResults.set(source,finished);return finished;};
  const extension=source.name.split('.').pop().toLowerCase();
- if(/^(txt|csv)$/.test(extension)){
-  const bytes=new Uint8Array(await source.arrayBuffer()),encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';
-  const text=new TextDecoder(encoding).decode(bytes);return remember({text,metadata:{},warnings:[],pages:text.split('\f').length,engine:'native-text'});
- }
  const warnings=[],configuredEndpoint=document.querySelector('meta[name="pgenro-ocr-endpoint"]')?.content?.trim();
  const endpoints=configuredEndpoint?[configuredEndpoint]:[];
  // Local static previews can use the supplied Python server without editing HTML.
- if(['localhost','127.0.0.1','[::1]'].includes(location.hostname)&&location.port!=='5000')endpoints.push('http://127.0.0.1:5000/ocr');
+ if((['localhost','127.0.0.1','[::1]'].includes(location.hostname)||location.protocol==='file:')&&location.port!=='5000')endpoints.push('http://127.0.0.1:5000/ocr');
  for(const address of [...new Set(endpoints)]){
   const endpoint=new URL(address,location.href).href,sameOrigin=new URL(endpoint).origin===location.origin;
-  let health=sameOrigin?{ok:true,documentTimeoutSeconds:180}:null;
-  if(!sameOrigin){
+  let health=null;
+  {
    const probe=new AbortController(),probeTimer=setTimeout(()=>probe.abort(),3500);if(operation)operation.controller=probe;
-   try{const url=new URL(endpoint);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/health');progress('Connecting to the document reader…',3);
+   try{const url=new URL(endpoint);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/health');progress('Connecting to the document reader\u2026',3);
     const response=await fetch(url,{signal:probe.signal,cache:'no-store'});if(response.ok)health=await response.json();
    }catch{}finally{clearTimeout(probeTimer);}
   }
@@ -1044,13 +1270,13 @@ async function extractDocument(source,progress=()=>{}){
    try{const url=new URL(endpoint);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/ocr/status/')+operation.requestId;
     const response=await fetch(url,{signal:pollAbort.signal,cache:'no-store'});if(response.ok){const state=await response.json();if(posting&&!operation.cancelled&&state.success){
      const total=Number(state.pages)||0,done=Number(state.completedPages)||0;
-     progress(total?`${state.stage} · ${done} of ${total} pages`:state.stage||'Reading the full document…',total?Math.min(96,8+88*done/total):8);
+     progress(total?`${state.stage} \xb7 ${done} of ${total} pages`:state.stage||'Reading the full document\u2026',total?Math.min(96,8+88*done/total):8);
     }}
    }catch{}finally{clearTimeout(deadline);pollAbort=null;if(posting&&!operation?.cancelled)pollTimer=setTimeout(pollProgress,1000);}
   }
   try{
-   if(operation){operation.controller=controller;operation.endpoint=endpoint;operation.requestId=crypto.randomUUID();controller.signal.addEventListener('abort',()=>notifyReaderCancel(operation),{once:true});}
-   progress('Reading all pages, the letter body and printed signatures…',8);const body=new FormData();body.append('file',source);
+   if(operation){operation.controller=controller;operation.endpoint=endpoint;operation.requestId=M.uuid();controller.signal.addEventListener('abort',()=>notifyReaderCancel(operation),{once:true});}
+   progress('Reading all pages, the letter body and printed signatures\u2026',8);const body=new FormData();body.append('file',source);body.append('clientId',readerClientId);body.append('communicationType',$('typeSelect').value||'Incoming');
    if(operation)pollTimer=setTimeout(pollProgress,700);
    const response=await fetch(endpoint,{method:'POST',body,headers:operation?{'X-OCR-Request-ID':operation.requestId}:{},signal:controller.signal});
    // A static server has no OCR endpoint. Continue to the local/browser reader.
@@ -1058,6 +1284,7 @@ async function extractDocument(source,progress=()=>{}){
    let result;try{result=await response.json();}catch{throw Error('The document reader returned an invalid response. Reload and retry.');}
    if(!response.ok||result.success===false)throw Error(result.error||'The document reader could not read this file.');
    if(typeof result.text!=='string')throw Error('The document reader returned no document text.');
+   checkRead();if(result.requestId&&operation&&result.requestId!==operation.requestId)throw Error('The reader response does not match this document. Retry the read.');
    return remember({...result,metadata:result.metadata||{},warnings:result.warnings||[]});
   }catch(error){
    checkRead();
@@ -1068,14 +1295,20 @@ async function extractDocument(source,progress=()=>{}){
   }finally{posting=false;clearTimeout(timer);clearTimeout(pollTimer);pollAbort?.abort();}
  }
  if(endpoints.length)warnings.push('The document service is unavailable; the browser reader was used.');
- let worker=null,pdf=null,stage='Reading scanned text…',floor=0,span=90;
+ if(/^(txt|csv)$/.test(extension)){
+  const bytes=new Uint8Array(await source.arrayBuffer()),encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';
+  const text=new TextDecoder(encoding).decode(bytes);return remember({text,metadata:{},warnings,pages:text.split('\f').length,engine:'native-text'});
+ }
+ let worker=null,pdf=null,stage='Reading scanned text\u2026',floor=0,span=90;
  async function recognize(input,psm='3'){
   checkRead();clearTimeout(readerRuntime.idle);
+  readerRuntime.owner=operation;
   readerRuntime.logger=info=>{if(info.status==='recognizing text')progress(stage,Math.min(98,Math.round(floor+info.progress*span)));};
   if(!readerRuntime.promise){
+   const workerToken={};readerRuntime.workerToken=workerToken;
    readerRuntime.promise=(async()=>{
     await loadReaderScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
-    const ready=await Tesseract.createWorker('eng',1,{logger:info=>readerRuntime.logger?.(info)});if(operation?.cancelled){await ready.terminate();checkRead();}readerRuntime.worker=ready;return ready;
+    checkRead();const ready=await Tesseract.createWorker('eng',1,{logger:info=>{if(readerRuntime.workerToken===workerToken)readerRuntime.logger?.(info);}});if(operation?.cancelled){await ready.terminate();checkRead();}readerRuntime.worker=ready;return ready;
    })();
   }
   const workerPromise=readerRuntime.promise;try{worker=await workerPromise;}catch(error){if(readerRuntime.promise===workerPromise)readerRuntime.promise=null;throw error;}
@@ -1094,21 +1327,35 @@ async function extractDocument(source,progress=()=>{}){
   if((text.match(/\S+/g)||[]).length<12||Number(first.confidence??100)<65){
    const alternate=await recognize(canvas,'6');
    if(score(alternate.text||'')>score(text)){chosen=alternate;text=alternate.text||'';}
-   if(!parseCorrespondence(text).signatory&&parseCorrespondence(alternate.text||'').signatory)text=mergeDocumentText(text,alternate.text);
+   if(!parseCorrespondence(text).signatory&&parseCorrespondence(alternate.text||'').signatory)text=supplementSenderEvidence(text,alternate.text);
   }
   const lines=text.split(/\r?\n/),signatureHint=lines.some(line=>/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)|signed(?:\s+by)?|signatory|submitted\s+by|prepared\s+by|approved\s+by)\b/i.test(line))||lines.slice(Math.floor(lines.length*.55)).some(line=>/\b(?:officer|director|chief|mayor|governor|secretary|manager|president|chairperson|coordinator|principal|engineer)\b/i.test(line));
   const senderFields=parseCorrespondence(text);
-  if(text&&!senderFields.signatory&&!senderFields.signatoryCandidates.length&&signatureHint){
+  if(text&&!senderFields.receivedFrom&&senderFields.receivedFromSource!=='ambiguous'&&(signatureHint||(canvas.height>canvas.width*.65&&(text.match(/\S+/g)||[]).length>=12))){
    const marker=chosen.lines?.find(line=>/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)|signed|submitted|prepared|approved)\b/i.test(line.text||''));
-   const top=Math.max(0,marker?.bbox?.y0!=null?marker.bbox.y0-30:Math.floor(canvas.height*.45));
+   const top=canvas.height<canvas.width*.65?0:Math.max(0,marker?.bbox?.y0!=null?marker.bbox.y0-30:Math.floor(canvas.height*.45));
    const crop=document.createElement('canvas');crop.width=canvas.width;crop.height=canvas.height-top;const ctx=crop.getContext('2d');ctx.drawImage(canvas,0,top,canvas.width,crop.height,0,0,canvas.width,crop.height);
    const data=ctx.getImageData(0,0,crop.width,crop.height);
    for(let i=0;i<data.data.length;i+=4){const r=data.data[i],g=data.data[i+1],b=data.data[i+2];if(b>r*1.25&&b>g*1.18&&b-r>12)data.data[i]=data.data[i+1]=data.data[i+2]=255;}
    ctx.putImageData(data,0,0);
-   try{const recovered=await recognize(crop,'6');if(parseCorrespondence(recovered.text||'').signatory)text=mergeDocumentText(text,recovered.text);}finally{crop.width=crop.height=0;}
+   try{const recovered=await recognize(crop,'11');text=supplementSenderEvidence(text,recovered.text||'',true);}finally{crop.width=crop.height=0;}
   }
   if(Number(chosen.confidence??100)<65&&!warnings.includes('Some scanned text has low confidence. Review the detected fields.'))warnings.push('Some scanned text has low confidence. Review the detected fields.');
   return text;
+ }
+ function pdfNativeTextIsTrustworthy(lib,ops,native){
+  if(native.includes('\ufffd')||(native.match(/\w+/g)||[]).length<20||!scanPrintedSignatories(native).candidates.some(c=>c.score>=75))return false;
+  let mode=0,visible=0,total=0;const stack=[];
+  const showOps=[lib.OPS.showText,lib.OPS.showSpacedText,lib.OPS.nextLineShowText,lib.OPS.nextLineSetSpacingShowText].filter(Number.isInteger);
+  const count=value=>Array.isArray(value)?value.reduce((sum,item)=>sum+count(item),0):value?.unicode?.length||0;
+  for(let i=0;i<ops.fnArray.length;i++){
+   const op=ops.fnArray[i],args=ops.argsArray[i];
+   if(op===lib.OPS.save)stack.push(mode);
+   else if(op===lib.OPS.restore)mode=stack.pop()??0;
+   else if(op===lib.OPS.setTextRenderingMode)mode=args?.[0]??0;
+   else if(showOps.includes(op)){const chars=count(args);total+=chars;if(mode!==3&&mode!==7)visible+=chars;}
+  }
+  return total?visible/total>=.8:!ops.fnArray.some((op,i)=>op===lib.OPS.setTextRenderingMode&&ops.argsArray[i]?.[0]===3);
  }
  function pdfNeedsOcr(lib,ops,items,native,page){
   if(native.trim().length<40||native.includes('\ufffd'))return true;
@@ -1126,6 +1373,14 @@ async function extractDocument(source,progress=()=>{}){
     const points=[[0,0],[1,0],[0,1],[1,1]].map(([x,y])=>[matrix[0]*x+matrix[2]*y+matrix[4],matrix[1]*x+matrix[3]*y+matrix[5]]);
     images.push([Math.min(...points.map(p=>p[0])),Math.min(...points.map(p=>p[1])),Math.max(...points.map(p=>p[0])),Math.max(...points.map(p=>p[1]))]);
    }else if([lib.OPS.paintImageXObjectRepeat,lib.OPS.paintImageMaskXObjectRepeat,lib.OPS.paintInlineImageXObjectGroup,lib.OPS.paintImageMaskXObjectGroup].filter(Number.isInteger).includes(op))return true;
+  }
+  const hiddenText=ops.fnArray.some((op,i)=>op===lib.OPS.setTextRenderingMode&&ops.argsArray[i]?.[0]===3);
+  const scannedPage=images.some(([x0,y0,x1,y1])=>(x1-x0)*(y1-y0)/area>.6);
+  if(hiddenText&&scannedPage){
+   const sender=parseCorrespondence(native),header=parseDocumentHeader(native);
+   const hasClosing=/^(?:for your (?:information|compliance|guidance)|respectfully|sincerely|yours|signed by|signatory|submitted by)\b/im.test(native);
+   if((page.pageNumber===1||hasClosing)&&!sender.signatory)return true;
+   if(page.pageNumber===1&&header.isMemo&&!header.controlNo)return true;
   }
   return images.some(([x0,y0,x1,y1])=>{
    let coverage=0;const bands=new Set();
@@ -1152,7 +1407,7 @@ async function extractDocument(source,progress=()=>{}){
   }
   const prefix=extension==='docx'?'word/media/':extension==='pptx'?'ppt/media/':'xl/media/';
   for(const name of names.filter(n=>n.startsWith(prefix)&&/\.(png|jpe?g|webp|bmp)$/i.test(n))){
-   let canvas;try{canvas=await imageCanvas(new Blob([await zip.file(name).async('uint8array')],{type:attachmentMime(name)}));parts.push(await readPage(canvas));}catch(error){warnings.push('An embedded image could not be read: '+error.message);}finally{if(canvas)canvas.width=canvas.height=0;}
+   checkRead();let canvas;try{canvas=await imageCanvas(new Blob([await zip.file(name).async('uint8array')],{type:attachmentMime(name)}));parts.push(await readPage(canvas));}catch(error){checkRead();warnings.push('An embedded image could not be read: '+error.message);}finally{if(canvas)canvas.width=canvas.height=0;}
   }
   return parts.filter(s=>s.trim()).join(extension==='docx'?'\n\n':'\n\f\n');
  }
@@ -1164,15 +1419,15 @@ async function extractDocument(source,progress=()=>{}){
   else if(extension==='pdf'){
    const lib=await import('../vendor/pdfjs/pdf.min.mjs');lib.GlobalWorkerOptions.workerSrc=new URL('../vendor/pdfjs/pdf.worker.min.mjs',location.href).href;pdf=await lib.getDocument({data:await source.arrayBuffer(),isEvalSupported:false,cMapUrl:new URL('../vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('../vendor/pdfjs/standard_fonts/',location.href).href}).promise;const pages=[];
    for(let number=1;number<=pdf.numPages;number++){
-    stage=`Reading page ${number} of ${pdf.numPages}, including the body and signature…`;floor=(number-1)/pdf.numPages*90;span=90/pdf.numPages;progress(stage,Math.round(floor));
+    checkRead();
+    stage=`Reading page ${number} of ${pdf.numPages}, including the body and signature\u2026`;floor=(number-1)/pdf.numPages*90;span=90/pdf.numPages;progress(stage,Math.round(floor));
     const page=await pdf.getPage(number),content=await page.getTextContent(),native=pdfTextLines(content.items),ops=await page.getOperatorList();
     let pageText=native;
     if(pdfNeedsOcr(lib,ops,content.items,native,page)){
      const base=page.getViewport({scale:1}),viewport=page.getViewport({scale:Math.min(240/72,3000/Math.max(base.width,base.height))}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
      try{await page.render({canvasContext:canvas.getContext('2d'),viewport,background:'rgb(255,255,255)'}).promise;const scanned=await readPage(canvas);
-      const nativeWords=(native.match(/\S+/g)||[]).length,scanWords=(scanned.match(/\S+/g)||[]).length;
-      pageText=nativeWords>=scanWords*.9&&parseCorrespondence(native).signatory?native:mergeDocumentText(scanned,native);
-     }catch(error){if(!native.trim())throw error;warnings.push(`Page ${number}: scanned content could not be read; selectable text was kept. ${error.message}`);}
+      pageText=choosePdfPageText(native,scanned,pdfNativeTextIsTrustworthy(lib,ops,native));
+     }catch(error){checkRead();if(!native.trim())throw error;warnings.push(`Page ${number}: scanned content could not be read; selectable text was kept. ${error.message}`);}
      finally{canvas.width=canvas.height=0;}
     }
     pages.push(pageText);page.cleanup();
@@ -1180,76 +1435,177 @@ async function extractDocument(source,progress=()=>{}){
    text=pages.join('\n\f\n');
   }else if(/^(tif|tiff)$/.test(extension)){
    await loadReaderScript('https://cdn.jsdelivr.net/npm/pako@1.0.11/dist/pako.min.js');await loadReaderScript('https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js');const bytes=await source.arrayBuffer(),frames=UTIF.decode(bytes),pages=[];
-   for(let i=0;i<frames.length;i++){const frame=frames[i];UTIF.decodeImage(bytes,frame);const canvas=document.createElement('canvas');canvas.width=frame.width;canvas.height=frame.height;canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(UTIF.toRGBA8(frame)),frame.width,frame.height),0,0);stage=`Reading image page ${i+1} of ${frames.length}…`;floor=i/frames.length*90;span=90/frames.length;try{pages.push(await readPage(canvas));}finally{canvas.width=canvas.height=0;}}
+   for(let i=0;i<frames.length;i++){const frame=frames[i];UTIF.decodeImage(bytes,frame);const canvas=document.createElement('canvas');canvas.width=frame.width;canvas.height=frame.height;canvas.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(UTIF.toRGBA8(frame)),frame.width,frame.height),0,0);stage=`Reading image page ${i+1} of ${frames.length}\u2026`;floor=i/frames.length*90;span=90/frames.length;try{pages.push(await readPage(canvas));}finally{canvas.width=canvas.height=0;}}
    text=pages.join('\n\f\n');
   }else if(/^(png|jpe?g|webp|bmp)$/.test(extension)){const canvas=await imageCanvas(source);try{text=await readPage(canvas);}finally{canvas.width=canvas.height=0;}}
   else throw Error('This file type is not supported by the document reader.');
   return remember({text,metadata:{},warnings,pages:text.split('\f').length,engine:'browser-reader'});
- }finally{if(worker&&readerRuntime.worker===worker)readerRuntime.idle=setTimeout(()=>{stopReaderWorker();},60000);readerRuntime.logger=null;await pdf?.destroy();}
+ }finally{if(worker&&readerRuntime.worker===worker)readerRuntime.idle=setTimeout(()=>{stopReaderWorker();},60000);if(readerRuntime.owner===operation)readerRuntime.logger=null;await pdf?.destroy();}
 }
 /* End full-document reader. */
 
   let lastOcrMetadata=null,lastOcrWarnings=[];
-  function applyOcrValue(id,value,generated=false){
-   const input=$(id),current=input.value.trim(),previous=commOcrValues.get(id);
-   if(commManualFields.has(id))return;
-   if(value&&(!current||current===previous||generated)){input.value=value;commOcrValues.set(id,value);}
-   else if(!value&&previous!==undefined&&current===previous){input.value='';commOcrValues.delete(id);}
+  function setFieldState(id,state,evidence='') {
+   const input=$(id);if(!input)return;input.dataset.ocrState=state;
+   const label=document.querySelector(`label[for="${id}"]`);if(!label)return;
+   let badge=label.querySelector('.ocr-field-badge');
+   if(!state){badge?.remove();return;}
+   if(!badge){badge=document.createElement('span');badge.className='ocr-field-badge';label.append(badge);}
+   badge.dataset.state=state;badge.textContent=({detected:'Detected',review:'Review',missing:'Enter manually',edited:'Edited',generated:'Generated'})[state]||state;
+   badge.title=String(evidence||'').slice(0,1500);
   }
-  function extractFields(text,metadata=null,warnings=[]){
-   lastOcrMetadata=metadata;lastOcrWarnings=warnings;
-   const headerFields=parseDocumentHeader(text),parsed=parseCorrespondence(text),data={...headerFields,...parsed,...(metadata||{})},memo=detectMemo(text)||(metadata?.isMemo?{...headerFields,isMemo:true,warnings:headerFields.warnings||[]}:null);
-   const candidates=data.signatoryCandidates||parsed.signatoryCandidates||[];
-   if(!memo&&detectedMemo){detectedMemo=false;$('docTypeSelect').value='';applyOcrValue('memoRecipientInput','');applyOcrValue('memoIssuerInput','');}
-   if(memo){
-    detectedMemo=true;$('docTypeSelect').value='Memorandum';
-    const values={...memo,subject:data.subject||memo.subject,date:parseMemoDate(data.date||'')||memo.date,memoNo:data.memoNo||memo.memoNo||data.controlNo,addressedTo:data.recipient||memo.addressedTo,issuedBy:data.sender||data.issuedBy||memo.issuedBy||data.signatory};
-    for(const[key,id]of Object.entries(memoInputs))applyOcrValue(id,values[key],!editing&&((key==='date'&&$(id).value===M.today())||(key==='memoNo'&&[$(id).value].some(value=>value===newControlNo()||value===newMemoControlNo()))));
-    $('communicationMemoReview').hidden=false;$('communicationMemoReview').textContent=`Memorandum detected. Review the memo fields and save to Office Memos. ${memo.warnings.join(' ')} Manual edits are preserved.`;
-   }else{
-    $('communicationMemoReview').hidden=true;
-    applyOcrValue('docTypeSelect',data.documentType||headerFields.docType||'');
-    const header=text.split('\f')[0].split(/\r?\n/).slice(0,100).join('\n');
-    const control=header.match(/(?:^|\n)\s*(?:control\s*(?:no\.?|number|#)|reference\s*(?:no\.?|number))\s*[:#.-]?\s*([A-Z0-9][A-Z0-9/._-]*(?:,?\s*s\.?\s*\d{4})?)/i);
-    const subject=memo?memo.subject:headerFields.subject;
-    applyOcrValue('controlNoInput',data.controlNo||control?.[1]||'',!editing&&$('controlNoInput').value===newControlNo());
-    applyOcrValue('subjectInput',data.subject||subject||'');
-    applyOcrValue('dateInput',parseMemoDate(($('typeSelect').value==='Outgoing'?data.releasedDate:data.receivedDate)||data.date||'')||headerFields.date,!editing&&$('dateInput').value===M.today());
+  function setReaderState(state,label) {
+   $('encodingModal').dataset.ocrState=state;$('filePickerState').dataset.state=state;$('ocrStateLabel').textContent=label;
+   $('filePickerState').setAttribute('aria-busy',String(state==='processing'));
+  }
+  function syncOcrControls() {
+   const reading=ocrActive||Boolean(pendingRead);
+   $('saveRecordBtn').disabled=busy||reading;
+   $('runOcrBtn').disabled=busy||reading||routeCommitted||!file;
+   $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=busy||routeCommitted;
+   $('documentFileInput').disabled=busy||routeCommitted;
+   if(!reading)$('ocrStopControls').hidden=true;
+  }
+  function applyOcrValue(id,value,force=false) {
+   const input=$(id);if(!input||!ocrFormIds.has(id)||commManualFields.has(id))return false;
+   const current=input.value.trim(),previous=commOcrValues.get(id);
+   if(typeof value==='string'&&value.trim()&&(!current||current===previous||force)) {
+    if(input.tagName==='SELECT'&&![...input.options].some(option=>option.value===value))return false;
+    input.value=value;if(!input.value)return false;commOcrValues.set(id,input.value);return true;
    }
-   const outgoing=$('typeSelect').value==='Outgoing';
-   const received=(data.needsReview||[]).includes('receivedFrom')&&candidates.length>1?'':data.receivedFrom||data.signatory||data.sender||'';
-   const correctedRecipient=!outgoing&&received&&(()=>{const current=$('officeInput').value.trim(),to=String(data.recipient||headerFields.addressedTo||'').trim();return current.length>=4&&(to===current||to.startsWith(current+' '));})();
-   applyOcrValue('officeInput',outgoing?(data.recipient||memo?.addressedTo||''):received,correctedRecipient);
-   const select=$('ocrSignatorySelect');select.replaceChildren(new Option('Choose the sender / signatory…',''));
-   for(const candidate of candidates)select.add(new Option(`${candidate.name}${candidate.role?' — '+candidate.role:''} (page ${candidate.page})`,candidate.name));
-   select.value=received;$('ocrSignatoryGroup').hidden=outgoing||candidates.length<2;
-   const pageCount=text.split('\f').length,review=$('communicationOcrReview');review.hidden=!text.trim();
-   const chosen=candidates.find(c=>c.name===received),ambiguous=(data.needsReview||[]).includes('receivedFrom')&&candidates.length>1;
-   review.textContent=(correctedRecipient?'Corrected the TO recipient previously stored as sender. ':'')+`Read ${pageCount} ${pageCount===1?'page':'pages'} (${text.length.toLocaleString()} characters). `+(outgoing?(data.recipient?'Recipient detected: '+data.recipient+'. ':'Recipient was not detected; enter it manually. '):received?`Received From: ${received}${chosen?` (signature area, page ${chosen.page})`:'.'} `:ambiguous?'Multiple possible signatories were found. Choose the sender below. ':'A printed sender or signatory was not detected. Enter Received From manually. ')+warnings.join(' ');
-   if((data.needsReview||[]).some(key=>key==='subject'||key==='documentType'))review.textContent+=' Confirm the suggested subject and document type against the original.';
-   updateDestination();$('ocrStatsChip').textContent=`${text.length.toLocaleString()} characters · ${pageCount} ${pageCount===1?'page':'pages'}`;$('ocrStatsChip').style.display=text?'inline':'none';
+   if(!value&&previous!==undefined&&current===previous){input.value='';commOcrValues.delete(id);}
+   return false;
   }
-  $('cancelOcrBtn').addEventListener('click',cancelDocumentRead);
-  $('ocrSignatorySelect').addEventListener('change',()=>{if(!$('ocrSignatorySelect').value)return;$('officeInput').value=$('ocrSignatorySelect').value;commManualFields.add('officeInput');$('communicationOcrReview').textContent='Received From selected: '+$('officeInput').value+'. Review against the original document before saving.';});
-  $('typeSelect').addEventListener('change',()=>{if($('ocrTextInput').value.trim())extractFields($('ocrTextInput').value,lastOcrMetadata,lastOcrWarnings);});
-  $('ocrTextInput').addEventListener('change',()=>extractFields($('ocrTextInput').value));
-  $('runOcrBtn').addEventListener('click',async()=>{
-   if(!file||busy)return;busy=true;const source=file,version=ocrGeneration;
-   $('encodingModal').dataset.busy='true';$('ocrStopControls').hidden=false;for(const id of ['runOcrBtn','saveRecordBtn','browseDocumentBtn','removeDocumentBtn'])$(id).disabled=true;$('encodingUploadProgressBox').classList.add('active');
-   const started=performance.now();let stageMessage='Reading the document…';const elapsed=setInterval(()=>{$('encodingUploadStatusText').textContent=`${stageMessage} (${Math.floor((performance.now()-started)/1000)}s)`;},1000);
-   const progress=(message,pct)=>{stageMessage=message;$('encodingUploadStatusText').textContent=message;$('encodingProgressBar').style.width=`${Math.max(0,Math.min(100,pct))}%`;};
-   try{
-    progress('Reading the full document…',2);const result=await readWithCancellation(source,progress);if(version!==ocrGeneration)return;
-    $('ocrTextInput').value=result.text;extractFields(result.text,result.metadata,result.warnings);
-    const seconds=((result.durationMs??(performance.now()-started))/1000).toFixed(1);$('ocrStatsChip').textContent+=` · ${seconds}s${result.cacheHit?' · reused result':''}`;$('ocrActionSubtext').textContent=`Read in ${seconds}s. Review Received From and the detected fields before saving.`;
-    M.toast(result.text.trim()?(isMemo()?'Memorandum detected. Review the fields, then save to Office Memos.':'Full document read. Review Received From and the other fields before saving.'):'No readable text was detected. Enter the fields manually.',result.text.trim()?'success':'warning');progress('Full document extraction complete',100);
-   }catch(error){M.toast(error.message||'Text extraction failed. You can enter the record manually.',error.message?.startsWith('Reading stopped')?'warning':'error');}
-   finally{clearInterval(elapsed);$('ocrStopControls').hidden=true;busy=false;$('encodingModal').dataset.busy='false';for(const id of ['saveRecordBtn','browseDocumentBtn','removeDocumentBtn'])$(id).disabled=false;$('runOcrBtn').disabled=!file;$('encodingUploadProgressBox').classList.remove('active');}
+  function browserFormValues(data,text) {
+   const outgoing=$('typeSelect').value==='Outgoing',memo=Boolean(data.isMemo||data.documentType==='Memorandum');
+   const review=new Set(data.needsReview||[]),received=review.has('receivedFrom')?'':data.receivedFrom||'';
+   const values={controlNoInput:(memo?data.memoNo:'')||data.controlNo||'',docTypeSelect:data.documentType||data.docType||'',
+    subjectInput:data.subject||'',officeInput:outgoing?(data.recipient||data.addressedTo||''):received,
+    dateInput:parseMemoDate((memo?data.date:outgoing?data.releasedDate:data.receivedDate)||data.date||'')};
+   if(memo){values.memoRecipientInput=data.recipient||data.addressedTo||'';values.memoIssuerInput=review.has('receivedFrom')?'':data.signatory||data.issuedBy||'';}
+   for(const [id,label]of [['statusSelect','STATUS'],['actionTakenInput','ACTION\\s+TAKEN|DATE\\s+FORWARDED'],['remarksInput','REMARKS']]){
+    const match=String(text).match(new RegExp(`^\\s*(?:${label})\\s*[:\uff1a;]\\s*([^\\n\\f]+)`,'im'));
+    if(match){let value=match[1].trim();if(id==='statusSelect')value=[...$('statusSelect').options].find(option=>option.value.toLowerCase()===value.toLowerCase())?.value||'';if(value)values[id]=value;}
+   }
+   if(values.docTypeSelect&&![...$('docTypeSelect').options].some(option=>option.value===values.docTypeSelect))values.docTypeSelect='Other Communication';
+   return values;
+  }
+  function extractFields(text,metadata=null,warnings=[],form=null) {
+   lastOcrMetadata=metadata;lastOcrWarnings=warnings;lastOcrForm=form;
+   const contract=form?.formSchemaVersion===1&&form.formValues&&typeof form.formValues==='object';
+   // Python supplies the field mapping. Parse locally only for browser/manual reads.
+   const data=contract&&metadata?metadata:{...parseDocumentHeader(text),...parseLetterDetails(text),...parseCorrespondence(text),...(metadata||{})};
+   const fallback=browserFormValues(data,contract?'':text);
+   const values=contract?{...form.formValues}:fallback;
+   const directionChanged=contract&&form.communicationType!==$('typeSelect').value;
+   if(contract&&!values.officeInput&&!fallback.officeInput)values.officeInput='';
+   // Direction can change during OCR; sender/recipient mapping follows the current form.
+   if(directionChanged){values.officeInput=fallback.officeInput;values.dateInput=fallback.dateInput;}
+   for(const[id,value]of Object.entries(values)) {
+    if(id==='ocrTextInput'||!ocrFormIds.has(id)||typeof value!=='string')continue;
+    if(applyOcrValue(id,value,true)) {
+     const key=({docTypeSelect:'documentType',subjectInput:'subject',officeInput:$('typeSelect').value==='Outgoing'?'recipient':'receivedFrom',dateInput:'date'})[id];
+     const source=data[key+'Source'];
+     const contractState=directionChanged&&['officeInput','dateInput'].includes(id)?null:form?.fieldStates?.[id];
+     let state=contractState?.state||(data.needsReview?.includes(key)||['body','subject','fallback','letterhead','approval','footer-name','prepared-by'].includes(source)||key==='receivedFrom'&&data.receivedFromNeedsReview?'review':'detected');
+     if(id==='dateInput'&&!data.isMemo&&!data[$('typeSelect').value==='Outgoing'?'releasedDate':'receivedDate'])state='review';
+     setFieldState(id,state==='review'?'review':'detected',contractState?.evidence||data.fieldEvidence?.[key]||'Detected from the uploaded document.');
+    }
+   }
+   detectedMemo=!commManualFields.has('docTypeSelect')&&isMemo();updateDestination();
+   if(!values.controlNoInput&&!commManualFields.has('controlNoInput')&&!editing){applyOcrValue('controlNoInput',isMemo()?newMemoControlNo():newControlNo(),true);setFieldState('controlNoInput','generated','No printed number was detected. This reference was generated from the registry.');}
+   if(!values.dateInput&&$('dateInput').value&&!commManualFields.has('dateInput'))setFieldState('dateInput','review','No printed date was detected. Confirm the date received / released.');
+   const required=[...$('communicationForm').querySelectorAll('input[required],select[required],textarea[required]')];
+   for(const input of required)if(!input.value.trim())setFieldState(input.id,'missing','This required value could not be detected. Enter it manually.');
+   const candidates=data.signatoryCandidates||[],outgoing=$('typeSelect').value==='Outgoing';
+   const received=(data.needsReview||[]).includes('receivedFrom')?'':data.receivedFrom||'';
+   const select=$('ocrSignatorySelect');select.replaceChildren(new Option('Choose the originating person\u2026',''));
+   for(const candidate of candidates)select.add(new Option(`${candidate.name}${candidate.role?' \u2014 '+candidate.role:''} (page ${candidate.page})`,candidate.name));
+   select.value=received;$('ocrSignatoryGroup').hidden=outgoing||(!candidates.length)||(candidates.length===1&&!data.receivedFromNeedsReview);
+   const pageCount=Number(form?.pages)||text.split('\f').length,review=$('communicationOcrReview');review.hidden=!text.trim();
+   review.textContent=`Read ${pageCount} ${pageCount===1?'page':'pages'} \xb7 ${text.length.toLocaleString()} characters. `+
+    (outgoing?(data.recipient?'Recipient detected. ':'Enter the recipient office manually. '):received?'Originating person detected. ':candidates.length>1?'Choose the originating person from the detected names. ':'Enter Received From manually. ')+[...new Set([...(outgoing?[]:data.senderReviewReasons||[]),...warnings])].join(' ');
+   if((data.needsReview||[]).some(key=>key==='subject'||key==='documentType'))review.textContent+=' Confirm the suggested subject and document type.';
+   if($('dateInput').dataset.ocrState==='review')review.textContent+=values.dateInput?' The printed issue date was suggested; confirm the actual received / released date.':' No printed date was detected. Confirm the date received / released.';
+   $('communicationMemoReview').hidden=!(data.isMemo||data.documentType==='Memorandum');
+   $('communicationMemoReview').textContent=isMemo()?'Memorandum detected. Confirm the memo number, issue date, recipient and issuing office before saving to Office Memos.':'A memorandum was detected. Your chosen document type is kept; confirm the save destination.';
+   const filled=[...commOcrValues.keys()].filter(id=>['detected','review'].includes($(id).dataset.ocrState)).length;
+   const missing=required.filter(input=>!input.value.trim()).length,manual=commManualFields.size;
+   $('ocrFieldSummary').textContent=`${filled} ${filled===1?'field':'fields'} detected. ${missing?`${missing} required ${missing===1?'field needs':'fields need'} manual entry.`:'Required fields are complete.'}${manual?' Your manual edits are kept.':''}`;
+   $('ocrStatsChip').textContent=`${text.length.toLocaleString()} characters \xb7 ${pageCount} ${pageCount===1?'page':'pages'}`;$('ocrStatsChip').style.display=text?'inline-flex':'none';
+   return missing;
+  }
+  async function runDocumentRead(request) {
+   const current=()=>request.version===ocrGeneration&&request.source===file;
+   if(!current())return;ocrActive=true;syncOcrControls();setReaderState('processing','Reading your document');
+   $('ocrStopControls').hidden=false;$('encodingUploadProgressBox').classList.add('active');
+   const started=performance.now();let stageMessage='Preparing the document\u2026',lastPercent=0;
+   const elapsed=setInterval(()=>{if(current())$('encodingUploadStatusText').textContent=`${stageMessage} \xb7 ${Math.floor((performance.now()-started)/1000)}s`;},1000);
+   const progress=(message,pct)=>{if(!current())return;stageMessage=message;lastPercent=Math.max(lastPercent,Math.max(0,Math.min(100,pct)));
+    $('encodingUploadStatusText').textContent=message;$('encodingProgressBar').style.width=`${lastPercent}%`;$('communicationOcrProgress').setAttribute('aria-valuenow',String(Math.round(lastPercent)));};
+   $('encodingProgressBar').style.width='0%';$('communicationOcrProgress').setAttribute('aria-valuenow','0');
+   try {
+    progress('Reading all pages automatically\u2026',2);const result=await readWithCancellation(request.source,progress,current);if(!current())return;
+    const manualText=commManualFields.has('ocrTextInput');if(!manualText)$('ocrTextInput').value=result.text;
+    const missing=extractFields($('ocrTextInput').value,manualText?null:result.metadata,result.warnings||[],manualText?null:result);
+    const seconds=((result.durationMs??(performance.now()-started))/1000).toFixed(1);
+    $('ocrStatsChip').textContent+=` \xb7 ${seconds}s${result.cacheHit?' \xb7 reused result':''}`;
+    setReaderState(missing?'review':'complete',missing?'Review needed':'Ready to review');
+    $('ocrActionSubtext').textContent=`Read in ${seconds}s. Review the detected fields, then save.${result.cacheHit?' The existing result was reused.':''}`;
+    progress('Document read. Detected details are ready for review.',100);
+   } catch(error) {
+    if(!current())return;setReaderState('error','Reading needs attention');$('ocrActionSubtext').textContent=error.message||'Reading failed. Retry or fill the details manually.';
+    $('ocrFieldSummary').textContent='Your draft is kept. Retry reading or enter the required fields manually.';M.toast($('ocrActionSubtext').textContent,'error');
+   } finally {
+    clearInterval(elapsed);ocrActive=false;if(current()){$('encodingUploadProgressBox').classList.remove('active');$('ocrStopControls').hidden=true;}syncOcrControls();
+   }
+  }
+  function scheduleDocumentRead() {
+   if(!file||busy||routeCommitted)return;
+   pendingRead={source:file,version:ocrGeneration};setReaderState('processing','Preparing automatic reading');syncOcrControls();
+   if(ocrTask){cancelDocumentRead('replaced');return;}
+   const task=(async()=>{while(pendingRead){const request=pendingRead;pendingRead=null;await runDocumentRead(request);}})();ocrTask=task;
+   task.catch(error=>{setReaderState('error','Reading needs attention');M.toast(error.message||'The reader stopped. Retry the document.','error');}).finally(()=>{if(ocrTask===task)ocrTask=null;if(pendingRead)scheduleDocumentRead();else syncOcrControls();});
+  }
+  $('cancelOcrBtn').addEventListener('click',()=>{
+   pendingRead=null;ocrGeneration++;cancelDocumentRead();setReaderState('stopped','Reading stopped');
+   $('ocrActionSubtext').textContent='Your draft is kept. Select Read again to retry, or fill the details manually.';
+   $('encodingUploadProgressBox').classList.remove('active');$('ocrStopControls').hidden=true;syncOcrControls();
   });
-  await load();
-  if(M.client())M.read('office_memos').then(rows=>{memoRegistryRows=rows;M.storage.set('pgenro_office_memos',rows);}).catch(()=>{});
+  $('encodingModal').addEventListener('pgenro:modal-close',()=>{if(returnToEncoding)return;pendingRead=null;ocrGeneration++;cancelDocumentRead('closed');});
+  function selectOcrSender(name) {
+   if(!name)return;
+   if(!printedSenderName(name,true)){
+    $('communicationOcrReview').textContent='The selected OCR text is not a reliable printed name. Read the original and enter the correct name manually.';
+    return;
+   }
+   $('officeInput').value=name;commManualFields.add('officeInput');setFieldState('officeInput','edited','Selected from the printed signatories.');
+   let customIssuerKept=false;
+   if(isMemo()){
+    const issuer=$('memoIssuerInput');
+    // A previous dropdown choice is replaceable; a separately typed issuer is preserved.
+    const fromSelection=Boolean(issuer.dataset.senderSelection)&&issuer.value===issuer.dataset.senderSelection;
+    if(!commManualFields.has('memoIssuerInput')||fromSelection){
+     issuer.value=name;issuer.dataset.senderSelection=name;commManualFields.add('memoIssuerInput');
+     setFieldState('memoIssuerInput','edited','Selected from the printed signatories.');
+    }else customIssuerKept=issuer.value.trim()!==name;
+   }
+   $('communicationOcrReview').textContent=customIssuerKept
+    ? 'Sender selected. Issued by keeps your separate manual value; confirm both people against the original.'
+    : 'Received From selected. Confirm it against the original document.';
+  }
+  $('ocrSignatorySelect').addEventListener('change',()=>selectOcrSender($('ocrSignatorySelect').value));
+  $('typeSelect').addEventListener('change',()=>{updateDestination();if($('ocrTextInput').value.trim())extractFields($('ocrTextInput').value,lastOcrMetadata,lastOcrWarnings,lastOcrForm);});
+  $('ocrTextInput').addEventListener('change',()=>extractFields($('ocrTextInput').value));
+  $('runOcrBtn').addEventListener('click',scheduleDocumentRead);
   let channel,timer;
-  if(M.client())try{channel=M.client().channel('admin-communications').on('postgres_changes',{event:'*',schema:'public',table},()=>{clearTimeout(timer);timer=setTimeout(()=>load(),250);}).subscribe();}catch{}
+  function connectRecords() {
+   if(!M.client()||channel)return;
+   M.read('office_memos').then(rows=>{memoRegistryRows=rows;M.storage.set('pgenro_office_memos',rows);}).catch(()=>{});
+   try{channel=M.client().channel('admin-communications').on('postgres_changes',{event:'*',schema:'public',table},()=>{clearTimeout(timer);timer=setTimeout(()=>load(),250);}).subscribe();}catch{}
+  }
+  window.addEventListener('pgenro:backend-ready',()=>{connectRecords();if(mode!=='loading')load();});
+  await load();connectRecords();
   window.addEventListener('storage',e=>{if(e.key===cacheKey&&!M.client())load();});
   window.addEventListener('pagehide',(event)=>{if(event.persisted)return;clearTimeout(timer);generation++;releasePreview();if(channel)M.client()?.removeChannel(channel);});
  };
@@ -1276,7 +1632,7 @@ async function extractDocument(source,progress=()=>{}){
       const query = input.value.trim().toLowerCase(), words = query.split(/\s+/).filter(Boolean);
       const matches = links.filter(a => words.every(word => `${a.name} ${a.group} ${a.href}`.toLowerCase().includes(word)));
       active = -1;
-      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">↗</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try “memo”, “inventory”, or “users”.</p>';
+      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">\u2197</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try \u201cmemo\u201d, \u201cinventory\u201d, or \u201cusers\u201d.</p>';
       $('workspaceJumpCount').textContent = `${matches.length} destination${matches.length === 1 ? '' : 's'}`;
     }
     function open() {
@@ -1318,7 +1674,7 @@ async function extractDocument(source,progress=()=>{}){
       surface.querySelector('.modal-header').after(status);
       let locked = false, wasInert = false, focus = null;
       const update = () => {
-        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Working… Please wait before making more changes.' : '';
+        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Working\u2026 Please wait before making more changes.' : '';
         if (busy && !locked && form) { locked = true; wasInert = form.inert; focus = document.activeElement; form.inert = true; }
         if (!busy && locked) { locked = false; form.inert = wasInert; if (surface.classList.contains('open') && focus?.isConnected && !focus.disabled) focus.focus({preventScroll:true}); }
       };
@@ -1360,7 +1716,7 @@ async function extractDocument(source,progress=()=>{}){
       region.setAttribute('tabindex','0'); region.setAttribute('role','region');
       if (!region.hasAttribute('aria-label')) region.setAttribute('aria-label','Registry table; scroll horizontally to see all columns');
       const controls = document.createElement('div'); controls.className = 'workspace-table-controls'; controls.hidden = true;
-      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">←</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">→</button></div>`;
+      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">\u2190</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">\u2192</button></div>`;
       region.after(controls); const [left,right] = controls.querySelectorAll('button');
       let scheduled = 0;
       const measure = () => {
@@ -1524,14 +1880,10 @@ async function extractDocument(source,progress=()=>{}){
     renderIcons();
 
     // Table rows, OCR states and attachment controls create icons after page load.
-    const iconObserver = typeof MutationObserver === 'function' ? new MutationObserver(records => {
-      const hasIcons = records.some(record => [...record.addedNodes].some(node =>
-        node.nodeType === 1 && (node.matches('i[data-lucide]') || node.querySelector('i[data-lucide]'))
-      ));
-      if (hasIcons) renderIcons();
+    const tableObserver = typeof MutationObserver === 'function' ? new MutationObserver(records => {
       if (records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.matches('tr,tbody') || node.querySelector('tbody'))))) enhanceEmptyStates();
     }) : null;
-    iconObserver?.observe(document.body, { childList: true, subtree: true });
+    tableObserver?.observe(document.body, { childList: true, subtree: true });
 
     // Nothing is hidden waiting for JavaScript or an observer to run.
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -1556,13 +1908,13 @@ async function extractDocument(source,progress=()=>{}){
     }
     configureMotion();
     motion.addEventListener?.('change', configureMotion);
-    window.addEventListener('pagehide', event => { if (!event.persisted) { entranceObserver?.disconnect(); profileObserver?.disconnect(); iconObserver?.disconnect(); sidebarObserver?.disconnect(); } });
+    window.addEventListener('pagehide', event => { if (!event.persisted) { entranceObserver?.disconnect(); profileObserver?.disconnect(); tableObserver?.disconnect(); sidebarObserver?.disconnect(); } });
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initModernWorkspace, { once: true });
   else initModernWorkspace();
 })();
 
-/* ===== PGENRO DEPTH MOTION · page-owned, short animations only ===== */
+/* ===== PGENRO DEPTH MOTION \xb7 page-owned, short animations only ===== */
 (() => {
   'use strict';
   function initDepthWorkspace() {
@@ -1612,7 +1964,7 @@ async function extractDocument(source,progress=()=>{}){
 })();
 /* ===== END PGENRO DEPTH MOTION ===== */
 
-/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT · module-owned presentation ===== */
+/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT \xb7 module-owned presentation ===== */
 (() => {
   'use strict';
   function initWorkspaceNavigation() {
@@ -1672,7 +2024,7 @@ async function extractDocument(source,progress=()=>{}){
       dialog.setAttribute('aria-busy', String(value));
       dialog.querySelector('[data-workspace-logout-cancel]').disabled = value;
       dialog.querySelector('[data-workspace-logout-confirm]').disabled = value;
-      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging out…' : 'Yes, log out';
+      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging out\u2026' : 'Yes, log out';
     }
     function dismiss() {
       if (busy) return;
@@ -1706,7 +2058,7 @@ async function extractDocument(source,progress=()=>{}){
         <div class="workspace-logout-content">
           <div class="workspace-logout-heading"><span class="workspace-logout-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg></span><span class="workspace-logout-brand">PGENRO IMS<span>Secure workspace</span></span></div>
           <h2 id="workspaceLogoutTitle">Log out of your workspace?</h2>
-          <p id="workspaceLogoutDescription">You’ll need to sign in again to access your records and office modules.</p>
+          <p id="workspaceLogoutDescription">You\u2019ll need to sign in again to access your records and office modules.</p>
           <p class="workspace-logout-error" role="alert"></p>
           <div class="workspace-logout-actions"><button type="button" class="workspace-logout-cancel" data-workspace-logout-cancel autofocus>Cancel</button><button type="button" class="workspace-logout-confirm" data-workspace-logout-confirm><span>Yes, log out</span></button></div>
         </div>`;
@@ -1791,7 +2143,7 @@ async function extractDocument(source,progress=()=>{}){
     count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
     button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
     list.replaceChildren();
-    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications…'));
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications\u2026'));
     else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
     else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
     for(const item of feed.items||[]){
@@ -1857,6 +2209,14 @@ async function extractDocument(source,progress=()=>{}){
       .subscribe(state=>{if(state==='SUBSCRIBED')scheduleRefresh();});
     await refresh();
   }
+  function connectDatabase(){
+    if(disposed||authSubscription)return;
+    db=window.pgenroSupabase||window.PGENRO_DB?.client;
+    if(!db){status='unavailable';render();return;}
+    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
+    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
+    timer=setInterval(()=>{if(!document.hidden)refresh();},30000);
+  }
   function init(){
     const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
     document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
@@ -1868,7 +2228,7 @@ async function extractDocument(source,progress=()=>{}){
     panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
     const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
     count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
-    const closeBtn=element('button','module-notification-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const closeBtn=element('button','module-notification-close','\xd7');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
     const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
     markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
     tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
@@ -1878,11 +2238,9 @@ async function extractDocument(source,progress=()=>{}){
     window.addEventListener('resize',()=>{if(!panel.hidden)position();});
     window.addEventListener('focus',scheduleRefresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRefresh();});
     window.addEventListener('pageshow',event=>{if(event.persisted)scheduleRefresh();});
-    render();db=window.pgenroSupabase||window.PGENRO_DB?.client;
-    if(!db){status='unavailable';render();return;}
-    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
-    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
-    timer=setInterval(()=>{if(!document.hidden)refresh();},30000);
+    render();
+    window.addEventListener('pgenro:backend-ready',connectDatabase);
+    window.PGENRO_Module?.waitForBackend().then(connectDatabase);
     window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
   }
   window.PGENRO_Notifications={refresh,scheduleRefresh};
@@ -1988,4 +2346,3 @@ async function extractDocument(source,progress=()=>{}){
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
-

@@ -4134,3 +4134,175 @@ body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified .profile
 }
 
 }
+
+/* Communication encoder v3: one scroll region, an anchored footer, and theme tokens. */
+#encodingModal {
+  --encoder-surface: #ffffff;
+  --encoder-muted-surface: #f6f9f7;
+  --encoder-text: #19372a;
+  --encoder-muted: #66796e;
+  --encoder-border: #dce6df;
+  --encoder-accent: #24734c;
+  --encoder-accent-soft: #e7f3ec;
+  --encoder-warning: #936316;
+  --encoder-warning-soft: #fff5df;
+  --encoder-error: #a23939;
+  --encoder-error-soft: #fff0f0;
+  padding: 22px;
+}
+html[data-theme="dark"] #encodingModal {
+  --encoder-surface: #14291f;
+  --encoder-muted-surface: #1b3227;
+  --encoder-text: #e5f0e8;
+  --encoder-muted: #a8bcb0;
+  --encoder-border: #375143;
+  --encoder-accent: #8fd6ad;
+  --encoder-accent-soft: #244b36;
+  --encoder-warning: #f4ce80;
+  --encoder-warning-soft: #493d24;
+  --encoder-error: #f3abab;
+  --encoder-error-soft: #462d2f;
+  color-scheme: dark;
+}
+#encodingModal .communication-encoding-modal {
+  width: min(1140px, 100%);
+  max-width: 1140px;
+  max-height: calc(100dvh - 44px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--encoder-surface);
+  border: 1px solid var(--encoder-border);
+  color: var(--encoder-text);
+  border-radius: 20px;
+}
+#encodingModal #communicationForm { display:flex; flex:1 1 auto; flex-direction:column; min-height:0; overflow:hidden; }
+#encodingModal .communication-modal-header { flex:0 0 auto; padding:20px 24px; background:var(--encoder-surface); border-color:var(--encoder-border); }
+#encodingModal .communication-modal-heading { min-width:0; gap:13px; }
+#encodingModal .communication-modal-copy { min-width:0; }
+#encodingModal .communication-modal-copy h2 { font-size:21px; line-height:1.25; margin:4px 0 6px; color:var(--encoder-text); letter-spacing:-.5px; }
+#encodingModal .communication-modal-copy p { font-size:12px; line-height:1.6; color:var(--encoder-muted); margin:0; }
+#encodingModal .modal-close-btn { background:var(--encoder-muted-surface); border:1px solid var(--encoder-border); color:var(--encoder-text); border-radius:10px; }
+#encodingModal .communication-modal-icon, #encodingModal .encoder-upload-icon { background:var(--encoder-accent-soft); color:var(--encoder-accent); border-radius:12px; }
+#encodingModal .communication-modal-body { display:grid; grid-template-columns:minmax(270px,.8fr) minmax(0,1.45fr); gap:24px; padding:24px; min-height:0; overflow:auto; overscroll-behavior:contain; background:var(--encoder-surface); }
+#encodingModal .communication-modal-body > * { min-width:0; }
+#encodingModal .encoder-document-column, #encodingModal .encoder-fields-column { min-width:0; display:flex; flex-direction:column; gap:18px; }
+#encodingModal .encoder-upload-panel, #encodingModal .encoder-review-panel { padding:18px; margin:0; border:1px solid var(--encoder-border); border-radius:15px; background:var(--encoder-muted-surface); color:var(--encoder-text); }
+#encodingModal .encoder-upload-header { align-items:center; gap:10px; }
+#encodingModal .encoder-upload-title-wrap { min-width:0; gap:10px; align-items:center; }
+#encodingModal .encoder-upload-icon { width:36px; height:36px; flex:0 0 36px; }
+#encodingModal .encoder-upload-header h3 { font-size:15px; margin:3px 0 0; color:var(--encoder-text); }
+#encodingModal .encoder-eyebrow { font-size:10px; font-weight:700; letter-spacing:1px; color:var(--encoder-accent); }
+#encodingModal .encoder-auto-chip { padding:5px 8px; flex:0 0 auto; font-size:9px; font-weight:700; border-radius:7px; color:var(--encoder-accent); background:var(--encoder-accent-soft); }
+#encodingModal .encoder-upload-description { margin:14px 0 0; font-size:12px; line-height:1.7; color:var(--encoder-muted); }
+#encodingModal .encoder-upload-workspace { display:flex; flex-direction:column; align-items:stretch; gap:16px; margin-top:16px; }
+#encodingModal .encoder-file-picker { width:100%; align-items:flex-start; border:1px dashed var(--encoder-border); border-radius:12px; padding:16px 13px; background:var(--encoder-surface); gap:10px; }
+#encodingModal .encoder-file-picker.is-dragging { border-color:var(--encoder-accent); background:var(--encoder-accent-soft); }
+#encodingModal .encoder-file-icon { color:var(--encoder-accent); flex:0 0 22px; margin-top:2px; }
+#encodingModal .encoder-file-copy { flex:1; min-width:0; }
+#encodingModal .encoder-file-copy strong { font-size:12px; line-height:1.5; overflow-wrap:anywhere; }
+#encodingModal .encoder-file-copy > span { display:block; margin-top:4px; font-size:10px; line-height:1.6; color:var(--encoder-muted); }
+#encodingModal .encoder-file-actions, #encodingModal .encoder-reader-buttons { display:flex; flex-wrap:wrap; gap:7px; }
+#encodingModal .encoder-drop-hint { display:block; margin-top:9px; color:var(--encoder-muted); font-size:10px; }
+#encodingModal .file-picker-button, #encodingModal .btn-ocr { min-height:36px; padding:8px 10px; border-radius:9px; border:1px solid var(--encoder-border); color:var(--encoder-text); background:var(--encoder-surface); font-size:11px; gap:6px; }
+#encodingModal .file-picker-button svg, #encodingModal .btn-ocr svg { width:14px; height:14px; }
+#encodingModal .btn-ocr { color:var(--encoder-accent); background:var(--encoder-accent-soft); border-color:var(--encoder-border); }
+#encodingModal .file-picker-button:disabled, #encodingModal .btn-ocr:disabled { opacity:.55; cursor:not-allowed; }
+#encodingModal .encoder-reader-heading { display:flex; align-items:center; gap:8px; font-size:12px; }
+#encodingModal .encoder-reader-dot { width:8px; height:8px; border-radius:50%; background:var(--encoder-muted); flex:0 0 8px; }
+#encodingModal #filePickerState[data-state="processing"] .encoder-reader-dot { background:var(--encoder-accent); animation:communication-reader-pulse 1.4s ease-in-out infinite; }
+#encodingModal #filePickerState[data-state="complete"] .encoder-reader-dot { background:var(--encoder-accent); }
+#encodingModal #filePickerState[data-state="review"] .encoder-reader-dot { background:var(--encoder-warning); }
+#encodingModal #filePickerState[data-state="error"] .encoder-reader-dot { background:var(--encoder-error); }
+#encodingModal #ocrActionSubtext { font-size:11px; line-height:1.7; color:var(--encoder-muted); margin:6px 0 12px; overflow-wrap:anywhere; }
+#encodingModal .ocr-stop-controls { padding:0; border:0; background:transparent; display:block; }
+#encodingModal .upload-progress-box { margin-top:14px; }
+#encodingModal .upload-progress-copy { flex-direction:column; gap:6px; line-height:1.5; color:var(--encoder-text); }
+#encodingModal .upload-progress-hint { color:var(--encoder-muted); }
+#encodingModal .progress-bar-sm { background:var(--encoder-border); height:6px; }
+#encodingModal .progress-bar-sm .fill { background:var(--encoder-accent); transition:width .2s ease; }
+#encodingModal .file-preview-card { margin-top:16px; background:var(--encoder-surface); border-color:var(--encoder-border); }
+#encodingModal .file-preview-header { align-items:flex-start; flex-direction:column; gap:8px; padding:12px; background:var(--encoder-surface); border-color:var(--encoder-border); color:var(--encoder-text); }
+#encodingModal .file-preview-title { flex-wrap:wrap; font-size:11px; }
+#encodingModal .file-preview-body { height:190px; background:var(--encoder-muted-surface); }
+#encodingModal .file-preview-body img { min-width:0; max-width:100%; }
+#encodingModal .file-preview-body p { padding:12px; font-size:12px; color:var(--encoder-muted); text-align:center; line-height:1.7; }
+#encodingModal .communication-pdf-preview-card { display:grid; justify-items:center; padding:14px; gap:8px; }
+#encodingModal #ocrFieldSummary { margin:8px 0 0; font-size:12px; font-weight:600; line-height:1.7; color:var(--encoder-text); }
+#encodingModal .ocr-review-note { margin:10px 0 0; padding:0; border:0; background:transparent; font-size:11px; line-height:1.8; color:var(--encoder-muted); overflow-wrap:anywhere; }
+#encodingModal #ocrSignatoryGroup { margin-top:14px; }
+#encodingModal #ocrSignatoryGroup small { color:var(--encoder-muted); font-size:11px; line-height:1.7; }
+#encodingModal .encoder-section { margin:0; background:transparent; }
+#encodingModal .encoder-section-heading { margin:0 0 14px; padding:0; background:transparent; }
+#encodingModal .encoder-section-heading h3 { font-size:15px; margin:4px 0 0; color:var(--encoder-text); }
+#encodingModal .encoder-section-heading p { font-size:11px; line-height:1.6; margin:5px 0 0; color:var(--encoder-muted); }
+#encodingModal .encoder-required-note { white-space:nowrap; color:var(--encoder-muted); }
+#encodingModal .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+#encodingModal .form-group { min-width:0; margin:0; gap:7px; }
+#encodingModal .form-group.full-width { grid-column:1/-1; }
+#encodingModal .form-group label { display:flex; align-items:center; flex-wrap:wrap; gap:5px; color:var(--encoder-text); font-size:11px; font-weight:650; line-height:1.6; }
+#encodingModal .form-control { width:100%; min-width:0; max-width:100%; min-height:42px; padding:10px 12px; font-size:13px; line-height:1.6; color:var(--encoder-text); background:var(--encoder-surface); border:1px solid var(--encoder-border); border-radius:9px; box-shadow:none; }
+#encodingModal .form-control:focus { border-color:var(--encoder-accent); outline:2px solid var(--encoder-accent-soft); outline-offset:1px; }
+#encodingModal .form-control::placeholder { color:var(--encoder-muted); opacity:.85; }
+#encodingModal textarea.form-control { height:auto; min-height:76px; resize:vertical; }
+#encodingModal #subjectInput { min-height:104px; }
+#encodingModal .field-hint { color:var(--encoder-muted); font-size:10px; line-height:1.6; }
+#encodingModal .document-destination, #encodingModal .communication-memo-review { margin:0 0 16px; padding:10px 12px; border:1px solid var(--encoder-border); border-radius:9px; color:var(--encoder-accent); background:var(--encoder-accent-soft); font-size:11px; line-height:1.7; }
+#encodingModal .communication-memo-review { background:var(--encoder-warning-soft); color:var(--encoder-warning); }
+#encodingModal .ocr-field-badge { margin-left:auto; padding:2px 6px; border-radius:5px; color:var(--encoder-accent); background:var(--encoder-accent-soft); font-size:9px; font-weight:600; line-height:1.5; white-space:nowrap; }
+#encodingModal .ocr-field-badge[data-state="review"], #encodingModal .ocr-field-badge[data-state="missing"] { background:var(--encoder-warning-soft); color:var(--encoder-warning); }
+#encodingModal .ocr-field-badge[data-state="edited"] { color:var(--encoder-muted); background:var(--encoder-muted-surface); }
+#encodingModal .encoder-ocr-result { grid-column:1/-1; padding:14px 16px; border:1px solid var(--encoder-border); border-radius:12px; background:var(--encoder-muted-surface); }
+#encodingModal .encoder-result-heading { margin:0; cursor:pointer; display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; color:var(--encoder-text); font-size:12px; }
+#encodingModal .encoder-result-heading > span:first-child { display:flex; gap:8px; align-items:center; }
+#encodingModal .encoder-result-heading svg { width:16px; height:16px; color:var(--encoder-accent); }
+#encodingModal .ocr-stats-chip { background:var(--encoder-accent-soft); color:var(--encoder-accent); font-size:10px; border-radius:6px; padding:4px 7px; }
+#encodingModal .encoder-text-label { display:block; margin:14px 0 8px; font-size:11px; color:var(--encoder-muted); }
+#encodingModal #ocrTextInput { min-height:180px; font-family:ui-monospace,SFMono-Regular,Consolas,monospace; font-size:12px; }
+#encodingModal .communication-modal-actions { padding:16px 24px; gap:16px; justify-content:space-between; background:var(--encoder-surface); color:var(--encoder-text); border-color:var(--encoder-border); }
+#encodingModal .modal-action-note { display:flex; gap:8px; align-items:flex-start; font-size:10px; line-height:1.7; color:var(--encoder-muted); max-width:400px; }
+#encodingModal .modal-action-note svg { width:16px; height:16px; flex:0 0 16px; margin-top:1px; color:var(--encoder-accent); }
+#encodingModal .modal-action-buttons { display:flex; gap:8px; flex-wrap:wrap; }
+#encodingModal .modal-action-buttons .btn { min-height:42px; font-size:12px; }
+#encodingModal .btn-secondary { background:var(--encoder-muted-surface); border-color:var(--encoder-border); color:var(--encoder-text); }
+#encodingModal .btn-primary { background:#24734c; color:#ffffff; border-color:#24734c; }
+#encodingModal [hidden] { display:none !important; }
+@keyframes communication-reader-pulse { 50% { opacity:.35; } }
+@media(max-width:900px) {
+  #encodingModal .communication-modal-body { grid-template-columns:minmax(0,1fr); }
+  #encodingModal .encoder-document-column { display:grid; grid-template-columns:minmax(0,1.25fr) minmax(0,1fr); align-items:start; }
+}
+@media(max-width:640px) {
+  #encodingModal { padding:10px; }
+  #encodingModal .communication-encoding-modal { max-height:calc(100dvh - 20px); border-radius:15px; }
+  #encodingModal .communication-modal-header { padding:16px; }
+  #encodingModal .communication-modal-icon { display:none; }
+  #encodingModal .communication-modal-copy h2 { font-size:18px; }
+  #encodingModal .communication-modal-copy p { font-size:11px; }
+  #encodingModal .communication-modal-body { padding:16px; gap:18px; }
+  #encodingModal .encoder-document-column { display:flex; }
+  #encodingModal .encoder-upload-panel, #encodingModal .encoder-review-panel { padding:14px; }
+  #encodingModal .form-grid { grid-template-columns:minmax(0,1fr); gap:14px; }
+  #encodingModal .form-control { font-size:16px; }
+  #encodingModal .communication-modal-actions { padding:12px 16px; flex-wrap:wrap; gap:10px; }
+  #encodingModal .modal-action-note { display:none; }
+  #encodingModal .modal-action-buttons { width:100%; }
+  #encodingModal .modal-action-buttons .btn { flex:1; font-size:11px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #encodingModal .encoder-reader-dot { animation:none !important; }
+  #encodingModal .progress-bar-sm .fill { transition:none; }
+}
+
+#encodingModal .encoder-inline-notice { margin:12px 0 0; padding:10px 12px; border:1px solid var(--encoder-border); border-radius:9px; font-size:11px; line-height:1.7; background:var(--encoder-accent-soft); color:var(--encoder-accent); overflow-wrap:anywhere; }
+#encodingModal .encoder-inline-notice[data-type="error"] { background:var(--encoder-error-soft); color:var(--encoder-error); }
+#encodingModal .encoder-inline-notice[data-type="warning"] { background:var(--encoder-warning-soft); color:var(--encoder-warning); }
+#encodingModal #filePreviewBody.is-text-document { height:auto; min-height:72px; }
+
+/* Local SVG paint stays consistent in both appearances. */
+body.pgenro-admin svg.lucide {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
