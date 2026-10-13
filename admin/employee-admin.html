@@ -1,23 +1,22 @@
 <!DOCTYPE html>
-
 <html data-css-scope="admin-dashboard" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<meta content="light" name="color-scheme"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
+<meta content="light" name="color-scheme">
 <title>PGENRO IMS | Employee Profiles Admin</title>
-<meta content="#f5f7f8" name="theme-color"/>
+<meta content="#f5f7f8" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Fonts -->
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <!-- Lucide Icons & Supabase SDK -->
-<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Core Admin Stylesheets Matching admin.html -->
-<link href="employee-admin.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+<link href="employee-admin.css?v=20261013-layout-v2" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="employee-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="employee-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Employees">
 <div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- =========================================================
@@ -26,56 +25,106 @@
 
          ========================================================= -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
+
 <div class="sidebar-header">
+
 <a class="logo-area" href="admin.html">
+
 <div class="logo-icon">
-<img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
+
+<img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png">
+
 </div>
+
 <div class="logo-text">
+
 <h2>PGENRO IMS</h2>
+
 <span>Administrative workspace</span>
+
 </div>
+
 </a>
 
-<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-x "><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div>
+
 <nav aria-label="Administrator navigation" class="sidebar-nav">
+
 <div class="nav-group">
+
 <span class="nav-label">Workspace</span>
+
 <ul>
-<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+
+<li><a class="nav-item" href="admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-layout-dashboard "><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Dashboard</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Office operations</span>
+
 <ul>
-<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
-<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
-<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a aria-current="page" class="nav-item active" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
-<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
-<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
-<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
+
+<li><a class="nav-item" href="admincommunication.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-arrow-left-right "><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg><span>Communications</span></a></li>
+
+<li><a class="nav-item" href="travelOR-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-briefcase "><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg><span>Travel Orders</span></a></li>
+
+<li><a class="nav-item" href="officememo-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-file-text "><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><span>Office Memos</span></a></li>
+
+<li><a class="nav-item active" href="employee-admin.html" aria-current="page"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-users-round "><path d="M18 21a8 8 0 0 0-16 0"></path><circle cx="10" cy="8" r="5"></circle><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path></svg><span>Employees</span></a></li>
+
+<li><a class="nav-item" href="invetoryadmin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-boxes "><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path d="M7 16.5v5.17"></path><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path d="M17 16.5v5.17"></path><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path d="M12 13.5V8"></path></svg><span>Inventory</span></a></li>
+
+<li><a class="nav-item" href="visitors-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-clipboard-check "><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg><span>Visitors</span></a></li>
+
+<li><a class="nav-item" href="serviceAdmin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-wrench "><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg><span>Service Requests</span></a></li>
+
+<li><a class="nav-item" href="ics-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-file-check-2 "><path d="M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="m14 20 2 2 4-4"></path></svg><span>Property Slips</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Administration</span>
+
 <ul>
-<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-<li><a class="nav-item" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
+
+<li><a class="nav-item" href="Usermanagement.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-cog "><path d="M10 15H6a4 4 0 0 0-4 4v2"></path><path d="m14.305 16.53.923-.382"></path><path d="m15.228 13.852-.923-.383"></path><path d="m16.852 12.228-.383-.923"></path><path d="m16.852 17.772-.383.924"></path><path d="m19.148 12.228.383-.923"></path><path d="m19.53 18.696-.382-.924"></path><path d="m20.772 13.852.924-.383"></path><path d="m20.772 16.148.924.383"></path><circle cx="18" cy="15" r="3"></circle><circle cx="9" cy="7" r="4"></circle></svg><span>User Management</span></a></li>
+
+<li><a class="nav-item" href="requestacc.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-plus "><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" x2="19" y1="8" y2="14"></line><line x1="22" x2="16" y1="11" y2="11"></line></svg><span>Account Requests</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Workspace tools</span>
+
 <ul>
-<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
-<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
-<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
+
+<li><a class="nav-item" href="audittrail-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-shield-alert "><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span>Audit Trail</span></a></li>
+
+<li><a class="nav-item" href="backup-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-database-backup "><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 12a9 3 0 0 0 5 2.69"></path><path d="M21 9.3V5"></path><path d="M3 5v14a9 3 0 0 0 6.47 2.88"></path><path d="M12 12v4h4"></path><path d="M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"></path></svg><span>Backups</span></a></li>
+
+<li><a class="nav-item" href="admin.html#settings"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-settings "><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Preferences</span></a></li>
+
 </ul>
+
 </div>
+
 </nav>
-<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
-</aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+
+</aside>
+
+<div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
 <!-- =========================================================
 
          MAIN WRAPPER
@@ -83,79 +132,141 @@
          ========================================================= -->
 <div class="main-wrapper">
 <header class="topbar">
-<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-<i data-lucide="panel-left-close"></i>
-<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-<i data-lucide="menu"></i>
-</button>
-<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Employee directory</span></a>
 
-<div class="global-search" role="search">
-<i class="search-icon" data-lucide="search"></i>
-<input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search employee records…" spellcheck="false" type="text"/>
-<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-panel-left-close "><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m16 15-3-3 3-3"></path></svg>
+
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-menu "><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+
+</button>
+
+<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Employees</span></a>
+
+<div class="global-search ui-affixed-control" role="search">
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-search search-icon ui-field-icon"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+
+<input aria-controls="searchPaletteDropdown" aria-expanded="false" aria-label="Search workspace modules" autocomplete="off" id="globalSearchInput" placeholder="Search workspace" spellcheck="false" type="text" class="ui-affixed-field">
+
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-layout-dashboard "><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Modules</span><kbd>K</kbd></button>
+
 <!-- Search Quick Palette -->
+
+<div aria-label="Module search results" class="search-palette-dropdown" id="searchPaletteDropdown">
+
+<div class="search-palette-group-title">Jump to Module</div>
+
+<div id="searchPaletteModules"></div>
+
 </div>
+
 </div>
+
+</div>
+
 <div class="topbar-right">
-<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
+
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-moon "><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button>
+
 <!-- Notification Button & Drawer -->
+
 <div class="notification-wrapper">
+
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
-<i data-lucide="bell"></i>
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-bell "><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
+
 <span class="notification-ping" id="notifPing" style="display: none;"></span>
+
 </button>
+
 <div class="notification-dropdown" id="notificationDropdown">
+
 <div class="notification-header">
+
 <h3>Notifications</h3>
+
 <span class="badge-count" id="notifBadgeCount">0 Unread</span>
+
 </div>
+
 <div class="notification-list" id="notificationList">
+
 <div class="empty-notif-state">No new notifications</div>
+
 </div>
+
 </div>
+
 </div>
+
 <div class="v-divider"></div>
+
 <!-- Profile Menu -->
+
 <div class="profile-menu" id="profileMenu">
+
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
-<div class="profile-avatar"><i data-lucide="user-round"></i></div>
-<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+
+<div class="profile-avatar"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-round "><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg></div>
+
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-down profile-chevron"><path d="m6 9 6 6 6-6"></path></svg>
+
 </button>
+
 <div class="profile-dropdown" id="profileDropdown">
+
 <div class="profile-dropdown-header">
-<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+
+<div class="profile-avatar big"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-round "><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg></div>
+
 <div class="profile-dropdown-copy">
+
 <h3 id="dropdownUserName">PGENRO Admin</h3>
+
 <p id="dropdownUserEmail">Administrator Session</p>
+
 <span class="role-badge" id="dropdownUserRole">Administrator</span>
+
 </div>
+
 </div>
+
 <div class="dropdown-links">
-<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
-<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
-<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
-<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
+
+<a href="admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-layout-dashboard "><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Executive Dashboard</span></a>
+
+<a href="Usermanagement.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-users "><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><span>User Management</span></a>
+
+<a href="requestacc.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-check "><path d="m16 11 2 2 4-4"></path><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg><span>Account Requests</span></a>
+
+<a href="admin.html#settings"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-settings "><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Workspace Preferences</span></a>
+
 </div>
+
 <div class="dropdown-footer">
-<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+
+<button class="logout-btn" id="logoutBtn" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-log-out "><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path></svg><span>Sign Out</span></button>
+
 </div>
+
 </div>
+
 </div>
+
 </div>
+
 </header>
+
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <!-- PAGE HEADER -->
-<section class="page-header depth-hero" id="dashboard">
+<section class="page-header depth-hero unified-page-header" id="dashboard">
 <div class="header-title">
-<div aria-hidden="true" class="page-heading-mark"><i data-lucide="users-round"></i></div>
-<div class="breadcrumb">
-<span>Admin Console</span>
-<i data-lucide="chevron-right"></i>
-<span class="active">Employee Profiles</span>
-</div>
-<h1>Employee directory</h1>
+<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-users-round"><path d="M18 21a8 8 0 0 0-16 0"></path><circle cx="10" cy="8" r="5"></circle><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Employees</span></div><h1>Employees</h1>
 <p>A complete view of your people, records, and employment information.</p>
 </div>
 <div class="header-actions">
@@ -215,8 +326,8 @@
 </div>
 </section>
 <!-- KPI METRICS GRID -->
-<section class="kpi-grid">
-<div class="kpi-card">
+<section class="kpi-grid unified-metric-grid">
+<div class="kpi-card unified-metric unified-metric-featured">
 <div class="kpi-header">
 <span class="kpi-label">Registered Personnel</span>
 <div class="kpi-icon emerald"><i data-lucide="users"></i></div>
@@ -229,7 +340,7 @@
 <a href="#directorySection">View Directory Masterfile →</a>
 </div>
 </div>
-<div class="kpi-card">
+<div class="kpi-card unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Active Duty Staff</span>
 <div class="kpi-icon blue"><i data-lucide="user-check"></i></div>
@@ -242,7 +353,7 @@
 <span>On official duty assignment</span>
 </div>
 </div>
-<div class="kpi-card urgent-border">
+<div class="kpi-card urgent-border unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">On Leave Notices</span>
 <div class="kpi-icon amber"><i data-lucide="calendar-off"></i></div>
@@ -255,7 +366,7 @@
 <span>Approved leave applications</span>
 </div>
 </div>
-<div class="kpi-card">
+<div class="kpi-card unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Operational Divisions</span>
 <div class="kpi-icon purple"><i data-lucide="building-2"></i></div>
@@ -314,9 +425,9 @@
 <div class="card table-card">
 <!-- ADVANCED TOOLBAR -->
 <div class="employee-filter-bar">
-<div class="search-field">
-<i data-lucide="search"></i>
-<input autocomplete="off" id="searchInput" placeholder="Search by name, ID, position, division, email..." type="search"/>
+<div class="search-field ui-affixed-control">
+<i data-lucide="search" class="ui-field-icon"></i>
+<input autocomplete="off" id="searchInput" placeholder="Search by name, ID, position, division, email..." type="search" class="ui-affixed-field">
 </div>
 <div class="filter-controls">
 <select aria-label="Filter employment type" class="input-sm" id="filterEmploymentType">
@@ -367,10 +478,10 @@
 </div>
 <!-- TABLE -->
 <div class="table-responsive" id="employeeScrollBox" tabindex="0">
-<table class="data-table" id="employeeTable">
+<table class="data-table unified-records-table" id="employeeTable" data-ui-columns="9" style="--ui-table-min:1080px;">
 <thead>
 <tr>
-<th width="40"><input aria-label="Select all employees" id="selectAllRows" type="checkbox"/></th>
+<th width="40"><input aria-label="Select all employees" id="selectAllRows" type="checkbox"></th>
 <th style="width: 130px;">Employee ID</th>
 <th>Employee Name</th>
 <th>Designation &amp; Item</th>
@@ -392,11 +503,11 @@
 <div class="table-footer">
 <span class="text-muted" id="tablePaginationInfo">Showing 0 of 0 staff</span>
 <div class="pagination" id="paginationControls">
-<button aria-label="Previous page" class="page-btn" disabled="" id="prevPageBtn" type="button">
+<button aria-label="Previous page" class="page-btn" disabled id="prevPageBtn" type="button">
 <i data-lucide="chevron-left"></i>
 </button>
 <div class="pagination-numbers" id="pageNumbers"></div>
-<button aria-label="Next page" class="page-btn" disabled="" id="nextPageBtn" type="button">
+<button aria-label="Next page" class="page-btn" disabled id="nextPageBtn" type="button">
 <i data-lucide="chevron-right"></i>
 </button>
 </div>
@@ -404,18 +515,7 @@
 </div>
 </section>
 <!-- FOOTER -->
-<footer class="admin-footer">
-<div>
-<p>© 2026 Provincial Government Environment and Natural Resources Office (PGENRO). All rights reserved.</p>
-</div>
-<div class="footer-links">
-<a href="audittrail-admin.html">Security audit</a>
-<a href="admin.html#settings">Workspace preferences</a>
-<a href="Usermanagement.html">User management</a>
-</div>
-</footer>
-<footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
-</main>
+<footer class="admin-footer"><p>© 2026 PGENRO · Records and operations workspace</p><div class="footer-links"><a href="admin.html">Dashboard</a><a href="Usermanagement.html">User Management</a><a href="admin.html#settings">Preferences</a></div></footer></main>
 </div>
 </div>
 <!-- =========================================================
@@ -448,19 +548,19 @@
 <div><h3>Personal Information</h3><p>Name, birth details, and personal information.</p></div>
 </div>
 <div class="form-grid form-grid-3">
-<div class="form-group"><label for="empId">Employee ID <span>*</span></label><input class="form-control" id="empId" placeholder="e.g. 5653 or EMP-2026-001" required="" type="text"/></div>
-<div class="form-group"><label for="empLastName">Last Name <span>*</span></label><input class="form-control" id="empLastName" placeholder="e.g. Dela Cruz" required="" type="text"/></div>
-<div class="form-group"><label for="empFirstName">First Name <span>*</span></label><input class="form-control" id="empFirstName" placeholder="e.g. Juan" required="" type="text"/></div>
-<div class="form-group"><label for="empMiddleName">Middle Name</label><input class="form-control" id="empMiddleName" placeholder="e.g. Santos" type="text"/></div>
+<div class="form-group"><label for="empId">Employee ID <span>*</span></label><input class="form-control" id="empId" placeholder="e.g. 5653 or EMP-2026-001" required="" type="text"></div>
+<div class="form-group"><label for="empLastName">Last Name <span>*</span></label><input class="form-control" id="empLastName" placeholder="e.g. Dela Cruz" required="" type="text"></div>
+<div class="form-group"><label for="empFirstName">First Name <span>*</span></label><input class="form-control" id="empFirstName" placeholder="e.g. Juan" required="" type="text"></div>
+<div class="form-group"><label for="empMiddleName">Middle Name</label><input class="form-control" id="empMiddleName" placeholder="e.g. Santos" type="text"></div>
 <div class="form-group"><label for="empExtension">Extension Name</label><select class="form-control" id="empExtension"><option value="">None</option><option value="Jr.">Jr.</option><option value="Sr.">Sr.</option><option value="II">II</option><option value="III">III</option><option value="IV">IV</option><option value="V">V</option></select></div>
 <div class="form-group"><label for="empGender">Gender</label><select class="form-control" id="empGender"><option value="Male">Male</option><option value="Female">Female</option><option value="Other">Other</option></select></div>
-<div class="form-group"><label for="empDob">Date of Birth</label><input class="form-control" id="empDob" type="date"/></div>
-<div class="form-group span-2"><label for="empPob">Birth Place</label><input class="form-control" id="empPob" placeholder="City / Municipality, Province" type="text"/></div>
+<div class="form-group"><label for="empDob">Date of Birth</label><input class="form-control" id="empDob" type="date"></div>
+<div class="form-group span-2"><label for="empPob">Birth Place</label><input class="form-control" id="empPob" placeholder="City / Municipality, Province" type="text"></div>
 <div class="form-group"><label for="empCivilStatus">Civil Status</label><select class="form-control" id="empCivilStatus"><option value="Single">Single</option><option value="Married">Married</option><option value="Widowed">Widowed</option><option value="Separated">Separated</option><option value="Annulled">Annulled</option></select></div>
-<div class="form-group"><label for="empReligion">Religion</label><input class="form-control" id="empReligion" placeholder="Optional" type="text"/></div>
+<div class="form-group"><label for="empReligion">Religion</label><input class="form-control" id="empReligion" placeholder="Optional" type="text"></div>
 <div class="form-group"><label for="empBloodType">Blood Type</label><select class="form-control" id="empBloodType"><option value="">Unknown</option><option value="A+">A+</option><option value="A-">A-</option><option value="B+">B+</option><option value="B-">B-</option><option value="AB+">AB+</option><option value="AB-">AB-</option><option value="O+">O+</option><option value="O-">O-</option></select></div>
-<div class="form-group"><label for="empHeightCm">Height (cm)</label><input class="form-control" id="empHeightCm" min="0" placeholder="e.g. 165" step="0.1" type="number"/></div>
-<div class="form-group"><label for="empWeightKg">Weight (kg)</label><input class="form-control" id="empWeightKg" min="0" placeholder="e.g. 60" step="0.1" type="number"/></div>
+<div class="form-group"><label for="empHeightCm">Height (cm)</label><input class="form-control" id="empHeightCm" min="0" placeholder="e.g. 165" step="0.1" type="number"></div>
+<div class="form-group"><label for="empWeightKg">Weight (kg)</label><input class="form-control" id="empWeightKg" min="0" placeholder="e.g. 60" step="0.1" type="number"></div>
 </div>
 </section>
 <!-- EMPLOYMENT -->
@@ -471,17 +571,17 @@
 </div>
 <div class="form-grid form-grid-3">
 <div class="form-group"><label for="empStatusType">Employment Status</label><select class="form-control" id="empStatusType"><option value="PERMANENT">PERMANENT</option><option value="CASUAL">CASUAL</option><option value="JOB ORDER">JOB ORDER</option><option value="CONTRACT OF SERVICE">CONTRACT OF SERVICE</option><option value="TEMPORARY">TEMPORARY</option></select></div>
-<div class="form-group span-2"><label for="empDesignation">Designation / Position Title <span>*</span></label><input class="form-control" id="empDesignation" placeholder="e.g. Administrative Aide IV" required="" type="text"/></div>
-<div class="form-group span-2"><label for="empDepartment">Division / Department <span>*</span></label><input class="form-control" id="empDepartment" placeholder="e.g. Administrative Division" required="" type="text"/></div>
-<div class="form-group"><label for="empItemCode">Item No. / Plantilla Code</label><input class="form-control" id="empItemCode" placeholder="e.g. PENRO-1-001" type="text"/></div>
-<div class="form-group"><label for="empDateEmployed">Date Employed</label><input class="form-control" id="empDateEmployed" type="date"/></div>
-<div class="form-group"><label for="empDateAssumption">Date of Assumption</label><input class="form-control" id="empDateAssumption" type="date"/></div>
+<div class="form-group span-2"><label for="empDesignation">Designation / Position Title <span>*</span></label><input class="form-control" id="empDesignation" placeholder="e.g. Administrative Aide IV" required="" type="text"></div>
+<div class="form-group span-2"><label for="empDepartment">Division / Department <span>*</span></label><input class="form-control" id="empDepartment" placeholder="e.g. Administrative Division" required="" type="text"></div>
+<div class="form-group"><label for="empItemCode">Item No. / Plantilla Code</label><input class="form-control" id="empItemCode" placeholder="e.g. PENRO-1-001" type="text"></div>
+<div class="form-group"><label for="empDateEmployed">Date Employed</label><input class="form-control" id="empDateEmployed" type="date"></div>
+<div class="form-group"><label for="empDateAssumption">Date of Assumption</label><input class="form-control" id="empDateAssumption" type="date"></div>
 <div class="form-group"><label for="empDutyStatus">Duty Status</label><select class="form-control" id="empDutyStatus"><option value="Active">Active</option><option value="On Leave">On Leave</option><option value="Inactive">Inactive</option><option value="Separated">Separated</option></select></div>
-<div class="form-group"><label for="empSalaryGrade">Salary Grade</label><input class="form-control" id="empSalaryGrade" placeholder="e.g. SG 18" type="text"/></div>
-<div class="form-group"><label for="empStepNo">Step No.</label><input class="form-control" id="empStepNo" placeholder="e.g. 2" type="text"/></div>
-<div class="form-group"><label for="empNosaDate">N.O.S.A. Date</label><input class="form-control" id="empNosaDate" title="Notice of Salary Adjustment date" type="date"/></div>
-<div class="form-group"><label for="empBasicSalary">Basic Salary</label><input class="form-control" id="empBasicSalary" min="0" placeholder="0.00" step="0.01" type="number"/></div>
-<div class="form-group span-2"><label for="empEligibility">Eligibility</label><input class="form-control" id="empEligibility" placeholder="Civil Service / board / professional eligibility" type="text"/></div>
+<div class="form-group"><label for="empSalaryGrade">Salary Grade</label><input class="form-control" id="empSalaryGrade" placeholder="e.g. SG 18" type="text"></div>
+<div class="form-group"><label for="empStepNo">Step No.</label><input class="form-control" id="empStepNo" placeholder="e.g. 2" type="text"></div>
+<div class="form-group"><label for="empNosaDate">N.O.S.A. Date</label><input class="form-control" id="empNosaDate" title="Notice of Salary Adjustment date" type="date"></div>
+<div class="form-group"><label for="empBasicSalary">Basic Salary</label><input class="form-control" id="empBasicSalary" min="0" placeholder="0.00" step="0.01" type="number"></div>
+<div class="form-group span-2"><label for="empEligibility">Eligibility</label><input class="form-control" id="empEligibility" placeholder="Civil Service / board / professional eligibility" type="text"></div>
 </div>
 </section>
 <!-- GOVERNMENT NUMBERS -->
@@ -491,10 +591,10 @@
 <div><h3>Government &amp; Benefit Numbers</h3><p>Government identification and benefit membership numbers.</p></div>
 </div>
 <div class="form-grid form-grid-2">
-<div class="form-group"><label for="empTinNo">T.I.N. No.</label><input autocomplete="off" class="form-control" id="empTinNo" type="text"/></div>
-<div class="form-group"><label for="empGsisBpNo">G.S.I.S. B.P. No.</label><input autocomplete="off" class="form-control" id="empGsisBpNo" type="text"/></div>
-<div class="form-group"><label for="empPagibigNo">PAG-IBIG No.</label><input autocomplete="off" class="form-control" id="empPagibigNo" type="text"/></div>
-<div class="form-group"><label for="empPhilhealthNo">PHILHEALTH No.</label><input autocomplete="off" class="form-control" id="empPhilhealthNo" type="text"/></div>
+<div class="form-group"><label for="empTinNo">T.I.N. No.</label><input autocomplete="off" class="form-control" id="empTinNo" type="text"></div>
+<div class="form-group"><label for="empGsisBpNo">G.S.I.S. B.P. No.</label><input autocomplete="off" class="form-control" id="empGsisBpNo" type="text"></div>
+<div class="form-group"><label for="empPagibigNo">PAG-IBIG No.</label><input autocomplete="off" class="form-control" id="empPagibigNo" type="text"></div>
+<div class="form-group"><label for="empPhilhealthNo">PHILHEALTH No.</label><input autocomplete="off" class="form-control" id="empPhilhealthNo" type="text"></div>
 </div>
 </section>
 <!-- ADDRESS -->
@@ -504,11 +604,11 @@
 <div><h3>Complete Address</h3><p>House or street, barangay, municipality, and province.</p></div>
 </div>
 <div class="form-grid form-grid-3">
-<div class="form-group span-2"><label for="empHouseStreetPurok">House No. / Street / Purok</label><input class="form-control" id="empHouseStreetPurok" type="text"/></div>
-<div class="form-group"><label for="empBarangay">Barangay</label><input class="form-control" id="empBarangay" type="text"/></div>
-<div class="form-group"><label for="empCityMunicipality">City / Municipality</label><input class="form-control" id="empCityMunicipality" type="text"/></div>
-<div class="form-group"><label for="empProvince">Province</label><input class="form-control" id="empProvince" type="text"/></div>
-<div class="form-group"><label for="empZipCode">Zip Code</label><input class="form-control" id="empZipCode" inputmode="numeric" type="text"/></div>
+<div class="form-group span-2"><label for="empHouseStreetPurok">House No. / Street / Purok</label><input class="form-control" id="empHouseStreetPurok" type="text"></div>
+<div class="form-group"><label for="empBarangay">Barangay</label><input class="form-control" id="empBarangay" type="text"></div>
+<div class="form-group"><label for="empCityMunicipality">City / Municipality</label><input class="form-control" id="empCityMunicipality" type="text"></div>
+<div class="form-group"><label for="empProvince">Province</label><input class="form-control" id="empProvince" type="text"></div>
+<div class="form-group"><label for="empZipCode">Zip Code</label><input class="form-control" id="empZipCode" inputmode="numeric" type="text"></div>
 <div class="form-group full"><label for="empAddress">Additional / Complete Address</label><textarea class="form-control" id="empAddress" placeholder="Enter a complete address if the fields above are blank." rows="2"></textarea></div>
 </div>
 </section>
@@ -519,14 +619,14 @@
 <div><h3>Family Background</h3><p>Spouse details, occupation, and contact information.</p></div>
 </div>
 <div class="form-grid form-grid-3">
-<div class="form-group"><label for="empSpouseLastName">Spouse Last Name</label><input class="form-control" id="empSpouseLastName" type="text"/></div>
-<div class="form-group"><label for="empSpouseFirstName">First Name</label><input class="form-control" id="empSpouseFirstName" type="text"/></div>
-<div class="form-group"><label for="empSpouseMiddleName">Middle Name</label><input class="form-control" id="empSpouseMiddleName" type="text"/></div>
-<div class="form-group"><label for="empSpouseExtension">Extension Name</label><input class="form-control" id="empSpouseExtension" placeholder="Jr., Sr., III, etc." type="text"/></div>
-<div class="form-group span-2"><label for="empSpouseOccupation">Occupation</label><input class="form-control" id="empSpouseOccupation" type="text"/></div>
-<div class="form-group span-2"><label for="empSpouseEmployer">Employer / Business Name</label><input class="form-control" id="empSpouseEmployer" type="text"/></div>
-<div class="form-group"><label for="empSpouseContact">Contact No.</label><input class="form-control" id="empSpouseContact" type="tel"/></div>
-<div class="form-group full"><label for="empSpouseEmail">Email Address</label><input class="form-control" id="empSpouseEmail" type="email"/></div>
+<div class="form-group"><label for="empSpouseLastName">Spouse Last Name</label><input class="form-control" id="empSpouseLastName" type="text"></div>
+<div class="form-group"><label for="empSpouseFirstName">First Name</label><input class="form-control" id="empSpouseFirstName" type="text"></div>
+<div class="form-group"><label for="empSpouseMiddleName">Middle Name</label><input class="form-control" id="empSpouseMiddleName" type="text"></div>
+<div class="form-group"><label for="empSpouseExtension">Extension Name</label><input class="form-control" id="empSpouseExtension" placeholder="Jr., Sr., III, etc." type="text"></div>
+<div class="form-group span-2"><label for="empSpouseOccupation">Occupation</label><input class="form-control" id="empSpouseOccupation" type="text"></div>
+<div class="form-group span-2"><label for="empSpouseEmployer">Employer / Business Name</label><input class="form-control" id="empSpouseEmployer" type="text"></div>
+<div class="form-group"><label for="empSpouseContact">Contact No.</label><input class="form-control" id="empSpouseContact" type="tel"></div>
+<div class="form-group full"><label for="empSpouseEmail">Email Address</label><input class="form-control" id="empSpouseEmail" type="email"></div>
 </div>
 </section>
 <!-- CONTACT -->
@@ -536,13 +636,13 @@
 <div><h3>Contact Information</h3><p>Phone numbers, email address, and social profiles.</p></div>
 </div>
 <div class="form-grid form-grid-3">
-<div class="form-group"><label for="empLandline">Landline No.</label><input class="form-control" id="empLandline" type="tel"/></div>
-<div class="form-group"><label for="empMobile">Mobile No. 1</label><input class="form-control" id="empMobile" placeholder="09xx xxx xxxx" type="tel"/></div>
-<div class="form-group"><label for="empMobile2">Mobile No. 2</label><input class="form-control" id="empMobile2" placeholder="Optional" type="tel"/></div>
-<div class="form-group full"><label for="empEmail">Email Address</label><input class="form-control" id="empEmail" placeholder="name@example.com" type="email"/></div>
-<div class="form-group"><label for="empFacebook">Facebook</label><input class="form-control" id="empFacebook" type="text"/></div>
-<div class="form-group"><label for="empInstagram">Instagram</label><input class="form-control" id="empInstagram" type="text"/></div>
-<div class="form-group"><label for="empTwitter">Twitter / X</label><input class="form-control" id="empTwitter" type="text"/></div>
+<div class="form-group"><label for="empLandline">Landline No.</label><input class="form-control" id="empLandline" type="tel"></div>
+<div class="form-group"><label for="empMobile">Mobile No. 1</label><input class="form-control" id="empMobile" placeholder="09xx xxx xxxx" type="tel"></div>
+<div class="form-group"><label for="empMobile2">Mobile No. 2</label><input class="form-control" id="empMobile2" placeholder="Optional" type="tel"></div>
+<div class="form-group full"><label for="empEmail">Email Address</label><input class="form-control" id="empEmail" placeholder="name@example.com" type="email"></div>
+<div class="form-group"><label for="empFacebook">Facebook</label><input class="form-control" id="empFacebook" type="text"></div>
+<div class="form-group"><label for="empInstagram">Instagram</label><input class="form-control" id="empInstagram" type="text"></div>
+<div class="form-group"><label for="empTwitter">Twitter / X</label><input class="form-control" id="empTwitter" type="text"></div>
 </div>
 </section>
 <!-- EDUCATION -->
@@ -552,10 +652,10 @@
 <div><h3>Educational Background</h3><p>Highest education level and most recent school information.</p></div>
 </div>
 <div class="form-grid form-grid-2">
-<div class="form-group"><label for="empEducationLevel">Level</label><input class="form-control" id="empEducationLevel" placeholder="e.g. Graduate School" type="text"/></div>
-<div class="form-group"><label for="empCourse">Course</label><input class="form-control" id="empCourse" placeholder="e.g. Master in Management" type="text"/></div>
-<div class="form-group"><label for="empLastSchool">Last School Attended</label><input class="form-control" id="empLastSchool" type="text"/></div>
-<div class="form-group"><label for="empYearGraduated">Year Graduated</label><input class="form-control" id="empYearGraduated" inputmode="numeric" maxlength="4" placeholder="e.g. 2010" type="text"/></div>
+<div class="form-group"><label for="empEducationLevel">Level</label><input class="form-control" id="empEducationLevel" placeholder="e.g. Graduate School" type="text"></div>
+<div class="form-group"><label for="empCourse">Course</label><input class="form-control" id="empCourse" placeholder="e.g. Master in Management" type="text"></div>
+<div class="form-group"><label for="empLastSchool">Last School Attended</label><input class="form-control" id="empLastSchool" type="text"></div>
+<div class="form-group"><label for="empYearGraduated">Year Graduated</label><input class="form-control" id="empYearGraduated" inputmode="numeric" maxlength="4" placeholder="e.g. 2010" type="text"></div>
 </div>
 </section>
 </div>
@@ -694,11 +794,11 @@
 <form class="monitor-editor" id="ceremonyForm">
 <div class="monitor-editor-heading"><h4 id="ceremonyEditorTitle">Add Record</h4><span class="monitor-edit-tag" hidden="" id="ceremonyEditTag">Editing</span></div>
 <div aria-live="polite" class="form-feedback" hidden="" id="ceremonyFeedback" role="status"></div>
-<div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number</label><input aria-describedby="ceremonyControlHelp" class="form-control" id="ceremonyControl" maxlength="80" placeholder="e.g. FC-2026-0001" type="text"/><small class="field-help" id="ceremonyControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" required="" type="date"/></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required=""><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required=""><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number</label><input aria-describedby="ceremonyControlHelp" class="form-control" id="ceremonyControl" maxlength="80" placeholder="e.g. FC-2026-0001" type="text"><small class="field-help" id="ceremonyControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" required="" type="date"></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required=""><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required=""><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
 <div class="monitor-editor-actions"><button class="btn btn-primary" id="ceremonySave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="ceremonyClear" type="button">Clear</button></div>
 </form>
 <div class="monitor-report">
-<form class="monitor-filters" id="ceremonyFilters"><div class="form-group"><label for="ceremonyFrom">From</label><input class="form-control" id="ceremonyFrom" type="date"/></div><div class="form-group"><label for="ceremonyTo">To</label><input class="form-control" id="ceremonyTo" type="date"/></div><div class="form-group"><label for="ceremonyFilterActivity">Activity</label><select class="form-control" id="ceremonyFilterActivity"><option value="">05. All activities</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group"><label for="ceremonyFilterStatus">Status</label><select class="form-control" id="ceremonyFilterStatus"><option value="">All statuses</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group full"><label for="ceremonySearch">Search</label><input class="form-control" id="ceremonySearch" maxlength="200" placeholder="Control number, date, activity, or remarks" type="search"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
+<form class="monitor-filters" id="ceremonyFilters"><div class="form-group"><label for="ceremonyFrom">From</label><input class="form-control" id="ceremonyFrom" type="date"></div><div class="form-group"><label for="ceremonyTo">To</label><input class="form-control" id="ceremonyTo" type="date"></div><div class="form-group"><label for="ceremonyFilterActivity">Activity</label><select class="form-control" id="ceremonyFilterActivity"><option value="">05. All activities</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group"><label for="ceremonyFilterStatus">Status</label><select class="form-control" id="ceremonyFilterStatus"><option value="">All statuses</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group full"><label for="ceremonySearch">Search</label><input class="form-control" id="ceremonySearch" maxlength="200" placeholder="Control number, date, activity, or remarks" type="search"></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
 <p class="monitor-filter-error" hidden="" id="ceremonyFilterError" role="status"></p>
 <div class="monitor-report-heading"><strong id="ceremonyRecordCount">0 records</strong><span>Newest date first</span></div>
 <div aria-label="Flag Ceremony Monitoring records" class="monitor-table-scroll table-responsive" id="ceremonyTableRegion" role="region" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Status</th><th>Activity</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="ceremonyTableBody"></tbody></table></div>
@@ -714,11 +814,11 @@
 <form class="monitor-editor" id="uniformForm">
 <div class="monitor-editor-heading"><h4 id="uniformEditorTitle">Add Record</h4><span class="monitor-edit-tag" hidden="" id="uniformEditTag">Editing</span></div>
 <div aria-live="polite" class="form-feedback" hidden="" id="uniformFeedback" role="status"></div>
-<div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number</label><input aria-describedby="uniformControlHelp" class="form-control" id="uniformControl" maxlength="80" placeholder="e.g. UM-2026-0001" type="text"/><small class="field-help" id="uniformControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" required="" type="date"/></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required=""><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number</label><input aria-describedby="uniformControlHelp" class="form-control" id="uniformControl" maxlength="80" placeholder="e.g. UM-2026-0001" type="text"><small class="field-help" id="uniformControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" required="" type="date"></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required=""><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
 <div class="monitor-editor-actions"><button class="btn btn-primary" id="uniformSave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="uniformClear" type="button">Clear</button></div>
 </form>
 <div class="monitor-report">
-<form class="monitor-filters" id="uniformFilters"><div class="form-group"><label for="uniformFrom">From</label><input class="form-control" id="uniformFrom" type="date"/></div><div class="form-group"><label for="uniformTo">To</label><input class="form-control" id="uniformTo" type="date"/></div><div class="form-group"><label for="uniformFilterStatus">Compliance</label><select class="form-control" id="uniformFilterStatus"><option value="">All records</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformSearch">Search</label><input class="form-control" id="uniformSearch" maxlength="200" placeholder="Control number, date, or remarks" type="search"/></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
+<form class="monitor-filters" id="uniformFilters"><div class="form-group"><label for="uniformFrom">From</label><input class="form-control" id="uniformFrom" type="date"></div><div class="form-group"><label for="uniformTo">To</label><input class="form-control" id="uniformTo" type="date"></div><div class="form-group"><label for="uniformFilterStatus">Compliance</label><select class="form-control" id="uniformFilterStatus"><option value="">All records</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformSearch">Search</label><input class="form-control" id="uniformSearch" maxlength="200" placeholder="Control number, date, or remarks" type="search"></div><div class="monitor-filter-buttons"><button class="btn btn-secondary" type="submit"><i data-lucide="search"></i><span>Show Results</span></button><button class="btn btn-ghost" type="reset"><i data-lucide="rotate-ccw"></i><span>Reset Filters</span></button></div></form>
 <p class="monitor-filter-error" hidden="" id="uniformFilterError" role="status"></p>
 <div class="monitor-report-heading"><strong id="uniformRecordCount">0 records</strong><span>Newest date first</span></div>
 <div aria-label="Prescribed Uniform Monitoring records" class="monitor-table-scroll table-responsive" id="uniformTableRegion" role="region" tabindex="0"><table class="data-table monitor-table"><thead><tr><th>Control Number</th><th>Date</th><th>Compliant</th><th>Remarks</th><th class="monitor-actions-head">Actions</th></tr></thead><tbody id="uniformTableBody"></tbody></table></div>
@@ -739,12 +839,12 @@
 <div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" id="employeePrintArea"></div>
 <!-- Shared System Scripts -->
-<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer="" src="employee-admin.js?v=20261011-navigation-pdf-v2"></script>
+<script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer src="employee-admin.js?v=20261013-layout-v2"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
-<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"></div>
 <nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
 <div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
 </div>

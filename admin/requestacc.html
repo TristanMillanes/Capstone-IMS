@@ -1,138 +1,255 @@
 <!DOCTYPE html>
-
 <html data-css-scope="admin-account-requests" lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Account Access Requests</title>
-<meta content="#f5f7f8" name="theme-color"/>
+<meta content="#f5f7f8" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="requestacc.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="requestacc.css?v=20261013-layout-v2" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Account Requests">
 <div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
+
 <div class="sidebar-header">
+
 <a class="logo-area" href="admin.html">
+
 <div class="logo-icon">
-<img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png"/>
+
+<img alt="PGENRO Seal" class="logo-image" onerror="this.hidden=true;this.parentElement.classList.add('logo-fallback');" src="../logo/enro.png">
+
 </div>
+
 <div class="logo-text">
+
 <h2>PGENRO IMS</h2>
+
 <span>Administrative workspace</span>
+
 </div>
+
 </a>
 
-<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><i data-lucide="x"></i></button></div>
+<button aria-label="Close navigation" class="admin-sidebar-close" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-x "><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div>
+
 <nav aria-label="Administrator navigation" class="sidebar-nav">
+
 <div class="nav-group">
+
 <span class="nav-label">Workspace</span>
+
 <ul>
-<li><a class="nav-item" href="admin.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+
+<li><a class="nav-item" href="admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-layout-dashboard "><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Dashboard</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Office operations</span>
+
 <ul>
-<li><a class="nav-item" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
-<li><a class="nav-item" href="travelOR-admin.html"><i data-lucide="briefcase"></i><span>Travel Orders</span></a></li>
-<li><a class="nav-item" href="officememo-admin.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a class="nav-item" href="employee-admin.html"><i data-lucide="users-round"></i><span>Employees</span></a></li>
-<li><a class="nav-item" href="invetoryadmin.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
-<li><a class="nav-item" href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span>Visitors</span></a></li>
-<li><a class="nav-item" href="serviceAdmin.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
-<li><a class="nav-item" href="ics-admin.html"><i data-lucide="file-check-2"></i><span>Property slips</span></a></li>
+
+<li><a class="nav-item" href="admincommunication.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-arrow-left-right "><path d="M8 3 4 7l4 4"></path><path d="M4 7h16"></path><path d="m16 21 4-4-4-4"></path><path d="M20 17H4"></path></svg><span>Communications</span></a></li>
+
+<li><a class="nav-item" href="travelOR-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-briefcase "><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg><span>Travel Orders</span></a></li>
+
+<li><a class="nav-item" href="officememo-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-file-text "><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg><span>Office Memos</span></a></li>
+
+<li><a class="nav-item" href="employee-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-users-round "><path d="M18 21a8 8 0 0 0-16 0"></path><circle cx="10" cy="8" r="5"></circle><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path></svg><span>Employees</span></a></li>
+
+<li><a class="nav-item" href="invetoryadmin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-boxes "><path d="M2.97 12.92A2 2 0 0 0 2 14.63v3.24a2 2 0 0 0 .97 1.71l3 1.8a2 2 0 0 0 2.06 0L12 19v-5.5l-5-3-4.03 2.42Z"></path><path d="m7 16.5-4.74-2.85"></path><path d="m7 16.5 5-3"></path><path d="M7 16.5v5.17"></path><path d="M12 13.5V19l3.97 2.38a2 2 0 0 0 2.06 0l3-1.8a2 2 0 0 0 .97-1.71v-3.24a2 2 0 0 0-.97-1.71L17 10.5l-5 3Z"></path><path d="m17 16.5-5-3"></path><path d="m17 16.5 4.74-2.85"></path><path d="M17 16.5v5.17"></path><path d="M7.97 4.42A2 2 0 0 0 7 6.13v4.37l5 3 5-3V6.13a2 2 0 0 0-.97-1.71l-3-1.8a2 2 0 0 0-2.06 0l-3 1.8Z"></path><path d="M12 8 7.26 5.15"></path><path d="m12 8 4.74-2.85"></path><path d="M12 13.5V8"></path></svg><span>Inventory</span></a></li>
+
+<li><a class="nav-item" href="visitors-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-clipboard-check "><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg><span>Visitors</span></a></li>
+
+<li><a class="nav-item" href="serviceAdmin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-wrench "><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"></path></svg><span>Service Requests</span></a></li>
+
+<li><a class="nav-item" href="ics-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-file-check-2 "><path d="M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="m14 20 2 2 4-4"></path></svg><span>Property Slips</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Administration</span>
+
 <ul>
-<li><a class="nav-item" href="Usermanagement.html"><i data-lucide="user-cog"></i><span>User Management</span></a></li>
-<li><a aria-current="page" class="nav-item active" href="requestacc.html"><i data-lucide="user-plus"></i><span>Account Requests</span></a></li>
+
+<li><a class="nav-item" href="Usermanagement.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-cog "><path d="M10 15H6a4 4 0 0 0-4 4v2"></path><path d="m14.305 16.53.923-.382"></path><path d="m15.228 13.852-.923-.383"></path><path d="m16.852 12.228-.383-.923"></path><path d="m16.852 17.772-.383.924"></path><path d="m19.148 12.228.383-.923"></path><path d="m19.53 18.696-.382-.924"></path><path d="m20.772 13.852.924-.383"></path><path d="m20.772 16.148.924.383"></path><circle cx="18" cy="15" r="3"></circle><circle cx="9" cy="7" r="4"></circle></svg><span>User Management</span></a></li>
+
+<li><a class="nav-item active" href="requestacc.html" aria-current="page"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-plus "><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" x2="19" y1="8" y2="14"></line><line x1="22" x2="16" y1="11" y2="11"></line></svg><span>Account Requests</span></a></li>
+
 </ul>
+
 </div>
+
 <div class="nav-group">
+
 <span class="nav-label">Workspace tools</span>
+
 <ul>
-<li><a class="nav-item" href="audittrail-admin.html"><i data-lucide="shield-alert"></i><span>Audit trail</span></a></li>
-<li><a class="nav-item" href="backup-admin.html"><i data-lucide="database-backup"></i><span>Backups</span></a></li>
-<li><a class="nav-item" href="admin.html#settings"><i data-lucide="settings"></i><span>Preferences</span></a></li>
+
+<li><a class="nav-item" href="audittrail-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-shield-alert "><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg><span>Audit Trail</span></a></li>
+
+<li><a class="nav-item" href="backup-admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-database-backup "><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 12a9 3 0 0 0 5 2.69"></path><path d="M21 9.3V5"></path><path d="M3 5v14a9 3 0 0 0 6.47 2.88"></path><path d="M12 12v4h4"></path><path d="M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"></path></svg><span>Backups</span></a></li>
+
+<li><a class="nav-item" href="admin.html#settings"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-settings "><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Preferences</span></a></li>
+
 </ul>
+
 </div>
+
 </nav>
-<div class="sidebar-workspace-note"><i data-lucide="leaf"></i><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
-</aside><div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
+
+<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+
+</aside>
+
+<div aria-hidden="true" class="admin-sidebar-backdrop" id="sidebarBackdrop"></div>
 <div class="main-wrapper">
 <header class="topbar">
-<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
-<i data-lucide="panel-left-close"></i>
-<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
-<i data-lucide="menu"></i>
-</button>
-<a class="topbar-module" href="admin.html" title="Open dashboard"><i data-lucide="leaf"></i><span>Account requests</span></a>
 
-<div class="global-search" role="search">
-<i class="search-icon" data-lucide="search"></i>
-<input aria-label="Search this admin module" autocomplete="off" id="globalSearchInput" placeholder="Search account requests…" spellcheck="false" type="text"/>
-<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><i data-lucide="layout-dashboard"></i><span>Modules</span><kbd>K</kbd></button>
+<div class="topbar-left"><button aria-controls="sidebar" aria-expanded="true" aria-label="Collapse administrator menu" class="sidebar-toggle" id="sidebarCollapseBtn" title="Collapse Menu" type="button">
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-panel-left-close "><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="m16 15-3-3 3-3"></path></svg>
+
+<span class="navigation-button-label">Menu</span></button><button aria-controls="sidebar" aria-expanded="false" aria-label="Toggle Navigation" class="mobile-menu-btn" id="mobileMenuBtn" type="button">
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-menu "><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg>
+
+</button>
+
+<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Account Requests</span></a>
+
+<div class="global-search ui-affixed-control" role="search">
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-search search-icon ui-field-icon"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg>
+
+<input aria-controls="searchPaletteDropdown" aria-expanded="false" aria-label="Search workspace modules" autocomplete="off" id="globalSearchInput" placeholder="Search workspace" spellcheck="false" type="text" class="ui-affixed-field">
+
+<button aria-controls="workspaceJumpModal" aria-haspopup="dialog" aria-label="Jump to a module (Control K)" class="workspace-jump-btn" id="workspaceJumpBtn" title="Jump to a module (Ctrl K)" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-layout-dashboard "><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Modules</span><kbd>K</kbd></button>
+
 <!-- Search Quick Palette -->
+
+<div aria-label="Module search results" class="search-palette-dropdown" id="searchPaletteDropdown">
+
+<div class="search-palette-group-title">Jump to Module</div>
+
+<div id="searchPaletteModules"></div>
+
 </div>
+
 </div>
+
+</div>
+
 <div class="topbar-right">
-<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><i data-lucide="moon"></i></button>
+
+<button aria-label="Switch to dark appearance" aria-pressed="false" class="modern-theme-toggle" id="appearanceThemeBtn" title="Switch to dark appearance" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-moon "><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"></path></svg></button>
+
 <!-- Notification Button & Drawer -->
+
 <div class="notification-wrapper">
+
 <button aria-expanded="false" aria-label="System notifications" class="icon-btn" id="notificationsBtn" title="System Notifications" type="button">
-<i data-lucide="bell"></i>
+
+<svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-bell "><path d="M10.268 21a2 2 0 0 0 3.464 0"></path><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"></path></svg>
+
 <span class="notification-ping" id="notifPing" style="display: none;"></span>
+
 </button>
+
 <div class="notification-dropdown" id="notificationDropdown">
+
 <div class="notification-header">
+
 <h3>Notifications</h3>
+
 <span class="badge-count" id="notifBadgeCount">0 Unread</span>
+
 </div>
+
 <div class="notification-list" id="notificationList">
+
 <div class="empty-notif-state">No new notifications</div>
+
 </div>
+
 </div>
+
 </div>
+
 <div class="v-divider"></div>
+
 <!-- Profile Menu -->
+
 <div class="profile-menu" id="profileMenu">
+
 <button aria-expanded="false" aria-label="Open administrator profile" class="profile-btn" id="profileBtn" title="Administrator Profile" type="button">
-<div class="profile-avatar"><i data-lucide="user-round"></i></div>
-<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><i class="profile-chevron" data-lucide="chevron-down"></i>
+
+<div class="profile-avatar"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-round "><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg></div>
+
+<span aria-hidden="true" class="profile-btn-copy"><span class="profile-button-name">PGENRO Admin</span><span class="profile-button-role">Administrator</span></span><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-down profile-chevron"><path d="m6 9 6 6 6-6"></path></svg>
+
 </button>
+
 <div class="profile-dropdown" id="profileDropdown">
+
 <div class="profile-dropdown-header">
-<div class="profile-avatar big"><i data-lucide="user-round"></i></div>
+
+<div class="profile-avatar big"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-round "><circle cx="12" cy="8" r="5"></circle><path d="M20 21a8 8 0 0 0-16 0"></path></svg></div>
+
 <div class="profile-dropdown-copy">
+
 <h3 id="dropdownUserName">PGENRO Admin</h3>
+
 <p id="dropdownUserEmail">Administrator Session</p>
+
 <span class="role-badge" id="dropdownUserRole">Administrator</span>
+
 </div>
+
 </div>
+
 <div class="dropdown-links">
-<a href="admin.html"><i data-lucide="layout-dashboard"></i><span>Executive Dashboard</span></a>
-<a href="Usermanagement.html"><i data-lucide="users"></i><span>User Management</span></a>
-<a href="requestacc.html"><i data-lucide="user-check"></i><span>Account Requests</span></a>
-<a href="admin.html#settings"><i data-lucide="settings"></i><span>Workspace Preferences</span></a>
+
+<a href="admin.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-layout-dashboard "><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg><span>Executive Dashboard</span></a>
+
+<a href="Usermanagement.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-users "><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><span>User Management</span></a>
+
+<a href="requestacc.html"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-check "><path d="m16 11 2 2 4-4"></path><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg><span>Account Requests</span></a>
+
+<a href="admin.html#settings"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-settings "><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg><span>Workspace Preferences</span></a>
+
 </div>
+
 <div class="dropdown-footer">
-<button class="logout-btn" id="logoutBtn" type="button"><i data-lucide="log-out"></i><span>Sign Out</span></button>
+
+<button class="logout-btn" id="logoutBtn" type="button"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-log-out "><path d="m16 17 5-5-5-5"></path><path d="M21 12H9"></path><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path></svg><span>Sign Out</span></button>
+
 </div>
+
 </div>
+
 </div>
+
 </div>
+
 </header>
+
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
-<section class="page-header depth-hero"><div class="header-title">
-<div aria-hidden="true" class="page-heading-mark"><i data-lucide="user-plus"></i></div><div class="breadcrumb"><span>Admin Console</span><i data-lucide="chevron-right"></i><span class="active">Account Requests</span></div><h1>Account requests</h1>
+<section class="page-header depth-hero unified-page-header"><div class="header-title">
+<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" x2="19" y1="8" y2="14"></line><line x1="22" x2="16" y1="11" y2="11"></line></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Account Requests</span></div><h1>Account Requests</h1>
 <p>Review applications and provide the right access to your office workspace.</p></div><div class="header-actions"><button class="btn btn-secondary" id="refreshRequestsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button><a class="btn btn-secondary" href="Usermanagement.html"><i data-lucide="users"></i> User Directory</a></div>
 <div aria-hidden="true" class="depth-scene">
 <span class="depth-orbit"></span><span class="depth-orb"></span>
@@ -146,29 +263,28 @@
 </div><span class="depth-scene-dot"></span>
 </div>
 </section>
-<section class="kpi-grid"><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingCount">0</h3><span class="kpi-trend">Awaiting review</span></div><div class="kpi-footer"><span>Verify applicant details</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Approved Accounts</span><div class="kpi-icon emerald"><i data-lucide="user-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statApprovedCount">0</h3><span class="kpi-trend">Access granted</span></div><div class="kpi-footer"><span>Approved request history</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Declined Requests</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statRejectedCount">0</h3><span class="kpi-trend">Declined applications</span></div><div class="kpi-footer"><span>Review reasons and remarks</span></div></div><div class="kpi-card"><div class="kpi-header"><span class="kpi-label">Total Applications</span><div class="kpi-icon blue"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalCount">0</h3><span class="kpi-trend">All access requests</span></div><div class="kpi-footer"><span>Live account request registry</span></div></div></section>
+<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingCount">0</h3><span class="kpi-trend">Awaiting review</span></div><div class="kpi-footer"><span>Verify applicant details</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Approved Accounts</span><div class="kpi-icon emerald"><i data-lucide="user-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statApprovedCount">0</h3><span class="kpi-trend">Access granted</span></div><div class="kpi-footer"><span>Approved request history</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Declined Requests</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statRejectedCount">0</h3><span class="kpi-trend">Declined applications</span></div><div class="kpi-footer"><span>Review reasons and remarks</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Total Applications</span><div class="kpi-icon blue"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalCount">0</h3><span class="kpi-trend">All access requests</span></div><div class="kpi-footer"><span>Live account request registry</span></div></div></section>
 <section class="table-card">
-<div style="padding:18px 18px 0"><div class="table-toolbar"><div class="table-toolbar-left"><input class="filter-input" id="requestSearchInput" placeholder="Search name, email, request ID, Gov ID..." type="search"/><select class="filter-select" id="divisionFilterSelect"><option value="ALL">All Divisions</option><option value="Admin Office">Admin Office</option><option value="Environment Management">Environment Management</option><option value="Forestry Division">Forestry Division</option><option value="Mines &amp; Quarry">Mines &amp; Quarry</option><option value="Administrative and Finance Division">Administrative &amp; Finance</option><option value="Environmental Management Division">Environmental Management Division</option><option value="Forest Management Division">Forest Management Division</option><option value="Mines and Geosciences Division">Mines &amp; Geosciences Division</option><option value="Office of the PG-ENRO">Office of the PG-ENRO</option></select><select class="filter-select" id="statusFilterSelect"><option value="ALL">All Status</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div><div class="table-toolbar-right"><button class="btn btn-secondary btn-sm" disabled="" id="bulkApproveBtn" type="button"><i data-lucide="check-check"></i> Approve Selected</button><button class="btn btn-danger btn-sm" disabled="" id="bulkRejectBtn" type="button"><i data-lucide="x-circle"></i> Reject Selected</button></div></div></div>
-<div class="table-responsive"><table class="data-table data-table"><thead><tr><th width="40"><input id="selectAllCheckbox" type="checkbox"/></th><th>Request / Date</th><th>Applicant</th><th>Division</th><th>Requested Role</th><th>Assigned Role</th><th>Endorsement</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead><tbody id="requestTableBody"><tr><td colspan="8" style="text-align:center;padding:36px;color:#64748b">Loading access requests...</td></tr></tbody></table></div>
+<div style="padding:18px 18px 0"><div class="table-toolbar"><div class="table-toolbar-left"><input class="filter-input" id="requestSearchInput" placeholder="Search name, email, request ID, Gov ID..." type="search"><select class="filter-select" id="divisionFilterSelect"><option value="ALL">All Divisions</option><option value="Admin Office">Admin Office</option><option value="Environment Management">Environment Management</option><option value="Forestry Division">Forestry Division</option><option value="Mines &amp; Quarry">Mines &amp; Quarry</option><option value="Administrative and Finance Division">Administrative &amp; Finance</option><option value="Environmental Management Division">Environmental Management Division</option><option value="Forest Management Division">Forest Management Division</option><option value="Mines and Geosciences Division">Mines &amp; Geosciences Division</option><option value="Office of the PG-ENRO">Office of the PG-ENRO</option></select><select class="filter-select" id="statusFilterSelect"><option value="ALL">All Status</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div><div class="table-toolbar-right"><button class="btn btn-secondary btn-sm" disabled id="bulkApproveBtn" type="button"><i data-lucide="check-check"></i> Approve Selected</button><button class="btn btn-danger btn-sm" disabled id="bulkRejectBtn" type="button"><i data-lucide="x-circle"></i> Reject Selected</button></div></div></div>
+<div class="table-responsive"><table class="data-table data-table unified-records-table" data-ui-columns="9" style="--ui-table-min:1080px;"><thead><tr><th width="40"><input id="selectAllCheckbox" type="checkbox"></th><th>Request / Date</th><th>Applicant</th><th>Division</th><th>Requested Role</th><th>Assigned Role</th><th>Endorsement</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead><tbody id="requestTableBody"><tr><td colspan="8" style="text-align:center;padding:36px;color:#64748b">Loading access requests...</td></tr></tbody></table></div>
 <div class="table-footer"><span class="text-muted" id="tableRangeText">Showing 0 of 0 access requests</span><span class="text-muted">Live Registry</span></div>
 </section>
-<footer class="modern-page-footer"><span>PGENRO Information Management System</span><a href="admin.html#settings">Workspace preferences</a></footer>
-</main>
+<footer class="admin-footer"><p>© 2026 PGENRO · Records and operations workspace</p><div class="footer-links"><a href="admin.html">Dashboard</a><a href="Usermanagement.html">User Management</a><a href="admin.html#settings">Preferences</a></div></footer></main>
 </div>
 </div>
 <div aria-hidden="true" class="modal-backdrop" id="reviewModal"><div aria-labelledby="reviewModalTitle" aria-modal="true" class="modal-container" role="dialog"><div class="modal-header"><div class="modal-title-group"><div class="modal-icon emerald"><i data-lucide="user-cog"></i></div><div><h3 id="reviewModalTitle">Review Account Request</h3><p>Reference <strong id="reviewReqId">—</strong> · <span id="reviewDate">—</span></p></div></div><button class="modal-close-btn" id="closeReviewModalBtn" type="button">×</button></div><div class="modal-body"><div class="review-details-grid">
 <div class="review-note"><strong>Full Name</strong><span id="reviewFullName">—</span></div><div class="review-note"><strong>Email</strong><span id="reviewEmail">—</span></div><div class="review-note"><strong>Contact</strong><span id="reviewContact">—</span></div><div class="review-note"><strong>Account Source</strong><span id="reviewGovId">Account Authentication</span></div><div class="review-note"><strong>Position</strong><span id="reviewPosition">—</span></div><div class="review-note"><strong>Division</strong><span id="reviewDivision">—</span></div><div class="review-note"><strong>Requested Role</strong><span id="reviewRole">—</span></div><div class="review-note"><strong>Endorser</strong><span id="reviewEndorser">—</span></div></div><div class="review-note"><strong>Reason for Access</strong><span id="reviewReason">—</span></div><div class="form-group"><label for="assignRoleSelect">Final account role</label><select class="form-control" id="assignRoleSelect"><option value="User">User</option><option value="Admin">Admin</option></select><p class="role-assignment-help">Choose the account’s final access. You can change the role requested at registration.</p></div></div><div class="modal-footer modal-actions"><button class="btn btn-danger" id="declineModalActionBtn" type="button"><i data-lucide="user-x"></i> Decline</button><button class="btn btn-primary" id="approveModalActionBtn" type="button"><i data-lucide="user-check"></i> Approve &amp; Grant Access</button></div></div></div>
-<div aria-hidden="true" class="modal-backdrop" id="bulkApprovalModal"><div aria-labelledby="bulkApprovalTitle" aria-modal="true" class="modal-container" role="dialog" style="max-width:520px"><div class="modal-header"><div class="modal-title-group"><div class="modal-icon emerald"><i data-lucide="user-check"></i></div><div><h3 id="bulkApprovalTitle">Approve Selected Accounts</h3><p id="bulkApprovalCount"></p></div></div><button aria-label="Close approval" class="modal-close-btn" id="closeBulkApprovalBtn" type="button">×</button></div><div class="modal-body"><div class="form-group"><label for="bulkAssignRoleSelect">Final account role for all selected accounts</label><select class="form-control" id="bulkAssignRoleSelect"><option disabled="" selected="" value="">Choose Admin or User</option><option value="User">User</option><option value="Admin">Admin</option></select><p class="role-assignment-help">Every selected account will receive this role, regardless of its requested role.</p></div></div><div class="modal-footer modal-actions"><button class="btn btn-secondary" id="cancelBulkApprovalBtn" type="button">Cancel</button><button class="btn btn-primary" id="confirmBulkApproveBtn" type="button"><i data-lucide="user-check"></i> Approve Selected</button></div></div></div>
+<div aria-hidden="true" class="modal-backdrop" id="bulkApprovalModal"><div aria-labelledby="bulkApprovalTitle" aria-modal="true" class="modal-container" role="dialog" style="max-width:520px"><div class="modal-header"><div class="modal-title-group"><div class="modal-icon emerald"><i data-lucide="user-check"></i></div><div><h3 id="bulkApprovalTitle">Approve Selected Accounts</h3><p id="bulkApprovalCount"></p></div></div><button aria-label="Close approval" class="modal-close-btn" id="closeBulkApprovalBtn" type="button">×</button></div><div class="modal-body"><div class="form-group"><label for="bulkAssignRoleSelect">Final account role for all selected accounts</label><select class="form-control" id="bulkAssignRoleSelect"><option disabled selected value="">Choose Admin or User</option><option value="User">User</option><option value="Admin">Admin</option></select><p class="role-assignment-help">Every selected account will receive this role, regardless of its requested role.</p></div></div><div class="modal-footer modal-actions"><button class="btn btn-secondary" id="cancelBulkApprovalBtn" type="button">Cancel</button><button class="btn btn-primary" id="confirmBulkApproveBtn" type="button"><i data-lucide="user-check"></i> Approve Selected</button></div></div></div>
 <div aria-hidden="true" class="modal-backdrop" id="declineModal"><div aria-labelledby="declineModalTitle" aria-modal="true" class="modal-container" role="dialog" style="max-width:520px"><div class="modal-header"><div class="modal-title-group"><div class="modal-icon rose"><i data-lucide="shield-x"></i></div><div><h3 id="declineModalTitle">Decline Access Request</h3><p>Record the reason for the applicant.</p></div></div><button class="modal-close-btn" id="closeDeclineModalBtn" type="button">×</button></div><div class="modal-body"><div class="form-group"><label>Reason</label><select class="form-control" id="declineReasonSelect"><option>Unverified credentials</option><option>Incomplete information</option><option>Role requires additional authorization</option><option>Duplicate account request</option><option>Not eligible for requested system access</option><option>Other</option></select></div><div class="form-group"><label>Remarks / Notes</label><textarea class="form-control" id="declineNotesInput" placeholder="Add administrator remarks..." rows="4"></textarea></div></div><div class="modal-footer modal-actions"><button class="btn btn-secondary" id="cancelDeclineModalBtn" type="button">Cancel</button><button class="btn btn-danger" id="confirmDeclineBtn" type="button"><i data-lucide="user-x"></i> Confirm Decline</button></div></div></div>
 <div aria-hidden="true" class="modal-backdrop" id="systemConfirmModal"><div aria-labelledby="confirmModalTitle" aria-modal="true" class="modal-container confirm-modal-card" role="dialog" style="max-width:430px"><div class="modal-body"><div class="confirm-icon-box" id="confirmModalIconBox"><i data-lucide="alert-triangle"></i></div><h3 id="confirmModalTitle">Confirm Action</h3><p id="confirmModalDesc" style="color:var(--slate-500);margin-top:8px">Are you sure?</p><div class="confirm-modal-actions"><button class="btn btn-secondary" id="confirmModalCancelBtn" type="button">Cancel</button><button class="btn btn-danger" id="confirmModalActionBtn" type="button">Confirm</button></div></div></div></div>
-<script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer="" src="requestacc.js?v=20261011-navigation-pdf-v2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer src="requestacc.js?v=20261013-layout-v2"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
-<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"/></div>
+<div class="workspace-jump-search-wrap"><label for="workspaceJumpSearch">Find a module or workspace section</label><input aria-controls="workspaceJumpResults" autocomplete="off" id="workspaceJumpSearch" placeholder="Try memo, personnel, or inventory…" type="search"></div>
 <nav aria-label="Matching modules" class="workspace-jump-results" id="workspaceJumpResults"></nav>
 <div class="workspace-jump-footer"><span aria-live="polite" id="workspaceJumpCount"></span><span>↑ ↓ navigate · Enter open · Esc close</span></div>
 </div>
