@@ -172,6 +172,7 @@ const PGENRO_PageUI = (() => {
       currentRecord: null,
       realtimeChannel: null,
       loading: false,
+      dataLoaded: false,
       detailsOpen: false,
       printOpen: false,
       currentProfile: null,
@@ -243,94 +244,10 @@ const PGENRO_PageUI = (() => {
     }
 
     function normalizeRecord(raw = {}) {
-      const data =
-        raw?.data && typeof raw.data === "object"
-          ? raw.data
-          : {};
-
-      const row = {
-        ...raw,
-        ...data
-      };
-
-      const pick = (...keys) => {
-        for (const key of keys) {
-          if (
-            row[key] !== undefined &&
-            row[key] !== null &&
-            text(row[key]) !== ""
-          ) {
-            return row[key];
-          }
-        }
-
-        return "";
-      };
-
-      return {
-        id: first(pick("id"), crypto.randomUUID()),
-        controlNumber: text(pick(
-          "controlNumber",
-          "control_number",
-          "control_no"
-        )),
-        accountCode: text(pick(
-          "accountCode",
-          "account_code"
-        )),
-        article: text(pick(
-          "article",
-          "category"
-        )),
-        description: text(pick(
-          "description",
-          "item_description"
-        )),
-        serialNumber: text(pick(
-          "serialNumber",
-          "serial_number",
-          "serial_no"
-        )),
-        entryNumber: text(pick(
-          "entryNumber",
-          "entry_number"
-        )),
-        icsNo: text(pick(
-          "icsNo",
-          "ics_no"
-        )),
-        quantity: Number(pick("quantity", "qty")) || 0,
-        unit: text(pick("unit")) || "unit",
-        unitValue: Number(pick(
-          "unitValue",
-          "unit_value"
-        )) || 0,
-        totalValue: Number(pick(
-          "totalValue",
-          "total_value"
-        )) || 0,
-        dateAcquired: text(pick(
-          "dateAcquired",
-          "date_acquired"
-        )),
-        prNo: text(pick(
-          "prNo",
-          "pr_no"
-        )),
-        prDate: text(pick(
-          "prDate",
-          "pr_date"
-        )),
-        accountable: text(pick(
-          "accountable",
-          "accountable_person"
-        )),
-        remarks: text(pick("remarks")),
-        createdAt: text(pick(
-          "created_at",
-          "createdAt"
-        ))
-      };
+      const row = window.PGENRO_ICS.normalize(raw);
+      return { ...row, controlNumber: row.controlNo, description: row.itemDescription,
+        serialNumber: row.serialNo, entryNumber: row.entryNo,
+        unitValue: row.unitCost, accountable: row.accountablePerson };
     }
 
     function populateProfile(profile = {}) {
@@ -414,92 +331,27 @@ const PGENRO_PageUI = (() => {
     }
 
     async function verifySession() {
-      if (!client || !ui.body.dataset.requiresAuth) {
-        return true;
-      }
-
       try {
-        const { data, error } = await client.auth.getSession();
-        if (error) throw error;
-
-        const user = data?.session?.user;
-
-        if (!user) {
-          redirectToLogin();
+        const profile = await window.PGENRO_ICS.requireProfile();
+        if (lower(profile.role) === 'admin') {
+          const form = new URLSearchParams(location.search).get('form') === 'new';
+          window.location.replace('../admin/ics-admin.html' + (form ? '?form=new' : ''));
           return false;
         }
-
-        const { data: profile, error: profileError } =
-          await client
-            .from(CONFIG.profileTable)
-            .select("*")
-            .eq("user_id", user.id)
-            .maybeSingle();
-
-        if (profileError) {
-          console.warn(
-            "Profile details were unavailable:",
-            profileError
-          );
-
-          state.currentProfile = {
-            email: user.email,
-            role: "user",
-            authUser: user
-          };
-
-          populateProfile(state.currentProfile);
-          return true;
-        }
-
-        const currentRole = lower(profile?.role).replace(/\s+/g, " ").trim();
-        if (['admin'].includes(currentRole)) {
-          window.location.replace("../admin/admin.html");
-          return false;
-        }
-
-        const status = lower(profile?.status);
-        const hasExplicitActiveFlag =
-          typeof profile?.is_active === "boolean";
-
-        if (
-          profile &&
-          (
-            (hasExplicitActiveFlag && profile.is_active === false) ||
-            (status && !["active", "approved"].includes(status))
-          )
-        ) {
-          await logout({ ask: false });
-          return false;
-        }
-
-        state.currentProfile = {
-          ...(profile || {}),
-          email: text(profile?.email) || text(user.email),
-          authUser: user
-        };
-
-        cacheProfile(user, state.currentProfile);
+        state.currentProfile = profile;
+        cacheProfile(profile.authUser, profile);
         return true;
       } catch (error) {
-        console.error(
-          "Unable to verify the current session:",
-          error
-        );
-
-        setDbStatus("offline", "Session verification failed");
-        showToast(
-          "Unable to verify your account session.",
-          "error"
-        );
-
+        setDbStatus('offline', 'ICS access unavailable');
+        if (error.code === 'ICS_SIGN_IN_REQUIRED') redirectToLogin();
+        else showToast(error.message || 'Unable to verify your account.', 'error');
         return false;
       }
     }
 
     function redirectToLogin() {
       window.location.replace(
-        ui.body.dataset.loginUrl || "login.html"
+        (ui.body.dataset.loginUrl || "login.html") + "?next=ics"
       );
     }
 
@@ -768,7 +620,8 @@ const PGENRO_PageUI = (() => {
           article === "ALL" ||
           record.article === article;
 
-        return matchesSearch && matchesArticle;
+        const status = document.getElementById('filterIcsStatus')?.value || 'ALL';
+        return matchesSearch && matchesArticle && (status === 'ALL' || record.status === status);
       });
     }
 
@@ -824,12 +677,8 @@ const PGENRO_PageUI = (() => {
           0
         );
 
-      const numericControls =
-        state.records
-          .map((record) =>
-            Number.parseInt(record.controlNumber, 10)
-          )
-          .filter(Number.isFinite);
+      const controlNumbers = state.records.map(record => record.controlNumber).filter(Boolean)
+        .sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
 
       if (ui.statTotalSlips) {
         ui.statTotalSlips.textContent =
@@ -848,8 +697,8 @@ const PGENRO_PageUI = (() => {
 
       if (ui.statLatestControl) {
         ui.statLatestControl.textContent =
-          numericControls.length
-            ? String(Math.max(...numericControls))
+          controlNumbers.length
+            ? controlNumbers.at(-1)
             : "---";
       }
     }
@@ -868,7 +717,7 @@ const PGENRO_PageUI = (() => {
       if (!records.length) {
         ui.tableBody.innerHTML = `
           <tr>
-            <td class="empty-table-cell" colspan="9">
+            <td class="empty-table-cell" colspan="10">
               No matching inventory custodian records found.
             </td>
           </tr>
@@ -935,6 +784,7 @@ const PGENRO_PageUI = (() => {
               </div>
             </td>
 
+            <td><span class="ics-review-status ${record.status === 'Pending' ? 'pending' : record.status === 'Archived' ? 'archived' : 'active'}">${escapeHtml(record.status === 'Pending' ? 'Pending review' : record.status)}</span></td>
             <td class="action-column">
               <button class="btn-icon-view"
                       type="button"
@@ -956,115 +806,34 @@ const PGENRO_PageUI = (() => {
       renderTable();
     }
 
-    function loadLocalRecords() {
-      try {
-        const localRaw =
-          localStorage.getItem("pgenro_ics_records") ||
-          localStorage.getItem("icsRecords") ||
-          "[]";
-
-        const local = JSON.parse(localRaw);
-
-        state.records =
-          Array.isArray(local)
-            ? local.map(normalizeRecord)
-            : [];
-      } catch (error) {
-        console.warn(
-          "Unable to read local ICS records:",
-          error
-        );
-
-        state.records = [];
-      }
-
-      render();
-    }
-
     async function loadData({ notify = false } = {}) {
-      if (state.loading) return;
-
-      if (!client) {
-        setDbStatus(
-          "offline",
-          "Local ICS mode"
-        );
-
-        loadLocalRecords();
-
-        if (notify) {
-          showToast(
-            "Supabase is unavailable. Showing local ICS records.",
-            "warning"
-          );
-        }
-
-        return;
-      }
-
+      if (state.loading) { state.reloadRequested = true; return; }
       state.loading = true;
-      setDbStatus(
-        "standby",
-        "Loading ICS records…"
-      );
-
-      if (ui.refreshBtn) {
-        ui.refreshBtn.disabled = true;
-      }
-
+      setDbStatus('standby', 'Loading ICS records…');
+      if (ui.refreshBtn) ui.refreshBtn.disabled = true;
       try {
-        const { data, error } =
-          await client
-            .from(CONFIG.table)
-            .select("*")
-            .order("created_at", {
-              ascending: false
-            });
-
-        if (error) throw error;
-
-        state.records =
-          (data || []).map(normalizeRecord);
-
-        setDbStatus(
-          "online",
-          "ICS database connected"
-        );
-
+        const records = await window.PGENRO_ICS.list();
+        state.records = records.map(normalizeRecord);
+        state.dataLoaded = true;
+        setDbStatus('online', 'ICS database connected');
         render();
-
-        if (notify) {
-          showToast(
-            "ICS records synchronized."
-          );
+        if (state.detailsOpen && state.currentRecord) {
+          const latest = state.records.find(row => String(row.id) === String(state.currentRecord.id));
+          if (latest) { state.currentRecord = latest; populateDetails(latest); }
+          else closeDetails();
         }
+        if (notify) showToast('ICS records synchronized.');
       } catch (error) {
-        console.error(
-          "Unable to load ICS records:",
-          error
-        );
-
-        setDbStatus(
-          "offline",
-          "ICS database unavailable"
-        );
-
-        loadLocalRecords();
-
-        showToast(
-          state.records.length
-            ? "Database unavailable. Showing local ICS records."
-            : "Unable to load ICS records.",
-          state.records.length
-            ? "warning"
-            : "error"
-        );
+        state.dataLoaded = false;
+        setDbStatus('offline', state.records.length ? 'Sync failed · showing last loaded records' : 'ICS database unavailable');
+        if (!state.records.length && ui.tableBody) {
+          ui.tableBody.innerHTML = '<tr><td colspan="10" class="empty-table-cell">Unable to load ICS records. Check your connection and use Sync Data to retry.</td></tr>';
+        }
+        showToast(error.message || 'Unable to load ICS records.', 'error');
       } finally {
         state.loading = false;
-
-        if (ui.refreshBtn) {
-          ui.refreshBtn.disabled = false;
-        }
+        if (ui.refreshBtn) ui.refreshBtn.disabled = false;
+        if (state.reloadRequested) { state.reloadRequested = false; queueMicrotask(() => loadData()); }
       }
     }
 
@@ -1091,7 +860,7 @@ const PGENRO_PageUI = (() => {
             }
           )
           .subscribe((status) => {
-            if (status === "SUBSCRIBED") {
+            if (status === "SUBSCRIBED" && state.dataLoaded) {
               setDbStatus(
                 "online",
                 "ICS database connected"
@@ -1109,6 +878,13 @@ const PGENRO_PageUI = (() => {
 
     function populateDetails(record) {
       if (!record) return;
+      const extra = {
+        modalIcsStatus: record.status === 'Pending' ? 'Pending review' : record.status,
+        modalIcsDivision: record.division, modalIcsItemNo: record.itemNo,
+        modalIcsFundCluster: record.fundCluster, modalIcsSubmittedBy: record.submittedBy,
+        modalIcsSubmittedAt: record.submittedAt ? new Date(record.submittedAt).toLocaleString('en-PH') : ''
+      };
+      Object.entries(extra).forEach(([id, value]) => { const element = document.getElementById(id); if (element) element.textContent = value || '—'; });
 
       if (ui.modalControlNoTitle) {
         ui.modalControlNoTitle.textContent =
@@ -1246,6 +1022,8 @@ const PGENRO_PageUI = (() => {
     }
 
     function populatePrintSheet(record) {
+      document.getElementById('printFundCluster').textContent = record.fundCluster || 'General Fund (01)';
+      document.getElementById('printReviewStatus').textContent = record.status === 'Pending' ? 'Pending review' : record.status;
       const today =
         new Date()
           .toISOString()
@@ -1299,6 +1077,7 @@ const PGENRO_PageUI = (() => {
 
       if (ui.printItemNo) {
         ui.printItemNo.textContent =
+          record.itemNo ||
           record.accountCode ||
           record.controlNumber ||
           "---";
@@ -1366,6 +1145,10 @@ const PGENRO_PageUI = (() => {
     }
 
     function bindEvents() {
+      document.getElementById('filterIcsStatus')?.addEventListener('change', renderTable);
+      const retryWhenVisible = () => { if (!document.hidden && state.currentProfile) loadData(); };
+      document.addEventListener('visibilitychange', retryWhenVisible);
+      window.addEventListener('online', retryWhenVisible);
       ui.hamburger?.addEventListener(
         "click",
         (event) => {
@@ -1610,9 +1393,97 @@ const PGENRO_PageUI = (() => {
       );
     }
 
+    function bindSubmissionForm() {
+      const modal = document.getElementById('icsSubmissionModal');
+      const form = document.getElementById('icsSubmissionForm');
+      const trigger = document.getElementById('fillIcsFormBtn');
+      const feedback = document.getElementById('icsSubmissionFeedback');
+      const submit = document.getElementById('submitIcsBtn');
+      const background = document.querySelector('.app-container');
+      let saving = false, savedRecord = null;
+      const field = name => form.elements.namedItem(name);
+      const total = () => {
+        const value = Number(field('quantity').value) * Number(field('unitCost').value);
+        document.getElementById('submissionTotalValue').textContent = currency(Number.isFinite(value) ? value : 0);
+      };
+      const close = () => {
+        if (saving) return;
+        modal.classList.remove('open'); modal.setAttribute('aria-hidden', 'true');
+        ui.body.classList.remove('modal-open'); background.inert = false;
+        trigger.focus({ preventScroll: true });
+      };
+      const open = () => {
+        if (saving || !state.currentProfile) return;
+        closeProfile(); setSidebarOpen(false);
+        form.reset(); feedback.hidden = true; feedback.textContent = '';
+        field('accountablePerson').value = state.currentProfile.full_name || state.currentProfile.username || '';
+        field('division').value = state.currentProfile.division || '';
+        total(); modal.classList.add('open'); modal.setAttribute('aria-hidden', 'false');
+        ui.body.classList.add('modal-open'); background.inert = true;
+        form.querySelector('.modal-body').scrollTop = 0;
+        field('controlNo').focus({ preventScroll: true });
+      };
+      trigger.addEventListener('click', open);
+      ['closeIcsSubmissionBtn', 'cancelIcsSubmissionBtn'].forEach(id => document.getElementById(id).addEventListener('click', close));
+      modal.addEventListener('click', event => { if (event.target === modal) close(); });
+      modal.addEventListener('keydown', event => {
+        if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); }
+        if (event.key !== 'Tab') return;
+        const focusable = [...modal.querySelectorAll('button,input,select,textarea')].filter(el => !el.disabled && el.getClientRects().length);
+        if (!focusable.length) { event.preventDefault(); return; }
+        const first = focusable[0], last = focusable.at(-1);
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      });
+      form.addEventListener('input', event => {
+        event.target.setCustomValidity?.('');
+        feedback.hidden = true;
+        total();
+      });
+      form.addEventListener('submit', async event => {
+        event.preventDefault();
+        if (saving) return;
+        for (const element of form.querySelectorAll('input[required]')) {
+          element.setCustomValidity(element.type !== 'number' && !element.value.trim() ? 'Please complete this field.' : '');
+        }
+        if (!form.reportValidity()) return;
+        const payload = Object.fromEntries(new FormData(form));
+        const controls = [...modal.querySelectorAll('button,input,textarea,select')];
+        const previousDisabled = controls.map(element => element.disabled);
+        saving = true; form.setAttribute('aria-busy', 'true');
+        controls.forEach(element => { element.disabled = true; });
+        modal.tabIndex = -1; modal.focus({ preventScroll: true });
+        const label = submit.querySelector('span'); label.textContent = 'Submitting…';
+        let saved = null;
+        try {
+          saved = normalizeRecord(await window.PGENRO_ICS.save(payload, null, { submission: true }));
+          state.records = [saved, ...state.records.filter(row => String(row.id) !== String(saved.id))];
+          render();
+          savedRecord = saved;
+          document.getElementById('icsSubmissionSuccessText').textContent = `${saved.controlNumber} is pending administrator review. You can follow its status in this registry.`;
+          document.getElementById('icsSubmissionSuccess').hidden = false;
+        } catch (error) {
+          feedback.textContent = error.message || 'Your ICS form could not be submitted. Please try again.';
+          feedback.hidden = false;
+          feedback.scrollIntoView({ block: 'nearest' });
+        } finally {
+          saving = false; form.setAttribute('aria-busy', 'false');
+          controls.forEach((element, index) => { element.disabled = previousDisabled[index]; });
+          label.textContent = 'Submit ICS Form';
+        }
+        if (saved) { close(); showToast('ICS form submitted for administrator review.'); loadData(); }
+      });
+      document.getElementById('viewSubmittedIcsBtn').addEventListener('click', () => {
+        const record = savedRecord && state.records.find(row => row.id === savedRecord.id);
+        if (record) openDetails(record); else showToast('This record is no longer available. Use Sync Data to refresh.', 'warning');
+      });
+      return { open, enable: () => { trigger.disabled = false; } };
+    }
+
     async function start() {
       refreshIcons();
       bindEvents();
+      const submissionForm = bindSubmissionForm();
 
       try {
         const cached =
@@ -1637,8 +1508,13 @@ const PGENRO_PageUI = (() => {
         return;
       }
 
+      submissionForm.enable();
       await loadData();
       subscribeToRealtime();
+      if (new URLSearchParams(location.search).get('form') === 'new') {
+        submissionForm.open();
+        const url = new URL(location.href); url.searchParams.delete('form'); history.replaceState(null, '', url);
+      }
     }
 
     start();

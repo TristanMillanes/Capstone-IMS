@@ -9,7 +9,7 @@
 
 <title>PGENRO IMS | Audit Trail</title>
 
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 
@@ -27,13 +27,13 @@
 
 <!-- Stylesheet -->
 
-<link href="audittrail-admin.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="audittrail-admin.css?v=20261027-emerald-v6" rel="stylesheet">
 
 </head>
 
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="audittrail-admin.html" data-css-scope="admin-audit" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Audit Trail">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="audittrail-admin.html" data-css-scope="admin-audit" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Audit Trail" data-design="emerald-v6">
 
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+
 
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 
@@ -137,7 +137,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -161,7 +161,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Audit Trail</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Audit Trail</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -289,7 +289,7 @@
 
 <div class="header-title">
 
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-shield-alert"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="M12 8v4"></path><path d="M12 16h.01"></path></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Audit Trail</span></div><h1 id="auditPageTitle">Audit Trail</h1>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Audit Trail</span></div><h1 id="auditPageTitle">Audit Trail</h1>
 
 <p>Review recorded account activity and changes across your office modules.</p>
 
@@ -309,13 +309,13 @@
 
 <section aria-label="Summary of matching audit events" class="audit-metrics unified-metric-grid">
 
-<article class="audit-metric unified-metric unified-metric-featured"><div class="unified-metric-heading"><span class="audit-metric-label">Matching events</span><span class="kpi-icon emerald"><i data-lucide="activity"></i></span></div><strong id="auditTotal">—</strong><small id="auditTotalDetail">All recorded dates</small></article>
+<article class="audit-metric unified-metric unified-metric-featured"><div class="unified-metric-heading"><span class="audit-metric-label">Matching events</span></div><strong id="auditTotal">—</strong><small id="auditTotalDetail">All recorded dates</small></article>
 
-<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Activity today</span><span class="kpi-icon emerald"><i data-lucide="clock-3"></i></span></div><strong id="auditToday">—</strong><small>Philippine calendar day</small></article>
+<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Activity today</span></div><strong id="auditToday">—</strong><small>Philippine calendar day</small></article>
 
-<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Distinct operators</span><span class="kpi-icon emerald"><i data-lucide="users-round"></i></span></div><strong id="auditUsers">—</strong><small>Among matching events</small></article>
+<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Distinct operators</span></div><strong id="auditUsers">—</strong><small>Among matching events</small></article>
 
-<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Flagged events</span><span class="kpi-icon emerald"><i data-lucide="shield-alert"></i></span></div><strong id="auditFlagged">—</strong><small>Recorded failure or denial</small></article>
+<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Flagged events</span></div><strong id="auditFlagged">—</strong><small>Recorded failure or denial</small></article>
 
 </section>
 
@@ -481,7 +481,7 @@
 
 <script defer src="../shared/supabase.js?v=20261013-audit-responsive-v1"></script>
 
-<script defer src="audittrail-admin.js?v=20261013-layout-v2"></script>
+<script defer src="audittrail-admin.js?v=20261027-emerald-v6"></script>
 
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 

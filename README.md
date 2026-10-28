@@ -1,4 +1,10 @@
+# Administrator Service Request update
+
+See [ADMIN_SERVICE_REQUEST_UPDATE.md](ADMIN_SERVICE_REQUEST_UPDATE.md) for the public-form review queue, filters, status updates, document downloads, and Print Form. Existing public Service Request setup instructions remain in [PUBLIC_SERVICE_REQUEST_SETUP.md](PUBLIC_SERVICE_REQUEST_SETUP.md).
+
 Current navigation, dark-mode, chart and PDF update: see [UI_NAVIGATION_PDF_UPDATE.md](UI_NAVIGATION_PDF_UPDATE.md).
+
+Public Service Request form update, 26 October 2026: **Service Request · Fill Up Form** opens `/User/service-request-form.html` directly without signing in. Follow [PUBLIC_SERVICE_REQUEST_SETUP.md](PUBLIC_SERVICE_REQUEST_SETUP.md) and run `supabase/PUBLIC_SERVICE_REQUEST_PATCH.sql` to enable public submissions. Requests appear in the existing admin Service Requests registry as **Pending Review**. ICS retains its authenticated workflow.
 
 # PGENRO Information Management System
 
@@ -13,7 +19,7 @@ Before saving new shared attachments, run `supabase/DOCUMENT_STORAGE_PATCH.sql` 
 ## Main folders
 
 - `admin/` — administrator workspace and write-enabled operational modules.
-- `User/` — authenticated user/viewer workspace. Operational records remain read-only for ordinary users.
+- `User/` — public sign-in and service request submission pages, plus the authenticated user/viewer workspace. Operational registries remain read-only for ordinary users.
 - `shared/` — shared Supabase client, runtime settings and OCR field helpers.
 - `supabase/` — database setup/patch SQL and Edge Functions.
 - `SettingIMS/` — account/workspace settings UI.
@@ -34,6 +40,7 @@ Before saving new shared attachments, run `supabase/DOCUMENT_STORAGE_PATCH.sql` 
 ## Production entry points
 
 - `/` → `/User/login.html`
+- `/User/service-request-form.html` → public Service Request form
 - `/ocr` → full-document OCR API
 - `/ocr/status/<request_id>` → live page progress
 - `/cancel` → cancel an OCR request

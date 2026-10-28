@@ -1,4 +1,8 @@
-# PGENRO Admin — Modern Workspace (6 October 2026)
+# PGENRO Admin
+
+**Latest update: Emerald interface, 27 October 2026.** All 13 admin pages now use emerald branding with refined light/dark surfaces, a gradient dashboard header, clearer cards/tables/forms, and finite page, menu, dialog, sidebar and button animations. Botanical icons and decorative header/metric icons remain removed. Navigation and chart-pointer fixes are included. See `EMERALD_UI_UPDATE.md` for installation and current validation. Older interface notes below remain historical context.
+
+## Modern Workspace (6 October 2026)
 
 The complete system uses Admin and User access. Follow `../ADMIN_USER_SETUP.md` for SQL and Edge Function deployment. User Management and account requests are available to an active Admin; ordinary User accounts retain read-only operational access.
 
@@ -76,7 +80,7 @@ Keep your real `shared/supabase.js` one level above `admin/`. It must initialize
 
 The account helpers must continue to handle `create`, `update`, `set_status`, `delete`, `approve_request` and `reject_request`. Stock changes require the existing `record_inventory_movement` RPC with its current `p_item_id`, `p_movement_type`, `p_quantity`, `p_reference_no`, `p_remarks` and `p_recorded_by` parameters. The required registries are `employees`, `communications`, `travel_orders`, `office_memos`, `inventory`, `inventory_movements`, `visitors`, `service_requests`, `ics_records`, `profiles` and `access_requests`; `audit_logs` supports the audit trail. Preserve your matching schema, constraints, access policies and realtime publication.
 
-Keep `logo/enro.png` and `User/login.html` in their existing locations outside `admin/`. A local leaf symbol appears if the logo image is unavailable. Sign out continues to use the existing login route.
+Keep `logo/enro.png` and `User/login.html` in their existing locations outside `admin/`. A simple P letter mark appears if the logo image is unavailable. Sign out continues to use the existing login route.
 
 The official Supabase SDK and document reader libraries require network access. Fonts use the existing Google Fonts include; icons are rendered locally. The dashboard has native chart fallbacks. Workspace backup/restore manages local browser caches and preferences; it does not back up or restore the hosted database.
 

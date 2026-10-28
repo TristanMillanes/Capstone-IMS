@@ -3,7 +3,7 @@ FROM python:3.11-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1 \
-    OCR_LANG=eng \
+    OCR_LANG=eng+fil \
     OCR_WORKERS=1 \
     OCR_DOCUMENT_WORKERS=1 \
     OCR_PAGE_CACHE_SIZE=64 \
@@ -16,6 +16,8 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
        tesseract-ocr \
        tesseract-ocr-eng \
+       tesseract-ocr-fil \
+       tesseract-ocr-osd \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app

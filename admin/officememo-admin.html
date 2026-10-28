@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Office Memorandum Administration</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -14,10 +14,10 @@
 <!-- Lucide Icons -->
 <!-- Supabase JavaScript SDK -->
 <!-- Stylesheets -->
-<link href="officememo-admin.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="officememo-admin.css?v=20261027-emerald-v6" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Office Memos">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Office Memos" data-design="emerald-v6">
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -116,7 +116,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -136,7 +136,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Office Memos</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Office Memos</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -260,7 +260,7 @@
 <!-- PAGE HEADER -->
 <section class="page-header depth-hero unified-page-header">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-file-text"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Office Memos</span></div><h1>Office Memos</h1>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Office Memos</span></div><h1>Office Memos</h1>
 <p>Issue, review, and retrieve the directives that keep your office moving.</p>
 </div>
 <div class="header-actions"><button class="btn btn-secondary" id="refreshMemosBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
@@ -274,44 +274,34 @@
 <i data-lucide="plus-circle"></i> Issue New Memorandum
             </button>
 </div>
-<div aria-hidden="true" class="depth-scene">
-<span class="depth-orbit"></span><span class="depth-orb"></span>
-<div class="depth-stack">
-<span class="depth-sheet depth-sheet-back"></span>
-<span class="depth-sheet depth-sheet-middle"></span>
-<span class="depth-sheet depth-sheet-front">
-<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-</span>
-</div><span class="depth-scene-dot"></span>
-</div>
+
 </section>
 <!-- KPI METRICS GRID -->
 <section class="kpi-grid unified-metric-grid">
 <div aria-label="Show all memorandums" aria-pressed="false" class="kpi-card unified-metric unified-metric-featured" data-memo-kpi="all" role="button" tabindex="0" title="Show all memorandums">
 <div class="kpi-header">
 <span class="kpi-label">Total Memorandums</span>
-<div class="kpi-icon emerald"><i data-lucide="file-text"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiTotalMemos">0</h3>
-<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> Official Records</span>
+<span class="kpi-trend positive"> Official Records</span>
 </div>
 </div>
 <div aria-label="Show pinned memorandums" aria-pressed="false" class="kpi-card urgent-border unified-metric" data-memo-kpi="pinned" role="button" tabindex="0" title="Show pinned memorandums">
 <div class="kpi-header">
 <span class="kpi-label">Pinned Directives</span>
-<div class="kpi-icon amber"><i data-lucide="pin"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiPinnedMemos">0</h3>
-<span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> High Priority</span>
+<span class="kpi-trend urgent"> High Priority</span>
 </div>
 </div>
 <div aria-label="Show memorandums issued this month" aria-pressed="false" class="kpi-card unified-metric" data-memo-kpi="month" role="button" tabindex="0" title="Show memorandums issued this month">
 <div class="kpi-header">
 <span class="kpi-label">Issued This Month</span>
-<div class="kpi-icon blue"><i data-lucide="calendar"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiThisMonthMemos">0</h3>
@@ -321,7 +311,7 @@
 <div aria-label="Show memorandums with attachments" aria-pressed="false" class="kpi-card unified-metric" data-memo-kpi="attached" role="button" tabindex="0" title="Show memorandums with attachments">
 <div class="kpi-header">
 <span class="kpi-label">Digital Attachments</span>
-<div class="kpi-icon purple"><i data-lucide="file-check"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiWithAttachments">0</h3>
@@ -646,7 +636,7 @@
 <!-- SCRIPTS -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer src="officememo-admin.js?v=20261013-layout-v2"></script>
+<script defer src="officememo-admin.js?v=20261027-emerald-v6"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

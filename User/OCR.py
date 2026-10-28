@@ -44,8 +44,8 @@ except ImportError:
 
 MAX_BYTES = 50 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'tif', 'tiff', 'docx', 'txt', 'csv', 'xlsx', 'pptx'}
-OCR_LANG = os.getenv('OCR_LANG', 'eng')
-OCR_PARSER_VERSION = 19
+OCR_LANG_REQUESTED = os.getenv('OCR_LANG', 'eng+fil').strip() or 'eng'
+OCR_PARSER_VERSION = 20
 OCR_TIMEOUT = max(5, int(os.getenv('OCR_TIMEOUT', '45')))
 OCR_DOCUMENT_TIMEOUT = max(OCR_TIMEOUT, int(os.getenv('OCR_DOCUMENT_TIMEOUT', '140')))
 OCR_WORKERS = max(1, min(4, int(os.getenv('OCR_WORKERS', str(min(2, os.cpu_count() or 1))))))
@@ -172,6 +172,48 @@ if not TESSERACT_CMD:
             TESSERACT_CMD = str(candidate)
             break
 TESSERACT_CMD = TESSERACT_CMD or 'tesseract'
+
+
+def resolve_ocr_language(requested):
+    """Use requested OCR languages that are actually installed, with English as a safe fallback."""
+    requested_codes = [code.strip() for code in re.split(r'[+,]', str(requested or 'eng')) if code.strip()]
+    if not requested_codes:
+        requested_codes = ['eng']
+    try:
+        result = subprocess.run(
+            [TESSERACT_CMD, '--list-langs'],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=5,
+            check=False,
+        )
+        if result.returncode == 0:
+            available = {
+                line.strip() for line in result.stdout.splitlines()
+                if line.strip() and not line.lower().startswith('list of available languages')
+            }
+            selected = [code for code in requested_codes if code in available]
+            if not selected and 'eng' in available:
+                selected = ['eng']
+            if selected:
+                missing = [code for code in requested_codes if code not in available]
+                if missing:
+                    print(
+                        '[OCR] Language data not installed for ' + ', '.join(missing)
+                        + '; using ' + '+'.join(selected) + '.',
+                        file=sys.stderr,
+                        flush=True,
+                    )
+                return '+'.join(selected)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    # Leave the configured value intact when the executable cannot be queried.
+    # The request handler will report a useful Tesseract error if it is missing.
+    return '+'.join(requested_codes)
+
+
+OCR_LANG = resolve_ocr_language(OCR_LANG_REQUESTED)
 
 # =========================================================================
 # GENERAL LETTER & ADMINISTRATIVE FUZZY PATTERNS
@@ -726,6 +768,13 @@ def parse_header(text):
 def letterhead_office(lines):
     generic = re.compile(r'^(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY)$', re.I)
     for line in lines:
+        # Do not mistake registry labels or their values for an office name.
+        # For example, "ACTION TAKEN: Forwarded to Planning Division" contains
+        # the word "Division" but is not the document's letterhead.
+        if HEADER_FIELD.match(line) or SIGN_LABEL.match(line):
+            continue
+        if re.match(r'^(?:STATUS|ACTION\s+TAKEN|DATE\s+FORWARDED|REMARKS?)\s*[:：;–—-]', line, re.I):
+            continue
         if re.search(r'\b(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|PROVINCIAL\s+GOVERNMENT|REPUBLIC|MUNICIPALITY)\b', line, re.I):
             if not generic.fullmatch(line) and len(line.split()) >= 2:
                 return line
@@ -764,6 +813,7 @@ LETTER_CLASSIFIER_RULES = [
         ],
         'body': [
             r'\b(?:we|I)\s+(?:would\s+like\s+to|humbly|respectfully|am\s+writing\s+to)\s+request\b',
+            r'\b(?:respectfully|humbly)\s+request\b',
             r'\b(?:requesting\s+(?:for|your|the|permission|approval|assistance|consideration))\b',
             r'\bmay\s+(?:we|I)\s+request\b',
             r'\bseek(?:ing)?\s+your\s+(?:approval|assistance|permission|guidance)\b',
@@ -909,8 +959,9 @@ LETTER_CLASSIFIER_RULES = [
 def classify_letter_type(raw_text='', extracted_subject=''):
     clean = str(raw_text or '').replace('\r', '').split('\f', 1)[0]
     lines = [tidy(l) for l in clean.split('\n') if tidy(l)]
-    top_block = ' '.join(lines[:20])
-    body_block = ' '.join(lines[5:45])
+    top_lines = lines[:20]
+    top_block = ' '.join(top_lines)
+    body_block = ' '.join(lines[:45])
     subject_text = str(extracted_subject or '').strip()
 
     scores = {}
@@ -922,7 +973,9 @@ def classify_letter_type(raw_text='', extracted_subject=''):
         evidence_map[t] = []
 
         for pat in rule.get('headings', []):
-            m = re.search(pat, top_block, re.I)
+            # Headings often follow the government letterhead. Test each line
+            # separately so anchored patterns such as ^REQUEST LETTER still match.
+            m = next((match for line in top_lines if (match := re.search(pat, line, re.I))), None)
             if m:
                 scores[t] += 60
                 evidence_map[t].append(f"Header: '{m.group(0)}'")
@@ -974,43 +1027,164 @@ def classify_letter_type(raw_text='', extracted_subject=''):
 
 def parse_letter_details(raw_text=''):
     first = str(raw_text or '').replace('\r', '').split('\f', 1)[0]
-    lines = [tidy(l) for l in first.split('\n') if tidy(l)]
+    lines = [tidy(line) for line in first.split('\n') if tidy(line)]
     subject = ''
     opening = ''
+    printed_subject = False
 
-    for i, line in enumerate(lines[:80]):
-        sm = re.match(r'^(?:S[Uu0]BJ[Ee3]CT(?:\s+M[Aa]TT[Ee]R)?|S[Uu0]BJ(?:[Ee3]C[TIL1]|\.)?|R[Ee]|P[Aa]KS[Aa])\s*[:：;\-]?\s*(.*)$', line, re.I)
-        if sm:
-            parts = [sm.group(1)] if sm.group(1) else []
-            for j in range(i + 1, min(len(lines), i + 6)):
-                fol = lines[j]
-                if FIELD_LABEL.match(fol) or BODY.match(fol) or CLOSING.match(fol): break
-                parts.append(fol)
+    for index, line in enumerate(lines[:80]):
+        match = re.match(
+            r'^(?:S[Uu0]BJ[Ee3]CT(?:\s+M[Aa]TT[Ee]R)?|S[Uu0]BJ(?:[Ee3]C[TIL1]|\.)?|R[Ee](?=\s*[:：;\-])|P[Aa]KS[Aa])\s*[:：;\-]?\s*(.*)$',
+            line,
+            re.I,
+        )
+        if match:
+            parts = [match.group(1)] if match.group(1) else []
+            for following in lines[index + 1:min(len(lines), index + 6)]:
+                if FIELD_LABEL.match(following) or BODY.match(following) or CLOSING.match(following):
+                    break
+                parts.append(following)
             subject = tidy(' '.join(parts))
+            printed_subject = bool(subject)
             break
-        if BODY.match(line) and not opening:
-            opening = ' '.join(lines[i:i + 3])
+        if not opening and re.match(r'^(?:DEAR\b|SIR\s*[,!:]|MADAM\s*[,!:]|MA.M\s*[,!:]|GREETINGS\b|GOOD\s+(?:DAY|MORNING|AFTERNOON)\b|TO\s+WHOM\b)', line, re.I):
+            continue
+        if not opening and not CLOSING.match(line) and (
+            BODY.match(line)
+            or re.match(r'^[|!¦]?\s*(?:(?:I|WE)\s+)?(?:respectfully|humbly)\s+request\b', line, re.I)
+            or re.match(r'^(?:I|WE)\s+(?:hereby|would\s+like\s+to|am\s+writing\s+to|wish\s+to|request|seek)\b', line, re.I)
+        ):
+            opening = re.sub(r'^[|!¦]\s*(?=respectfully\s+request)', 'I ', ' '.join(lines[index:index + 3]), flags=re.I).strip()
+            opening = re.sub(r'^[|!¦]\s*', '', opening).strip()
 
     if not subject and opening:
         match = re.match(r'^.*?[.!?](?=\s+[A-Z]|$)', opening)
         subject = match.group(0) if match else opening[:180] + '…'
 
     classification = classify_letter_type(raw_text, subject)
+    needs_review = []
+    if not printed_subject:
+        needs_review.append('subject')
+    if classification['confidence'] != 'high' or classification['documentType'] == 'Other Communication':
+        needs_review.append('documentType')
 
     return {
         'subject': subject,
-        'subjectSource': 'printed' if subject else 'body',
+        'subjectSource': 'printed' if printed_subject else 'body',
         'subjectEvidence': subject,
         'documentType': classification['documentType'],
         'documentTypeSource': classification['confidence'],
         'documentTypeEvidence': classification['evidence'],
-        'needsReview': ['subject'] if not subject else []
+        'needsReview': needs_review,
     }
+
+FORM_FIELD_PATTERNS = {
+    'status': r'(?:RECORD\s+)?STATUS',
+    'actionTaken': r'(?:ACTION\s+TAKEN(?:\s*/\s*DATE\s+FORWARDED)?|ACTION\s*/\s*DATE\s+FORWARDED|DATE\s+FORWARDED)',
+    'remarks': r'(?:REMARKS?|NOTES?)',
+}
+
+
+def _read_labeled_form_value(text, label_pattern, max_lines=3):
+    """Read only explicitly labelled registry fields, never infer them from letter prose."""
+    first_page = str(text or '').replace('\r', '').split('\f', 1)[0]
+    lines = first_page.splitlines()
+    label = rf'(?:{label_pattern})'
+    inline_pattern = re.compile(
+        rf'^\s*{label}\s*(?::|：|;|–|—|-)\s*(.*?)\s*$',
+        re.I,
+    )
+    bare_pattern = re.compile(rf'^\s*{label}\s*$', re.I)
+    for index, raw_line in enumerate(lines[:160]):
+        line = raw_line.strip()
+        match = inline_pattern.match(line)
+        if match:
+            value = tidy(match.group(1))
+            if value:
+                return value, line
+        elif not bare_pattern.fullmatch(line):
+            continue
+
+        parts = []
+        for following in lines[index + 1:index + 1 + max_lines]:
+            candidate = tidy(following)
+            if not candidate:
+                if parts:
+                    break
+                continue
+            if (
+                inline_pattern.match(candidate)
+                or bare_pattern.fullmatch(candidate)
+                or FIELD_LABEL.match(candidate)
+                or BODY.match(candidate)
+                or CLOSING.match(candidate)
+            ):
+                break
+            parts.append(candidate)
+        value = tidy(' '.join(parts))
+        if value:
+            return value, line + '\n' + value
+    return '', ''
+
+
+def extract_registry_form_fields(text):
+    """Extract optional workflow fields when a document labels them explicitly."""
+    raw_status, status_evidence = _read_labeled_form_value(
+        text, FORM_FIELD_PATTERNS['status'], max_lines=1
+    )
+    normalized_status = re.sub(r'[^a-z]+', ' ', raw_status.casefold()).strip()
+    status = ''
+    status_aliases = {
+        'pending': 'Pending',
+        'for action': 'Pending',
+        'for review': 'Pending',
+        'awaiting action': 'Pending',
+        'received': 'Received',
+        'received and logged': 'Received',
+        'logged': 'Received',
+        'accepted': 'Received',
+        'forwarded': 'Forwarded',
+        'routed': 'Forwarded',
+        'endorsed': 'Forwarded',
+        'released': 'Released',
+        'sent out': 'Released',
+        'dispatched': 'Released',
+        'archived': 'Archived',
+        'filed': 'Archived',
+    }
+    status = status_aliases.get(normalized_status, '')
+
+    action_taken, action_evidence = _read_labeled_form_value(
+        text, FORM_FIELD_PATTERNS['actionTaken'], max_lines=3
+    )
+    remarks, remarks_evidence = _read_labeled_form_value(
+        text, FORM_FIELD_PATTERNS['remarks'], max_lines=3
+    )
+
+    evidence = {}
+    if status:
+        evidence['status'] = status_evidence
+    if action_taken:
+        evidence['actionTaken'] = action_evidence
+    if remarks:
+        evidence['remarks'] = remarks_evidence
+
+    return {
+        'status': status,
+        'statusSource': 'printed' if status else '',
+        'actionTaken': action_taken,
+        'actionTakenSource': 'printed' if action_taken else '',
+        'remarks': remarks,
+        'remarksSource': 'printed' if remarks else '',
+        'fieldEvidence': evidence,
+    }
+
 
 def extract_document_metadata(text):
     header = parse_header(text)
     details = parse_letter_details(text)
     sender = parse_correspondence(text)
+    registry_fields = extract_registry_form_fields(text)
 
     if not sender['recipient']:
         lines = [tidy(l) for l in str(text).split('\f', 1)[0].splitlines() if tidy(l)]
@@ -1019,21 +1193,45 @@ def extract_document_metadata(text):
             block = lines[max(0, greet_idx - 6):greet_idx]
             sender['recipient'] = ' '.join(block)
 
+    source_office = sender.get('sender') or header.get('senderOffice') or ''
+    received_from = sender.get('receivedFrom') or ''
+    received_from_source = sender.get('receivedFromSource') or 'missing'
+    received_from_needs_review = bool(sender.get('receivedFromNeedsReview'))
+    combined_review = list(dict.fromkeys(header['needsReview'] + details['needsReview'] + sender['needsReview']))
+    # If a printed originating office is available but the letter has no
+    # person-name signatory, use that explicit office in the required
+    # "Received from" field. Ambiguous person candidates still require review.
+    if not received_from and source_office and received_from_source == 'missing':
+        received_from = source_office
+        received_from_source = 'office'
+        received_from_needs_review = False
+        combined_review = [key for key in combined_review if key != 'receivedFrom']
+
     result = {
         **header, **sender,
+        'receivedFrom': received_from,
+        'receivedFromSource': received_from_source,
+        'receivedFromNeedsReview': received_from_needs_review,
         'subject': header['subject'] or details['subject'],
         'subjectSource': 'header' if header['subject'] else details['subjectSource'],
         'documentType': header['documentType'] or details['documentType'],
         'documentTypeSource': 'heading' if header['documentType'] else details['documentTypeSource'],
         'issuedBy': sender['signatory'] or header['issuedBy'] or sender['sender'],
         'sourceOffice': sender['sender'],
+        'status': registry_fields['status'],
+        'statusSource': registry_fields['statusSource'],
+        'actionTaken': registry_fields['actionTaken'],
+        'actionTakenSource': registry_fields['actionTakenSource'],
+        'remarks': registry_fields['remarks'],
+        'remarksSource': registry_fields['remarksSource'],
         'detectedNumbers': extract_numeric_tokens(text),
         'fieldEvidence': {
-            **header['fieldEvidence'], **sender['fieldEvidence'],
+            **header['fieldEvidence'], **sender['fieldEvidence'], **registry_fields['fieldEvidence'],
+            'receivedFrom': sender['fieldEvidence'].get('receivedFrom') or (source_office if received_from_source == 'office' else ''),
             'subject': header['fieldEvidence'].get('subject') or details['subject'],
             'documentType': header['documentType'] or details['documentType']
         },
-        'needsReview': list(dict.fromkeys(header['needsReview'] + details['needsReview'] + sender['needsReview']))
+        'needsReview': combined_review
     }
     return result
 
@@ -1052,16 +1250,23 @@ def communication_form_payload(metadata, text, communication_type=''):
         'controlNoInput': (metadata.get('memoNo') if memo else '') or metadata.get('controlNo') or '',
         'docTypeSelect': metadata.get('documentType') or 'Other Communication',
         'subjectInput': metadata.get('subject') or '',
-        'officeInput': (metadata.get('recipient') or '') if direction == 'Outgoing' else received,
-        'dateInput': (metadata.get('date') if memo else metadata.get('releasedDate' if direction == 'Outgoing' else 'receivedDate')) or metadata.get('date') or ''
+        'officeInput': (metadata.get('recipient') or metadata.get('addressedTo') or '') if direction == 'Outgoing' else (received or metadata.get('sourceOffice') or metadata.get('senderOffice') or ''),
+        'dateInput': (metadata.get('date') if memo else metadata.get('releasedDate' if direction == 'Outgoing' else 'receivedDate')) or metadata.get('date') or '',
+        'statusSelect': metadata.get('status') or '',
+        'actionTakenInput': metadata.get('actionTaken') or '',
+        'remarksInput': metadata.get('remarks') or ''
     }
     if memo:
         values['memoRecipientInput'] = metadata.get('recipient') or ''
         values['memoIssuerInput'] = '' if 'receivedFrom' in uncertain else metadata.get('signatory') or metadata.get('issuedBy') or ''
 
     states = {}
+    office_key = 'recipient' if direction == 'Outgoing' else (
+        'receivedFrom' if received else 'sourceOffice' if values.get('officeInput') else 'receivedFrom'
+    )
     keys = {'controlNoInput': 'controlNo', 'docTypeSelect': 'documentType', 'subjectInput': 'subject',
-            'officeInput': 'recipient' if direction == 'Outgoing' else 'receivedFrom', 'dateInput': 'date',
+            'officeInput': office_key, 'dateInput': 'date',
+            'statusSelect': 'status', 'actionTakenInput': 'actionTaken', 'remarksInput': 'remarks',
             'memoRecipientInput': 'recipient', 'memoIssuerInput': 'receivedFrom'}
     for input_id, value in values.items():
         key = keys[input_id]
@@ -1100,35 +1305,176 @@ def supplement_sender_evidence(base, extra, signature_region=False):
     return base[:at].rstrip() + '\n\n' + proof + '\n\n' + base[at:]
 
 
+def detect_page_rotation(image):
+    """Ask Tesseract OSD whether a scan is sideways or upside down."""
+    if not (shutil.which(TESSERACT_CMD) or Path(TESSERACT_CMD).is_file()):
+        return 0
+    acquired = False
+    try:
+        while not _ocr_slots.acquire(timeout=min(.2, check_budget())):
+            check_budget()
+        acquired = True
+        with tempfile.TemporaryDirectory(prefix='pgenro_osd_') as folder:
+            path = Path(folder) / 'orientation.png'
+            image.convert('RGB').save(path, 'PNG')
+            env = os.environ.copy()
+            env.setdefault('OMP_THREAD_LIMIT', '1')
+            result = subprocess.run(
+                [TESSERACT_CMD, str(path), 'stdout', '-l', 'osd', '--psm', '0'],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=min(8, check_budget()),
+                env=env,
+                check=False,
+            )
+            if result.returncode:
+                return 0
+            rotation = re.search(r'(?im)^\s*Rotate:\s*(0|90|180|270)\s*$', result.stdout)
+            confidence = re.search(r'(?im)^\s*Orientation confidence:\s*([0-9.]+)', result.stdout)
+            if not rotation:
+                return 0
+            confidence_value = float(confidence.group(1)) if confidence else 0
+            return int(rotation.group(1)) if confidence_value >= 1.5 else 0
+    except (OSError, ValueError, subprocess.SubprocessError, ReadCancelled, DocumentTimeout):
+        return 0
+    finally:
+        if acquired:
+            _ocr_slots.release()
+
+
+def _otsu_binarize(image):
+    """Create a high-contrast alternate for faint or unevenly scanned pages."""
+    gray = ImageOps.grayscale(image)
+    histogram = gray.histogram()
+    total = sum(histogram)
+    if not total:
+        return gray
+    weighted = sum(level * count for level, count in enumerate(histogram))
+    background_weight = 0
+    background_sum = 0
+    best_variance = -1
+    threshold = 127
+    for level, count in enumerate(histogram):
+        background_weight += count
+        if background_weight == 0:
+            continue
+        foreground_weight = total - background_weight
+        if foreground_weight == 0:
+            break
+        background_sum += level * count
+        background_mean = background_sum / background_weight
+        foreground_mean = (weighted - background_sum) / foreground_weight
+        variance = background_weight * foreground_weight * (background_mean - foreground_mean) ** 2
+        if variance > best_variance:
+            best_variance = variance
+            threshold = level
+    return gray.point(lambda pixel: 255 if pixel > threshold else 0)
+
+
+def _ocr_candidate_score(candidate):
+    """Prefer legible OCR that also captures useful letter-header evidence."""
+    text = clean_text(candidate.get('text', ''))
+    if not text:
+        return -1
+    confidence = float(candidate.get('confidence') or 0)
+    words = re.findall(r'[\wÀ-ž]+', text, re.UNICODE)
+    score = confidence + min(12, len(words) * 0.08)
+    header = parse_header(text)
+    details = parse_letter_details(text)
+    sender = parse_correspondence(text)
+    score += 6 if header.get('subject') else 0
+    score += 4 if header.get('date') or header.get('receivedDate') or header.get('releasedDate') else 0
+    score += 4 if header.get('controlNo') else 0
+    score += 7 if sender.get('receivedFrom') else 0
+    score += 3 if details.get('documentType') not in ('', 'Other Communication') else 0
+    return score
+
+
 def fast_ocr_image(image, header_metadata=None):
     check_budget()
     image = trim_blank_margins(resize_ocr_image(opaque_image(image)))
     processed = preprocess_image_for_ocr(image, resize=False)
     extrema = processed.getextrema()
-    if extrema[1] - extrema[0] < 8: return ''
+    if extrema[1] - extrema[0] < 8:
+        return ''
     page_key = f'{OCR_PARSER_VERSION}:{OCR_LANG}:{processed.size}:' + hashlib.sha256(processed.tobytes()).hexdigest()
     with _page_cache_lock:
         cached = _page_cache.get(page_key)
         if cached and time.monotonic() - cached[0] <= OCR_CACHE_TTL:
-            if cached[1].get('lowConfidence'): mark_sender_ocr_review()
+            if cached[1].get('lowConfidence'):
+                mark_sender_ocr_review()
             return cached[1]['text']
+
     first = run_tesseract(processed, 3, with_data=True)
-    best, text = first, first['text']
-    corr = parse_correspondence(text)
-    # Whole-page alternate preserves recipient context and catches centrally placed signatures.
-    if not corr['receivedFrom'] or first['confidence'] < OCR_MIN_CONFIDENCE:
+    # Orientation detection is conditional: clear portrait scans skip the extra
+    # process, while low-confidence or landscape scans get an OSD check.
+    if first.get('confidence', 0) < max(OCR_MIN_CONFIDENCE, 78) or image.width > image.height:
+        rotation = detect_page_rotation(processed)
+        if rotation:
+            oriented = processed.rotate(-rotation, expand=True, fillcolor=255)
+            oriented_result = run_tesseract(oriented, 3, with_data=True)
+            if _ocr_candidate_score(oriented_result) > _ocr_candidate_score(first):
+                processed, first = oriented, oriented_result
+
+    candidates = [first]
+    first_text = first.get('text', '')
+    first_header = parse_header(first_text)
+    first_sender = parse_correspondence(first_text)
+    header_gaps = sum(not first_header.get(key) for key in ('subject', 'date', 'controlNo'))
+    # A readable body can still have a missed header or signature. Try a
+    # single-column layout whenever the first pass is weak or incomplete.
+    needs_alternate = (
+        not first_text.strip()
+        or first['confidence'] < max(OCR_MIN_CONFIDENCE, 72)
+        or not first_sender.get('receivedFrom')
+        or header_gaps >= 2
+    )
+    if needs_alternate:
         alternate = run_tesseract(processed, 6, with_data=True)
-        if not text.strip() or (alternate['confidence'] > first['confidence'] + 8 and len(alternate['text']) >= len(text)*.8):
-            best, text = alternate, alternate['text']
-        else:
-            supplemented = supplement_sender_evidence(text, alternate['text'])
-            if supplemented != text: best = alternate
-            text = supplemented
+        candidates.append(alternate)
+
+    best = max(candidates, key=_ocr_candidate_score)
+    text = best.get('text', '')
+
+    # If a layout pass finds the sender more clearly than the selected pass,
+    # retain the sender evidence without duplicating the rest of the page.
+    if not parse_correspondence(text).get('receivedFrom'):
+        for candidate in candidates:
+            if candidate is best:
+                continue
+            supplemented = supplement_sender_evidence(text, candidate.get('text', ''))
+            if supplemented != text:
+                text = supplemented
+                if parse_correspondence(text).get('receivedFrom'):
+                    if _ocr_candidate_score(candidate) >= _ocr_candidate_score(best) - 2:
+                        best = candidate
+                    break
+
+    # Faint scans and low-contrast phone photos benefit from a binarized pass.
+    # Keep it conditional so clear documents remain fast.
+    if best.get('confidence', 0) < max(OCR_MIN_CONFIDENCE, 68) or len(re.findall(r'\S+', text)) < 18:
+        thresholded = _otsu_binarize(processed)
+        alternate = run_tesseract(thresholded, 6, with_data=True)
+        candidates.append(alternate)
+        if _ocr_candidate_score(alternate) > _ocr_candidate_score(best):
+            best = alternate
+            text = alternate.get('text', '')
+        if not parse_correspondence(text).get('receivedFrom'):
+            for candidate in candidates:
+                if candidate is best:
+                    continue
+                supplemented = supplement_sender_evidence(text, candidate.get('text', ''))
+                if supplemented != text:
+                    text = supplemented
+                    if parse_correspondence(text).get('receivedFrom'):
+                        break
+
     corr = parse_correspondence(text)
     # A cropped region needs an explicit signature marker or nearby role. Never
     # promote an isolated recipient/body name merely because it appears in a crop.
     if not corr['receivedFrom'] and corr['receivedFromSource'] != 'ambiguous' and processed.height > 500:
-        crop = processed.crop((0, int(processed.height*.48), processed.width, processed.height))
+        crop = processed.crop((0, int(processed.height * .48), processed.width, processed.height))
         alternate = run_tesseract(crop, 11, with_data=True)
         scan = scan_sender_candidates(alternate['text'], True)
         strong = [c for c in scan['primary'] if c['kind'] == 'signature' and c['role']]
@@ -1138,22 +1484,30 @@ def fast_ocr_image(image, header_metadata=None):
         if strong:
             proof = '\n\n'.join(c['evidence'] for c in strong)
             supplemented = supplement_sender_evidence(text, proof, True)
-            if supplemented != text: best, text = alternate, supplemented
+            if supplemented != text:
+                best, text = alternate, supplemented
+
     current = _state.get()
-    low = best['confidence'] < OCR_MIN_CONFIDENCE
+    low = best.get('confidence', 0) < OCR_MIN_CONFIDENCE
     # Inspect confidence for the printed name itself, not only the body average.
     selected = parse_correspondence(text)['receivedFrom']
     if selected:
         name_tokens = set(re.findall(r'[^\W\d_]+', selected.casefold()))
-        name_conf = [w['conf'] for w in best['words'] if re.sub(r'[^\w]', '', w['text'].casefold()) in name_tokens]
+        name_conf = [
+            word['conf'] for word in best.get('words', [])
+            if re.sub(r'[^\w]', '', word['text'].casefold()) in name_tokens
+        ]
         low = low or bool(name_conf and min(name_conf) < 45)
     if current:
-        with current.lock: current.confidences.append(best['confidence'])
-    if low: mark_sender_ocr_review()
+        with current.lock:
+            current.confidences.append(best.get('confidence', 0))
+    if low:
+        mark_sender_ocr_review()
     if OCR_PAGE_CACHE_SIZE and len(text) <= 128000:
         with _page_cache_lock:
             _page_cache[page_key] = (time.monotonic(), {'text': text, 'lowConfidence': low})
-            while len(_page_cache) > OCR_PAGE_CACHE_SIZE: _page_cache.popitem(last=False)
+            while len(_page_cache) > OCR_PAGE_CACHE_SIZE:
+                _page_cache.popitem(last=False)
     return text
 
 
@@ -1292,7 +1646,9 @@ def read_document(file_path, extension):
         metadata['senderConfidence'] = 'low'
         metadata['needsReview'] = list(dict.fromkeys(metadata['needsReview']+['receivedFrom']))
         metadata['senderReviewReasons'].append('Confirm the name because part of the scan had low OCR confidence.')
-    if not text.strip(): warn('No readable text was found. Upload a clearer scan or enter the fields manually.')
+    if not text.strip():
+        warn('No readable text was found. Upload a clearer scan or enter the fields manually.')
+        raise ValueError('No readable text was found. Upload a clearer scan or enter the fields manually.')
     return {'text': text, 'metadata': metadata, 'warnings': list(current.warnings) if current else [], 'pages': text.count('\f')+1}
 
 
@@ -1313,10 +1669,13 @@ if app is not None:
 
     @app.route('/health', methods=['GET'])
     def health():
+        with _reads_lock:
+            active_reads = len(_active_reads)
         return jsonify({
             'ok': True, 'success': True, 'service': 'PGENRO Intelligent Letter OCR & Classifier',
             'version': OCR_PARSER_VERSION, 'fullDocument': True, 'documentTimeoutSeconds': OCR_DOCUMENT_TIMEOUT,
-            'adaptive': True, 'tesseractAvailable': bool(shutil.which(TESSERACT_CMD) or Path(TESSERACT_CMD).is_file())
+            'adaptive': True, 'ocrLanguages': OCR_LANG.split('+'), 'activeReads': active_reads,
+            'tesseractAvailable': bool(shutil.which(TESSERACT_CMD) or Path(TESSERACT_CMD).is_file())
         }), 200
 
     @app.errorhandler(413)
@@ -1362,8 +1721,11 @@ if app is not None:
             with tempfile.TemporaryDirectory(prefix='PGENRO_OCR_') as tmp_dir:
                 tmp_path = Path(tmp_dir) / f'doc.{ext}'
                 uploaded_file.save(tmp_path)
-                if tmp_path.stat().st_size > MAX_BYTES:
+                uploaded_size = tmp_path.stat().st_size
+                if uploaded_size > MAX_BYTES:
                     return jsonify(success=False, error='The file exceeds 50 MB.'), 413
+                if uploaded_size == 0:
+                    return jsonify(success=False, error='The uploaded file is empty.'), 422
                 check_budget()
                 digest = hashlib.sha256(tmp_path.read_bytes()).hexdigest()
                 key = f'{OCR_PARSER_VERSION}:{OCR_LANG}:{ext}:{digest}'
@@ -1374,10 +1736,14 @@ if app is not None:
                     cache_result(key, result)
             check_budget()
             reading_progress(stage='Complete')
+            duration_ms = round((time.monotonic() - state.started) * 1000)
+            reading_stats = state.snapshot()
+            reading_stats['ocrPasses'] = state.passes
+            reading_stats['cacheHit'] = hit
             return jsonify({
                 'success': True, 'filename': filename, 'requestId': request_id,
-                'characters': len(result['text']), 'durationMs': round((time.monotonic()-state.started)*1000),
-                'parserVersion': OCR_PARSER_VERSION, 'cacheHit': hit, **result,
+                'characters': len(result['text']), 'durationMs': duration_ms, 'processingMs': duration_ms,
+                'parserVersion': OCR_PARSER_VERSION, 'cacheHit': hit, 'readingStats': reading_stats, **result,
                 **communication_form_payload(result['metadata'], result['text'], request.form.get('communicationType', 'Incoming'))
             }), 200
         except ReadCancelled as error:
@@ -1386,9 +1752,15 @@ if app is not None:
         except (DocumentTimeout, subprocess.TimeoutExpired) as error:
             reading_progress(stage='Time limit reached')
             return jsonify(success=False, error='Reading reached the time limit. Use a smaller document or increase the OCR timeout.', requestId=request_id), 408
-        except (ValueError, zipfile.BadZipFile, ET.ParseError, UnidentifiedImageError) as error:
+        except ValueError as error:
             reading_progress(stage='Document could not be read')
-            return jsonify(success=False, error=str(error), requestId=request_id), 422
+            message = str(error)
+            status_code = 400 if 'password protected' in message.casefold() else 422
+            return jsonify(success=False, error=message, requestId=request_id), status_code
+        except (fitz.FileDataError, fitz.EmptyFileError, zipfile.BadZipFile, ET.ParseError, UnidentifiedImageError) as error:
+            reading_progress(stage='Document could not be read')
+            message = 'The uploaded file is invalid or unreadable.'
+            return jsonify(success=False, error=message, requestId=request_id), 400
         except Exception as error:
             reading_progress(stage='Reading failed')
             return jsonify(success=False, error=str(error), requestId=request_id), 500

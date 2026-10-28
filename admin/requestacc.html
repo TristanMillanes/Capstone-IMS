@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Account Access Requests</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link href="requestacc.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="requestacc.css?v=20261027-emerald-v6" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Account Requests">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Account Requests" data-design="emerald-v6">
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
 
@@ -110,7 +110,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -128,7 +128,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Account Requests</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Account Requests</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -249,21 +249,11 @@
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <section class="page-header depth-hero unified-page-header"><div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" x2="19" y1="8" y2="14"></line><line x1="22" x2="16" y1="11" y2="11"></line></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Account Requests</span></div><h1>Account Requests</h1>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Account Requests</span></div><h1>Account Requests</h1>
 <p>Review applications and provide the right access to your office workspace.</p></div><div class="header-actions"><button class="btn btn-secondary" id="refreshRequestsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button><a class="btn btn-secondary" href="Usermanagement.html"><i data-lucide="users"></i> User Directory</a></div>
-<div aria-hidden="true" class="depth-scene">
-<span class="depth-orbit"></span><span class="depth-orb"></span>
-<div class="depth-stack">
-<span class="depth-sheet depth-sheet-back"></span>
-<span class="depth-sheet depth-sheet-middle"></span>
-<span class="depth-sheet depth-sheet-front">
-<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-</span>
-</div><span class="depth-scene-dot"></span>
-</div>
+
 </section>
-<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingCount">0</h3><span class="kpi-trend">Awaiting review</span></div><div class="kpi-footer"><span>Verify applicant details</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Approved Accounts</span><div class="kpi-icon emerald"><i data-lucide="user-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statApprovedCount">0</h3><span class="kpi-trend">Access granted</span></div><div class="kpi-footer"><span>Approved request history</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Declined Requests</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statRejectedCount">0</h3><span class="kpi-trend">Declined applications</span></div><div class="kpi-footer"><span>Review reasons and remarks</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Total Applications</span><div class="kpi-icon blue"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalCount">0</h3><span class="kpi-trend">All access requests</span></div><div class="kpi-footer"><span>Live account request registry</span></div></div></section>
+<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Pending Requests</span></div><div class="kpi-body"><h3 class="counter" id="statPendingCount">0</h3><span class="kpi-trend">Awaiting review</span></div><div class="kpi-footer"><span>Verify applicant details</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Approved Accounts</span></div><div class="kpi-body"><h3 class="counter" id="statApprovedCount">0</h3><span class="kpi-trend">Access granted</span></div><div class="kpi-footer"><span>Approved request history</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Declined Requests</span></div><div class="kpi-body"><h3 class="counter" id="statRejectedCount">0</h3><span class="kpi-trend">Declined applications</span></div><div class="kpi-footer"><span>Review reasons and remarks</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Total Applications</span></div><div class="kpi-body"><h3 class="counter" id="statTotalCount">0</h3><span class="kpi-trend">All access requests</span></div><div class="kpi-footer"><span>Live account request registry</span></div></div></section>
 <section class="table-card">
 <div style="padding:18px 18px 0"><div class="table-toolbar"><div class="table-toolbar-left"><input class="filter-input" id="requestSearchInput" placeholder="Search name, email, request ID, Gov ID..." type="search"><select class="filter-select" id="divisionFilterSelect"><option value="ALL">All Divisions</option><option value="Admin Office">Admin Office</option><option value="Environment Management">Environment Management</option><option value="Forestry Division">Forestry Division</option><option value="Mines &amp; Quarry">Mines &amp; Quarry</option><option value="Administrative and Finance Division">Administrative &amp; Finance</option><option value="Environmental Management Division">Environmental Management Division</option><option value="Forest Management Division">Forest Management Division</option><option value="Mines and Geosciences Division">Mines &amp; Geosciences Division</option><option value="Office of the PG-ENRO">Office of the PG-ENRO</option></select><select class="filter-select" id="statusFilterSelect"><option value="ALL">All Status</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div><div class="table-toolbar-right"><button class="btn btn-secondary btn-sm" disabled id="bulkApproveBtn" type="button"><i data-lucide="check-check"></i> Approve Selected</button><button class="btn btn-danger btn-sm" disabled id="bulkRejectBtn" type="button"><i data-lucide="x-circle"></i> Reject Selected</button></div></div></div>
 <div class="table-responsive"><table class="data-table data-table unified-records-table" data-ui-columns="9" style="--ui-table-min:1080px;"><thead><tr><th width="40"><input id="selectAllCheckbox" type="checkbox"></th><th>Request / Date</th><th>Applicant</th><th>Division</th><th>Requested Role</th><th>Assigned Role</th><th>Endorsement</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead><tbody id="requestTableBody"><tr><td colspan="8" style="text-align:center;padding:36px;color:#64748b">Loading access requests...</td></tr></tbody></table></div>
@@ -279,7 +269,7 @@
 <div aria-hidden="true" class="modal-backdrop" id="systemConfirmModal"><div aria-labelledby="confirmModalTitle" aria-modal="true" class="modal-container confirm-modal-card" role="dialog" style="max-width:430px"><div class="modal-body"><div class="confirm-icon-box" id="confirmModalIconBox"><i data-lucide="alert-triangle"></i></div><h3 id="confirmModalTitle">Confirm Action</h3><p id="confirmModalDesc" style="color:var(--slate-500);margin-top:8px">Are you sure?</p><div class="confirm-modal-actions"><button class="btn btn-secondary" id="confirmModalCancelBtn" type="button">Cancel</button><button class="btn btn-danger" id="confirmModalActionBtn" type="button">Confirm</button></div></div></div></div>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer src="requestacc.js?v=20261013-layout-v2"></script>
+<script defer src="requestacc.js?v=20261027-emerald-v6"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">

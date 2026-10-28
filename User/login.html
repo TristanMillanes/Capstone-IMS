@@ -9,9 +9,9 @@
 <title>PGENRO IMS | Sign in</title>
 <link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect"/>
 <link crossorigin="" href="https://zssrxubajhqryrwijyzm.supabase.co" rel="preconnect"/>
-<link href="login-modern.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+<link href="login-modern.css?v=20261026-public-service" rel="stylesheet"/>
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="login-modern.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="login-modern.js?v=20261026-public-service"></script>
 </head>
 <body class="pgenro-auth pgenro-login ui-unified" data-css-scope="auth-login" data-motion="paused">
 <svg aria-hidden="true" class="icon-definitions" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -160,6 +160,7 @@
 <div id="messageContent"></div>
 <button aria-label="Dismiss message" class="alert-dismiss-btn" id="dismissAlert" type="button"><svg aria-hidden="true" class="icon"><use href="#icon-close"></use></svg></button>
 </div>
+<p class="ics-signin-notice" id="icsSignInNotice" role="status" hidden>After sign-in, your Inventory Custodian Slip form will open automatically.</p>
 <form autocomplete="on" id="loginForm" novalidate="">
 <div class="input-group">
 <label class="input-label" for="email">Email address</label>
@@ -185,7 +186,8 @@
 <div aria-live="polite" class="loading-status" hidden="" id="loadingOverlay" role="status"><strong id="loadingStatusHeading">Signing in.</strong> <span id="loadingStatusText">Checking your account…</span></div>
 </form>
 <div class="card-divider"><span>Other access</span></div>
-<nav aria-label="Account and visitor access" class="secondary-access">
+<nav aria-label="Account, visitor, and service request access" class="secondary-access">
+<div class="access-card-entry ics-access-entry"><a class="ics-access-btn" id="serviceRequestAccessBtn" data-access-link="" href="service-request-form.html"><span class="secondary-icon"><svg aria-hidden="true" class="icon"><use href="#icon-folder"></use></svg></span><span class="access-copy"><strong>Service Request · Fill Up Form</strong><small>Fill out and submit a service request directly</small></span><svg aria-hidden="true" class="icon access-arrow"><use href="#icon-arrow-up"></use></svg></a></div>
 <div class="access-card-entry"><a class="access-request" data-access-link="" href="requestacc.html"><span class="secondary-icon"><svg aria-hidden="true" class="icon"><use href="#icon-user-plus"></use></svg></span><span class="access-copy"><strong>Request account</strong><small>For new staff</small></span><svg aria-hidden="true" class="icon access-arrow"><use href="#icon-arrow-up"></use></svg></a></div>
 <div class="access-card-entry"><a class="visitor-access-btn" data-access-link="" href="../VisitorsLog/visitorslog.html"><span class="secondary-icon"><svg aria-hidden="true" class="icon"><use href="#icon-visitor"></use></svg></span><span class="access-copy"><strong>Visitors log</strong><small>Visitor access</small></span><svg aria-hidden="true" class="icon access-arrow"><use href="#icon-arrow-up"></use></svg></a></div>
 </nav>

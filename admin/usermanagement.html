@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | User Management</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <meta content="20261011-admin-user-v7" name="pgenro-user-management-build">
 <script>window.PGENRO_ADMIN_FUNCTION='admin-user';window.PGENRO_USER_MANAGEMENT_BUILD='20261011-admin-user-v7';</script>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
@@ -14,10 +14,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <!-- Lucide Icons -->
 <!-- CSS -->
-<link href="Usermanagement.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="Usermanagement.css?v=20261027-emerald-v6" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="Usermanagement.html" data-css-scope="admin-users" data-user-management-access="admin" data-unified-ui="20261013" data-module-title="User Management">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="Usermanagement.html" data-css-scope="admin-users" data-user-management-access="admin" data-unified-ui="20261013" data-module-title="User Management" data-design="emerald-v6">
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -116,7 +116,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -136,7 +136,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>User Management</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>User Management</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -260,7 +260,7 @@
 <!-- PAGE HEADER -->
 <section class="page-header depth-hero unified-page-header">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-user-cog"><path d="M10 15H6a4 4 0 0 0-4 4v2"></path><path d="m14.305 16.53.923-.382"></path><path d="m15.228 13.852-.923-.383"></path><path d="m16.852 12.228-.383-.923"></path><path d="m16.852 17.772-.383.924"></path><path d="m19.148 12.228.383-.923"></path><path d="m19.53 18.696-.382-.924"></path><path d="m20.772 13.852.924-.383"></path><path d="m20.772 16.148.924.383"></path><circle cx="18" cy="15" r="3"></circle><circle cx="9" cy="7" r="4"></circle></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">User Management</span></div><h1>User Management <span class="role-badge-pill" id="userManagementBuild">v7</span></h1>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">User Management</span></div><h1>User Management <span class="role-badge-pill" id="userManagementBuild">v7</span></h1>
 <p>Manage authorized accounts, roles, and access to your workspace.</p>
 </div>
 <div class="header-actions"><button class="btn btn-secondary" id="refreshUsersBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
@@ -273,29 +273,10 @@
 <span>Add New User</span>
 </button>
 </div>
-<div aria-hidden="true" class="depth-scene">
 
-  <span class="depth-orbit"></span><span class="depth-orb"></span>
-
-  <div class="depth-stack">
-
-    <span class="depth-sheet depth-sheet-back"></span>
-
-    <span class="depth-sheet depth-sheet-middle"></span>
-
-    <span class="depth-sheet depth-sheet-front">
-
-      <span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-
-      <span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-
-    </span>
-
-  </div><span class="depth-scene-dot"></span>
-</div>
 </section>
 <!-- KPI SUMMARY CARDS -->
-<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Total Accounts</span><div class="kpi-icon emerald"><i data-lucide="users"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalUsers">0</h3><span class="kpi-trend">Personnel accounts</span></div><div class="kpi-footer"><span>Registered account profiles</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Active Administrators</span><div class="kpi-icon blue"><i data-lucide="shield-check"></i></div></div><div class="kpi-body"><h3 class="counter" id="statTotalAdmins">0</h3><span class="kpi-trend">Administrator accounts</span></div><div class="kpi-footer"><span>Active access to admin modules</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Pending Requests</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="statPendingRequests">0</h3><span class="kpi-trend">Awaiting account review</span></div><div class="kpi-footer"><span>Review Account Requests</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Suspended / Inactive</span><div class="kpi-icon purple"><i data-lucide="user-x"></i></div></div><div class="kpi-body"><h3 class="counter" id="statSuspendedUsers">0</h3><span class="kpi-trend">Restricted access</span></div><div class="kpi-footer"><span>Inactive or suspended accounts</span></div></div></section>
+<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Total Accounts</span></div><div class="kpi-body"><h3 class="counter" id="statTotalUsers">0</h3><span class="kpi-trend">Personnel accounts</span></div><div class="kpi-footer"><span>Registered account profiles</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Active Administrators</span></div><div class="kpi-body"><h3 class="counter" id="statTotalAdmins">0</h3><span class="kpi-trend">Administrator accounts</span></div><div class="kpi-footer"><span>Active access to admin modules</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Pending Requests</span></div><div class="kpi-body"><h3 class="counter" id="statPendingRequests">0</h3><span class="kpi-trend">Awaiting account review</span></div><div class="kpi-footer"><span>Review Account Requests</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Suspended / Inactive</span></div><div class="kpi-body"><h3 class="counter" id="statSuspendedUsers">0</h3><span class="kpi-trend">Restricted access</span></div><div class="kpi-footer"><span>Inactive or suspended accounts</span></div></div></section>
 <!-- USER TABLE & FILTERS SECTION -->
 <section class="dashboard-section">
 <div aria-live="polite" class="user-management-feedback" hidden="" id="userManagementFeedback" role="status"></div>
@@ -456,7 +437,7 @@
 <!-- JS -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- This module owns its Supabase session/access controller in the versioned script below. -->
-<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management v7 script is missing. Upload Usermanagement.admin-user.v7.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.admin-user.v7.js?v=20261013-layout-v2"></script>
+<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management v7 script is missing. Upload Usermanagement.admin-user.v7.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.admin-user.v7.js?v=20261027-emerald-v6"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 

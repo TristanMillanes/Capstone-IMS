@@ -1,13 +1,15 @@
 # OCR regression checks
 
-Run these commands from `Capstone-IMS/verification/ocr`:
+Run the core OCR and front-end mapping checks from `Capstone-IMS/verification/ocr`:
 
 ```bash
-node header-fields.test.cjs
-node printed-sender.test.cjs
-node ../../admin/verification/memo-parser.test.cjs
-node ../../admin/verification/memorandum-routing.test.cjs
+python functional-server-tests.py
+node frontend-ocr-contract.test.cjs
+node --check ../../admin/admincommunication.js
+node --check ../../admin/officememo-admin.js
 ```
+
+The Python suite uses the production Flask test client and local Tesseract. The front-end contract test exercises the actual form-mapping function with labelled status, action, remarks, and source-office fallback examples. Browser automation tests below require the listed Playwright dependencies and Chromium.
 
 For the real browser reader checks, install the test dependencies and Chromium:
 

@@ -500,12 +500,12 @@
 
   // Operational Modules Definition
   const activityModules = [
-    { key: "communications", label: "Communications", table: "communications", href: "admincommunication.html", color: "#4b9da7" },
-    { key: "memos", label: "Office Memos", table: "office_memos", href: "officememo-admin.html", color: "#278560" },
-    { key: "travel", label: "Travel Orders", table: "travel_orders", href: "travelOR-admin.html", color: "#8b7ac7" },
-    { key: "visitors", label: "Visitors", table: "visitors", href: "visitors-admin.html", color: "#c79b46" },
-    { key: "services", label: "Service Requests", table: "service_requests", href: "serviceAdmin.html", color: "#ce7d78" },
-    { key: "ics", label: "ICS Property Slips", table: "ics_records", href: "ics-admin.html", color: "#7caa9f" }
+    { key: "communications", label: "Communications", table: "communications", href: "admincommunication.html", color: "#059669" },
+    { key: "memos", label: "Office Memos", table: "office_memos", href: "officememo-admin.html", color: "#35a7a0" },
+    { key: "travel", label: "Travel Orders", table: "travel_orders", href: "travelOR-admin.html", color: "#8b7fc6" },
+    { key: "visitors", label: "Visitors", table: "visitors", href: "visitors-admin.html", color: "#d5a13c" },
+    { key: "services", label: "Service Requests", table: "service_requests", href: "serviceAdmin.html", color: "#d77988" },
+    { key: "ics", label: "ICS Property Slips", table: "ics_records", href: "ics-admin.html", color: "#709fa8" }
   ];
 
   const moduleTableKeys = {
@@ -793,8 +793,108 @@
   const chartInstances = new Map();
   const chartFailures = new Set();
   const chartTheme = () => document.documentElement.dataset.theme === "dark"
-    ? { text: "#a9c6bb", grid: "#294b3e", surface: "#142c23", total: "#ecf7f1", tip: "#071c14" }
-    : { text: "#71857a", grid: "#e8efe9", surface: "#ffffff", total: "#163d2b", tip: "#163d2b" };
+    ? { text: "#a5c1b1", grid: "#25483c", surface: "#102a23", total: "#ecf8f0", tip: "#091c17" }
+    : { text: "#627e70", grid: "#dfeae4", surface: "#ffffff", total: "#163b2e", tip: "#065f46" };
+
+  let chartTooltip = null, chartTooltipOwner = null, chartTooltipContent = "", touchSelectionChart = null;
+  function hideChartTooltip() {
+    if (chartTooltip) chartTooltip.hidden = true;
+    chartTooltipOwner = null; touchSelectionChart = null;
+  }
+
+  // A single viewport-level tooltip avoids clipping inside the personnel scroller.
+  // Use the canvas's displayed size, not its retina bitmap or page scroll offsets.
+  function renderChartTooltip({ chart, tooltip }) {
+    if (!tooltip.opacity || !tooltip.dataPoints?.length) {
+      if (chartTooltipOwner === chart) hideChartTooltip();
+      return;
+    }
+    if (!chartTooltip) {
+      chartTooltip = document.createElement("div");
+      chartTooltip.className = "analytics-pointer-tooltip";
+      chartTooltip.id = "analyticsPointerTooltip";
+      chartTooltip.setAttribute("role", "tooltip");
+      document.body.appendChild(chartTooltip);
+    }
+    const rows = tooltip.dataPoints.map((point, index) => {
+      const parsed = point.parsed;
+      const value = chart.config.type === "doughnut" ? parsed
+        : chart.options.indexAxis === "y" ? parsed.x : parsed.y;
+      const colors = tooltip.labelColors[index];
+      const color = chart.config.type === "line" ? colors?.borderColor : colors?.backgroundColor;
+      return { label: point.dataset.label || point.label, value: Number(value || 0).toLocaleString("en-PH"), color };
+    });
+    const title = (tooltip.title || []).join(" ");
+    const content = JSON.stringify([chart.canvas.id, title, rows]);
+    if (content !== chartTooltipContent) {
+      const heading = document.createElement("strong");
+      heading.className = "analytics-tooltip-title"; heading.textContent = title;
+      const items = rows.map(row => {
+        const item = document.createElement("div"), swatch = document.createElement("i");
+        const label = document.createElement("span"), count = document.createElement("strong");
+        item.className = "analytics-tooltip-row"; swatch.setAttribute("aria-hidden", "true");
+        swatch.style.backgroundColor = typeof row.color === "string" ? row.color : "#278560";
+        label.textContent = row.label; count.textContent = row.value;
+        item.append(swatch, label, count); return item;
+      });
+      chartTooltip.replaceChildren(heading, ...items); chartTooltipContent = content;
+    }
+    chartTooltipOwner = chart; chartTooltip.hidden = false;
+    const viewport = window.visualViewport;
+    const viewportWidth = viewport?.width || innerWidth, viewportHeight = viewport?.height || innerHeight;
+    const currentBox = chartTooltip.getBoundingClientRect(), style = getComputedStyle(chartTooltip);
+    const scaleX = currentBox.width / parseFloat(style.width) || 1;
+    const scaleY = currentBox.height / parseFloat(style.height) || 1;
+    chartTooltip.style.maxWidth = `${Math.max(1, Math.min(320, viewportWidth - 24)) / scaleX}px`;
+    chartTooltip.style.maxHeight = `${Math.max(1, viewportHeight - 16) / scaleY}px`;
+    const rect = chart.canvas.getBoundingClientRect();
+    const anchorX = rect.left + tooltip.caretX * rect.width / chart.width;
+    const anchorY = rect.top + tooltip.caretY * rect.height / chart.height;
+    const leftEdge = (viewport?.offsetLeft || 0) + 8, topEdge = (viewport?.offsetTop || 0) + 8;
+    const rightEdge = leftEdge + viewportWidth - 16;
+    const bottomEdge = topEdge + viewportHeight - 16;
+    const box = chartTooltip.getBoundingClientRect(), width = box.width, height = box.height;
+    const left = anchorX + 12 + width <= rightEdge ? anchorX + 12 : anchorX - width - 12;
+    const top = anchorY + 12 + height <= bottomEdge ? anchorY + 12 : anchorY - height - 12;
+    chartTooltip.style.left = `${Math.max(leftEdge, Math.min(left, rightEdge - width)) / scaleX}px`;
+    chartTooltip.style.top = `${Math.max(topEdge, Math.min(top, bottomEdge - height)) / scaleY}px`;
+  }
+  // A scroll can move a canvas without a mouse event. Hide the old information
+  // immediately; the next pointer/touch event computes fresh coordinates.
+  document.addEventListener("scroll", hideChartTooltip, { capture: true, passive: true });
+  window.addEventListener("resize", hideChartTooltip, { passive: true });
+  window.visualViewport?.addEventListener("resize", hideChartTooltip, { passive: true });
+  window.visualViewport?.addEventListener("scroll", hideChartTooltip, { passive: true });
+  document.addEventListener("pointermove", event => {
+    if (event.pointerType === "mouse") {
+      touchSelectionChart = null;
+      if (chartTooltipOwner && event.target !== chartTooltipOwner.canvas) hideChartTooltip();
+    }
+  }, { passive: true });
+  document.addEventListener("pointerdown", event => {
+    if (chartTooltipOwner && event.target !== chartTooltipOwner.canvas) hideChartTooltip();
+  }, { passive: true });
+  document.addEventListener("keydown", event => { if (event.key === "Escape") hideChartTooltip(); });
+
+  const chartPointerCoordinates = {
+    id: "pgenroPointerCoordinates",
+    beforeEvent(chart, args) {
+      const { event } = args;
+      // Touch taps can emit a synthetic mouseout immediately afterwards. Keep
+      // their selection until another tap, a real mouse move, scroll or Escape.
+      if (event.type === "mouseout") return touchSelectionChart === chart ? false : undefined;
+      const native = event.native, pointer = native?.touches?.[0] || native?.changedTouches?.[0] || native;
+      if (native?.type?.startsWith("touch")) touchSelectionChart = chart;
+      if (!Number.isFinite(pointer?.clientX) || !Number.isFinite(pointer?.clientY)) return;
+      const rect = chart.canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      // offsetX/offsetY can use different units under CSS zoom. Normalize both
+      // hit testing and tooltip anchoring from the same visible canvas rectangle.
+      event.x = (pointer.clientX - rect.left) * chart.width / rect.width;
+      event.y = (pointer.clientY - rect.top) * chart.height / rect.height;
+      args.inChartArea = chart.isPointInArea(event);
+    }
+  };
 
   const doughnutTotal = {
     id: "pgenroDoughnutTotal",
@@ -822,11 +922,12 @@
       responsive: true, maintainAspectRatio: false, resizeDelay: 0,
       animation: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? false : { duration: 220 },
       font: { family: "Inter, system-ui, sans-serif" },
-      interaction: { mode: doughnut ? "nearest" : "index", intersect: doughnut, axis: horizontal ? "y" : "x" },
+      interaction: { mode: doughnut ? "nearest" : "index", intersect: doughnut, axis: doughnut ? "xy" : horizontal ? "y" : "x" },
       layout: { padding: { top: 8, bottom: 2, left: 0, right: 8 } },
       plugins: {
-        legend: { display: legend, position: "bottom", labels: { color: theme.text, usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7, padding: 13, font: { family: "Inter, system-ui, sans-serif", size: 10 } } },
-        tooltip: { backgroundColor: theme.tip, titleColor: "#fff", bodyColor: "#ddefe4", padding: 12, cornerRadius: 10, displayColors: true,
+        legend: { display: legend, position: "bottom", labels: { color: theme.text, usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7, padding: 13, font: { family: "Inter, system-ui, sans-serif", size: 11 } } },
+        tooltip: { enabled: false, external: renderChartTooltip, position: "pgenroPointer", animation: false, animations: false,
+          backgroundColor: theme.tip, titleColor: "#fff", bodyColor: "#ddefe4", padding: 12, cornerRadius: 10, displayColors: true,
           callbacks: { label(context) {
             const value = doughnut ? context.parsed : horizontal ? context.parsed.x : context.parsed.y;
             return `${context.dataset.label || context.label}: ${Number(value || 0).toLocaleString("en-PH")}`;
@@ -836,48 +937,55 @@
     };
     if (doughnut) { result.cutout = "74%"; return result; }
     result.indexAxis = horizontal ? "y" : "x";
-    const numbers = { beginAtZero: true, suggestedMax: 1, border: { display: false }, grid: { color: theme.grid, drawTicks: false }, ticks: { precision: 0, padding: 8, color: theme.text, font: { size: 10 } } };
-    const labels = { border: { display: false }, grid: { display: false }, ticks: { autoSkip: !horizontal, maxRotation: 0, maxTicksLimit: horizontal ? 24 : 8, padding: 8, color: theme.text, font: { size: 10 } } };
+    const numbers = { beginAtZero: true, suggestedMax: 1, border: { display: false }, grid: { color: theme.grid, drawTicks: false }, ticks: { precision: 0, padding: 8, color: theme.text, font: { size: 11 } } };
+    const labels = { border: { display: false }, grid: { display: false }, ticks: { autoSkip: !horizontal, maxRotation: 0, maxTicksLimit: horizontal ? 24 : 8, padding: 8, color: theme.text, font: { size: 11 } } };
     result.scales = horizontal ? { x: numbers, y: labels } : { x: labels, y: numbers };
     return result;
   }
 
   function lineArea(context) {
     const { chart } = context, area = chart.chartArea;
-    if (!area) return "#27856018";
+    if (!area) return "#05966918";
     const gradient = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
-    gradient.addColorStop(0, "#27856036"); gradient.addColorStop(1, "#27856000"); return gradient;
+    gradient.addColorStop(0, "#05966936"); gradient.addColorStop(1, "#05966900"); return gradient;
   }
 
   function chartConfig(id) {
     if (id === "monthlyChart") return {
       type: "line", data: { labels: [], datasets: [
-        { label: "Documents & ICS", borderColor: "#278560", backgroundColor: lineArea, fill: true },
-        { label: "Travel orders", borderColor: "#8b7ac7" },
-        { label: "Visitors", borderColor: "#c79b46" },
-        { label: "Service requests", borderColor: "#ce7d78" }
-      ].map(ds => ({ ...ds, data: [], tension: .25, borderWidth: 2.3, pointRadius: 0, pointHoverRadius: 4, pointHitRadius: 12 })) },
-      options: chartOptions({ legend: true })
+        { label: "Documents & ICS", borderColor: "#059669", backgroundColor: lineArea, fill: true },
+        { label: "Travel orders", borderColor: "#8b7fc6" },
+        { label: "Visitors", borderColor: "#d5a13c" },
+        { label: "Service requests", borderColor: "#d77988" }
+      ].map(ds => ({ ...ds, data: [], tension: .25, borderWidth: 2.3, pointRadius: 2, pointHoverRadius: 5, pointHitRadius: 12 })) },
+      options: chartOptions({ legend: true }),
+      plugins: [chartPointerCoordinates]
     };
     const donut = ["categoryChart", "commChart"].includes(id);
     const labels = id === "categoryChart" ? activityModules.map(m => m.label)
       : id === "commChart" ? ["Incoming", "Outgoing", "Internal", "Unclassified"]
       : id === "statusChart" ? ["Completed", "In progress", "Pending", "Archived", "Other"] : [];
     const colors = id === "categoryChart" ? activityModules.map(m => m.color)
-      : id === "commChart" ? ["#4b9da7", "#278560", "#8b7ac7", "#c79b46"]
-      : id === "statusChart" ? ["#278560", "#4b9da7", "#c79b46", "#94a3b8", "#b8c2bc"]
-      : ["#278560", "#4b9da7", "#8b7ac7", "#c79b46", "#ce7d78", "#7caa9f"];
+      : id === "commChart" ? ["#059669", "#35a7a0", "#8b7fc6", "#d5a13c"]
+      : id === "statusChart" ? ["#059669", "#4e88a8", "#d5a13c", "#8fa79c", "#bdcfc5"]
+      : ["#059669", "#35a7a0", "#8b7fc6", "#d5a13c", "#d77988", "#709fa8"];
     return {
       type: donut ? "doughnut" : "bar",
       data: { labels, datasets: [{ label: id === "personnelChart" ? "Personnel" : "Records", data: [], backgroundColor: colors,
         borderColor: chartTheme().surface, borderWidth: donut ? 3 : 0, borderRadius: donut ? 5 : 6, borderSkipped: false, maxBarThickness: 23, spacing: donut ? 2 : 0 }] },
-      options: chartOptions({ doughnut: donut, horizontal: !donut, legend: donut }),
-      plugins: donut ? [doughnutTotal] : []
+      options: chartOptions({ doughnut: donut, horizontal: !donut }),
+      plugins: donut ? [chartPointerCoordinates, doughnutTotal] : [chartPointerCoordinates]
     };
   }
 
   function initCharts() {
     if (typeof window.Chart !== "function") return;
+    // The default average position lands between line series or at a bar end.
+    // Anchor the information to the actual event, with no animation lag.
+    window.Chart.Tooltip.positioners.pgenroPointer = function(elements, position) {
+      if (!elements.length || !Number.isFinite(position?.x) || !Number.isFinite(position?.y)) return false;
+      return { x: position.x, y: position.y };
+    };
     for (const id of ["monthlyChart", "categoryChart", "statusChart", "personnelChart", "commChart"]) {
       const canvas = $(id);
       if (!canvas || chartInstances.has(id) || chartFailures.has(id)) continue;
@@ -895,11 +1003,12 @@
   }
 
   function updateDashboardCharts(model) {
+    hideChartTooltip();
     initCharts();
     for (const [id, chart] of chartInstances) {
       const horizontal = ["statusChart", "personnelChart"].includes(id);
       const doughnut = ["categoryChart", "commChart"].includes(id);
-      chart.options = chartOptions({ horizontal, doughnut, legend: doughnut || id === "monthlyChart" });
+      const options = chartOptions({ horizontal, doughnut, legend: id === "monthlyChart" });
       if (id === "monthlyChart") {
         chart.data.labels = model.buckets.map(b => b.label);
         ["documents", "travel", "visitors", "services"].forEach((key, i) => { chart.data.datasets[i].data = model.buckets.map(b => b[key]); });
@@ -910,22 +1019,55 @@
         const divisions = Object.entries(model.divisionCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
         chart.data.labels = divisions.map(([label]) => label);
         chart.data.datasets[0].data = divisions.map(([, value]) => value);
-        chart.canvas.parentElement.style.height = `${Math.max(240, divisions.length * 33 + 32)}px`;
-        chart.options.scales.y.ticks.callback = function(value) {
+        chart.canvas.parentElement.style.height = `${Math.max(240, divisions.length * 38 + 32)}px`;
+        options.scales.y.ticks.callback = function(value) {
           const text = String(this.getLabelForValue(value));
-          return text.length > 28 ? `${text.slice(0, 27)}…` : text;
+          const limit = this.chart.width < 380 ? 17 : 28;
+          return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
         };
       }
       if (doughnut) chart.data.datasets[0].borderColor = chartTheme().surface;
+      chart.options = options;
       // Realtime bursts and appearance changes must not queue five new animations.
       chart.update("none");
     }
+  }
+
+  // HTML legends keep full category names and totals outside the bounded canvas.
+  // Their buttons retain Chart.js's show/hide behavior and work with a keyboard.
+  function renderChartLegend(canvasId) {
+    const legend = $(`${canvasId}Legend`), chart = chartInstances.get(canvasId);
+    if (!legend) return;
+    legend.hidden = !chart || !chart.data.datasets[0].data.some(value => value > 0);
+    if (legend.hidden) { legend.replaceChildren(); return; }
+    const dataset = chart.data.datasets[0];
+    const buttons = chart.data.labels.map((label, index) => {
+      const button = document.createElement("button");
+      const swatch = document.createElement("i"), name = document.createElement("span"), value = document.createElement("strong");
+      const visible = chart.getDataVisibility(index);
+      button.type = "button"; button.className = "analytics-legend-item";
+      button.setAttribute("aria-pressed", String(visible));
+      button.setAttribute("aria-label", `${visible ? 'Hide' : 'Show'} ${label}`);
+      button.title = `${label}: ${Number(dataset.data[index]).toLocaleString("en-PH")} records`;
+      swatch.style.backgroundColor = dataset.backgroundColor[index]; swatch.setAttribute("aria-hidden", "true");
+      name.textContent = label; value.textContent = Number(dataset.data[index]).toLocaleString("en-PH");
+      button.append(swatch, name, value);
+      button.addEventListener("click", () => {
+        chart.toggleDataVisibility(index); chart.update("none");
+        const isVisible = chart.getDataVisibility(index);
+        button.setAttribute("aria-pressed", String(isVisible));
+        button.setAttribute("aria-label", `${isVisible ? 'Hide' : 'Show'} ${label}`);
+      });
+      return button;
+    });
+    legend.replaceChildren(...buttons);
   }
 
   const chartAppearanceObserver = new MutationObserver(scheduleAnalytics);
   chartAppearanceObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   window.addEventListener("pageshow", event => { if (event.persisted) { chartInstances.forEach(chart => chart.resize()); scheduleAnalytics(); } });
   window.addEventListener("pagehide", event => {
+    hideChartTooltip();
     if (event.persisted) return;
     clearTimeout(analyticsFrame);
     chartAppearanceObserver.disconnect();
@@ -1048,7 +1190,7 @@
     }
     if (trend) {
       const buckets = entries;
-      const colors = ["#278560", "#8b7ac7", "#c79b46", "#ce7d78"];
+      const colors = ["#059669", "#8b7fc6", "#d5a13c", "#d77988"];
       const keys = ["documents", "travel", "visitors", "services"];
       const labels = ["Documents & ICS", "Travel", "Visitors", "Services"];
       const maximum = Math.max(1, ...buckets.flatMap((b) => keys.map((key) => b[key])));
@@ -1090,7 +1232,9 @@
     nativeChart("categoryChart", model.breakdown.map((mod) => ({ label: mod.label, value: mod.current, color: mod.color })));
     nativeChart("statusChart", Object.entries(model.serviceStatuses).map(([label, value]) => ({ label: label === "progress" ? "In progress" : label[0].toUpperCase() + label.slice(1), value })));
     nativeChart("personnelChart", Object.entries(model.divisionCounts).map(([label, value]) => ({ label, value })));
-    nativeChart("commChart", ["incoming", "outgoing", "internal", "unclassified"].map((key, i) => ({ label: key[0].toUpperCase() + key.slice(1), value: model.commBreakdown[key], color: ["#4b9da7", "#278560", "#6366f1", "#f59e0b"][i] })));
+    nativeChart("commChart", ["incoming", "outgoing", "internal", "unclassified"].map((key, i) => ({ label: key[0].toUpperCase() + key.slice(1), value: model.commBreakdown[key], color: ["#059669", "#35a7a0", "#8b7fc6", "#d5a13c"][i] })));
+    renderChartLegend("categoryChart");
+    renderChartLegend("commChart");
   }
 
   function csvCell(value) {

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Visitor Management</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Font: Plus Jakarta Sans -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -12,10 +12,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <!-- Lucide Icons -->
 <!-- Unified Admin Stylesheets -->
-<link href="visitors-admin.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="visitors-admin.css?v=20261027-emerald-v6" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="visitors-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Visitors">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="visitors-admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Visitors" data-design="emerald-v6">
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION (1:1 with admin.html) -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -114,7 +114,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -134,7 +134,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Visitors</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Visitors</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -258,7 +258,7 @@
 <!-- PAGE HEADER -->
 <section class="page-header depth-hero unified-page-header" id="dashboard">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-clipboard-check"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"></rect><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><path d="m9 14 2 2 4-4"></path></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Visitors</span></div><h1>Visitors</h1>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Visitors</span></div><h1>Visitors</h1>
 <p>Keep a clear record of arrivals, office visits, and departures.</p>
 </div>
 <div class="header-actions">
@@ -266,28 +266,18 @@
 <button class="btn btn-secondary" id="refreshBtn" type="button"><i data-lucide="refresh-cw"></i><span>Sync Data</span></button>
 <button class="btn btn-primary" id="addVisitorBtn" type="button"><i data-lucide="user-plus"></i><span>New Visitor</span></button>
 </div>
-<div aria-hidden="true" class="depth-scene">
-<span class="depth-orbit"></span><span class="depth-orb"></span>
-<div class="depth-stack">
-<span class="depth-sheet depth-sheet-back"></span>
-<span class="depth-sheet depth-sheet-middle"></span>
-<span class="depth-sheet depth-sheet-front">
-<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-</span>
-</div><span class="depth-scene-dot"></span>
-</div>
+
 </section>
 <!-- KPI METRICS GRID (1:1 styling with admin.html) -->
 <section class="kpi-grid unified-metric-grid">
 <div class="kpi-card unified-metric unified-metric-featured">
 <div class="kpi-header">
 <span class="kpi-label">Total Visitor Records</span>
-<div class="kpi-icon emerald"><i data-lucide="users"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="summaryTotal">0</h3>
-<span class="kpi-trend positive"><i data-lucide="trending-up"></i> All recorded visits</span>
+<span class="kpi-trend positive"> All recorded visits</span>
 </div>
 <div class="kpi-footer">
 <a href="#visitor-records">View Complete Registry →</a>
@@ -296,11 +286,11 @@
 <div class="kpi-card unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Today's Arrivals</span>
-<div class="kpi-icon blue"><i data-lucide="calendar-clock"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="summaryToday">0</h3>
-<span class="kpi-trend positive"><i data-lucide="calendar-days"></i> <span id="todayDateStr">Today</span></span>
+<span class="kpi-trend positive"> <span id="todayDateStr">Today</span></span>
 </div>
 <div class="kpi-footer">
 <a href="#visitor-records">Arrivals checked in today →</a>
@@ -309,11 +299,11 @@
 <div class="kpi-card urgent-border unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Currently Inside</span>
-<div class="kpi-icon amber"><i data-lucide="badge-check"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="summaryInside">0</h3>
-<span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Active in facility</span>
+<span class="kpi-trend urgent"> Active in facility</span>
 </div>
 <div class="kpi-footer">
 <a href="#visitor-records">Monitor active occupants →</a>
@@ -322,11 +312,11 @@
 <div class="kpi-card unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Departed Today</span>
-<div class="kpi-icon purple"><i data-lucide="log-out"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="summaryCompletedToday">0</h3>
-<span class="kpi-trend neutral"><i data-lucide="circle-check"></i> Completed visits</span>
+<span class="kpi-trend neutral"> Completed visits</span>
 </div>
 <div class="kpi-footer">
 <a href="#visitor-records">Check sign-out passes →</a>
@@ -577,7 +567,7 @@
 <!-- SDKs & Script Controller -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer src="visitors-admin.js?v=20261013-layout-v2"></script>
+<script defer src="visitors-admin.js?v=20261027-emerald-v6"></script>
 <div aria-hidden="true" class="modal-backdrop" id="detailDrawer"><aside aria-labelledby="drawerName" aria-modal="true" class="modal-card visitor-detail-card" role="dialog">
 <div class="drawer-header modal-header">
 <div class="drawer-title-group">

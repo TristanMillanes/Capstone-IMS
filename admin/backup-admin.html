@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Workspace Backups</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -14,10 +14,10 @@
 <!-- Icons are rendered locally by admin.js. -->
 <!-- Chart.js -->
 <!-- Stylesheet -->
-<link href="backup-admin.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="backup-admin.css?v=20261027-emerald-v6" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="backup-admin.html" data-css-scope="admin-backup" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Backups">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="backup-admin.html" data-css-scope="admin-backup" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Backups" data-design="emerald-v6">
+
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
@@ -117,7 +117,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -137,7 +137,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Backups</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Backups</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -259,13 +259,13 @@
 <main class="main-content" id="adminMainContent" tabindex="-1">
 <div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
 <section aria-labelledby="backupTitle" class="page-header unified-page-header">
-<div class="header-title"><div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-database-backup"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 12a9 3 0 0 0 5 2.69"></path><path d="M21 9.3V5"></path><path d="M3 5v14a9 3 0 0 0 6.47 2.88"></path><path d="M12 12v4h4"></path><path d="M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"></path></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Backups</span></div><h1 id="backupTitle">Backups</h1><p>Save a copy of local module caches and preferences, or review a backup before restoring it.</p></div>
+<div class="header-title"><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Backups</span></div><h1 id="backupTitle">Backups</h1><p>Save a copy of local module caches and preferences, or review a backup before restoring it.</p></div>
 <div class="header-actions"><button class="btn btn-secondary" id="refreshBackupBtn" type="button"><i data-lucide="refresh-cw"></i>Refresh summary</button></div>
 </section>
 <section aria-label="Local backup summary" class="audit-metrics backup-metrics unified-metric-grid">
-<article class="audit-metric unified-metric unified-metric-featured"><div class="unified-metric-heading"><span class="audit-metric-label">Available keys</span><span class="kpi-icon emerald"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-database-backup"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 12a9 3 0 0 0 5 2.69"></path><path d="M21 9.3V5"></path><path d="M3 5v14a9 3 0 0 0 6.47 2.88"></path><path d="M12 12v4h4"></path><path d="M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"></path></svg></span></div><strong id="backupKeyCount">0</strong><small>Supported local workspace data</small></article>
-<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Backup size</span><span class="kpi-icon emerald"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-database-backup"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 12a9 3 0 0 0 5 2.69"></path><path d="M21 9.3V5"></path><path d="M3 5v14a9 3 0 0 0 6.47 2.88"></path><path d="M12 12v4h4"></path><path d="M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"></path></svg></span></div><strong id="backupBytes">0 B</strong><small>Estimated JSON file size</small></article>
-<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Last export</span><span class="kpi-icon emerald"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-database-backup"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M3 12a9 3 0 0 0 5 2.69"></path><path d="M21 9.3V5"></path><path d="M3 5v14a9 3 0 0 0 6.47 2.88"></path><path d="M12 12v4h4"></path><path d="M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"></path></svg></span></div><strong class="backup-date" id="backupLastExport">Never</strong><small>From this browser</small></article>
+<article class="audit-metric unified-metric unified-metric-featured"><div class="unified-metric-heading"><span class="audit-metric-label">Available keys</span></div><strong id="backupKeyCount">0</strong><small>Supported local workspace data</small></article>
+<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Backup size</span></div><strong id="backupBytes">0 B</strong><small>Estimated JSON file size</small></article>
+<article class="audit-metric unified-metric"><div class="unified-metric-heading"><span class="audit-metric-label">Last export</span></div><strong class="backup-date" id="backupLastExport">Never</strong><small>From this browser</small></article>
 </section>
 <section aria-label="Backup actions" class="backup-tools-grid">
 <article class="card backup-tool"><span class="backup-tool-icon"><i data-lucide="download"></i></span><span class="section-eyebrow">Save a copy</span><h2>Export workspace backup</h2><p>Download available local records and preferences as a JSON file. Keep the file somewhere you can find it later.</p><button class="btn btn-primary" id="downloadLocalBackupBtn" type="button"><i data-lucide="download"></i>Download backup</button></article>
@@ -285,7 +285,7 @@
 <!-- Backup module scripts -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer src="backup-admin.js?v=20261013-layout-v2"></script>
+<script defer src="backup-admin.js?v=20261027-emerald-v6"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

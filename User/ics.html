@@ -10,7 +10,7 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="https://unpkg.com/lucide@latest"></script>
-<link href="ics.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+<link href="ics.css?v=20261022-ics-form" rel="stylesheet"/>
 </head>
 <body class="pgenro-user depth-workspace ui-unified" data-css-scope="user-ics" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
 <div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
@@ -149,15 +149,16 @@
 </div>
 <h1>Inventory Custodian Slip</h1>
 <p>
-              Review semi-expendable property assignments, acquisition references,
-              serial numbers, recorded values, and accountable personnel.
+              Submit an Inventory Custodian Slip and track its review status,
+              property details, and accountable personnel in the shared registry.
             </p>
 </div>
 <div class="header-actions">
 <span class="access-pill">
 <span class="status-dot"></span>
-              Viewer access
+              Staff submissions
             </span>
+<button class="primary-action" id="fillIcsFormBtn" type="button" disabled><i data-lucide="clipboard-pen-line"></i><span>Fill Up ICS Form</span></button>
 <button class="secondary-action" id="printRegistryBtn" type="button">
 <i data-lucide="printer"></i>
 <span>Print Registry</span>
@@ -179,6 +180,7 @@
 </div><span class="depth-scene-dot"></span>
 </div>
 </section>
+<div class="ics-submission-success" id="icsSubmissionSuccess" role="status" hidden><div><strong>ICS form submitted</strong><p id="icsSubmissionSuccessText"></p></div><button class="secondary-action" id="viewSubmittedIcsBtn" type="button">View submitted record</button></div>
 <section aria-label="ICS summary" class="stats-grid reveal">
 <article class="stat-card">
 <div class="stat-icon green">
@@ -195,9 +197,9 @@
 <i data-lucide="package-open"></i>
 </div>
 <div class="stat-copy">
-<p>Total Issued Items</p>
+<p>Total Recorded Items</p>
 <h2 id="statIssuedItems">0</h2>
-<span>Combined issued quantity</span>
+<span>Combined recorded quantity</span>
 </div>
 </article>
 <article class="stat-card">
@@ -241,6 +243,7 @@
 <select aria-label="Filter by article or category" class="filter-select" id="filterArticleSelect">
 <option value="ALL">All Articles / Categories</option>
 </select>
+<select aria-label="Filter ICS records by review status" class="filter-select" id="filterIcsStatus"><option value="ALL">All statuses</option><option value="Pending">Pending review</option><option value="Active">Active</option><option value="Archived">Archived</option></select>
 </div>
 <div class="table-wrapper">
 <table class="data-table">
@@ -254,12 +257,13 @@
 <th class="qty-column">Quantity</th>
 <th class="value-column">Total Value</th>
 <th>Person Accountable</th>
+<th>Status</th>
 <th class="action-column">View</th>
 </tr>
 </thead>
 <tbody id="slipTableBody">
 <tr>
-<td class="empty-table-cell" colspan="9">
+<td class="empty-table-cell" colspan="10">
                     Connecting to ICS database records…
                   </td>
 </tr>
@@ -372,6 +376,14 @@
 <span class="spec-label">Person Accountable</span>
 <p class="custodian-name" id="modalAccountable">---</p>
 </div>
+<div class="detail-keyvalue-list ics-submission-details">
+<div class="kv-row"><span>Review status</span><strong id="modalIcsStatus">---</strong></div>
+<div class="kv-row"><span>Division / Unit</span><strong id="modalIcsDivision">---</strong></div>
+<div class="kv-row"><span>Item / Inventory No.</span><strong id="modalIcsItemNo">---</strong></div>
+<div class="kv-row"><span>Fund Cluster</span><strong id="modalIcsFundCluster">---</strong></div>
+<div class="kv-row"><span>Submitted by</span><strong id="modalIcsSubmittedBy">---</strong></div>
+<div class="kv-row"><span>Submitted on</span><strong id="modalIcsSubmittedAt">---</strong></div>
+</div>
 <div class="remarks-box">
 <span class="spec-label">Historical / Remarks</span>
 <p id="modalRemarks">No additional remarks noted.</p>
@@ -419,9 +431,10 @@
 </div>
 <div class="coa-meta-grid">
 <div><strong>Entity Name:</strong> Provincial Government</div>
-<div><strong>Fund Cluster:</strong> General Fund (01)</div>
+<div><strong>Fund Cluster:</strong> <span id="printFundCluster">General Fund (01)</span></div>
 <div><strong>ICS No.:</strong> <span id="printIcsNo">---</span></div>
 <div><strong>Control No.:</strong> <span id="printControlNo">---</span></div>
+<div><strong>Review status:</strong> <span id="printReviewStatus">---</span></div>
 </div>
 <table class="coa-table">
 <thead>
@@ -482,9 +495,17 @@
 </div>
 </div>
 </section>
+<section class="modal-backdrop ics-submission-modal" id="icsSubmissionModal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="icsSubmissionTitle" aria-describedby="icsSubmissionHelp">
+<div class="modal-container large">
+<div class="modal-header"><div class="modal-title-group"><span class="modal-header-icon"><i data-lucide="clipboard-pen-line"></i></span><div><span class="modal-kicker">Staff ICS submission</span><h2 id="icsSubmissionTitle">Fill Up ICS Form</h2><p id="icsSubmissionHelp">Required fields are marked *. Submitted records go to the administrator for review.</p></div></div><button class="modal-close-btn" id="closeIcsSubmissionBtn" type="button" aria-label="Close ICS form"><i data-lucide="x"></i></button></div>
+<form id="icsSubmissionForm" novalidate>
+<div class="modal-body"><div id="icsSubmissionFeedback" class="ics-form-feedback" role="alert" hidden></div><fieldset class="ics-form-section"><legend>Control & Identification</legend><p>Use the official reference numbers for this slip.</p><div class="ics-form-grid"><div class="ics-form-field"><label for="submission-controlNo">Control No. <span aria-hidden="true">*</span></label><input type="text" id="submission-controlNo" name="controlNo" required aria-required="true" maxlength="60" placeholder="e.g. ICS-2026-0001"></div><div class="ics-form-field"><label for="submission-icsNo">ICS No. <span aria-hidden="true">*</span></label><input type="text" id="submission-icsNo" name="icsNo" required aria-required="true" maxlength="60" placeholder="Official ICS number"></div><div class="ics-form-field"><label for="submission-entryNo">Entry No.</label><input type="text" id="submission-entryNo" name="entryNo" maxlength="60" placeholder="Entry / registry number"></div><div class="ics-form-field"><label for="submission-accountCode">Account Code</label><input type="text" id="submission-accountCode" name="accountCode" maxlength="60" placeholder="Account code"></div></div></fieldset><fieldset class="ics-form-section"><legend>Property Information</legend><p>Describe the property and its identifying details.</p><div class="ics-form-grid"><div class="ics-form-field"><label for="submission-article">Article / Category <span aria-hidden="true">*</span></label><input type="text" id="submission-article" name="article" required aria-required="true" maxlength="120" placeholder="e.g. Office Equipment"></div><div class="ics-form-field"><label for="submission-itemDescription">Item Description <span aria-hidden="true">*</span></label><input type="text" id="submission-itemDescription" name="itemDescription" required aria-required="true" maxlength="240" placeholder="Detailed property description"></div><div class="ics-form-field"><label for="submission-serialNo">Serial Number</label><input type="text" id="submission-serialNo" name="serialNo" maxlength="120" placeholder="Serial / service tag"></div><div class="ics-form-field"><label for="submission-itemNo">Item / Inventory No.</label><input type="text" id="submission-itemNo" name="itemNo" maxlength="120" placeholder="Property / inventory number"></div><div class="ics-form-field"><label for="submission-unit">Unit of Measure</label><input type="text" id="submission-unit" name="unit" maxlength="40" placeholder="Unit" value="unit"></div><div class="ics-form-field"><label for="submission-quantity">Quantity <span aria-hidden="true">*</span></label><input type="number" id="submission-quantity" name="quantity" required aria-required="true" value="1" inputmode="decimal" min="0.01" step="0.01"></div></div></fieldset><fieldset class="ics-form-section"><legend>Financial & Procurement</legend><p>The total value is calculated from quantity and unit cost.</p><div class="ics-form-grid"><div class="ics-form-field"><label for="submission-unitCost">Unit Cost (₱) <span aria-hidden="true">*</span></label><input type="number" id="submission-unitCost" name="unitCost" required aria-required="true" value="0" inputmode="decimal" min="0" step="0.01"></div><div class="ics-form-field"><label for="submission-dateAcquired">Date Acquired</label><input type="date" id="submission-dateAcquired" name="dateAcquired"></div><div class="ics-form-field"><label for="submission-fundCluster">Fund Cluster</label><input type="text" id="submission-fundCluster" name="fundCluster" maxlength="80" placeholder="Fund cluster" value="General Fund (01)"></div><div class="ics-form-field"><label for="submission-prNo">Purchase Request (P.R.) No.</label><input type="text" id="submission-prNo" name="prNo" maxlength="80" placeholder="P.R. number"></div><div class="ics-form-field"><label for="submission-prDate">P.R. Date</label><input type="date" id="submission-prDate" name="prDate"></div><div class="ics-form-field ics-total"><span>Total Value</span><output id="submissionTotalValue" aria-live="polite">₱0.00</output></div></div></fieldset><fieldset class="ics-form-section"><legend>Accountability</legend><p>Confirm the responsible person and office.</p><div class="ics-form-grid"><div class="ics-form-field"><label for="submission-accountablePerson">Person Accountable <span aria-hidden="true">*</span></label><input type="text" id="submission-accountablePerson" name="accountablePerson" required aria-required="true" maxlength="180" placeholder="Complete name of accountable employee"></div><div class="ics-form-field"><label for="submission-division">Division / Unit</label><input type="text" id="submission-division" name="division" maxlength="120" placeholder="Office / division"></div><div class="ics-form-field ics-form-wide"><label for="submission-remarks">Historical / Remarks</label><textarea id="submission-remarks" name="remarks" maxlength="1000" rows="3" placeholder="Condition, transfers, or additional notes"></textarea></div></div></fieldset></div>
+<div class="modal-footer"><p class="ics-submit-note">Your record will appear as <strong>Pending review</strong> in the user and admin registries.</p><button class="secondary-action" id="cancelIcsSubmissionBtn" type="button">Cancel</button><button class="primary-action" id="submitIcsBtn" type="submit"><i data-lucide="send"></i><span>Submit ICS Form</span></button></div>
+</form></div></section>
 <div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer="" src="ics.js?v=20261011-navigation-pdf-v2"></script>
+<script defer src="../shared/ics-records.js?v=20261026-private-ics"></script>
+<script defer="" src="ics.js?v=20261022-ics-form"></script>
 </body>
 </html>

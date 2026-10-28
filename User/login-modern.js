@@ -2,6 +2,11 @@
 (() => {
   "use strict";
 
+  if (['service','service-request'].includes(new URLSearchParams(window.location.search).get('next'))) {
+    window.location.replace('service-request-form.html');
+    return;
+  }
+
   const CONFIG = Object.freeze({
     url: "https://zssrxubajhqryrwijyzm.supabase.co",
     publishableKey: "sb_publishable_5RWFfJ5oN6ike6SSyafajw_yF9DYApP"
@@ -11,7 +16,10 @@
   const normalize = value => String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
   const isAdminRole = role => ADMIN_ROLES.has(normalize(role));
   const isApproved = profile => profile?.is_active === true && ["active", "approved"].includes(normalize(profile.status));
-  const routeFor = role => isAdminRole(role) ? "../admin/admin.html" : "../User/homepage.html";
+  const wantsIcs = () => new URLSearchParams(window.location.search).get('next') === 'ics';
+  const routeFor = role => wantsIcs()
+    ? (isAdminRole(role) ? '../admin/ics-admin.html?form=new' : 'ics.html?form=new')
+    : (isAdminRole(role) ? '../admin/admin.html' : '../User/homepage.html');
   const storage = {
     get(key, session = false) { try { return (session ? sessionStorage : localStorage).getItem(key); } catch { return null; } },
     set(key, value, session = false) { try { (session ? sessionStorage : localStorage).setItem(key, String(value)); } catch {} },
@@ -282,6 +290,13 @@
     el.password.addEventListener("keyup", checkCaps);
     el.password.addEventListener("blur", () => { el.capsLockWarning.hidden = true; });
     el.dismissAlert.addEventListener("click", hideMessage);
+
+    const selectIcs = () => {
+      document.getElementById('loginHeading').textContent = 'Sign in for your ICS form';
+      document.getElementById('icsSignInNotice').hidden = false;
+    };
+    if (wantsIcs()) selectIcs();
+
 
     // Only a still-current restore attempt may redirect. A submitted login takes priority.
     async function resumeSession() {

@@ -59,6 +59,30 @@ class FunctionalReaderTests(unittest.TestCase):
             self.assertEqual(second['filename'], 'renamed.png')
             self.record('Identical bytes reuse the read after renaming', second)
 
+    def test_optional_registry_fields_flow_to_frontend_form(self):
+        text = (
+            'REQUEST LETTER\n'
+            'CONTROL NO: REF-2026-181\n'
+            'DATE: September 20, 2026\n'
+            'TO: PROVINCIAL ENRO\n'
+            'SUBJECT: REQUEST FOR TECHNICAL ASSISTANCE\n'
+            'STATUS: Forwarded\n'
+            'ACTION TAKEN: Forwarded to Planning Division\n'
+            'REMARKS: Original received and logged.\n'
+            '\nDear Sir:\nPlease provide technical assistance.\n'
+            'Respectfully yours,\nMARIA L. SANTOS\nMunicipal Mayor'
+        )
+        metadata = reader.extract_document_metadata(text)
+        self.assertEqual(metadata['status'], 'Forwarded')
+        self.assertEqual(metadata['actionTaken'], 'Forwarded to Planning Division')
+        self.assertEqual(metadata['remarks'], 'Original received and logged.')
+        payload = reader.communication_form_payload(metadata, text, 'Incoming')
+        values = payload['formValues']
+        self.assertEqual(values['statusSelect'], 'Forwarded')
+        self.assertEqual(values['actionTakenInput'], 'Forwarded to Planning Division')
+        self.assertEqual(values['remarksInput'], 'Original received and logged.')
+        self.record('Explicit status, action and remarks populate the frontend form contract')
+
     def test_dates_and_memo_heading(self):
         text = 'REQUEST LETTER\nREF: TEST-901\nDATE: September 20, 2026\nDATE RECEIVED: October 1, 2026\nTO: PROVINCIAL ENRO\nSUBJECT: WORK\n\nPlease refer to memorandum 2026-099 dated October 3, 2026.\n\nRespectfully yours,\nMARIA L. SANTOS\nMunicipal Mayor'
         fields = reader.extract_document_metadata(text)
@@ -87,7 +111,7 @@ class FunctionalReaderTests(unittest.TestCase):
     def test_annex_and_ambiguous_names(self):
         text = 'REQUEST LETTER\nSUBJECT: WORK\n\nRespectfully yours,\nMARIA L. SANTOS\nDirector\n\f\nANNEX A\nSincerely,\nPEDRO R. REYES\nManager'
         self.assertEqual(reader.extract_document_metadata(text)['receivedFrom'], 'MARIA L. SANTOS')
-        fields = reader.extract_document_metadata(text.split('\f')[0] + '\nPEDRO R. REYES\nManager')
+        fields = reader.extract_document_metadata(text.split('\f')[0] + '\n\nRespectfully yours,\nPEDRO R. REYES\nManager')
         self.assertEqual(fields['receivedFrom'], '')
         self.assertIn('receivedFrom', fields['needsReview'])
         self.assertEqual(len(fields['signatoryCandidates']), 2)

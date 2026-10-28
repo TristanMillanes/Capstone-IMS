@@ -138,7 +138,7 @@
     });
   }
   // ICON_MAP is inserted while packaging, from the existing local Lucide subset.
-  const icons = {"activity":[["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],"arrow-left":[["path",{"d":"m12 19-7-7 7-7"}],["path",{"d":"M19 12H5"}]],"arrow-right":[["path",{"d":"M5 12h14"}],["path",{"d":"m12 5 7 7-7 7"}]],"badge":[["path",{"d":"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"}]],"briefcase":[["path",{"d":"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"}],["rect",{"width":"20","height":"14","x":"2","y":"6","rx":"2"}]],"building-2":[["path",{"d":"M10 12h4"}],["path",{"d":"M10 8h4"}],["path",{"d":"M14 21v-3a2 2 0 0 0-4 0v3"}],["path",{"d":"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"}],["path",{"d":"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"}]],"calendar":[["path",{"d":"M8 2v4"}],["path",{"d":"M16 2v4"}],["rect",{"width":"18","height":"18","x":"3","y":"4","rx":"2"}],["path",{"d":"M3 10h18"}]],"check":[["path",{"d":"M20 6 9 17l-5-5"}]],"check-circle-2":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"clipboard-list":[["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1","ry":"1"}],["path",{"d":"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"}],["path",{"d":"M12 11h4"}],["path",{"d":"M12 16h4"}],["path",{"d":"M8 11h.01"}],["path",{"d":"M8 16h.01"}]],"clock":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6l4 2"}]],"contact":[["path",{"d":"M16 2v2"}],["path",{"d":"M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"}],["path",{"d":"M8 2v2"}],["circle",{"cx":"12","cy":"11","r":"3"}],["rect",{"x":"3","y":"4","width":"18","height":"18","rx":"2"}]],"database":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 5V19A9 3 0 0 0 21 19V5"}],["path",{"d":"M3 12A9 3 0 0 0 21 12"}]],"database-backup":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 12a9 3 0 0 0 5 2.69"}],["path",{"d":"M21 9.3V5"}],["path",{"d":"M3 5v14a9 3 0 0 0 6.47 2.88"}],["path",{"d":"M12 12v4h4"}],["path",{"d":"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"}]],"download":[["path",{"d":"M12 15V3"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}],["path",{"d":"m7 10 5 5 5-5"}]],"file-check-2":[["path",{"d":"M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m14 20 2 2 4-4"}]],"file-search":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["circle",{"cx":"11.5","cy":"14.5","r":"2.5"}],["path",{"d":"M13.3 16.3 15 18"}]],"file-text":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],"git-branch":[["path",{"d":"M15 6a9 9 0 0 0-9 9V3"}],["circle",{"cx":"18","cy":"6","r":"3"}],["circle",{"cx":"6","cy":"18","r":"3"}]],"hash":[["line",{"x1":"4","x2":"20","y1":"9","y2":"9"}],["line",{"x1":"4","x2":"20","y1":"15","y2":"15"}],["line",{"x1":"10","x2":"8","y1":"3","y2":"21"}],["line",{"x1":"16","x2":"14","y1":"3","y2":"21"}]],"info":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 16v-4"}],["path",{"d":"M12 8h.01"}]],"leaf":[["path",{"d":"M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"}],["path",{"d":"M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"}]],"mail":[["path",{"d":"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"}],["rect",{"x":"2","y":"4","width":"20","height":"16","rx":"2"}]],"map-pin":[["path",{"d":"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"}],["circle",{"cx":"12","cy":"10","r":"3"}]],"menu":[["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],"panel-left-close":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m16 15-3-3 3-3"}]],"panel-left-open":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m14 9 3 3-3 3"}]],"phone":[["path",{"d":"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"}]],"plus":[["path",{"d":"M5 12h14"}],["path",{"d":"M12 5v14"}]],"refresh-cw":[["path",{"d":"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}],["path",{"d":"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"}],["path",{"d":"M8 16H3v5"}]],"rotate-ccw":[["path",{"d":"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}],["path",{"d":"M3 3v5h5"}]],"rows-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M21 9H3"}],["path",{"d":"M21 15H3"}]],"save":[["path",{"d":"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"}],["path",{"d":"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"}],["path",{"d":"M7 3v4a1 1 0 0 0 1 1h7"}]],"search":[["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],"settings":[["path",{"d":"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"table":[["path",{"d":"M12 3v18"}],["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M3 9h18"}],["path",{"d":"M3 15h18"}]],"tag":[["path",{"d":"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"}],["circle",{"cx":"7.5","cy":"7.5","r":".5","fill":"currentColor"}]],"user":[["path",{"d":"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}],["circle",{"cx":"12","cy":"7","r":"4"}]],"user-check":[["path",{"d":"m16 11 2 2 4-4"}],["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-round":[["circle",{"cx":"12","cy":"8","r":"5"}],["path",{"d":"M20 21a8 8 0 0 0-16 0"}]],"users":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["path",{"d":"M16 3.128a4 4 0 0 1 0 7.744"}],["path",{"d":"M22 21v-2a4 4 0 0 0-3-3.87"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"wrench":[["path",{"d":"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"}]],"x":[["path",{"d":"M18 6 6 18"}],["path",{"d":"m6 6 12 12"}]],"sun":[["circle",{"cx":"12","cy":"12","r":"4"}],["path",{"d":"M12 2v2"}],["path",{"d":"M12 20v2"}],["path",{"d":"m4.93 4.93 1.41 1.41"}],["path",{"d":"m17.66 17.66 1.41 1.41"}],["path",{"d":"M2 12h2"}],["path",{"d":"M20 12h2"}],["path",{"d":"m6.34 17.66-1.41 1.41"}],["path",{"d":"m19.07 4.93-1.41 1.41"}]],"moon":[["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]],"columns-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"M15 3v18"}]],"inbox":[["polyline",{"points":"22 12 16 12 14 15 10 15 8 12 2 12"}],["path",{"d":"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"}]]};
+  const icons = {"activity":[["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],"arrow-left":[["path",{"d":"m12 19-7-7 7-7"}],["path",{"d":"M19 12H5"}]],"arrow-right":[["path",{"d":"M5 12h14"}],["path",{"d":"m12 5 7 7-7 7"}]],"badge":[["path",{"d":"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"}]],"briefcase":[["path",{"d":"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"}],["rect",{"width":"20","height":"14","x":"2","y":"6","rx":"2"}]],"building-2":[["path",{"d":"M10 12h4"}],["path",{"d":"M10 8h4"}],["path",{"d":"M14 21v-3a2 2 0 0 0-4 0v3"}],["path",{"d":"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"}],["path",{"d":"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"}]],"calendar":[["path",{"d":"M8 2v4"}],["path",{"d":"M16 2v4"}],["rect",{"width":"18","height":"18","x":"3","y":"4","rx":"2"}],["path",{"d":"M3 10h18"}]],"check":[["path",{"d":"M20 6 9 17l-5-5"}]],"check-circle-2":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"m9 12 2 2 4-4"}]],"clipboard-list":[["rect",{"width":"8","height":"4","x":"8","y":"2","rx":"1","ry":"1"}],["path",{"d":"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"}],["path",{"d":"M12 11h4"}],["path",{"d":"M12 16h4"}],["path",{"d":"M8 11h.01"}],["path",{"d":"M8 16h.01"}]],"clock":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6l4 2"}]],"contact":[["path",{"d":"M16 2v2"}],["path",{"d":"M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"}],["path",{"d":"M8 2v2"}],["circle",{"cx":"12","cy":"11","r":"3"}],["rect",{"x":"3","y":"4","width":"18","height":"18","rx":"2"}]],"database":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 5V19A9 3 0 0 0 21 19V5"}],["path",{"d":"M3 12A9 3 0 0 0 21 12"}]],"database-backup":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 12a9 3 0 0 0 5 2.69"}],["path",{"d":"M21 9.3V5"}],["path",{"d":"M3 5v14a9 3 0 0 0 6.47 2.88"}],["path",{"d":"M12 12v4h4"}],["path",{"d":"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"}]],"download":[["path",{"d":"M12 15V3"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}],["path",{"d":"m7 10 5 5 5-5"}]],"file-check-2":[["path",{"d":"M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m14 20 2 2 4-4"}]],"file-search":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["circle",{"cx":"11.5","cy":"14.5","r":"2.5"}],["path",{"d":"M13.3 16.3 15 18"}]],"file-text":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],"git-branch":[["path",{"d":"M15 6a9 9 0 0 0-9 9V3"}],["circle",{"cx":"18","cy":"6","r":"3"}],["circle",{"cx":"6","cy":"18","r":"3"}]],"hash":[["line",{"x1":"4","x2":"20","y1":"9","y2":"9"}],["line",{"x1":"4","x2":"20","y1":"15","y2":"15"}],["line",{"x1":"10","x2":"8","y1":"3","y2":"21"}],["line",{"x1":"16","x2":"14","y1":"3","y2":"21"}]],"info":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 16v-4"}],["path",{"d":"M12 8h.01"}]],"mail":[["path",{"d":"m22 7-8.991 5.727a2 2 0 0 1-2.009 0L2 7"}],["rect",{"x":"2","y":"4","width":"20","height":"16","rx":"2"}]],"map-pin":[["path",{"d":"M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"}],["circle",{"cx":"12","cy":"10","r":"3"}]],"menu":[["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],"panel-left-close":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m16 15-3-3 3-3"}]],"panel-left-open":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m14 9 3 3-3 3"}]],"phone":[["path",{"d":"M13.832 16.568a1 1 0 0 0 1.213-.303l.355-.465A2 2 0 0 1 17 15h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2A18 18 0 0 1 2 4a2 2 0 0 1 2-2h3a2 2 0 0 1 2 2v3a2 2 0 0 1-.8 1.6l-.468.351a1 1 0 0 0-.292 1.233 14 14 0 0 0 6.392 6.384"}]],"plus":[["path",{"d":"M5 12h14"}],["path",{"d":"M12 5v14"}]],"refresh-cw":[["path",{"d":"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}],["path",{"d":"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"}],["path",{"d":"M8 16H3v5"}]],"rotate-ccw":[["path",{"d":"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}],["path",{"d":"M3 3v5h5"}]],"rows-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M21 9H3"}],["path",{"d":"M21 15H3"}]],"save":[["path",{"d":"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"}],["path",{"d":"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"}],["path",{"d":"M7 3v4a1 1 0 0 0 1 1h7"}]],"search":[["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],"settings":[["path",{"d":"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"table":[["path",{"d":"M12 3v18"}],["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M3 9h18"}],["path",{"d":"M3 15h18"}]],"tag":[["path",{"d":"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"}],["circle",{"cx":"7.5","cy":"7.5","r":".5","fill":"currentColor"}]],"user":[["path",{"d":"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}],["circle",{"cx":"12","cy":"7","r":"4"}]],"user-check":[["path",{"d":"m16 11 2 2 4-4"}],["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-round":[["circle",{"cx":"12","cy":"8","r":"5"}],["path",{"d":"M20 21a8 8 0 0 0-16 0"}]],"users":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["path",{"d":"M16 3.128a4 4 0 0 1 0 7.744"}],["path",{"d":"M22 21v-2a4 4 0 0 0-3-3.87"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"wrench":[["path",{"d":"M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"}]],"x":[["path",{"d":"M18 6 6 18"}],["path",{"d":"m6 6 12 12"}]],"sun":[["circle",{"cx":"12","cy":"12","r":"4"}],["path",{"d":"M12 2v2"}],["path",{"d":"M12 20v2"}],["path",{"d":"m4.93 4.93 1.41 1.41"}],["path",{"d":"m17.66 17.66 1.41 1.41"}],["path",{"d":"M2 12h2"}],["path",{"d":"M20 12h2"}],["path",{"d":"m6.34 17.66-1.41 1.41"}],["path",{"d":"m19.07 4.93-1.41 1.41"}]],"moon":[["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]],"columns-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"M15 3v18"}]],"inbox":[["polyline",{"points":"22 12 16 12 14 15 10 15 8 12 2 12"}],["path",{"d":"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"}]]};
   const aliases = {'eye':'search','pencil':'file-text','save':'file-check-2','cloud-upload':'file-up','plus-circle':'user-plus','database':'database-backup','hash':'file-text','files':'file-text','folder-open':'briefcase','file-search':'search','scan-text':'file-text','paperclip':'file-text','trash':'trash-2','shield-check':'shield-alert','calendar-days':'calendar','clock-3':'clock','contact':'user-round','building-2':'briefcase','printer':'file-text','file-spreadsheet':'file-text'};
   function renderIcons() {
     document.querySelectorAll('i[data-lucide]').forEach(el => {
@@ -224,7 +224,38 @@
           .replaceAll("'", '&#039;');
 
       const showToast=M.toast;
-      let online=false,saving=false,loadVersion=0,channel=null;
+      let online=false,saving=false,loadVersion=0,channel=null,loadingPromise=null;
+      const isPublicRequest = record => record?.submissionSource === 'public' || String(record?.id || '').startsWith('public-service-');
+      function requestState(record) {
+        const status = String(record.serviceStatus || 'Pending Review').toLowerCase();
+        if (/cancel|disapproved/.test(status)) return 'cancelled';
+        if (/complete|closed/.test(status)) return 'completed';
+        if (/pending|review/.test(status)) return 'pending';
+        return 'active';
+      }
+      function serviceScope(record) {
+        const values = ['technicalAssistance','iecService','plantingMaterials','environmentalConcerns','certifications']
+          .map(key => record[key]).filter(Boolean);
+        if (record.otherServices) values.push('Other Services');
+        return [...new Set(values)].join('; ') || record.primaryCategory || 'General Service';
+      }
+      function filteredRecords() {
+        const term = ($('#serviceRegistrySearch').value || '').trim().toLowerCase();
+        const state = $('#serviceStatusFilter').value, source = $('#serviceSourceFilter').value;
+        return serviceRecords.filter(record => matchesRecord(record,term)
+          && (!state || requestState(record) === state)
+          && (!source || (isPublicRequest(record) ? 'public' : 'office') === source));
+      }
+      function renderRequestContext(record = null) {
+        const publicRequest = isPublicRequest(record), context = $('#serviceSubmissionContext');
+        $('#serviceNo').readOnly = publicRequest;
+        $('#dateRequest').readOnly = publicRequest;
+        context.hidden = !publicRequest;
+        if (!publicRequest) { context.textContent = ''; return; }
+        const submitted = new Date(record.submittedAt || record.createdAt || record.created_at);
+        const when = Number.isNaN(submitted.valueOf()) ? '' : ` on ${submitted.toLocaleString('en-PH',{timeZone:'Asia/Manila'})}`;
+        context.textContent = `Public form submission${when}. Reference: ${record.id}. Review the client details and record your assessment in Course of Action.`;
+      }
       function setDbStatus(value) { online=value; }
       function setButtonHidden(button, hidden) {
         if (!button) return;
@@ -640,6 +671,7 @@
             )
         );
 
+        renderRequestContext();
         switchTab(0, true);
 
         if (notify) {
@@ -867,8 +899,20 @@
             'Pending Review'
         );
 
+        renderRequestContext(data);
         switchTab(0, true);
       }
+
+      $('#btnPreviewServiceFile')?.addEventListener('click', () => {
+        if (saving) return;
+        void window.PGENRO_ServiceFile.view(getFormData(), {fromForm:true});
+      });
+      document.addEventListener('click', event => {
+        const button=event.target.closest('.js-view-service-file');
+        if (!button || saving) return;
+        const record=serviceRecords.find(item=>String(item.id)===String(button.dataset.recordId));
+        if (record) void window.PGENRO_ServiceFile.view(record);
+      });
 
       $('#serviceStatus')
         ?.addEventListener(
@@ -909,34 +953,58 @@
          DATABASE
       ================================================================= */
 
-      async function loadRecords(){
+      function loadRecords({quiet=false}={}) {
+        if (loadingPromise) return loadingPromise;
         const version=++loadVersion;
-        try {
-          const records=await M.read('service_requests');if(version!==loadVersion)return false;
-          serviceRecords=records.sort((a,b)=>new Date(b.updatedAt||b.updated_at||b.createdAt||b.dateRequest||0)-new Date(a.updatedAt||a.updated_at||a.createdAt||a.dateRequest||0));
-          online=true;M.storage.set('pgenro_admin_service_requests_live_cache',serviceRecords);M.observeRecords('service requests',serviceRecords);renderRegistry();
-          if(!hiddenDocId?.value&&!$('#clientName').value&&!$('#organization').value){$('#serviceNo').value=generateNewServiceNo();displayActiveId.textContent=$('#serviceNo').value;}
-          return true;
-        } catch(error){
-          if(version!==loadVersion)return false;online=false;const cache=M.storage.get('pgenro_admin_service_requests_live_cache',[]);if(!serviceRecords.length&&Array.isArray(cache))serviceRecords=cache;renderRegistry();showToast(error.message||'Service registry could not refresh. Cached records are read-only.','error');return false;
-        }
+        $('#serviceSyncStatus').textContent = 'Refreshing requests…';
+        loadingPromise = (async () => {
+          try {
+            const records=await M.read('service_requests');if(version!==loadVersion)return false;
+            serviceRecords=records.sort((a,b)=>new Date(b.submittedAt||b.createdAt||b.created_at||b.dateRequest||0)-new Date(a.submittedAt||a.createdAt||a.created_at||a.dateRequest||0));
+            online=true;M.storage.set('pgenro_admin_service_requests_live_cache',serviceRecords);M.observeRecords('service requests',serviceRecords);renderRegistry();
+            $('#serviceSyncStatus').textContent = `Updated ${new Date().toLocaleTimeString('en-PH',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Manila'})}`;
+            $('#serviceSyncStatus').dataset.state = 'ready';
+            if(!hiddenDocId?.value&&!$('#clientName').value&&!$('#organization').value){$('#serviceNo').value=generateNewServiceNo();displayActiveId.textContent=$('#serviceNo').value;}
+            return true;
+          } catch(error) {
+            if(version!==loadVersion)return false;
+            online=false;
+            const cache=M.storage.get('pgenro_admin_service_requests_live_cache',[]);
+            if(!serviceRecords.length&&Array.isArray(cache))serviceRecords=cache;
+            renderRegistry();
+            $('#serviceSyncStatus').textContent = 'Connection unavailable. Showing cached requests; refresh before saving.';
+            $('#serviceSyncStatus').dataset.state = 'error';
+            if(!quiet)showToast(error.message||'Service registry could not refresh. Cached records are read-only.','error');
+            return false;
+          } finally { loadingPromise=null; }
+        })();
+        return loadingPromise;
       }
       function renderRegistry(){
-        const term=($('#serviceRegistrySearch').value||'').trim().toLowerCase();
-        const filtered=serviceRecords.filter(r=>matchesRecord(r,term));
+        const filtered=filteredRecords();
         renderSummaryTable(filtered);$('#serviceRegistryBody').innerHTML=$('#summaryMasterBody').innerHTML;
+        if(!filtered.length)$('#serviceRegistryBody').innerHTML='<tr><td colspan="7" class="empty-table-cell">'+(serviceRecords.length?'No requests match the selected filters.':'No service requests received yet.')+'</td></tr>';
         $('#serviceRegistryCount').textContent=`Showing ${filtered.length} of ${serviceRecords.length} requests`;
         $('#serviceTotal').textContent=serviceRecords.length;
-        const complete=r=>/complete|closed/i.test(r.serviceStatus||'');
-        const pending=r=>/pending|review/i.test(r.serviceStatus||'Pending Review');
-        $('#servicePending').textContent=serviceRecords.filter(pending).length;
-        $('#serviceCompleted').textContent=serviceRecords.filter(complete).length;
-        $('#serviceActive').textContent=serviceRecords.filter(r=>!complete(r)&&!pending(r)&&!/cancel|disapproved/i.test(r.serviceStatus||'')).length;
+        const pending=serviceRecords.filter(r=>requestState(r)==='pending').length;
+        $('#servicePending').textContent=pending;
+        $('#serviceCompleted').textContent=serviceRecords.filter(r=>requestState(r)==='completed').length;
+        $('#serviceActive').textContent=serviceRecords.filter(r=>requestState(r)==='active').length;
+        $('#serviceReviewNotice').hidden=!pending;
+        $('#serviceReviewNoticeText').textContent=`${pending} request${pending===1?' is':'s are'} awaiting review, including ${serviceRecords.filter(r=>isPublicRequest(r)&&requestState(r)==='pending').length} from the public form.`;
         M.renderIcons();
       }
       $('#refreshServicesBtn').onclick=async()=>{$('#refreshServicesBtn').disabled=true;try{if(await loadRecords())showToast('Service registry refreshed.');}finally{$('#refreshServicesBtn').disabled=false;}};
       $('#serviceRegistrySearch').addEventListener('input',()=>{$('#globalSearchInput').value=$('#serviceRegistrySearch').value;renderRegistry();});
       $('#globalSearchInput').addEventListener('input',()=>{$('#serviceRegistrySearch').value=$('#globalSearchInput').value;renderRegistry();});
+      $('#serviceStatusFilter').addEventListener('change',renderRegistry);
+      $('#serviceSourceFilter').addEventListener('change',renderRegistry);
+      $('#showPendingServicesBtn').addEventListener('click',()=>{
+        $('#serviceStatusFilter').value='pending';$('#serviceSourceFilter').value='';
+        $('#serviceRegistrySearch').value='';$('#globalSearchInput').value='';renderRegistry();
+        $('#serviceRegistry').scrollIntoView({behavior:'smooth',block:'start'});
+        $('#serviceStatusFilter').focus({preventScroll:true});
+      });
       document.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>M.closeModal(button.dataset.close)));
       /* ================================================================
          SAVE / UPDATE SERVICE REQUEST
@@ -951,12 +1019,16 @@
         if(record.dateNeeded&&record.dateRequest&&record.dateNeeded<record.dateRequest){switchTab(1,true);showToast('Date needed cannot be before the request date.','warning');$('#dateNeeded').focus();return;}
         saving=true;$('#serviceFormModal').dataset.busy='true';btnSaveAction.disabled=true;const markup=btnSaveAction.innerHTML;btnSaveAction.textContent='Saving…';
         try {
-          if(!id)record.createdAt=new Date().toISOString();
+          if(!id){record.createdAt=new Date().toISOString();record.submissionSource='admin';}
           const saved=await M.write('service_requests',record,id||null);hiddenDocId.value=saved.id;
           serviceRecords=id?serviceRecords.map(r=>String(r.id)===String(id)?saved:r):[saved,...serviceRecords];
           M.storage.set('pgenro_admin_service_requests_live_cache',serviceRecords);M.observeRecords('service requests',serviceRecords);renderRegistry();
           showToast(`Service request ${record.serviceNo} ${id?'updated':'saved'}.`);
           $('#serviceFormModal').dataset.busy='false';closeModal($('#serviceFormModal'));
+          void M.audit(id?'Update Service Request':'Create Service Request',{recordId:saved.id,serviceNo:saved.serviceNo});
+          // Schedule after the save lock is released. Preview errors cannot undo
+          // or misreport a successful database write.
+          queueMicrotask(()=>window.PGENRO_ServiceFile.view(saved,{saved:true}));
         }catch(error){showToast(error.message||'Unable to save this request.','error');}
         finally{saving=false;$('#serviceFormModal').dataset.busy='false';btnSaveAction.disabled=false;btnSaveAction.innerHTML=markup;M.renderIcons();}
       });
@@ -1086,7 +1158,12 @@
           record.serviceNo,
           record.clientName,
           record.organization,
-          record.location
+          record.location,
+          record.id,
+          record.contactNo,
+          record.emailAddress,
+          record.serviceStatus,
+          serviceScope(record)
         ].some((value) =>
           String(value || '')
             .toLowerCase()
@@ -1282,6 +1359,7 @@
                   <td
                     class="table-action-cell"
                   >
+                    <button type="button" class="btn btn-secondary btn-sm js-view-service-file" data-record-id="${escapeHtml(item.id)}" aria-label="View file for ${escapeHtml(item.serviceNo || 'service request')}">View File</button>
                     <button
                       type="button"
                       class="btn btn-secondary btn-sm js-load-record"
@@ -1345,12 +1423,7 @@
         tbody.innerHTML =
           list
             .map((item) => {
-              const scope =
-                item.primaryCategory ||
-                item.technicalAssistance ||
-                item.plantingMaterials ||
-                item.certifications ||
-                'General Service';
+              const scope = serviceScope(item);
 
               return `
                 <tr>
@@ -1363,6 +1436,7 @@
                           '--'
                       )}
                     </strong>
+                    <span class="service-source-label ${isPublicRequest(item)?'public-source':'office-source'}">${isPublicRequest(item)?'Public form':'Office entry'}</span>
                   </td>
 
                   <td>
@@ -1414,6 +1488,7 @@
                   <td
                     class="table-action-cell"
                   >
+                    <button type="button" class="btn btn-secondary btn-sm js-view-service-file" data-record-id="${escapeHtml(item.id)}" aria-label="View file for ${escapeHtml(item.serviceNo || 'service request')}">View File</button>
                     <button
                       type="button"
                       class="btn btn-secondary btn-sm js-load-record"
@@ -1421,7 +1496,7 @@
                         item.id
                       )}"
                     >
-                      Edit
+                      ${requestState(item)==='pending'?'Review':'Update'}
                     </button>
                   </td>
                 </tr>
@@ -1485,12 +1560,12 @@
          CSV EXPORT
       ================================================================= */
 
-      function exportCsv(){
-        const term=$('#serviceRegistrySearch').value.trim().toLowerCase(),list=serviceRecords.filter(r=>matchesRecord(r,term));
+      function exportCsv({all=false}={}){
+        const list=all?serviceRecords:filteredRecords();
         if(!list.length){showToast('No matching service records to export.','warning');return;}
-        M.csv([['Service No','Date Requested','Client Name','Organization','Contact No','Status','Location','Current Step'],...list.map(r=>[r.serviceNo,r.dateRequest,r.clientName,r.organization,r.contactNo,r.serviceStatus,r.location,r.currentStep||1])],`PGENRO_Service_Requests_${M.today()}.csv`);
+        M.csv([['Service No','Date Requested','Client Name','Organization','Contact No','Status','Location','Current Step','Source','Submitted At','Submission Reference'],...list.map(r=>[r.serviceNo,r.dateRequest,r.clientName,r.organization,r.contactNo,r.serviceStatus,r.location,r.currentStep||1,isPublicRequest(r)?'Public form':'Office entry',r.submittedAt||r.createdAt||'',r.id])],`PGENRO_Service_Requests_${M.today()}.csv`);
       }
-      $('#btnExportSummaryCsv').onclick=exportCsv;$('#exportServicesBtn').onclick=exportCsv;
+      $('#btnExportSummaryCsv').onclick=()=>exportCsv({all:true});$('#exportServicesBtn').onclick=()=>exportCsv();
       /* ================================================================
          REMOVE VALIDATION ERROR WHEN USER TYPES
       ================================================================= */
@@ -1524,7 +1599,18 @@
       renderRegistry();
       loadRecords();
       if(M.client())channel=M.client().channel('admin-service-requests').on('postgres_changes',{event:'*',schema:'public',table:'service_requests'},loadRecords).subscribe();
-      window.addEventListener('pagehide',(event)=>{if(event.persisted)return;loadVersion++;if(channel)M.client()?.removeChannel(channel);});
+      const refreshWhenVisible=()=>{if(!document.hidden&&!saving&&navigator.onLine!==false)void loadRecords({quiet:true});};
+      const refreshTimer=setInterval(refreshWhenVisible,30000);
+      window.addEventListener('focus',refreshWhenVisible);
+      window.addEventListener('online',refreshWhenVisible);
+      document.addEventListener('visibilitychange',refreshWhenVisible);
+      window.addEventListener('pagehide',(event)=>{
+        if(event.persisted)return;
+        loadVersion++;clearInterval(refreshTimer);
+        window.removeEventListener('focus',refreshWhenVisible);window.removeEventListener('online',refreshWhenVisible);
+        document.removeEventListener('visibilitychange',refreshWhenVisible);
+        if(channel)M.client()?.removeChannel(channel);
+      });
     },
     {
       once: true
@@ -1781,7 +1867,7 @@
     if (profileName) profileObserver?.observe(profileName, { childList: true, characterData: true, subtree: true });
     if (profileRole) profileObserver?.observe(profileRole, { childList: true, characterData: true, subtree: true });
 
-    // Keep the genuine seal when available; show an environmental symbol if missing.
+    // Keep the genuine seal when available; show a simple letter mark if missing.
     const seal = document.querySelector('.logo-image');
     function showSealFallback() {
       if (!seal || !seal.parentElement) return;
@@ -1789,8 +1875,8 @@
       const host = seal.parentElement;
       host.classList.add('logo-fallback');
       if (!host.querySelector('.logo-fallback-mark')) {
-        const mark = document.createElement('i');
-        mark.dataset.lucide = 'leaf';
+        const mark = document.createElement('span');
+        mark.textContent = 'P';
         mark.className = 'logo-fallback-mark';
         host.append(mark);
         renderIcons();

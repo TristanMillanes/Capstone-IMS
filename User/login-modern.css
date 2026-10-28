@@ -500,3 +500,11 @@ html[data-theme="dark"] body.pgenro-auth.ui-unified :is(.step.active,.input-box:
 html[data-theme="dark"] body.pgenro-auth.ui-unified .form-panel :is(a,.login-link) {color:var(--green-700);}
 
 }
+
+/* ICS sign-in entry. */
+.secondary-access .ics-access-entry { grid-column: 1 / -1; }
+.secondary-access .ics-access-btn { min-height: 74px; border-color: #9fcab4; background: #edf7f0; }
+.ics-access-btn .secondary-icon { color: #166545; background: #dceee2; }
+.ics-signin-notice { margin: 0 0 16px; padding: 11px 13px; border: 1px solid #c5ddce; border-radius: 11px; color: var(--ink); background: #edf7f0; font-size: 12px; line-height: 1.6; }
+html[data-theme="dark"] .secondary-access .ics-access-btn,
+html[data-theme="dark"] .ics-signin-notice { color: #cde7d7; background: #193c2e; border-color: #3c6950; }

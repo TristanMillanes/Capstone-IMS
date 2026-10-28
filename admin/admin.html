@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Admin Dashboard</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -12,13 +12,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <!-- Lucide Icons -->
 <!-- Icons are rendered locally by admin.js. -->
-<!-- Chart.js -->
-<script defer src="../vendor/chart.umd.min.js"></script>
+<!-- Chart.js is bundled with this admin folder for offline/cached dashboards. -->
+<script defer src="vendor/chart.umd.min.js?v=4.5.1"></script>
 <!-- Stylesheet -->
-<link href="admin.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="admin.css?v=20261027-emerald-v6" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Dashboard">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Dashboard" data-design="emerald-v6">
+
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR NAVIGATION -->
@@ -118,7 +118,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -138,7 +138,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Dashboard</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Dashboard</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -262,8 +262,8 @@
 <!-- PAGE HEADER -->
 <section class="page-header modern-dashboard-hero depth-hero unified-page-header" id="dashboard">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-layout-dashboard"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Dashboard</span></div><h1>Dashboard</h1>
-<p>Your records, people, and daily operations. All in one place.</p>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Dashboard</span></div><h1>Office overview</h1>
+<p>Manage your records, review requests, and keep daily operations moving.</p>
 </div>
 <div class="header-actions"><a class="btn btn-primary" href="admincommunication.html"><i data-lucide="arrow-left-right"></i>Open communications</a><a class="btn btn-secondary" href="#analytics"><i data-lucide="bar-chart-3"></i>View analytics</a></div>
 </section>
@@ -272,11 +272,11 @@
 <div class="kpi-card unified-metric unified-metric-featured">
 <div class="kpi-header">
 <span class="kpi-label">Registered Personnel</span>
-<div class="kpi-icon emerald"><i data-lucide="users"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiPersonnel">—</h3>
-<span class="kpi-trend positive"><i data-lucide="trending-up"></i> Registered Personnel Records</span>
+<span class="kpi-trend positive"> Registered Personnel Records</span>
 </div>
 <div class="kpi-footer">
 <a href="employee-admin.html">View Employee Profiles →</a>
@@ -285,11 +285,11 @@
 <div class="kpi-card urgent-border unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Pending Account Requests</span>
-<div class="kpi-icon amber"><i data-lucide="user-plus"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiPendingAcc">—</h3>
-<span class="kpi-trend urgent"><i data-lucide="alert-circle"></i> Action Required</span>
+<span class="kpi-trend urgent"> Action Required</span>
 </div>
 <div class="kpi-footer">
 <a href="requestacc.html">Approve Credentials →</a>
@@ -298,11 +298,11 @@
 <div class="kpi-card unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">ICS Slips Recorded</span>
-<div class="kpi-icon blue"><i data-lucide="file-check-2"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiActiveICS">—</h3>
-<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> Registry Property Records</span>
+<span class="kpi-trend positive"> Registry Property Records</span>
 </div>
 <div class="kpi-footer">
 <a href="ics-admin.html">Manage ICS Property →</a>
@@ -311,24 +311,24 @@
 <div class="kpi-card urgent-border unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Low Supply Items</span>
-<div class="kpi-icon purple"><i data-lucide="boxes"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 class="counter" id="kpiLowStock">—</h3>
-<span class="kpi-trend urgent"><i data-lucide="alert-triangle"></i> Restock Advised</span>
+<span class="kpi-trend urgent"> Restock Advised</span>
 </div>
 <div class="kpi-footer">
 <a href="invetoryadmin.html">Check Inventory →</a>
 </div>
 </div>
 </section>
-<section aria-label="Frequently used modules" class="workspace-quick-actions"><div><strong>Quick access</strong><p>Your everyday office tools.</p></div><nav aria-label="Quick module access" class="workspace-quick-links"><a href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span><strong>Communications</strong><small>Incoming &amp; outgoing</small></span><i data-lucide="arrow-up-right"></i></a><a href="officememo-admin.html"><i data-lucide="file-text"></i><span><strong>Office memos</strong><small>Directives &amp; issuances</small></span><i data-lucide="arrow-up-right"></i></a><a href="serviceAdmin.html"><i data-lucide="wrench"></i><span><strong>Service requests</strong><small>Actions &amp; follow-up</small></span><i data-lucide="arrow-up-right"></i></a><a href="visitors-admin.html"><i data-lucide="clipboard-check"></i><span><strong>Visitor logbook</strong><small>Arrivals &amp; departures</small></span><i data-lucide="arrow-up-right"></i></a></nav></section>
+<section aria-label="Frequently used modules" class="workspace-quick-actions"><div><strong>Quick access</strong><p>Your everyday office tools.</p></div><nav aria-label="Quick module access" class="workspace-quick-links"><a href="admincommunication.html"><span class="studio-shortcut-index" aria-hidden="true">01</span><span><strong>Communications</strong><small>Incoming &amp; outgoing</small></span></a><a href="officememo-admin.html"><span class="studio-shortcut-index" aria-hidden="true">02</span><span><strong>Office memos</strong><small>Directives &amp; issuances</small></span></a><a href="serviceAdmin.html"><span class="studio-shortcut-index" aria-hidden="true">03</span><span><strong>Service requests</strong><small>Actions &amp; follow-up</small></span></a><a href="visitors-admin.html"><span class="studio-shortcut-index" aria-hidden="true">04</span><span><strong>Visitor logbook</strong><small>Arrivals &amp; departures</small></span></a></nav></section>
 <!-- DATA ANALYTICS -->
 <section aria-labelledby="analyticsTitle" class="dashboard-section data-analytics" id="analytics">
 <div class="analytics-heading">
 <div>
-<span class="analytics-eyebrow"><i data-lucide="chart-no-axes-combined"></i> Performance Overview</span>
-<h2 id="analyticsTitle">Data Analytics</h2>
+<span class="analytics-eyebrow"> Performance overview</span>
+<h2 id="analyticsTitle">Operational analytics</h2>
 <p>Activity trends, service fulfillment rates, communications flow, and personnel statistics.</p>
 </div>
 <div class="analytics-controls">
@@ -352,25 +352,25 @@
 </div>
 <div class="analytics-metrics">
 <article class="analytics-metric">
-<span class="analytics-metric-label"><i data-lucide="activity"></i> Record Activity</span>
+<span class="analytics-metric-label"> Record Activity</span>
 <strong id="analyticsVolume">—</strong>
 <span class="analytics-comparison" id="analyticsVolumeChange">Selected period</span>
 <small>Documents, travel, visitors, services &amp; ICS</small>
 </article>
 <article class="analytics-metric">
-<span class="analytics-metric-label"><i data-lucide="circle-check"></i> Service Completion</span>
+<span class="analytics-metric-label"> Service Completion</span>
 <strong id="analyticsCompletion">—</strong>
 <span id="analyticsCompletionDetail">Waiting for service records</span>
 <small>Current status of requests in this period</small>
 </article>
 <article class="analytics-metric">
-<span class="analytics-metric-label"><i data-lucide="clock-3"></i> Open Service Requests</span>
+<span class="analytics-metric-label"> Open Service Requests</span>
 <strong id="analyticsBacklog">—</strong>
 <span id="analyticsBacklogDetail">Pending + In progress</span>
 <small>Current snapshot · All recorded dates</small>
 </article>
 <article class="analytics-metric">
-<span class="analytics-metric-label"><i data-lucide="package-search"></i> Stock Alerts</span>
+<span class="analytics-metric-label"> Stock Alerts</span>
 <strong id="analyticsStockAlerts">—</strong>
 <span id="analyticsStockDetail">Waiting for inventory records</span>
 <small>Current snapshot · Out of stock + Low stock</small>
@@ -405,6 +405,7 @@
 <div class="chart-canvas-host"><canvas aria-describedby="analyticsDistributionSummary" aria-label="Record distribution by module" id="categoryChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsDistributionEmpty"></p>
 </div>
+<div aria-label="Activity chart categories" class="analytics-chart-legend" hidden="" id="categoryChartLegend"></div>
 <p class="analytics-chart-caption" id="analyticsDistributionSummary">Waiting for module records.</p>
 </article>
 <!-- 3. Service Requests Bar Chart -->
@@ -443,7 +444,6 @@
 <span class="analytics-eyebrow">AUTOMATED INTELLIGENCE</span>
 <h3>Key Insights</h3>
 </div>
-<i data-lucide="lightbulb" style="color: var(--amber-500);"></i>
 </div>
 <ul class="analytics-insights" id="analyticsInsights">
 <li>Insights will generate when module records are loaded.</li>
@@ -477,6 +477,7 @@
 <div class="chart-canvas-host"><canvas aria-describedby="analyticsCommSummary" aria-label="Communications flow by direction and type" id="commChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsCommEmpty"></p>
 </div>
+<div aria-label="Communication chart categories" class="analytics-chart-legend" hidden="" id="commChartLegend"></div>
 <p class="analytics-chart-caption" id="analyticsCommSummary">Includes incoming communications, endorsements, and official issuances.</p>
 </article>
 </div>
@@ -576,7 +577,7 @@
 <!-- SCRIPTS -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer src="admin.js?v=20261013-layout-v2"></script>
+<script defer src="admin.js?v=20261027-emerald-v6"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

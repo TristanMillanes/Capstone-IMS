@@ -4,15 +4,15 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Admin Travel Orders</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link href="travelOR-admin.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="travelOR-admin.css?v=20261028-travel-summary-fix-3" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="travelOR-admin.html" data-css-scope="admin-travelor" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Travel Orders">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="travelOR-admin.html" data-css-scope="admin-travelor" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Travel Orders" data-design="emerald-v6">
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -111,7 +111,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -131,7 +131,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Travel Orders</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Travel Orders</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -255,7 +255,7 @@
 <!-- HERO HEADER -->
 <section class="page-header travel-page-header depth-hero unified-page-header">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-briefcase"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path><rect width="20" height="14" x="2" y="6" rx="2"></rect></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Travel Orders</span></div><div class="travel-heading-row">
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Travel Orders</span></div><div class="travel-heading-row">
 <div>
 <h1>Travel Orders</h1>
 <p>Manage official travel, itineraries, and approvals in one organized registry.</p>
@@ -270,20 +270,10 @@
 <i data-lucide="plus-circle"></i><span>Create Travel Order</span>
 </button>
 </div>
-<div aria-hidden="true" class="depth-scene">
-<span class="depth-orbit"></span><span class="depth-orb"></span>
-<div class="depth-stack">
-<span class="depth-sheet depth-sheet-back"></span>
-<span class="depth-sheet depth-sheet-middle"></span>
-<span class="depth-sheet depth-sheet-front">
-<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-</span>
-</div><span class="depth-scene-dot"></span>
-</div>
+
 </section>
 <!-- KPI METRICS GRID -->
-<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Total Travel Orders</span><div class="kpi-icon blue"><i data-lucide="file-text"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricTotal">0</h3><span class="kpi-trend">Official requests filed</span></div><div class="kpi-footer"><span>Travel order registry</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Pending Approval</span><div class="kpi-icon amber"><i data-lucide="clock"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricPending">0</h3><span class="kpi-trend">Awaiting signature</span></div><div class="kpi-footer"><span>Requests for review</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Approved / Active</span><div class="kpi-icon emerald"><i data-lucide="check-circle-2"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricApproved">0</h3><span class="kpi-trend">Authorized field trips</span></div><div class="kpi-footer"><span>Approved travel itineraries</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Completed Trips</span><div class="kpi-icon purple"><i data-lucide="flag"></i></div></div><div class="kpi-body"><h3 class="counter" id="metricCompleted">0</h3><span class="kpi-trend">Returned from travel</span></div><div class="kpi-footer"><span>Finished travel orders</span></div></div></section>
+<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Total Travel Orders</span></div><div class="kpi-body"><h3 class="counter" id="metricTotal">0</h3><span class="kpi-trend">Official requests filed</span></div><div class="kpi-footer"><span>Travel order registry</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Pending Approval</span></div><div class="kpi-body"><h3 class="counter" id="metricPending">0</h3><span class="kpi-trend">Awaiting signature</span></div><div class="kpi-footer"><span>Requests for review</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Approved / Active</span></div><div class="kpi-body"><h3 class="counter" id="metricApproved">0</h3><span class="kpi-trend">Authorized field trips</span></div><div class="kpi-footer"><span>Approved travel itineraries</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Completed Trips</span></div><div class="kpi-body"><h3 class="counter" id="metricCompleted">0</h3><span class="kpi-trend">Returned from travel</span></div><div class="kpi-footer"><span>Finished travel orders</span></div></div></section>
 <!-- FILTER & TOOLBAR PANEL -->
 <section aria-labelledby="travelFilterTitle" class="toolbar-container travel-filter-workspace">
 <div class="travel-filter-heading">
@@ -613,7 +603,7 @@
 <!-- SCRIPT -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer src="travelOR-admin.js?v=20261013-layout-v2"></script>
+<script defer src="travelOR-admin.js?v=20261027-emerald-v6"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

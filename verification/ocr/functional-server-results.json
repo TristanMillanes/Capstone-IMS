@@ -1,7 +1,7 @@
 {
   "method": "Production Flask app and real local Tesseract; no external database",
   "passed": true,
-  "testMethods": 9,
+  "testMethods": 10,
   "scenarios": [
     {
       "scenario": "Annex names are excluded and equal signatories require a choice",
@@ -18,10 +18,16 @@
     {
       "scenario": "Identical bytes reuse the read after renaming",
       "result": "PASS",
-      "processingMs": 0,
+      "processingMs": 1,
       "readingStats": {
-        "cachedPages": 1,
-        "ocrPasses": 0
+        "cacheHit": true,
+        "cachedPages": 0,
+        "cancelled": false,
+        "completedPages": 0,
+        "durationMs": 1,
+        "ocrPasses": 0,
+        "pages": 0,
+        "stage": "Complete"
       },
       "cacheHit": true
     },
@@ -36,90 +42,148 @@
     {
       "scenario": "Native incoming.csv",
       "result": "PASS",
-      "processingMs": 1,
+      "processingMs": 4,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 0
+        "cancelled": false,
+        "completedPages": 0,
+        "durationMs": 4,
+        "ocrPasses": 0,
+        "pages": 0,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
       "scenario": "Native incoming-utf16.txt",
       "result": "PASS",
-      "processingMs": 1,
+      "processingMs": 4,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 0
+        "cancelled": false,
+        "completedPages": 0,
+        "durationMs": 4,
+        "ocrPasses": 0,
+        "pages": 0,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
       "scenario": "Native incoming.xlsx",
       "result": "PASS",
-      "processingMs": 2,
+      "processingMs": 5,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 0
+        "cancelled": false,
+        "completedPages": 1,
+        "durationMs": 5,
+        "ocrPasses": 0,
+        "pages": 1,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
       "scenario": "Native incoming.pptx",
       "result": "PASS",
-      "processingMs": 1,
+      "processingMs": 9,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 0
+        "cancelled": false,
+        "completedPages": 1,
+        "durationMs": 9,
+        "ocrPasses": 0,
+        "pages": 1,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
       "scenario": "Native incoming.docx",
       "result": "PASS",
-      "processingMs": 2,
+      "processingMs": 10,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 0
+        "cancelled": false,
+        "completedPages": 1,
+        "durationMs": 10,
+        "ocrPasses": 0,
+        "pages": 1,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
       "scenario": "Native incoming.pdf",
       "result": "PASS",
-      "processingMs": 9,
+      "processingMs": 20,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 0
+        "cancelled": false,
+        "completedPages": 1,
+        "durationMs": 20,
+        "ocrPasses": 0,
+        "pages": 1,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
+      "scenario": "Explicit status, action and remarks populate the frontend form contract",
+      "result": "PASS"
+    },
+    {
       "scenario": "Printed scan rotated 90",
       "result": "PASS",
-      "processingMs": 1071,
+      "processingMs": 4035,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 2
+        "cancelled": false,
+        "completedPages": 1,
+        "durationMs": 4035,
+        "ocrPasses": 4,
+        "pages": 1,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
       "scenario": "Printed scan rotated 180",
       "result": "PASS",
-      "processingMs": 905,
+      "processingMs": 3416,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 2
+        "cancelled": false,
+        "completedPages": 1,
+        "durationMs": 3416,
+        "ocrPasses": 4,
+        "pages": 1,
+        "stage": "Complete"
       },
       "cacheHit": false
     },
     {
       "scenario": "Printed scan rotated 270",
       "result": "PASS",
-      "processingMs": 456,
+      "processingMs": 2839,
       "readingStats": {
+        "cacheHit": false,
         "cachedPages": 0,
-        "ocrPasses": 1
+        "cancelled": false,
+        "completedPages": 1,
+        "durationMs": 2839,
+        "ocrPasses": 3,
+        "pages": 1,
+        "stage": "Complete"
       },
       "cacheHit": false
     },

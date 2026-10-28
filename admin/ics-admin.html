@@ -4,17 +4,17 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | ICS Administration</title>
-<meta content="#f5f7f8" name="theme-color">
+<meta content="#063d32" name="theme-color">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <!-- Supabase JavaScript SDK -->
 <!-- Your existing admin theme + ICS module styles -->
-<link href="ics-admin.css?v=20261013-layout-v2" rel="stylesheet">
+<link href="ics-admin.css?v=20261027-emerald-v6" rel="stylesheet">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="ics-admin.html" data-css-scope="admin-ics" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Property Slips">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div><a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="ics-admin.html" data-css-scope="admin-ics" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Property Slips" data-design="emerald-v6">
+<a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- ====================== SIDEBAR ====================== -->
 <aside aria-label="Administrator sidebar" class="sidebar" id="sidebar">
@@ -113,7 +113,7 @@
 
 </nav>
 
-<div class="sidebar-workspace-note"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
+<div class="sidebar-workspace-note"><span><strong>PGENRO administration</strong>Records · People · Operations</span></div>
 
 </aside>
 
@@ -132,7 +132,7 @@
 
 </button>
 
-<a class="topbar-module" href="admin.html" title="Open dashboard"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-leaf "><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"></path><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"></path></svg><span>Property Slips</span></a>
+<a class="topbar-module" href="admin.html" title="Open dashboard"><span>Property Slips</span></a>
 
 <div class="global-search ui-affixed-control" role="search">
 
@@ -255,68 +255,58 @@
 <!-- PAGE HEADER -->
 <section class="page-header depth-hero unified-page-header" id="icsOverview">
 <div class="header-title">
-<div class="page-heading-mark" aria-hidden="true"><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-file-check-2"><path d="M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="m14 20 2 2 4-4"></path></svg></div><div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Property Slips</span></div><h1>Property Slips</h1>
+<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Property Slips</span></div><h1>Property Slips</h1>
 <p>Organize property assignments, custodians, and official inventory slips.</p>
 </div>
 <div class="header-actions"><button class="btn btn-secondary" id="refreshIcsBtn" type="button"><i data-lucide="refresh-cw"></i> Refresh</button>
 <button class="btn btn-secondary" id="exportCsvBtn" type="button"><i data-lucide="download"></i> Export CSV</button>
 <button class="btn btn-primary" id="addIcsBtn" type="button"><i data-lucide="plus"></i> New ICS Record</button>
 </div>
-<div aria-hidden="true" class="depth-scene">
-<span class="depth-orbit"></span><span class="depth-orb"></span>
-<div class="depth-stack">
-<span class="depth-sheet depth-sheet-back"></span>
-<span class="depth-sheet depth-sheet-middle"></span>
-<span class="depth-sheet depth-sheet-front">
-<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-</span>
-</div><span class="depth-scene-dot"></span>
-</div>
+
 </section>
 <!-- KPI METRICS GRID -->
 <section class="kpi-grid unified-metric-grid">
 <div class="kpi-card unified-metric unified-metric-featured">
 <div class="kpi-header">
 <span class="kpi-label">Total ICS Records</span>
-<div class="kpi-icon emerald"><i data-lucide="files"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 id="kpiTotal">0</h3>
-<span class="kpi-trend positive"><i data-lucide="database"></i> Encoded property records</span>
+<span class="kpi-trend positive"> Encoded property records</span>
 </div>
 <div class="kpi-footer">All ICS records in the registry</div>
 </div>
 <div class="kpi-card unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Active Records</span>
-<div class="kpi-icon blue"><i data-lucide="badge-check"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 id="kpiActive">0</h3>
-<span class="kpi-trend positive"><i data-lucide="check-circle-2"></i> Currently assigned</span>
+<span class="kpi-trend positive"> Currently assigned</span>
 </div>
 <div class="kpi-footer">Property under active accountability</div>
 </div>
 <div class="kpi-card urgent-border unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Archived Records</span>
-<div class="kpi-icon amber"><i data-lucide="archive"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 id="kpiArchived">0</h3>
-<span class="kpi-trend urgent"><i data-lucide="archive-restore"></i> Historical records</span>
+<span class="kpi-trend urgent"> Historical records</span>
 </div>
 <div class="kpi-footer">Archived accountability history</div>
 </div>
 <div class="kpi-card unified-metric">
 <div class="kpi-header">
 <span class="kpi-label">Recorded Value</span>
-<div class="kpi-icon purple"><i data-lucide="coins"></i></div>
+
 </div>
 <div class="kpi-body">
 <h3 id="kpiValue">₱0.00</h3>
-<span class="kpi-trend positive"><i data-lucide="philippine-peso"></i> Total property value</span>
+<span class="kpi-trend positive"> Total property value</span>
 </div>
 <div class="kpi-footer">Computed from quantity and unit cost</div>
 </div>
@@ -326,10 +316,11 @@
 <div class="ics-panel-header">
 <div>
 <h2><i data-lucide="database"></i> ICS Property Registry</h2>
-<p>Administrative encoding workspace for document records.</p>
+<p>Review staff ICS submissions and manage official property records.</p>
 </div>
 <div class="view-switcher">
 <button class="view-tab active" data-status-filter="ALL" type="button">All</button>
+<button class="view-tab" data-status-filter="Pending" type="button">Pending review <span id="tabCountPending">0</span></button>
 <button class="view-tab" data-status-filter="Active" type="button">Active</button>
 <button class="view-tab" data-status-filter="Archived" type="button">Archived</button>
 </div>
@@ -519,6 +510,7 @@
 <div class="field">
 <label for="status">Record Status</label>
 <select id="status">
+<option value="Pending">Pending review</option>
 <option value="Active">Active</option>
 <option value="Archived">Archived</option>
 </select>
@@ -581,12 +573,15 @@
 <div class="view-card"><span>Fund Cluster</span><strong id="viewFundCluster">---</strong></div>
 <div class="view-card span-2"><span>Person Accountable</span><strong id="viewAccountable">---</strong></div>
 <div class="view-card span-2"><span>Division / Unit</span><strong id="viewDivision">---</strong></div>
+<div class="view-card span-2"><span>Submitted by</span><strong id="viewSubmittedBy">---</strong></div>
+<div class="view-card span-2"><span>Submitted on</span><strong id="viewSubmittedAt">---</strong></div>
 <div class="view-card span-4"><span>Historical / Remarks</span><p id="viewRemarks">No remarks.</p></div>
 </div>
 </div>
 <div class="ics-modal-footer modal-actions">
 <button class="btn btn-danger-outline" id="deleteViewBtn" type="button"><i data-lucide="trash-2"></i> Delete</button>
 <div class="footer-actions-right">
+<button class="btn btn-primary" id="approveIcsBtn" type="button" hidden><i data-lucide="check"></i> Approve ICS</button>
 <button class="btn btn-secondary" id="printViewBtn" type="button"><i data-lucide="printer"></i> Print</button>
 <button class="btn btn-primary" id="editViewBtn" type="button"><i data-lucide="square-pen"></i> Edit Record</button>
 </div>
@@ -595,7 +590,8 @@
 </div>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer src="ics-admin.js?v=20261013-layout-v2"></script>
+<script defer src="../shared/ics-records.js?v=20261026-private-ics"></script>
+<script defer src="ics-admin.js?v=20261027-emerald-v6"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
