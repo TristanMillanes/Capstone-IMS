@@ -1,157 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#176445">
-<meta name="description" content="Fill out and submit a PGENRO Inventory Custodian Slip for administrator review.">
-<title>PGENRO IMS | Fill Up ICS Form</title>
-<link rel="stylesheet" href="ics-form.css?v=20261026-public-ics">
-<script defer src="ics-form.js?v=20261026-public-ics"></script>
+  <meta charset="utf-8">
+  <script src="user-theme.js?v=20261103-frontend-fix"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#173e30">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Complete an Inventory Custodian Slip, review the property details and send it to PGENRO for administrator review.">
+  <title>PGENRO IMS | Inventory Custodian Slip</title>
+  <link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui">
+  <link rel="stylesheet" href="user-polish.css?v=20261101-user-ui">
+  <link rel="stylesheet" href="ics-form.css?v=20261101-ics-refresh">
+  <script defer src="user-refresh.js?v=20261101-user-ui"></script>
+  <script defer src="ics-form.js?v=20261101-ics-refresh"></script>
 </head>
-<body>
-<header class="public-header">
-  <div class="public-brand"><img src="../logo/enro.png" alt="PGENRO seal" width="54" height="54"><div><strong>PGENRO IMS</strong><span>Provincial Government of Quezon</span></div></div>
-  <a href="login.html">Staff sign in</a>
-</header>
-<main class="public-main">
-  <header class="public-intro">
-    <p class="public-eyebrow">Inventory Custodian Slip</p>
-    <h1>Fill Up ICS Form</h1>
-    <p>Complete your property details and submit them for administrator review. Required fields are marked *.</p>
+<body class="user-refresh public-property-page ics-entry-page">
+  <a class="user-skip-link" href="#icsFormHeading">Skip to ICS form</a>
+  <header class="public-header">
+    <a class="public-brand" href="login.html" aria-label="PGENRO IMS home">
+      <span class="public-seal"><img src="../logo/enro.png" alt="PGENRO seal" width="44" height="44"></span>
+      <span class="brand-copy"><strong>PGENRO <span class="ics-brand-tag">IMS</span></strong><small>Information Management System</small></span>
+    </a>
+    <div class="public-header-links"><span class="ics-header-label">Province of Quezon</span><a class="staff-link" href="login.html">Staff sign in <span aria-hidden="true">↗</span></a></div>
   </header>
-  <noscript><p class="ics-form-feedback">Please enable JavaScript to submit this form.</p></noscript>
-  <form id="icsSubmissionForm" class="public-card" novalidate>
-    <div id="icsSubmissionFeedback" class="ics-form-feedback" role="alert" tabindex="-1" hidden></div>
-<fieldset class="ics-form-section">
-<legend>Control & Identification</legend>
-<p>Use the official reference numbers for this slip.</p>
-<div class="ics-form-grid">
-<div class="ics-form-field">
-<label for="submission-controlNo">Control No. <span aria-hidden="true">*</span>
-</label>
-<input type="text" id="submission-controlNo" name="controlNo" required aria-required="true" maxlength="60" placeholder="e.g. ICS-2026-0001">
-</div>
-<div class="ics-form-field">
-<label for="submission-icsNo">ICS No. <span aria-hidden="true">*</span>
-</label>
-<input type="text" id="submission-icsNo" name="icsNo" required aria-required="true" maxlength="60" placeholder="Official ICS number">
-</div>
-<div class="ics-form-field">
-<label for="submission-entryNo">Entry No.</label>
-<input type="text" id="submission-entryNo" name="entryNo" maxlength="60" placeholder="Entry / registry number">
-</div>
-<div class="ics-form-field">
-<label for="submission-accountCode">Account Code</label>
-<input type="text" id="submission-accountCode" name="accountCode" maxlength="60" placeholder="Account code">
-</div>
-</div>
-</fieldset>
-<fieldset class="ics-form-section">
-<legend>Property Information</legend>
-<p>Describe the property and its identifying details.</p>
-<div class="ics-form-grid">
-<div class="ics-form-field">
-<label for="submission-article">Article / Category <span aria-hidden="true">*</span>
-</label>
-<input type="text" id="submission-article" name="article" required aria-required="true" maxlength="120" placeholder="e.g. Office Equipment">
-</div>
-<div class="ics-form-field">
-<label for="submission-itemDescription">Item Description <span aria-hidden="true">*</span>
-</label>
-<input type="text" id="submission-itemDescription" name="itemDescription" required aria-required="true" maxlength="240" placeholder="Detailed property description">
-</div>
-<div class="ics-form-field">
-<label for="submission-serialNo">Serial Number</label>
-<input type="text" id="submission-serialNo" name="serialNo" maxlength="120" placeholder="Serial / service tag">
-</div>
-<div class="ics-form-field">
-<label for="submission-itemNo">Item / Inventory No.</label>
-<input type="text" id="submission-itemNo" name="itemNo" maxlength="120" placeholder="Property / inventory number">
-</div>
-<div class="ics-form-field">
-<label for="submission-unit">Unit of Measure</label>
-<input type="text" id="submission-unit" name="unit" maxlength="40" placeholder="Unit" value="unit">
-</div>
-<div class="ics-form-field">
-<label for="submission-quantity">Quantity <span aria-hidden="true">*</span>
-</label>
-<input type="number" max="1000000" id="submission-quantity" name="quantity" required aria-required="true" value="1" inputmode="decimal" min="0.01" step="0.01">
-</div>
-</div>
-</fieldset>
-<fieldset class="ics-form-section">
-<legend>Financial & Procurement</legend>
-<p>The total value is calculated from quantity and unit cost.</p>
-<div class="ics-form-grid">
-<div class="ics-form-field">
-<label for="submission-unitCost">Unit Cost (₱) <span aria-hidden="true">*</span>
-</label>
-<input type="number" max="1000000000" id="submission-unitCost" name="unitCost" required aria-required="true" value="0" inputmode="decimal" min="0" step="0.01">
-</div>
-<div class="ics-form-field">
-<label for="submission-dateAcquired">Date Acquired</label>
-<input type="date" id="submission-dateAcquired" name="dateAcquired">
-</div>
-<div class="ics-form-field">
-<label for="submission-fundCluster">Fund Cluster</label>
-<input type="text" id="submission-fundCluster" name="fundCluster" maxlength="80" placeholder="Fund cluster" value="General Fund (01)">
-</div>
-<div class="ics-form-field">
-<label for="submission-prNo">Purchase Request (P.R.) No.</label>
-<input type="text" id="submission-prNo" name="prNo" maxlength="80" placeholder="P.R. number">
-</div>
-<div class="ics-form-field">
-<label for="submission-prDate">P.R. Date</label>
-<input type="date" id="submission-prDate" name="prDate">
-</div>
-<div class="ics-form-field ics-total">
-<span>Total Value</span>
-<output id="submissionTotalValue" aria-live="polite">₱0.00</output>
-</div>
-</div>
-</fieldset>
-<fieldset class="ics-form-section">
-<legend>Accountability</legend>
-<p>Confirm the responsible person and office.</p>
-<div class="ics-form-grid">
-<div class="ics-form-field">
-<label for="submission-accountablePerson">Person Accountable <span aria-hidden="true">*</span>
-</label>
-<input type="text" id="submission-accountablePerson" name="accountablePerson" required aria-required="true" maxlength="180" placeholder="Complete name of accountable employee">
-</div>
-<div class="ics-form-field">
-<label for="submission-division">Division / Unit</label>
-<input type="text" id="submission-division" name="division" maxlength="120" placeholder="Office / division">
-</div>
-<div class="ics-form-field ics-form-wide">
-<label for="submission-remarks">Historical / Remarks</label>
-<textarea id="submission-remarks" name="remarks" maxlength="1000" rows="3" placeholder="Condition, transfers, or additional notes">
-</textarea>
-</div>
-</div>
-</fieldset>
-    <div class="public-actions">
-      <p class="ics-submit-note">Your submission will be marked <strong>Pending review</strong> until the administrator approves it.</p>
-      <button class="secondary-action" type="reset">Clear form</button>
-      <button class="primary-action" id="submitIcsBtn" type="submit">Submit ICS Form</button>
+  <main class="public-main ics-page-main">
+    <div class="ics-workspace">
+      <aside class="ics-guide" aria-labelledby="icsWelcomeTitle">
+        <div class="ics-guide-intro"><p class="ics-guide-eyebrow"><span aria-hidden="true"></span>PROPERTY ACCOUNTABILITY</p><h1 id="icsWelcomeTitle">Every asset.<br><span>Accounted for.</span></h1><p>Keep your property records clear, complete, and ready for review.</p></div>
+        <div class="ics-property-art" aria-hidden="true">
+          <div class="ics-art-halo"></div><div class="ics-art-shadow"></div>
+          <div class="ics-art-sheet ics-art-sheet-back"></div>
+          <div class="ics-art-sheet ics-art-sheet-front"><span class="ics-art-sheet-heading"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 3C10 3 4 8 4 14a6 6 0 0 0 6 6c7 0 10-8 10-17ZM3 21 14 10"/></svg> PROPERTY RECORD</span><span class="ics-art-line"></span><span class="ics-art-line short"></span><span class="ics-art-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m12 3 9 5v9l-9 5-9-5V8Zm0 10 9-5M3 8l9 5v9M7 5.8l9 5"/></svg><span>Inventory<br><b>Custodian Slip</b></span></span><span class="ics-art-line"></span><span class="ics-art-line short"></span></div>
+          <span class="ics-art-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"><path d="m5 12 4 4L19 6"/></svg></span><span class="ics-art-spark one"></span><span class="ics-art-spark two"></span>
+        </div>
+        <nav class="ics-step-navigation" id="icsStepNavigation" aria-label="ICS form sections" hidden><ol><li><button type="button" data-ics-step="0" aria-controls="icsStep0" aria-current="step"><span class="ics-step-number">01</span><span class="ics-step-copy"><strong>Reference numbers</strong><small>Control and ICS numbers</small></span><span class="ics-step-check" aria-hidden="true">✓</span></button></li>
+<li><button type="button" data-ics-step="1" aria-controls="icsStep1" disabled><span class="ics-step-number">02</span><span class="ics-step-copy"><strong>Property details</strong><small>Item and quantity</small></span><span class="ics-step-check" aria-hidden="true">✓</span></button></li>
+<li><button type="button" data-ics-step="2" aria-controls="icsStep2" disabled><span class="ics-step-number">03</span><span class="ics-step-copy"><strong>Cost & procurement</strong><small>Value and purchase details</small></span><span class="ics-step-check" aria-hidden="true">✓</span></button></li>
+<li><button type="button" data-ics-step="3" aria-controls="icsStep3" disabled><span class="ics-step-number">04</span><span class="ics-step-copy"><strong>Accountability</strong><small>Person and office</small></span><span class="ics-step-check" aria-hidden="true">✓</span></button></li>
+<li><button type="button" data-ics-step="4" aria-controls="icsStep4" disabled><span class="ics-step-number">05</span><span class="ics-step-copy"><strong>Review & submit</strong><small>Check your entries</small></span><span class="ics-step-check" aria-hidden="true">✓</span></button></li></ol></nav>
+        <div class="ics-guide-note"><span aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"/><path d="m8 12 3 3 5-6"/></svg></span><div><strong>Review before you send.</strong><p>Your form will be checked by the administrator before approval.</p></div></div>
+        <a href="login.html" class="ics-guide-back"><span aria-hidden="true">←</span> Back to start</a>
+      </aside>
+      <section class="ics-form-panel" aria-label="Inventory Custodian Slip form">
+        <form id="icsSubmissionForm" aria-labelledby="icsFormHeading" class="public-card ics-entry-card" novalidate>
+          <header class="ics-form-heading"><div><p class="card-kicker">INVENTORY CUSTODIAN SLIP</p><h2 id="icsFormHeading" tabindex="-1">Register your property<span>.</span></h2><p>Complete the details using your official records.</p></div><span class="ics-form-emblem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="17" rx="2"/><path d="M9 2h6v4H9ZM8 11h8m-8 4h5"/></svg></span></header>
+          <div class="ics-progress-block" id="icsProgressBlock" hidden><div class="ics-progress-meta"><span id="icsProgressText">Step 1 of 5</span><span id="icsCompletedCount">Your property record</span></div><progress id="icsProgress" value="1" max="5" aria-label="ICS form progress"></progress></div>
+          <div class="ics-section-heading"><span class="ics-section-number" id="icsSectionNumber" aria-hidden="true">01</span><div><h3 id="icsStepTitle" tabindex="-1">Reference numbers</h3><p id="icsStepCaption">Start with the official reference numbers for this slip.</p></div><span class="required-note"><span class="required-mark" aria-hidden="true">*</span> Required</span></div>
+          <div id="icsSubmissionFeedback" class="ics-form-feedback" role="alert" aria-live="assertive" tabindex="-1" hidden></div>
+          <noscript><p class="ics-form-feedback">Please enable JavaScript to calculate the total and submit your form.</p></noscript>
+          <div class="ics-step-content"><fieldset class="ics-form-section ics-step-panel" data-ics-panel="0" id="icsStep0">
+        <legend><span aria-hidden="true">01</span> Reference numbers</legend>
+        <p class="section-description">Use the official reference numbers assigned to this slip.</p>
+        <div class="ics-form-grid">
+          <div class="ics-form-field">
+            <label for="submission-controlNo">Control No. <span aria-hidden="true">*</span></label>
+            <input type="text" id="submission-controlNo" name="controlNo" required aria-required="true" maxlength="60" placeholder="e.g. ICS-2026-0001" autocomplete="off">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-icsNo">ICS No. <span aria-hidden="true">*</span></label>
+            <input type="text" id="submission-icsNo" name="icsNo" required aria-required="true" maxlength="60" placeholder="Official ICS number" autocomplete="off">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-entryNo">Entry No.</label>
+            <input type="text" id="submission-entryNo" name="entryNo" maxlength="60" placeholder="Entry / registry number">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-accountCode">Account Code</label>
+            <input type="text" id="submission-accountCode" name="accountCode" maxlength="60" placeholder="Account code">
+          </div>
+        </div>
+      </fieldset><fieldset class="ics-form-section ics-step-panel" data-ics-panel="1" id="icsStep1">
+        <legend><span aria-hidden="true">02</span> Property details</legend>
+        <p class="section-description">Describe the item and provide identifying details when available.</p>
+        <div class="ics-form-grid">
+          <div class="ics-form-field">
+            <label for="submission-article">Article / Category <span aria-hidden="true">*</span></label>
+            <input type="text" id="submission-article" name="article" required aria-required="true" maxlength="120" placeholder="e.g. Office Equipment">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-itemDescription">Item Description <span aria-hidden="true">*</span></label>
+            <input type="text" id="submission-itemDescription" name="itemDescription" required aria-required="true" maxlength="240" placeholder="Detailed property description">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-serialNo">Serial Number</label>
+            <input type="text" id="submission-serialNo" name="serialNo" maxlength="120" placeholder="Serial / service tag">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-itemNo">Item / Inventory No.</label>
+            <input type="text" id="submission-itemNo" name="itemNo" maxlength="120" placeholder="Property / inventory number">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-unit">Unit of Measure</label>
+            <input type="text" id="submission-unit" name="unit" maxlength="40" placeholder="Unit" value="unit">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-quantity">Quantity <span aria-hidden="true">*</span></label>
+            <input type="number" max="1000000" id="submission-quantity" name="quantity" required aria-required="true" value="1" inputmode="decimal" min="0.01" step="0.01">
+            <small class="field-hint">Enter a value greater than zero.</small>
+          </div>
+        </div>
+      </fieldset><fieldset class="ics-form-section ics-step-panel" data-ics-panel="2" id="icsStep2">
+        <legend><span aria-hidden="true">03</span> Cost & procurement</legend>
+        <p class="section-description">The total value is calculated automatically from quantity and unit cost.</p>
+        <div class="ics-form-grid">
+          <div class="ics-form-field">
+            <label for="submission-unitCost">Unit Cost (₱) <span aria-hidden="true">*</span></label>
+            <div class="input-with-prefix">
+              <span aria-hidden="true">₱</span>
+              <input type="number" max="1000000000" id="submission-unitCost" name="unitCost" required aria-required="true" value="0" inputmode="decimal" min="0" step="0.01">
+            </div>
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-dateAcquired">Date Acquired</label>
+            <input type="date" id="submission-dateAcquired" name="dateAcquired">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-fundCluster">Fund Cluster</label>
+            <input type="text" id="submission-fundCluster" name="fundCluster" maxlength="80" placeholder="Fund cluster" value="General Fund (01)">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-prNo">Purchase Request (P.R.) No.</label>
+            <input type="text" id="submission-prNo" name="prNo" maxlength="80" placeholder="P.R. number">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-prDate">P.R. Date</label>
+            <input type="date" id="submission-prDate" name="prDate">
+          </div>
+          <div class="ics-form-field ics-total">
+            <span class="total-label">Calculated Total Value</span>
+            <output id="submissionTotalValue" aria-live="polite">₱0.00</output>
+            <small class="field-hint">Quantity × unit cost</small>
+          </div>
+        </div>
+      </fieldset><fieldset class="ics-form-section ics-step-panel" data-ics-panel="3" id="icsStep3">
+        <legend><span aria-hidden="true">04</span> Accountability</legend>
+        <p class="section-description">Identify the person responsible for the property and their office.</p>
+        <div class="ics-form-grid">
+          <div class="ics-form-field">
+            <label for="submission-accountablePerson">Person Accountable <span aria-hidden="true">*</span></label>
+            <input type="text" id="submission-accountablePerson" name="accountablePerson" required aria-required="true" maxlength="180" placeholder="Complete name of accountable employee" autocomplete="name">
+          </div>
+          <div class="ics-form-field">
+            <label for="submission-division">Division / Unit</label>
+            <input type="text" id="submission-division" name="division" maxlength="120" placeholder="Office / division">
+          </div>
+          <div class="ics-form-field ics-form-wide">
+            <label for="submission-remarks">Historical / Remarks</label>
+            <textarea id="submission-remarks" name="remarks" maxlength="1000" rows="4" placeholder="Condition, transfers, or additional notes"></textarea>
+            <small class="field-hint">Optional. Maximum 1,000 characters.</small>
+          </div>
+        </div>
+      </fieldset>
+            <section class="ics-step-panel ics-review-step" data-ics-panel="4" id="icsStep4" aria-labelledby="icsStepTitle" hidden><p class="ics-review-intro">Check these details carefully. Use Edit to make a correction before sending.</p><section class="ics-review-group" aria-labelledby="icsReviewTitle0"><header><h3 id="icsReviewTitle0">Reference numbers</h3><button type="button" class="ics-review-edit" data-ics-edit="0" aria-label="Edit reference numbers">Edit <span aria-hidden="true">↗</span></button></header><dl id="icsReviewGroup0" class="ics-review-list"></dl></section>
+<section class="ics-review-group" aria-labelledby="icsReviewTitle1"><header><h3 id="icsReviewTitle1">Property details</h3><button type="button" class="ics-review-edit" data-ics-edit="1" aria-label="Edit property details">Edit <span aria-hidden="true">↗</span></button></header><dl id="icsReviewGroup1" class="ics-review-list"></dl></section>
+<section class="ics-review-group" aria-labelledby="icsReviewTitle2"><header><h3 id="icsReviewTitle2">Cost & procurement</h3><button type="button" class="ics-review-edit" data-ics-edit="2" aria-label="Edit cost & procurement">Edit <span aria-hidden="true">↗</span></button></header><dl id="icsReviewGroup2" class="ics-review-list"></dl></section>
+<section class="ics-review-group" aria-labelledby="icsReviewTitle3"><header><h3 id="icsReviewTitle3">Accountability</h3><button type="button" class="ics-review-edit" data-ics-edit="3" aria-label="Edit accountability">Edit <span aria-hidden="true">↗</span></button></header><dl id="icsReviewGroup3" class="ics-review-list"></dl></section><div class="ics-review-total"><span>Total property value<small>Quantity × unit cost</small></span><output id="icsReviewTotal">₱0.00</output></div></section>
+          </div>
+          <footer class="form-bottom ics-form-navigation"><span class="ics-submit-note"><span class="ics-status-dot" aria-hidden="true"></span><span>Sent for <strong>administrator review</strong> after submission.</span></span><div class="public-actions"><button class="secondary-action" id="icsBackBtn" type="button" hidden><span aria-hidden="true">←</span> Back</button><button class="ics-clear-action" type="reset">Clear form</button><button class="primary-action" id="icsNextBtn" type="button" hidden>Continue <span aria-hidden="true">→</span></button><button class="primary-action" id="submitIcsBtn" type="submit" disabled><span class="submit-button-label">Submit ICS Form</span><span class="button-arrow" aria-hidden="true">→</span></button></div></footer>
+        </form>
+    <section id="icsReceipt" class="public-card public-receipt ics-receipt" tabindex="-1" aria-labelledby="receiptTitle" hidden>
+      <div class="receipt-success-icon" aria-hidden="true">✓</div>
+      <p class="card-kicker">SUBMISSION RECEIVED</p>
+      <h2 id="receiptTitle" class="receipt-heading">ICS form submitted</h2>
+      <span class="pending-label"><span aria-hidden="true">●</span> Pending review</span>
+      <p class="receipt-copy">Your form has been sent to the administrator. Save the reference below so the property custodian can locate your submission during follow-up.</p>
+      <dl class="receipt-details">
+        <div><dt>Control No.</dt><dd id="receiptControlNo"></dd></div>
+        <div><dt>ICS No.</dt><dd id="receiptIcsNo"></dd></div>
+        <div><dt>Submission reference</dt><dd id="receiptReference"></dd></div>
+      </dl>
+      <div class="public-actions receipt-actions">
+        <a class="secondary-action" href="login.html">Return to start</a>
+        <button class="primary-action" id="anotherIcsBtn" type="button">Fill another ICS form <span aria-hidden="true">→</span></button>
+      </div>
+    </section>
+
+      </section>
     </div>
-  </form>
-  <section id="icsReceipt" class="public-card public-receipt" tabindex="-1" aria-labelledby="receiptTitle" hidden>
-    <h2 id="receiptTitle" class="receipt-heading">ICS form submitted</h2>
-    <span class="pending-label">Pending review</span>
-    <p>Your form has been sent to the administrator. Keep the reference below when following up with the property custodian.</p>
-    <dl>
-      <div><dt>Control No.</dt><dd id="receiptControlNo"></dd></div>
-      <div><dt>ICS No.</dt><dd id="receiptIcsNo"></dd></div>
-      <div><dt>Submission reference</dt><dd id="receiptReference"></dd></div>
-    </dl>
-    <div class="public-actions">
-      <a class="secondary-action" href="login.html">Return to start</a>
-      <button class="primary-action" id="anotherIcsBtn" type="button">Fill another ICS form</button>
-    </div>
-  </section>
-</main>
-<footer class="public-footer">Provincial Government Environment &amp; Natural Resources Office</footer>
+  </main>
+  <footer class="public-footer"><span><strong>PGENRO IMS</strong> · Province of Quezon</span><span>Provincial Government Environment &amp; Natural Resources Office</span></footer>
 </body>
 </html>

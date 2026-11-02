@@ -1,0 +1,2403 @@
+/* Module-owned runtime. Kept inside each module; no extra shared file required. */
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const storage = {
+    get(key, fallback = null) { try { return JSON.parse(localStorage.getItem(key)) ?? fallback; } catch { return fallback; } },
+    set(key, value) { try { localStorage.setItem(key, JSON.stringify(value)); return true; } catch { return false; } }
+  };
+  const escape = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const uuid = () => crypto.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const today = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`; };
+  function placeToastContainer(root) {
+    if (!root) return;
+    const modal = document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open');
+    const header = modal?.querySelector('.modal-header');
+    root.classList.toggle('toast-in-dialog', !!header);
+    if (header) header.after(root);
+    else if (root.parentElement !== document.body) document.body.append(root);
+  }
+  function toast(message, type = 'success') {
+    let root = $('toastContainer');
+    if (!root) { root = document.createElement('div'); root.id = 'toastContainer'; root.className = 'toast-container'; root.setAttribute('aria-live','polite'); document.body.append(root); }
+    placeToastContainer(root);
+    const limit = root.classList.contains('toast-in-dialog') || innerWidth <= 600 ? 1 : 3;
+    while (root.children.length >= limit) root.firstElementChild.remove();
+    const item = document.createElement('div'); item.className = `toast show ${type}`; item.textContent = message; root.append(item); setTimeout(() => item.remove(), 5500);
+  }
+  function csv(rows, filename) {
+    const cell = v => { let s = String(v ?? ''); if (/^[\s]*[=+@-]/.test(s)) s = "'"+s; return `"${s.replaceAll('"','""')}"`; };
+    const blob = new Blob(['\ufeff', rows.map(row => row.map(cell).join(',')).join('\r\n')], {type:'text/csv;charset=utf-8'});
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+  const modalTriggers = new Map();
+  let pageScrollLock = null;
+  function lockPageScroll() {
+    if (pageScrollLock) return;
+    pageScrollLock = { x:window.scrollX, y:window.scrollY, position:document.body.style.position, top:document.body.style.top, left:document.body.style.left, width:document.body.style.width, overflow:document.documentElement.style.overflow };
+    document.body.style.position = 'fixed'; document.body.style.top = `-${pageScrollLock.y}px`;
+    document.body.style.left = '0'; document.body.style.width = '100%'; document.documentElement.style.overflow = 'hidden';
+  }
+  function unlockPageScroll() {
+    if (!pageScrollLock) return;
+    const previous = pageScrollLock; pageScrollLock = null;
+    for (const key of ['position','top','left','width']) document.body.style[key] = previous[key];
+    document.documentElement.style.overflow = previous.overflow;
+    window.scrollTo({left:previous.x, top:previous.y, behavior:'instant'});
+  }
+  function openModal(id) {
+    const modal = $(id); if (!modal) return;
+    if([...document.querySelectorAll('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')].some(other=>other.dataset.busy==='true'))return false;
+    document.querySelectorAll('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open').forEach(other => { if (other !== modal) closeModal(other.id); });
+    lockPageScroll(); if (!modal.classList.contains('open')) modalTriggers.set(id, document.activeElement); modal.classList.add('open'); modal.setAttribute('aria-hidden','false'); document.body.classList.add('admin-modal-open');
+    placeToastContainer($('toastContainer'));
+    const wrapper = document.querySelector('.app-layout'); if (wrapper) wrapper.inert = true;
+    const dialog = modal.querySelector('[role=dialog]') || modal; dialog.setAttribute('tabindex','-1');
+    modal.querySelectorAll('.modal-body,.admin-modal-body').forEach(body => {body.scrollTop = 0;});
+    (modal.querySelector('input:not([type=hidden]):not(:disabled),select:not(:disabled),textarea:not(:disabled),button:not(:disabled)') || dialog).focus({preventScroll:true});
+  }
+  function closeModal(id) {
+    const modal = $(id); if (!modal || !modal.classList.contains('open') || modal.dataset.busy === 'true') return;
+    modal.classList.remove('open'); modal.setAttribute('aria-hidden','true');
+    placeToastContainer($('toastContainer'));
+    if (!document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')) {
+      document.body.classList.remove('admin-modal-open'); unlockPageScroll(); const wrapper = document.querySelector('.app-layout'); if (wrapper) wrapper.inert = false;
+    }
+    const trigger=modalTriggers.get(id);modalTriggers.delete(id);
+    if(trigger?.isConnected&&trigger.getClientRects?.().length&&!trigger.closest?.('[inert]')&&!trigger.disabled)trigger.focus({preventScroll:true});
+    else if(!document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open'))(document.querySelector('.header-actions .btn-primary')||document.querySelector('main'))?.focus({preventScroll:true});
+    modal.dispatchEvent(new Event('pgenro:modal-close'));
+  }
+  let currentIds = new Map(); const unread = [];
+  function observeRecords(key, rows) {
+    window.PGENRO_Notifications?.scheduleRefresh();
+    const ids = rows.map(r => String(r.id)).filter(Boolean); const prior = currentIds.get(key);
+    if (prior) {
+      const added = ids.filter(id => !prior.has(id));
+      if (added.length) { unread.unshift(`${added.length} new ${key.replaceAll('_',' ')} record${added.length === 1 ? '' : 's'} added.`); renderNotifications(); }
+    }
+    currentIds.set(key, new Set(ids));
+  }
+  function renderNotifications() {
+    if ($('notificationList')) $('notificationList').innerHTML = unread.length ? unread.slice(0,20).map(t => `<div class="notification-item"><strong>New record</strong><span>${escape(t)}</span></div>`).join('') : '<div class="empty-notif-state">No new notifications</div>';
+    if ($('notifBadgeCount')) $('notifBadgeCount').textContent = `${unread.length} Unread`;
+    if ($('notifPing')) $('notifPing').style.display = unread.length ? 'block' : 'none';
+  }
+  const wrapped = new Map();
+  const client = () => window.pgenroSupabase || window.PGENRO_DB?.client || null;
+  const unwrap = row => row.data && typeof row.data === 'object' && !Array.isArray(row.data) ? {...row.data,id:row.id,created_at:row.created_at ?? row.data.created_at,updated_at:row.updated_at ?? row.data.updated_at} : row;
+  async function read(table) {
+    const sb = client(); if (!sb) throw new Error('Database client is unavailable. Refresh the page and try again.');
+    if (!wrapped.has(table)) {
+      const probe = await sb.from(table).select('data').limit(1);
+      if (probe.error && !['42703','PGRST204'].includes(probe.error.code)) throw probe.error;
+      wrapped.set(table, !probe.error);
+    }
+    const rows = []; let offset = 0;
+    while (true) {
+      const response = await sb.from(table).select('*',{count:'exact'}).order('id',{ascending:true}).range(offset,offset+499);
+      if (response.error) throw response.error;
+      const batch = response.data || []; rows.push(...batch); offset += batch.length;
+      if (batch.length < 500 || (response.count !== null && response.count !== undefined && offset >= response.count)) break;
+    }
+    return rows.map(unwrap);
+  }
+  async function write(table, payload, id = null) {
+    await window.PGENRO_API?.requireAdmin?.();
+    const sb = client(); if (!sb) throw new Error('Database client is unavailable.');
+    let body = wrapped.get(table) ? {data:payload} : payload;
+    if (id && wrapped.get(table)) {
+      const existing = await sb.from(table).select('data').eq('id',id).limit(1);
+      if (existing.error) throw existing.error;
+      if (!existing.data?.length) throw new Error('This record is no longer available. Refresh before saving.');
+      body = {data:{...(existing.data[0].data || {}), ...payload}};
+    }
+    if (!id && wrapped.get(table)) body = {id:uuid(), ...body};
+    const response = await (id ? sb.from(table).update(body).eq('id',id) : sb.from(table).insert(body)).select('*');
+    if (response.error) throw response.error;
+    if (!response.data?.length) throw new Error('The record was not saved or is not accessible. Check your database permissions.');
+    return unwrap(response.data[0]);
+  }
+  async function remove(table, ids) {
+    await window.PGENRO_API?.requireAdmin?.();
+    const response = await client().from(table).delete().in('id',ids).select('id');
+    if (response.error) throw response.error;
+    if (response.data?.length !== ids.length) throw new Error('Some records could not be deleted. Refresh and check your database permissions.');
+  }
+  async function audit(action, details) {
+    const event = {id:uuid(),action,details,module:document.title.split('|')[1]?.trim(),timestamp:new Date().toISOString(),created_at:new Date().toISOString()};
+    const cached = storage.get('pgenro_audit_log_fallback',[]); storage.set('pgenro_audit_log_fallback',[event,...(Array.isArray(cached) ? cached : [])].slice(0,500));
+    // Keep the page usable if the optional audit table is unavailable.
+    if (client()) { try { await readAuditShape(); const result = await client().from('audit_logs').insert(wrapped.get('audit_logs') ? {id:event.id,data:event} : event); if (result.error) console.warn('Audit retained locally:',result.error.message); } catch {} }
+  }
+  async function readAuditShape() { if (!wrapped.has('audit_logs')) { const r = await client().from('audit_logs').select('data').limit(1); wrapped.set('audit_logs',!r.error); } }
+  function initShell() {
+    renderIcons(); renderNotifications();
+    const sidebar = $('sidebar'); const mobile = $('mobileMenuBtn'); const collapse = $('sidebarCollapseBtn'); const backdrop = $('sidebarBackdrop');
+    function closeMobile() { sidebar?.classList.remove('mobile-open'); backdrop?.classList.remove('active'); backdrop?.setAttribute('aria-hidden','true'); document.body.classList.remove('mobile-nav-open'); mobile?.setAttribute('aria-expanded','false'); if (innerWidth <= 900 && sidebar) sidebar.inert = true; }
+    function sync() {
+      let pref = 'expanded'; try { pref = localStorage.getItem('pgenro_admin_sidebar') || pref; } catch {}
+      const collapsed = innerWidth > 900 && pref === 'collapsed'; sidebar?.classList.toggle('collapsed',collapsed); document.body.classList.toggle('sidebar-collapsed',collapsed);
+      collapse?.setAttribute('aria-expanded',String(!collapsed)); collapse?.setAttribute('aria-label',collapsed ? 'Expand administrator menu' : 'Collapse administrator menu'); if (collapse) collapse.title = collapsed ? 'Expand Menu' : 'Collapse Menu';
+      if (innerWidth > 900) closeMobile(); if (sidebar) sidebar.inert = innerWidth <= 900 && !sidebar.classList.contains('mobile-open');
+    }
+    collapse?.addEventListener('click',() => { if (innerWidth <= 900) { closeMobile(); mobile?.focus(); return; } try { localStorage.setItem('pgenro_admin_sidebar',sidebar.classList.contains('collapsed') ? 'expanded' : 'collapsed'); } catch {} sync(); });
+    mobile?.addEventListener('click',() => { const open = !sidebar.classList.contains('mobile-open'); if (!open) return closeMobile(); sidebar.inert = false; sidebar.classList.add('mobile-open'); backdrop?.classList.add('active'); backdrop?.setAttribute('aria-hidden','false'); document.body.classList.add('mobile-nav-open'); mobile.setAttribute('aria-expanded','true'); sidebar.querySelector('a')?.focus(); });
+    backdrop?.addEventListener('click',() => {closeMobile();mobile?.focus();});
+    sidebar?.querySelectorAll('a').forEach(a => { a.title = a.textContent.trim(); a.addEventListener('click',closeMobile); });
+    let wasMobile = innerWidth <= 900; window.addEventListener('resize',() => {const next = innerWidth <= 900; if(next !== wasMobile){wasMobile = next; sync();}}); window.addEventListener('storage',event => {if(event.key === 'pgenro_admin_sidebar') sync();}); sync();
+    const pairs = [['profileBtn','profileDropdown'],['notificationsBtn','notificationDropdown']];
+    function closeMenus() { pairs.forEach(([button,menu])=>{$(button)?.setAttribute('aria-expanded','false');$(menu)?.classList.remove('open');}); }
+    pairs.forEach(([button,menu]) => $(button)?.addEventListener('click',() => { const open = !$(menu)?.classList.contains('open'); closeMenus(); if(open){$(menu)?.classList.add('open');$(button).setAttribute('aria-expanded','true'); if(button==='profileBtn')$(menu)?.querySelector('a,button')?.focus();if(button==='notificationsBtn'){unread.length=0; if($('notifBadgeCount'))$('notifBadgeCount').textContent='0 Unread'; if($('notifPing'))$('notifPing').style.display='none';}} }));
+    document.addEventListener('click',e => { if (!e.target.closest('.profile-menu,.notification-wrapper')) closeMenus(); });
+    document.addEventListener('keydown',e => {
+      if ((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k') {e.preventDefault();$('globalSearchInput')?.focus();}
+      const modal = document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open');
+      const surface = modal || (sidebar?.classList.contains('mobile-open') ? sidebar : null);
+      if (e.key === 'Escape') {const menuTrigger=pairs.find(([,menu])=>$(menu)?.classList.contains('open'))?.[0];const wasOpen=sidebar?.classList.contains('mobile-open');closeMenus();if(modal)closeModal(modal.id);closeMobile();if(wasOpen)mobile?.focus();else if(menuTrigger)$(menuTrigger)?.focus();}
+      if (e.key === 'Tab' && surface) {const elements = [...surface.querySelectorAll('button,a[href],input:not([type=hidden]),select,textarea,[tabindex="0"]')].filter(el=>!el.disabled && !el.closest('[inert]') && el.getClientRects().length); if (!elements.length) return; const first=elements[0],last=elements.at(-1);if(!surface.contains(document.activeElement)){e.preventDefault();(e.shiftKey?last:first).focus();}else if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}
+    });
+    document.querySelectorAll('.modal-overlay,.modal-backdrop').forEach(m => m.addEventListener('click',e => { if(e.target===m)closeModal(m.id); }));
+    const user = storage.get('pgenro_current_user',{}); if($('dropdownUserName'))$('dropdownUserName').textContent=user.fullName||user.full_name||user.name||'PGENRO Admin'; if($('dropdownUserEmail'))$('dropdownUserEmail').textContent=user.email||'Administrator Session';
+    if(document.body.dataset.adminPage !== 'admin.html') $('logoutBtn')?.addEventListener('click',async () => {
+      try { if(client()){const result=await client().auth.signOut();if(result?.error)throw result.error;} try{localStorage.removeItem('pgenro_current_user');sessionStorage.removeItem('pgenro_current_user');}catch{} location.href='../User/login.html'; }catch{toast('Sign out failed. Please try again.','error');}
+    });
+  }
+  // ICON_MAP is inserted while packaging, from the existing local Lucide subset.
+  const icons = {"activity":[["path",{"d":"M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"}]],"award":[["path",{"d":"m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"}],["circle",{"cx":"12","cy":"8","r":"6"}]],"badge":[["path",{"d":"M3.85 8.62a4 4 0 0 1 4.78-4.77 4 4 0 0 1 6.74 0 4 4 0 0 1 4.78 4.78 4 4 0 0 1 0 6.74 4 4 0 0 1-4.77 4.78 4 4 0 0 1-6.75 0 4 4 0 0 1-4.78-4.77 4 4 0 0 1 0-6.76Z"}]],"briefcase":[["path",{"d":"M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"}],["rect",{"width":"20","height":"14","x":"2","y":"6","rx":"2"}]],"building-2":[["path",{"d":"M10 12h4"}],["path",{"d":"M10 8h4"}],["path",{"d":"M14 21v-3a2 2 0 0 0-4 0v3"}],["path",{"d":"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2"}],["path",{"d":"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16"}]],"calendar-off":[["path",{"d":"M4.2 4.2A2 2 0 0 0 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 1.82-1.18"}],["path",{"d":"M21 15.5V6a2 2 0 0 0-2-2H9.5"}],["path",{"d":"M16 2v4"}],["path",{"d":"M3 10h7"}],["path",{"d":"M21 10h-5.5"}],["path",{"d":"m2 2 20 20"}]],"check":[["path",{"d":"M20 6 9 17l-5-5"}]],"chevron-left":[["path",{"d":"m15 18-6-6 6-6"}]],"chevron-right":[["path",{"d":"m9 18 6-6-6-6"}]],"clock":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6l4 2"}]],"clock-3":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 6v6h4"}]],"contact":[["path",{"d":"M16 2v2"}],["path",{"d":"M7 22v-2a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"}],["path",{"d":"M8 2v2"}],["circle",{"cx":"12","cy":"11","r":"3"}],["rect",{"x":"3","y":"4","width":"18","height":"18","rx":"2"}]],"database":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 5V19A9 3 0 0 0 21 19V5"}],["path",{"d":"M3 12A9 3 0 0 0 21 12"}]],"database-backup":[["ellipse",{"cx":"12","cy":"5","rx":"9","ry":"3"}],["path",{"d":"M3 12a9 3 0 0 0 5 2.69"}],["path",{"d":"M21 9.3V5"}],["path",{"d":"M3 5v14a9 3 0 0 0 6.47 2.88"}],["path",{"d":"M12 12v4h4"}],["path",{"d":"M13 20a5 5 0 0 0 9-3 4.5 4.5 0 0 0-4.5-4.5c-1.33 0-2.54.54-3.41 1.41L12 16"}]],"download":[["path",{"d":"M12 15V3"}],["path",{"d":"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"}],["path",{"d":"m7 10 5 5 5-5"}]],"eye":[["path",{"d":"M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"file-check":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m9 15 2 2 4-4"}]],"file-check-2":[["path",{"d":"M10.5 22H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.706.706l3.588 3.588A2.4 2.4 0 0 1 20 8v6"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"m14 20 2 2 4-4"}]],"file-search":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["circle",{"cx":"11.5","cy":"14.5","r":"2.5"}],["path",{"d":"M13.3 16.3 15 18"}]],"file-spreadsheet":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M8 13h2"}],["path",{"d":"M14 13h2"}],["path",{"d":"M8 17h2"}],["path",{"d":"M14 17h2"}]],"file-text":[["path",{"d":"M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"}],["path",{"d":"M14 2v5a1 1 0 0 0 1 1h5"}],["path",{"d":"M10 9H8"}],["path",{"d":"M16 13H8"}],["path",{"d":"M16 17H8"}]],"flag":[["path",{"d":"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528"}]],"id-card":[["path",{"d":"M16 10h2"}],["path",{"d":"M16 14h2"}],["path",{"d":"M6.17 15a3 3 0 0 1 5.66 0"}],["circle",{"cx":"9","cy":"11","r":"2"}],["rect",{"x":"2","y":"5","width":"20","height":"14","rx":"2"}]],"info":[["circle",{"cx":"12","cy":"12","r":"10"}],["path",{"d":"M12 16v-4"}],["path",{"d":"M12 8h.01"}]],"layers-3":[["path",{"d":"M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"}],["path",{"d":"M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"}],["path",{"d":"M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"}]],"menu":[["path",{"d":"M4 5h16"}],["path",{"d":"M4 12h16"}],["path",{"d":"M4 19h16"}]],"panel-left-close":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m16 15-3-3 3-3"}]],"panel-left-open":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"m14 9 3 3-3 3"}]],"pencil":[["path",{"d":"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"}],["path",{"d":"m15 5 4 4"}]],"printer":[["path",{"d":"M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"}],["path",{"d":"M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"}],["rect",{"x":"6","y":"14","width":"12","height":"8","rx":"1"}]],"refresh-cw":[["path",{"d":"M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"}],["path",{"d":"M21 3v5h-5"}],["path",{"d":"M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"}],["path",{"d":"M8 16H3v5"}]],"rotate-ccw":[["path",{"d":"M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"}],["path",{"d":"M3 3v5h5"}]],"rows-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M21 9H3"}],["path",{"d":"M21 15H3"}]],"save":[["path",{"d":"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"}],["path",{"d":"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"}],["path",{"d":"M7 3v4a1 1 0 0 0 1 1h7"}]],"search":[["path",{"d":"m21 21-4.34-4.34"}],["circle",{"cx":"11","cy":"11","r":"8"}]],"settings":[["path",{"d":"M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"}],["circle",{"cx":"12","cy":"12","r":"3"}]],"shield-alert":[["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"M12 8v4"}],["path",{"d":"M12 16h.01"}]],"shield-check":[["path",{"d":"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"}],["path",{"d":"m9 12 2 2 4-4"}]],"shirt":[["path",{"d":"M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"}]],"table":[["path",{"d":"M12 3v18"}],["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M3 9h18"}],["path",{"d":"M3 15h18"}]],"tag":[["path",{"d":"M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"}],["circle",{"cx":"7.5","cy":"7.5","r":".5","fill":"currentColor"}]],"trash-2":[["path",{"d":"M10 11v6"}],["path",{"d":"M14 11v6"}],["path",{"d":"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"}],["path",{"d":"M3 6h18"}],["path",{"d":"M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"}]],"trending-up":[["path",{"d":"M16 7h6v6"}],["path",{"d":"m22 7-8.5 8.5-5-5L2 17"}]],"user":[["path",{"d":"M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"}],["circle",{"cx":"12","cy":"7","r":"4"}]],"user-check":[["path",{"d":"m16 11 2 2 4-4"}],["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"user-plus":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["circle",{"cx":"9","cy":"7","r":"4"}],["line",{"x1":"19","x2":"19","y1":"8","y2":"14"}],["line",{"x1":"22","x2":"16","y1":"11","y2":"11"}]],"user-round":[["circle",{"cx":"12","cy":"8","r":"5"}],["path",{"d":"M20 21a8 8 0 0 0-16 0"}]],"users":[["path",{"d":"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"}],["path",{"d":"M16 3.128a4 4 0 0 1 0 7.744"}],["path",{"d":"M22 21v-2a4 4 0 0 0-3-3.87"}],["circle",{"cx":"9","cy":"7","r":"4"}]],"users-round":[["path",{"d":"M18 21a8 8 0 0 0-16 0"}],["circle",{"cx":"10","cy":"8","r":"5"}],["path",{"d":"M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"}]],"x":[["path",{"d":"M18 6 6 18"}],["path",{"d":"m6 6 12 12"}]],"sun":[["circle",{"cx":"12","cy":"12","r":"4"}],["path",{"d":"M12 2v2"}],["path",{"d":"M12 20v2"}],["path",{"d":"m4.93 4.93 1.41 1.41"}],["path",{"d":"m17.66 17.66 1.41 1.41"}],["path",{"d":"M2 12h2"}],["path",{"d":"M20 12h2"}],["path",{"d":"m6.34 17.66-1.41 1.41"}],["path",{"d":"m19.07 4.93-1.41 1.41"}]],"moon":[["path",{"d":"M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"}]],"columns-3":[["rect",{"width":"18","height":"18","x":"3","y":"3","rx":"2"}],["path",{"d":"M9 3v18"}],["path",{"d":"M15 3v18"}]],"inbox":[["polyline",{"points":"22 12 16 12 14 15 10 15 8 12 2 12"}],["path",{"d":"M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"}]]};
+  const aliases = {'eye':'search','pencil':'file-text','save':'file-check-2','cloud-upload':'file-up','plus-circle':'user-plus','database':'database-backup','hash':'file-text','files':'file-text','folder-open':'briefcase','file-search':'search','scan-text':'file-text','paperclip':'file-text','trash':'trash-2','shield-check':'shield-alert','calendar-days':'calendar','clock-3':'clock','contact':'user-round','building-2':'briefcase','printer':'file-text','file-spreadsheet':'file-text'};
+  function renderIcons() {
+    document.querySelectorAll('i[data-lucide]').forEach(el => {
+      const name = el.dataset.lucide;
+      const nodes = icons[name] || icons[aliases[name]] || icons['file-text'];
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      const attrs = { viewBox: '0 0 24 24', width: 20, height: 20, fill: 'none', stroke: 'currentColor', 'stroke-width': 1.8, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', 'aria-hidden': 'true', focusable: 'false' };
+      for (const [key, value] of Object.entries(attrs)) svg.setAttribute(key, value);
+      svg.setAttribute('class', 'lucide lucide-' + name + ' ' + el.className);
+      if (el.hasAttribute('style')) svg.setAttribute('style', el.getAttribute('style'));
+      for (const [tag, attributes] of nodes) {
+        const node = document.createElementNS(svg.namespaceURI, tag);
+        for (const [key, value] of Object.entries(attributes)) node.setAttribute(key, value);
+        svg.append(node);
+      }
+      el.replaceWith(svg);
+    });
+  }
+  const canStartAction = () => !document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]');
+  window.PGENRO_Module = {canStartAction,storage,escape,uuid,today,toast,csv,openModal,closeModal,observeRecords,renderIcons,read,write,remove,audit,client,unwrap};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initShell,{once:true});else initShell();
+})();
+
+(() => {
+
+
+/* ==========================================================================
+   PGENRO IMS — EMPLOYEE MASTERFILE ADMIN CONTROLLER
+   Full alignment with admin.html: Quick Actions, Batch Operations, Live
+   Supabase Synchronization, Robust Icons, Pagination & 201 Dossiers
+   ========================================================================== */
+
+(() => {
+  "use strict";
+
+  document.addEventListener("DOMContentLoaded", init);
+
+  async function init() {
+    /* ---------------- 1. HELPERS & RESILIENT ICONS ---------------- */
+    const $ = (selector, root = document) => root.querySelector(selector);
+    const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function refreshIcons() {
+      try {
+        window.PGENRO_Module.renderIcons();
+      } catch (err) {
+        console.warn("Lucide notice:", err);
+      }
+    }
+
+    refreshIcons();
+
+    /* ---------------- 2. DOM ELEMENTS ---------------- */
+    const statusDot = $("#dbStatusDot") || $("#statusDot");
+    const statusText = $("#dbStatusText") || $("#statusText");
+
+    // Table, Search & Filter Controls
+    const employeeTableBody = $("#employeeTableBody");
+    const searchInput = $("#searchInput");
+    const globalSearchInput = $("#globalSearchInput");
+    const filterEmploymentType = $("#filterEmploymentType");
+    const filterDepartment = $("#filterDepartment");
+    const filterStatus = $("#filterStatus");
+    const resetFiltersBtn = $("#resetFiltersBtn");
+    const recordCounter = $("#recordCounter");
+    const selectAllRows = $("#selectAllRows");
+
+    // Batch Actions Bar
+    const batchActionsBar = $("#batchActionsBar");
+    const selectedCountBadge = $("#selectedCountBadge");
+    const batchExportBtn = $("#batchExportBtn");
+    const batchDeleteBtn = $("#batchDeleteBtn");
+    const batchClearBtn = $("#batchClearBtn");
+
+    // Pagination
+    const tablePaginationInfo = $("#tablePaginationInfo");
+    const prevPageBtn = $("#prevPageBtn");
+    const nextPageBtn = $("#nextPageBtn");
+    const pageNumbers = $("#pageNumbers");
+
+    // KPI Metrics
+    const kpiPersonnel = $("#kpiPersonnel");
+    const kpiActive = $("#kpiActive");
+    const kpiActivePct = $("#kpiActivePct");
+    const kpiLeave = $("#kpiLeave");
+    const kpiDepts = $("#kpiDepts");
+
+    // Composition Counters
+    const countPermanent = $("#countPermanent");
+    const countCasual = $("#countCasual");
+    const countJO = $("#countJO");
+    const countCOS = $("#countCOS");
+
+    // Action Buttons
+    const addEmployeeBtn = $("#addEmployeeBtn");
+    const exportBtn = $("#exportBtn");
+    const refreshBtn = $("#refreshBtn");
+    const quickAddBtn = $("#quickAddBtn");
+    const quickExportBtn = $("#quickExportBtn");
+    const quickPrintBtn = $("#quickPrintBtn");
+    const quickFilterPermanent = $("#quickFilterPermanent");
+    const quickFilterCasual = $("#quickFilterCasual");
+    const quickFilterLeave = $("#quickFilterLeave");
+
+    // Modals
+    const employeeFormModal = $("#employeeFormModal");
+    const employeeForm = $("#employeeForm");
+    const employeeModalTitle = $("#employeeModalTitle");
+    const profileModal = $("#profileModal");
+    const printDossierBtn = $("#printDossierBtn");
+    const dossierEditBtn = $("#dossierEditBtn");
+    const saveEmployeeBtn = $("#saveEmployeeBtn");
+
+    // Form Inputs
+    const empId = $("#empId");
+    const empFirstName = $("#empFirstName");
+    const empMiddleName = $("#empMiddleName");
+    const empLastName = $("#empLastName");
+    const empExtension = $("#empExtension");
+    const empGender = $("#empGender");
+    const empDob = $("#empDob");
+    const empPob = $("#empPob");
+    const empCivilStatus = $("#empCivilStatus");
+    const empBloodType = $("#empBloodType");
+    const empDesignation = $("#empDesignation");
+    const empDepartment = $("#empDepartment");
+    const empStatusType = $("#empStatusType");
+    const empItemCode = $("#empItemCode");
+    const empDateEmployed = $("#empDateEmployed");
+    const empSalaryGrade = $("#empSalaryGrade");
+    const empDutyStatus = $("#empDutyStatus");
+    const empReligion = $("#empReligion");
+    const empHeightCm = $("#empHeightCm");
+    const empWeightKg = $("#empWeightKg");
+    const empDateAssumption = $("#empDateAssumption");
+    const empStepNo = $("#empStepNo");
+    const empNosaDate = $("#empNosaDate");
+    const empBasicSalary = $("#empBasicSalary");
+    const empEligibility = $("#empEligibility");
+    const empTinNo = $("#empTinNo");
+    const empGsisBpNo = $("#empGsisBpNo");
+    const empPagibigNo = $("#empPagibigNo");
+    const empPhilhealthNo = $("#empPhilhealthNo");
+    const empHouseStreetPurok = $("#empHouseStreetPurok");
+    const empBarangay = $("#empBarangay");
+    const empCityMunicipality = $("#empCityMunicipality");
+    const empProvince = $("#empProvince");
+    const empZipCode = $("#empZipCode");
+    const empSpouseLastName = $("#empSpouseLastName");
+    const empSpouseFirstName = $("#empSpouseFirstName");
+    const empSpouseMiddleName = $("#empSpouseMiddleName");
+    const empSpouseExtension = $("#empSpouseExtension");
+    const empSpouseOccupation = $("#empSpouseOccupation");
+    const empSpouseEmployer = $("#empSpouseEmployer");
+    const empSpouseContact = $("#empSpouseContact");
+    const empSpouseEmail = $("#empSpouseEmail");
+    const empLandline = $("#empLandline");
+    const empMobile = $("#empMobile");
+    const empMobile2 = $("#empMobile2");
+    const empEmail = $("#empEmail");
+    const empFacebook = $("#empFacebook");
+    const empInstagram = $("#empInstagram");
+    const empTwitter = $("#empTwitter");
+    const empEducationLevel = $("#empEducationLevel");
+    const empCourse = $("#empCourse");
+    const empLastSchool = $("#empLastSchool");
+    const empYearGraduated = $("#empYearGraduated");
+    const empAddress = $("#empAddress");
+
+    // Shell Controls
+    const sidebar = $("#sidebar");
+    const sidebarCollapseBtn = $("#sidebarCollapseBtn");
+    const mobileMenuBtn = $("#mobileMenuBtn");
+    const profileMenu = $("#profileMenu");
+    const profileBtn = $("#profileBtn");
+    const profileDropdown = $("#profileDropdown");
+    const notificationsBtn = $("#notificationsBtn");
+    const notificationDropdown = $("#notificationDropdown");
+    const logoutBtn = $("#logoutBtn");
+
+    /* ---------------- 4. STATE & DEMO DATA ---------------- */
+    let employees = [];
+    let selectedIds = new Set();
+    let editingId = null;
+    let currentViewingId = null;
+    let databaseMode = "offline";
+    let isMouseDownInsideModal = false;
+
+    // Pagination State
+    let currentPage = 1;
+    const pageSize = 10;
+
+    const M = window.PGENRO_Module;
+    const openModal = M.openModal;
+    const closeModal = M.closeModal;
+    document.querySelectorAll("[data-close]").forEach(btn => btn.addEventListener("click", () => closeModal(btn.dataset.close)));
+    let loadVersion = 0;
+    function requireWritable() {
+      const session = M.storage.get("pgenro_current_user", {});
+      if (/^(user|viewer|read[- ]only)$/i.test(session?.role || session?.user_role || "")) throw new Error("This account can view records only.");
+      if (databaseMode === "unavailable" || (supabase && databaseMode !== "supabase")) throw new Error("Refresh successfully before changing records.");
+    }
+
+    /* ---------------- 6. SUPABASE & LOCAL DATA ---------------- */
+    const supabase = window.pgenroSupabase || window.PGENRO_DB?.client || null;
+
+    const pick = (obj, ...keys) => {
+      for (const key of keys) {
+        const value = obj?.[key];
+        if (value !== undefined && value !== null && String(value).trim() !== "") return value;
+      }
+      return "";
+    };
+    const asNumberOrNull = (input) => {
+      const raw = input?.value?.trim?.() ?? String(input?.value ?? "").trim();
+      if (!raw) return null;
+      const value = Number(raw);
+      return Number.isFinite(value) ? value : null;
+    };
+    const employeeStructuredAddress = (emp) => [
+      pick(emp, "house_street_purok", "house_number", "house_no_street_purok"),
+      pick(emp, "barangay"),
+      pick(emp, "city_municipality", "municipality", "city"),
+      pick(emp, "province"),
+      pick(emp, "zip_code", "zipcode")
+    ].filter(Boolean).join(", ");
+    const formStructuredAddress = () => [
+      empHouseStreetPurok?.value.trim(), empBarangay?.value.trim(), empCityMunicipality?.value.trim(),
+      empProvince?.value.trim(), empZipCode?.value.trim()
+    ].filter(Boolean).join(", ");
+    const formatMoney = (value) => {
+      if (value === undefined || value === null || String(value).trim() === "") return "—";
+      const n = Number(value);
+      return Number.isFinite(n) ? new Intl.NumberFormat("en-PH", {style:"currency", currency:"PHP"}).format(n) : String(value);
+    };
+
+    function setStatus(online, text) {
+      if (statusDot) {
+        statusDot.className = `status-dot ${online ? "online" : "offline"}`;
+      }
+      if (statusText) {
+        statusText.textContent = text || (online ? "Online Mode" : "Offline Mode");
+      }
+    }
+
+    async function loadEmployees() {
+      const version = ++loadVersion;
+      try {
+        if (!supabase) {
+          databaseMode = "offline";
+          const cached = M.storage.get("pgenro_admin_employees", []);
+          employees = Array.isArray(cached) ? cached : [];
+        } else {
+          const rows = await M.read("employees");
+          if (version !== loadVersion) return false;
+          employees = rows;
+          databaseMode = "supabase";
+          saveLocalEmployees();
+        }
+        M.observeRecords("employees", employees);
+        render();
+        return true;
+      } catch (error) {
+        if (version !== loadVersion) return false;
+        databaseMode = "unavailable";
+        const cached = M.storage.get("pgenro_admin_employees", []);
+        employees = Array.isArray(cached) ? cached : [];
+        render();
+        showToast("Directory could not refresh. Cached records are available; saving requires a database connection.", "error");
+        return false;
+      }
+    }
+    function saveLocalEmployees() {
+      const ok = M.storage.set("pgenro_admin_employees", employees);
+      if (!ok && databaseMode !== "supabase") throw new Error("Browser storage is full or unavailable. Changes were not saved.");
+      return ok;
+    }
+
+    /* ---------------- 7. RENDER & METRICS ---------------- */
+    function getFilteredEmployees() {
+      const search = (searchInput?.value || globalSearchInput?.value || "").trim().toLowerCase();
+      const filterType = filterEmploymentType?.value || "";
+      const filterDept = filterDepartment?.value || "";
+      const filterStat = filterStatus?.value || "";
+
+      return employees.filter((emp) => {
+        const fullName =
+          [emp.first_name, emp.middle_name, emp.last_name, emp.name_extension].filter(Boolean).join(" ").toLowerCase();
+
+        const searchable = [
+          fullName, emp.employee_id, emp.designation, emp.department, emp.item_code, emp.email,
+          pick(emp,"mobile","mobile_1","mobile_number_1"), pick(emp,"mobile_2","mobile_number_2"), emp.landline,
+          emp.employment_type, emp.duty_status, emp.eligibility, emp.tin_no, emp.gsis_bp_no, emp.pagibig_no, emp.philhealth_no,
+          employeeStructuredAddress(emp), emp.address, emp.spouse_last_name, emp.spouse_first_name, emp.spouse_occupation, emp.spouse_employer_business,
+          emp.education_level, emp.course, emp.last_school_attended, emp.facebook, emp.instagram, emp.twitter,
+          ...monitorRecords(emp, "ceremony").flatMap(row => [row.control_number, row.date, row.status, row.activity, row.remarks]),
+          ...monitorRecords(emp, "uniform").flatMap(row => [row.control_number, row.date, row.compliant, row.remarks])
+        ].filter(Boolean).join(" ").toLowerCase();
+
+        return (
+          (!search || searchable.includes(search)) &&
+          (!filterType || (filterType === "CASUAL_OR_JO" ? ["CASUAL", "JOB ORDER"].includes(emp.employment_type) : emp.employment_type === filterType)) &&
+          (!filterDept || emp.department === filterDept) &&
+          (!filterStat || emp.duty_status === filterStat)
+        );
+      });
+    }
+
+    function render() {
+      if (!employeeTableBody) return;
+
+      selectedIds = new Set([...selectedIds].filter(id => employees.some(e => String(e.id) === id)));
+      const filtered = getFilteredEmployees();
+
+      // Pagination calculations
+      const totalRecords = filtered.length;
+      const totalPages = Math.ceil(totalRecords / pageSize) || 1;
+      if (currentPage > totalPages) currentPage = totalPages;
+
+      const startIndex = (currentPage - 1) * pageSize;
+      const paginated = filtered.slice(startIndex, startIndex + pageSize);
+
+      if (!paginated.length) {
+        employeeTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty-table-cell">
+              ${employees.length ? "No personnel records match the current filters." : "No employee records found in the database."}
+            </td>
+          </tr>
+        `;
+      } else {
+        employeeTableBody.innerHTML = paginated.map(rowHTML).join("");
+      }
+
+      // Update Pagination UI
+      if (tablePaginationInfo) {
+        const start = totalRecords ? startIndex + 1 : 0;
+        const end = Math.min(startIndex + pageSize, totalRecords);
+        tablePaginationInfo.textContent = `Showing ${start} to ${end} of ${totalRecords} personnel records`;
+      }
+
+      if (prevPageBtn) prevPageBtn.disabled = currentPage <= 1;
+      if (nextPageBtn) nextPageBtn.disabled = currentPage >= totalPages;
+
+      renderPageNumbers(totalPages);
+
+      // Update Overall Summary KPIs
+      const total = employees.length;
+      const active = employees.filter(e => e.duty_status === "Active").length;
+      const leave = employees.filter(e => e.duty_status === "On Leave").length;
+      const departments = [...new Set(employees.map(e => e.department).filter(Boolean))];
+      const activePct = total ? Math.round((active / total) * 100) : 0;
+
+      if (kpiPersonnel) kpiPersonnel.textContent = total.toLocaleString();
+      if (kpiActive) kpiActive.textContent = active.toLocaleString();
+      if (kpiActivePct) kpiActivePct.textContent = `${activePct}% of workforce`;
+      if (kpiLeave) kpiLeave.textContent = leave.toLocaleString();
+      if (kpiDepts) kpiDepts.textContent = departments.length.toLocaleString();
+
+      if (recordCounter) {
+        recordCounter.textContent = `Showing ${filtered.length} of ${total} Staff`;
+      }
+
+      // Update Workforce Composition Strip
+      const perm = employees.filter(e => e.employment_type === "PERMANENT").length;
+      const cas = employees.filter(e => e.employment_type === "CASUAL").length;
+      const jo = employees.filter(e => e.employment_type === "JOB ORDER").length;
+      const cos = employees.filter(e => e.employment_type === "CONTRACT OF SERVICE").length;
+
+      if (countPermanent) countPermanent.textContent = perm.toLocaleString();
+      if (countCasual) countCasual.textContent = cas.toLocaleString();
+      if (countJO) countJO.textContent = jo.toLocaleString();
+      if (countCOS) countCOS.textContent = cos.toLocaleString();
+
+      // Populate Department Filter options
+      if (filterDepartment && true) {
+        const cur = filterDepartment.value || "";
+        filterDepartment.innerHTML =
+          `<option value="">All Divisions</option>` +
+          departments.sort().map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join("");
+        if (departments.includes(cur)) filterDepartment.value = cur;
+      }
+
+      if (profileModal?.classList.contains("open")) {
+        if (!employees.some(emp => String(emp.id) === String(currentViewingId))) {
+          closeModal("profileModal");
+          showToast("This employee record is no longer available.", "warning");
+        } else renderEmployeeMonitoring();
+      }
+      // Sync Checkboxes & Batch Bar
+      syncSelectionUI();
+      refreshIcons();
+    }
+
+    function rowHTML(emp) {
+      const initials = `${(emp.first_name || "")[0] || ""}${(emp.last_name || "")[0] || ""}`.toUpperCase() || "--";
+      const fullName = `${emp.last_name || ""}, ${emp.first_name || ""} ${emp.middle_name ? emp.middle_name[0] + "." : ""} ${emp.name_extension || ""}`.trim();
+      const duty = emp.duty_status || "Active";
+      const isSuccess = duty === "Active";
+      const isUrgent = duty === "On Leave";
+      const isSelected = selectedIds.has(String(emp.id));
+
+      return `
+        <tr data-emp-id="${escapeHtml(emp.id)}" class="${isSelected ? "selected-row" : ""}">
+          <td>
+            <input type="checkbox" class="row-checkbox" data-id="${escapeHtml(emp.id)}" ${isSelected ? "checked" : ""} aria-label="Select row"/>
+          </td>
+          <td><span class="id-badge">${escapeHtml(emp.employee_id || "—")}</span></td>
+          <td>
+            <div class="employee-cell">
+              <div class="avatar-sm">${escapeHtml(initials)}</div>
+              <div>
+                <span class="employee-name">${escapeHtml(fullName)}</span>
+                <span class="employee-sub">${escapeHtml(emp.gender || "—")} &bull; ${escapeHtml(emp.civil_status || "—")}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <strong>${escapeHtml(emp.designation || "—")}</strong>
+            <span class="employee-sub">Item: ${escapeHtml(emp.item_code || "Plantilla N/A")}</span>
+          </td>
+          <td><span class="type-pill">${escapeHtml(emp.employment_type || "N/A")}</span></td>
+          <td>${escapeHtml(emp.department || "—")}</td>
+          <td>
+            <strong style="color:var(--slate-800);">${escapeHtml(pick(emp, "mobile", "mobile_1", "mobile_number_1") || "—")}</strong>
+            <span class="employee-sub">${escapeHtml(emp.email || "No email on file")}</span>
+          </td>
+          <td>
+            <span class="badge-status ${isSuccess ? "success" : isUrgent ? "urgent" : "info"}">
+              <span class="dot"></span>
+              ${escapeHtml(duty)}
+            </span>
+          </td>
+          <td style="text-align:right;">
+            <div class="actions employee-row-actions" role="group" aria-label="Actions for ${escapeHtml(fullName)}">
+              <button type="button" class="btn-action" data-action="view" data-id="${escapeHtml(emp.id)}" title="View Employee Record" aria-label="View employee record for ${escapeHtml(fullName)}">
+                <i data-lucide="eye"></i>
+              </button>
+              <button type="button" class="btn-action" data-action="ceremony" data-id="${escapeHtml(emp.id)}" title="Flag Ceremony Monitoring" aria-label="Flag ceremony records for ${escapeHtml(fullName)}"><i data-lucide="flag"></i></button>
+              <button type="button" class="btn-action" data-action="uniform" data-id="${escapeHtml(emp.id)}" title="Prescribed Uniform Monitoring" aria-label="Uniform records for ${escapeHtml(fullName)}"><i data-lucide="shirt"></i></button>
+              <button type="button" class="btn-action" data-action="edit" data-id="${escapeHtml(emp.id)}" title="Edit Profile" aria-label="Edit profile for ${escapeHtml(fullName)}">
+                <i data-lucide="pencil"></i>
+              </button>
+              <button type="button" class="btn-action delete" data-action="delete" data-id="${escapeHtml(emp.id)}" title="Delete Record" aria-label="Delete employee record for ${escapeHtml(fullName)}">
+                <i data-lucide="trash-2"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+
+    function renderPageNumbers(totalPages) {
+      if (!pageNumbers) return;
+      let html = "";
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          html += `<button type="button" class="page-btn ${i === currentPage ? "active" : ""}" data-page="${i}">${i}</button>`;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          html += `<span class="page-ellipsis">...</span>`;
+        }
+      }
+      pageNumbers.innerHTML = html;
+    }
+
+    /* ---------------- 8. CHECKBOX SELECTION & BATCH ACTIONS ---------------- */
+    function syncSelectionUI() {
+      const checkboxes = $$(".row-checkbox", employeeTableBody);
+      const allChecked = checkboxes.length > 0 && checkboxes.every(cb => cb.checked);
+      if (selectAllRows) {selectAllRows.checked = allChecked; selectAllRows.indeterminate = checkboxes.some(cb => cb.checked) && !allChecked;}
+
+      const count = selectedIds.size;
+      if (batchActionsBar) {
+        batchActionsBar.style.display = count > 0 ? "flex" : "none";
+      }
+      if (selectedCountBadge) {
+        selectedCountBadge.textContent = `${count} Selected`;
+      }
+    }
+
+    selectAllRows?.addEventListener("change", (e) => {
+      const isChecked = e.target.checked;
+      const paginated = getFilteredEmployees().slice((currentPage - 1) * pageSize, currentPage * pageSize);
+      paginated.forEach(emp => {
+        if (isChecked) selectedIds.add(String(emp.id));
+        else selectedIds.delete(String(emp.id));
+      });
+      render();
+    });
+
+    employeeTableBody?.addEventListener("change", (e) => {
+      const cb = e.target.closest(".row-checkbox");
+      if (!cb) return;
+      const id = cb.dataset.id;
+      if (cb.checked) selectedIds.add(id);
+      else selectedIds.delete(id);
+      syncSelectionUI();
+    });
+
+    batchClearBtn?.addEventListener("click", () => {
+      selectedIds.clear();
+      render();
+    });
+
+    batchExportBtn?.addEventListener("click", () => {
+      const selectedEmployees = employees.filter(e => selectedIds.has(String(e.id)));
+      if (!selectedEmployees.length) return;
+      exportToCSV(selectedEmployees, `pgenro_selected_employees_${new Date().toISOString().slice(0, 10)}.csv`);
+      showToast(`Exported ${selectedEmployees.length} selected employee records.`, "success");
+    });
+
+    batchDeleteBtn?.addEventListener("click", async () => {
+      const count = selectedIds.size;
+      if (!count) return;
+      if (!confirm(`Are you sure you want to delete ${count} selected employee record(s)?`)) return;
+
+      if (batchDeleteBtn.disabled) return;
+      batchDeleteBtn.disabled = true;
+      const ids = [...selectedIds];
+      const previousEmployees = employees;
+      try {
+        requireWritable();
+        if (databaseMode === "supabase") await M.remove("employees", ids);
+        employees = employees.filter(e => !ids.includes(String(e.id)));
+        saveLocalEmployees(); selectedIds.clear(); render();
+        M.audit("DELETE_RECORD", `${ids.length} employee records deleted`);
+        showToast(`Deleted ${ids.length} personnel records.`, "success");
+      } catch (err) { employees = previousEmployees; showToast(err.message || "Failed to delete selected records.", "error"); }
+      finally { batchDeleteBtn.disabled = false; }
+    });
+
+    /* ---------------- 9. PAGINATION EVENTS ---------------- */
+    prevPageBtn?.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        render();
+      }
+    });
+
+    nextPageBtn?.addEventListener("click", () => {
+      const totalPages = Math.ceil(getFilteredEmployees().length / pageSize) || 1;
+      if (currentPage < totalPages) {
+        currentPage++;
+        render();
+      }
+    });
+
+    pageNumbers?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".page-btn");
+      if (!btn) return;
+      currentPage = Number(btn.dataset.page);
+      render();
+    });
+
+    // Row Actions Dispatcher
+    employeeTableBody?.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]");
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (!id) return;
+
+      if (btn.dataset.action === "view") openProfileModal(id);
+      if (btn.dataset.action === "ceremony") openProfileModal(id, "ceremonyPanel");
+      if (btn.dataset.action === "uniform") openProfileModal(id, "uniformPanel");
+      if (btn.dataset.action === "edit") openEmployeeModal(id);
+      if (btn.dataset.action === "delete") deleteEmployee(id);
+    });
+
+    /* Employee form navigation, required-field progress, and save feedback. */
+    const employeeFormBody = document.getElementById("employeeFormSections");
+    const formSectionLinks = Array.from(document.querySelectorAll("[data-form-section]"));
+    const employeeSections = Array.from(employeeForm.querySelectorAll(".form-section"));
+    let formScrollFrame = 0;
+    let formNavigationTarget = null;
+
+    function showFormFeedback(id, message = "", type = "error") {
+      const feedback = document.getElementById(id);
+      if (!feedback) return;
+      feedback.textContent = message;
+      feedback.hidden = !message;
+      feedback.className = `form-feedback ${type}`;
+    }
+
+    function setSaveButtonState(button, busy, idleLabel) {
+      if (!button) return;
+      button.toggleAttribute("data-saving", busy);
+      if (busy) button.dataset.saving = "true";
+      button.setAttribute("aria-busy", String(busy));
+      const label = button.querySelector("span");
+      if (label) label.textContent = busy ? "Saving…" : idleLabel;
+    }
+
+    function setEmployeeFormBusy(busy) {
+      employeeFormModal.dataset.busy = String(busy);
+      employeeFormModal.setAttribute("aria-busy", String(busy));
+      employeeForm.setAttribute("aria-busy", String(busy));
+      setSaveButtonState(saveEmployeeBtn, busy, editingId ? "Save Changes" : "Save Employee");
+      employeeFormModal.querySelectorAll("button, input, select, textarea").forEach(control => {
+        if (busy && !control.disabled) { control.dataset.employeeFormDisabled = "true"; control.disabled = true; }
+        else if (!busy && control.dataset.employeeFormDisabled) { control.disabled = false; delete control.dataset.employeeFormDisabled; }
+      });
+    }
+
+    function updateEmployeeFormCompletion() {
+      const required = Array.from(employeeForm.querySelectorAll("input[required],select[required],textarea[required]"));
+      const completed = required.filter(field => String(field.value).trim() && field.validity.valid).length;
+      const progress = document.getElementById("employeeFormCompletion");
+      progress.max = required.length;
+      progress.value = completed;
+      document.getElementById("employeeFormCompletionCount").textContent = `${completed} / ${required.length}`;
+      document.getElementById("employeeFormCompletionText").textContent = completed === required.length ? "Required fields are complete." : `${required.length - completed} required field${required.length - completed === 1 ? "" : "s"} remaining.`;
+      formSectionLinks.forEach(link => {
+        const section = document.getElementById(link.dataset.formSection);
+        link.classList.toggle("has-errors", !!section.querySelector('[aria-invalid="true"]'));
+      });
+    }
+
+    function updateActiveFormSection() {
+      if (!employeeFormModal.classList.contains("open")) return;
+      const top = employeeFormBody.getBoundingClientRect().top + 38;
+      let active = employeeSections[0];
+      for (const section of employeeSections) if (section.getBoundingClientRect().top <= top) active = section;
+      if (employeeFormBody.scrollTop + employeeFormBody.clientHeight >= employeeFormBody.scrollHeight - 3) active = employeeSections.at(-1);
+      if (formNavigationTarget && Math.abs(employeeFormBody.scrollTop - formNavigationTarget.scrollTop) <= 1) active = document.getElementById(formNavigationTarget.id);
+      else formNavigationTarget = null;
+      formSectionLinks.forEach(link => {
+        const selected = link.dataset.formSection === active.id;
+        link.classList.toggle("active", selected);
+        if (selected) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+      const rail = document.querySelector(".employee-form-section-links");
+      const currentLink = formSectionLinks.find(link => link.dataset.formSection === active.id);
+      if (rail.scrollWidth > rail.clientWidth + 1 && currentLink) {
+        const bounds = rail.getBoundingClientRect();
+        const linkBounds = currentLink.getBoundingClientRect();
+        if (linkBounds.left < bounds.left || linkBounds.right > bounds.right) {
+          rail.scrollTo({left: rail.scrollLeft + linkBounds.left - bounds.left - (rail.clientWidth - linkBounds.width) / 2, behavior: "auto"});
+        }
+      }
+    }
+
+    formSectionLinks.forEach(link => link.addEventListener("click", () => {
+      const section = document.getElementById(link.dataset.formSection);
+      const offset = section.getBoundingClientRect().top - employeeFormBody.getBoundingClientRect().top + employeeFormBody.scrollTop - 18;
+      employeeFormBody.scrollTo({top: Math.max(0, offset), behavior: "auto"});
+      formNavigationTarget = {id:section.id, scrollTop:employeeFormBody.scrollTop};
+      updateActiveFormSection();
+    }));
+    employeeFormBody.addEventListener("scroll", () => {
+      if (formScrollFrame) return;
+      formScrollFrame = requestAnimationFrame(() => { formScrollFrame = 0; updateActiveFormSection(); });
+    }, {passive:true});
+    employeeForm.addEventListener("input", () => { showFormFeedback("employeeFormFeedback"); updateEmployeeFormCompletion(); requestAnimationFrame(updateEmployeeFormCompletion); });
+    employeeForm.addEventListener("change", updateEmployeeFormCompletion);
+    employeeForm.addEventListener("invalid", () => {
+      showFormFeedback("employeeFormFeedback", "Please review the highlighted fields before saving.");
+      requestAnimationFrame(() => {updateEmployeeFormCompletion();updateActiveFormSection();});
+    }, true);
+    employeeForm.addEventListener("reset", () => {
+      formNavigationTarget = null;
+      showFormFeedback("employeeFormFeedback");
+      requestAnimationFrame(updateEmployeeFormCompletion);
+    });
+    for (const kind of ["ceremony", "uniform"]) {
+      const form = document.getElementById(kind + "Form");
+      form.addEventListener("invalid", () => showFormFeedback(kind + "Feedback", "Complete the highlighted fields before saving."), true);
+      form.addEventListener("input", () => showFormFeedback(kind + "Feedback"));
+      form.addEventListener("change", () => showFormFeedback(kind + "Feedback"));
+    }
+
+    /* ---------------- 10. ADD & EDIT EMPLOYEE ---------------- */
+    function openEmployeeModal(id = null) {
+      if (!M.canStartAction()) return;
+      editingId = id;
+      employeeForm?.reset();
+
+      if (id) {
+        const emp = employees.find(item => String(item.id) === String(id));
+        if (!emp) return;
+
+        if (employeeModalTitle) employeeModalTitle.textContent = "Edit Employee Masterfile";
+        if (empId) empId.value = emp.employee_id || "";
+        if (empFirstName) empFirstName.value = emp.first_name || "";
+        if (empMiddleName) empMiddleName.value = emp.middle_name || "";
+        if (empLastName) empLastName.value = emp.last_name || "";
+        if (empExtension) empExtension.value = emp.name_extension || "";
+        if (empGender) empGender.value = emp.gender || "Male";
+        if (empDob) empDob.value = emp.dob || "";
+        if (empPob) empPob.value = emp.pob || "";
+        if (empCivilStatus) empCivilStatus.value = emp.civil_status || "Single";
+        if (empBloodType) empBloodType.value = emp.blood_type || "";
+        if (empReligion) empReligion.value = pick(emp, "religion");
+        if (empHeightCm) empHeightCm.value = pick(emp, "height_cm", "height");
+        if (empWeightKg) empWeightKg.value = pick(emp, "weight_kg", "weight");
+        if (empDesignation) empDesignation.value = emp.designation || "";
+        if (empDepartment) empDepartment.value = emp.department || "";
+        if (empStatusType) empStatusType.value = emp.employment_type || "PERMANENT";
+        if (empItemCode) empItemCode.value = emp.item_code || "";
+        if (empDateEmployed) empDateEmployed.value = emp.date_employed || "";
+        if (empDateAssumption) empDateAssumption.value = pick(emp, "date_assumption", "date_of_assumption");
+        if (empSalaryGrade) empSalaryGrade.value = emp.salary_grade || "";
+        if (empStepNo) empStepNo.value = pick(emp, "step_no", "salary_step");
+        if (empNosaDate) empNosaDate.value = pick(emp, "nosa_date", "nosa");
+        if (empBasicSalary) empBasicSalary.value = pick(emp, "basic_salary");
+        if (empEligibility) empEligibility.value = pick(emp, "eligibility");
+        if (empDutyStatus) empDutyStatus.value = emp.duty_status || "Active";
+        if (empTinNo) empTinNo.value = pick(emp, "tin_no", "tin");
+        if (empGsisBpNo) empGsisBpNo.value = pick(emp, "gsis_bp_no", "gsis_no");
+        if (empPagibigNo) empPagibigNo.value = pick(emp, "pagibig_no", "pag_ibig_no");
+        if (empPhilhealthNo) empPhilhealthNo.value = pick(emp, "philhealth_no", "phil_health_no");
+        if (empHouseStreetPurok) empHouseStreetPurok.value = pick(emp, "house_street_purok", "house_number", "house_no_street_purok");
+        if (empBarangay) empBarangay.value = pick(emp, "barangay");
+        if (empCityMunicipality) empCityMunicipality.value = pick(emp, "city_municipality", "municipality", "city");
+        if (empProvince) empProvince.value = pick(emp, "province");
+        if (empZipCode) empZipCode.value = pick(emp, "zip_code", "zipcode");
+        if (empSpouseLastName) empSpouseLastName.value = pick(emp, "spouse_last_name");
+        if (empSpouseFirstName) empSpouseFirstName.value = pick(emp, "spouse_first_name");
+        if (empSpouseMiddleName) empSpouseMiddleName.value = pick(emp, "spouse_middle_name");
+        if (empSpouseExtension) empSpouseExtension.value = pick(emp, "spouse_extension", "spouse_extension_name");
+        if (empSpouseOccupation) empSpouseOccupation.value = pick(emp, "spouse_occupation");
+        if (empSpouseEmployer) empSpouseEmployer.value = pick(emp, "spouse_employer_business", "spouse_employer");
+        if (empSpouseContact) empSpouseContact.value = pick(emp, "spouse_contact_no", "spouse_contact");
+        if (empSpouseEmail) empSpouseEmail.value = pick(emp, "spouse_email");
+        if (empLandline) empLandline.value = pick(emp, "landline", "landline_no");
+        if (empMobile) empMobile.value = pick(emp, "mobile", "mobile_1", "mobile_number_1");
+        if (empMobile2) empMobile2.value = pick(emp, "mobile_2", "mobile_number_2");
+        if (empEmail) empEmail.value = emp.email || "";
+        if (empFacebook) empFacebook.value = pick(emp, "facebook");
+        if (empInstagram) empInstagram.value = pick(emp, "instagram");
+        if (empTwitter) empTwitter.value = pick(emp, "twitter", "x_handle");
+        if (empEducationLevel) empEducationLevel.value = pick(emp, "education_level");
+        if (empCourse) empCourse.value = pick(emp, "course");
+        if (empLastSchool) empLastSchool.value = pick(emp, "last_school_attended", "last_school");
+        if (empYearGraduated) empYearGraduated.value = pick(emp, "year_graduated");
+        if (empAddress) empAddress.value = emp.address || employeeStructuredAddress(emp) || "";
+      } else {
+        if (employeeModalTitle) employeeModalTitle.textContent = "Add New Employee";
+        const prefix = `EMP-${new Date().getFullYear()}-`;
+        const highest = Math.max(0, ...employees.map(e => String(e.employee_id || "").startsWith(prefix) ? Number(String(e.employee_id).slice(prefix.length)) || 0 : 0));
+        if (empId) empId.value = prefix + String(highest + 1).padStart(3, "0");
+      }
+
+      showFormFeedback("employeeFormFeedback");
+      setSaveButtonState(saveEmployeeBtn, false, editingId ? "Save Changes" : "Save Employee");
+      updateEmployeeFormCompletion();
+      openModal("employeeFormModal");
+      updateActiveFormSection();
+    }
+
+    async function saveEmployee(e) {
+      e.preventDefault();
+      showFormFeedback("employeeFormFeedback");
+
+      const structuredAddress = formStructuredAddress();
+      const payload = {
+        employee_id: empId?.value.trim() || "",
+        first_name: empFirstName?.value.trim() || "",
+        middle_name: empMiddleName?.value.trim() || "",
+        last_name: empLastName?.value.trim() || "",
+        name_extension: empExtension?.value.trim() || "",
+        gender: empGender?.value || "Male",
+        dob: empDob?.value || null,
+        pob: empPob?.value.trim() || "",
+        civil_status: empCivilStatus?.value || "Single",
+        religion: empReligion?.value.trim() || "",
+        height_cm: asNumberOrNull(empHeightCm),
+        weight_kg: asNumberOrNull(empWeightKg),
+        blood_type: empBloodType?.value.trim() || "",
+        designation: empDesignation?.value.trim() || "",
+        department: empDepartment?.value.trim() || "",
+        employment_type: empStatusType?.value || "PERMANENT",
+        item_code: empItemCode?.value.trim() || "",
+        date_employed: empDateEmployed?.value || null,
+        date_assumption: empDateAssumption?.value || null,
+        salary_grade: empSalaryGrade?.value.trim() || "",
+        step_no: empStepNo?.value.trim() || "",
+        nosa_date: empNosaDate?.value || null,
+        basic_salary: asNumberOrNull(empBasicSalary),
+        eligibility: empEligibility?.value.trim() || "",
+        duty_status: empDutyStatus?.value || "Active",
+        tin_no: empTinNo?.value.trim() || "",
+        gsis_bp_no: empGsisBpNo?.value.trim() || "",
+        pagibig_no: empPagibigNo?.value.trim() || "",
+        philhealth_no: empPhilhealthNo?.value.trim() || "",
+        house_street_purok: empHouseStreetPurok?.value.trim() || "",
+        barangay: empBarangay?.value.trim() || "",
+        city_municipality: empCityMunicipality?.value.trim() || "",
+        province: empProvince?.value.trim() || "",
+        zip_code: empZipCode?.value.trim() || "",
+        spouse_last_name: empSpouseLastName?.value.trim() || "",
+        spouse_first_name: empSpouseFirstName?.value.trim() || "",
+        spouse_middle_name: empSpouseMiddleName?.value.trim() || "",
+        spouse_extension: empSpouseExtension?.value.trim() || "",
+        spouse_occupation: empSpouseOccupation?.value.trim() || "",
+        spouse_employer_business: empSpouseEmployer?.value.trim() || "",
+        spouse_contact_no: empSpouseContact?.value.trim() || "",
+        spouse_email: empSpouseEmail?.value.trim() || "",
+        landline: empLandline?.value.trim() || "",
+        mobile: empMobile?.value.trim() || "",
+        mobile_2: empMobile2?.value.trim() || "",
+        email: empEmail?.value.trim() || "",
+        facebook: empFacebook?.value.trim() || "",
+        instagram: empInstagram?.value.trim() || "",
+        twitter: empTwitter?.value.trim() || "",
+        education_level: empEducationLevel?.value.trim() || "",
+        course: empCourse?.value.trim() || "",
+        last_school_attended: empLastSchool?.value.trim() || "",
+        year_graduated: empYearGraduated?.value.trim() || "",
+        address: structuredAddress || empAddress?.value.trim() || "",
+        updated_at: new Date().toISOString()
+      };
+
+      if (!payload.employee_id || !payload.first_name || !payload.last_name || !payload.designation || !payload.department) {
+        showFormFeedback("employeeFormFeedback", "Complete the required fields marked with *.");
+        employeeForm.reportValidity();
+        showToast("Please fill in required fields marked with *.", "warning");
+        return;
+      }
+
+      if (!employeeForm.reportValidity()) return;
+      if (employees.some(emp => String(emp.id) !== String(editingId) && String(emp.employee_id || "").toLowerCase() === payload.employee_id.toLowerCase())) { showFormFeedback("employeeFormFeedback", "Employee ID already exists. Use a unique ID."); showToast("Employee ID already exists. Use a unique ID.", "warning"); empId?.focus(); return; }
+      if (saveEmployeeBtn?.disabled) return;
+      const previousEmployees = employees.map(emp => ({...emp}));
+      const wasEditing = editingId;
+      setEmployeeFormBusy(true);
+
+      try {
+        requireWritable();
+        if (databaseMode === "supabase") {
+          const saved = await M.write("employees", payload, editingId);
+          employees = editingId ? employees.map(emp => String(emp.id) === String(editingId) ? saved : emp) : [saved, ...employees];
+        } else if (editingId) {
+          employees = employees.map(emp => String(emp.id) === String(editingId) ? {...emp, ...payload} : emp);
+        } else {
+          employees.unshift({...payload, id:M.uuid()});
+        }
+        saveLocalEmployees();
+        M.observeRecords("employees", employees);
+        render();
+        employeeFormModal.dataset.busy = "false";
+        M.audit(wasEditing ? "EDIT_RECORD" : "ADD_RECORD", `Employee ${payload.employee_id}`);
+
+        closeModal("employeeFormModal");
+        showToast(editingId ? "Profile updated successfully." : "Employee added successfully.", "success");
+      } catch (err) {
+        employees = previousEmployees;
+        console.error("Save error:", err);
+        const message = err?.message || "Failed to save employee profile.";
+        const schemaHint = /column|schema cache|PGRST204|42703/i.test(message) ? " Run employee-record-supabase-migration.sql in Supabase, then refresh." : "";
+        showFormFeedback("employeeFormFeedback", message + schemaHint);
+        showToast(message + schemaHint, "error");
+      } finally {
+        setEmployeeFormBusy(false);
+      }
+    }
+
+    /* ---------------- 11. 201 DOSSIER MODAL ---------------- */
+    function openProfileModal(id, tab = "employeeDetailsPanel") {
+      if (!M.canStartAction()) return;
+      currentViewingId = id;
+      const emp = employees.find(e => String(e.id) === String(id));
+      if (!emp) return;
+
+      const initials = `${(emp.first_name || "")[0] || ""}${(emp.last_name || "")[0] || ""}`.toUpperCase() || "--";
+      const fullName = `${emp.first_name || ""} ${emp.middle_name || ""} ${emp.last_name || ""} ${emp.name_extension || ""}`.trim();
+      const duty = emp.duty_status || "Active";
+      const isSuccess = duty === "Active";
+
+      if ($("#viewAvatar")) $("#viewAvatar").textContent = initials;
+      if ($("#viewHeadingName")) $("#viewHeadingName").textContent = fullName || "Employee Profile";
+      if ($("#viewPillStatus")) {
+        $("#viewPillStatus").innerHTML = `<span class="dot"></span> ${escapeHtml(duty)}`;
+        $("#viewPillStatus").className = `badge-status ${isSuccess ? "success" : "urgent"}`;
+      }
+
+      if ($("#v_id")) $("#v_id").textContent = emp.employee_id || "—";
+      if ($("#v_name")) $("#v_name").textContent = fullName || "—";
+      if ($("#v_dob")) $("#v_dob").textContent = formatLongDate(emp.dob);
+      if ($("#v_pob")) $("#v_pob").textContent = emp.pob || "—";
+      if ($("#v_gender")) $("#v_gender").textContent = emp.gender || "—";
+      if ($("#v_civil")) $("#v_civil").textContent = emp.civil_status || "—";
+      if ($("#v_religion")) $("#v_religion").textContent = pick(emp,"religion") || "—";
+      if ($("#v_height")) $("#v_height").textContent = pick(emp,"height_cm","height") ? `${pick(emp,"height_cm","height")} cm` : "—";
+      if ($("#v_weight")) $("#v_weight").textContent = pick(emp,"weight_kg","weight") ? `${pick(emp,"weight_kg","weight")} kg` : "—";
+      if ($("#v_blood")) $("#v_blood").textContent = emp.blood_type || "—";
+
+      if ($("#v_desig")) $("#v_desig").textContent = emp.designation || "—";
+      if ($("#v_emp_status")) $("#v_emp_status").textContent = emp.employment_type || "—";
+      if ($("#v_duty_status")) $("#v_duty_status").textContent = duty || "—";
+      if ($("#v_dept")) $("#v_dept").textContent = emp.department || "—";
+      if ($("#v_item")) $("#v_item").textContent = emp.item_code || "—";
+      if ($("#v_date_employed")) $("#v_date_employed").textContent = formatLongDate(emp.date_employed);
+      if ($("#v_date_assumption")) $("#v_date_assumption").textContent = formatLongDate(pick(emp,"date_assumption","date_of_assumption"));
+      if ($("#v_salary_grade")) $("#v_salary_grade").textContent = emp.salary_grade || "—";
+      if ($("#v_step_no")) $("#v_step_no").textContent = pick(emp,"step_no","salary_step") || "—";
+      if ($("#v_nosa_date")) $("#v_nosa_date").textContent = formatLongDate(pick(emp,"nosa_date","nosa"));
+      if ($("#v_basic_salary")) $("#v_basic_salary").textContent = formatMoney(pick(emp,"basic_salary"));
+      if ($("#v_eligibility")) $("#v_eligibility").textContent = pick(emp,"eligibility") || "—";
+
+      if ($("#v_tin")) $("#v_tin").textContent = pick(emp,"tin_no","tin") || "—";
+      if ($("#v_gsis")) $("#v_gsis").textContent = pick(emp,"gsis_bp_no","gsis_no") || "—";
+      if ($("#v_pagibig")) $("#v_pagibig").textContent = pick(emp,"pagibig_no","pag_ibig_no") || "—";
+      if ($("#v_philhealth")) $("#v_philhealth").textContent = pick(emp,"philhealth_no","phil_health_no") || "—";
+
+      if ($("#v_house")) $("#v_house").textContent = pick(emp,"house_street_purok","house_number","house_no_street_purok") || "—";
+      if ($("#v_barangay")) $("#v_barangay").textContent = pick(emp,"barangay") || "—";
+      if ($("#v_city")) $("#v_city").textContent = pick(emp,"city_municipality","municipality","city") || "—";
+      if ($("#v_province")) $("#v_province").textContent = pick(emp,"province") || "—";
+      if ($("#v_zip")) $("#v_zip").textContent = pick(emp,"zip_code","zipcode") || "—";
+      if ($("#v_address")) $("#v_address").textContent = employeeStructuredAddress(emp) || emp.address || "—";
+
+      const spouseName = [pick(emp,"spouse_first_name"), pick(emp,"spouse_middle_name"), pick(emp,"spouse_last_name"), pick(emp,"spouse_extension","spouse_extension_name")].filter(Boolean).join(" ");
+      if ($("#v_spouse_name")) $("#v_spouse_name").textContent = spouseName || "—";
+      if ($("#v_spouse_occupation")) $("#v_spouse_occupation").textContent = pick(emp,"spouse_occupation") || "—";
+      if ($("#v_spouse_employer")) $("#v_spouse_employer").textContent = pick(emp,"spouse_employer_business","spouse_employer") || "—";
+      if ($("#v_spouse_contact")) $("#v_spouse_contact").textContent = pick(emp,"spouse_contact_no","spouse_contact") || "—";
+      if ($("#v_spouse_email")) $("#v_spouse_email").textContent = pick(emp,"spouse_email") || "—";
+
+      if ($("#v_landline")) $("#v_landline").textContent = pick(emp,"landline","landline_no") || "—";
+      if ($("#v_mobile")) $("#v_mobile").textContent = pick(emp,"mobile","mobile_1","mobile_number_1") || "—";
+      if ($("#v_mobile2")) $("#v_mobile2").textContent = pick(emp,"mobile_2","mobile_number_2") || "—";
+      if ($("#v_email")) $("#v_email").textContent = emp.email || "—";
+      if ($("#v_facebook")) $("#v_facebook").textContent = pick(emp,"facebook") || "—";
+      if ($("#v_instagram")) $("#v_instagram").textContent = pick(emp,"instagram") || "—";
+      if ($("#v_twitter")) $("#v_twitter").textContent = pick(emp,"twitter","x_handle") || "—";
+
+      if ($("#v_education_level")) $("#v_education_level").textContent = pick(emp,"education_level") || "—";
+      if ($("#v_course")) $("#v_course").textContent = pick(emp,"course") || "—";
+      if ($("#v_last_school")) $("#v_last_school").textContent = pick(emp,"last_school_attended","last_school") || "—";
+      if ($("#v_year_graduated")) $("#v_year_graduated").textContent = pick(emp,"year_graduated") || "—";
+
+      initializeEmployeeMonitoring(emp, tab);
+      M.audit("VIEW_RECORD", `Employee ${emp.employee_id} profile viewed`);
+      openModal("profileModal");
+    }
+
+    function formatLongDate(val) {
+      if (!val) return "—";
+      const d = new Date(/^\d{4}-\d{2}-\d{2}$/.test(String(val)) ? `${val}T12:00:00` : val);
+      if (Number.isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+    }
+
+    /* ---------------- 12. DELETE RECORD ---------------- */
+    let deleting = false;
+    async function deleteEmployee(id) {
+      if (deleting || !confirm("Delete this employee record?")) return;
+      deleting = true; const previousEmployees = employees;
+      try {
+        requireWritable();
+        if (databaseMode === "supabase") await M.remove("employees", [id]);
+        employees = employees.filter(emp => String(emp.id) !== String(id));
+        saveLocalEmployees(); selectedIds.delete(String(id)); render();
+        M.audit("DELETE_RECORD", `Employee record ${id} deleted`); showToast("Employee deleted.");
+      } catch (error) { employees = previousEmployees; showToast(error.message, "error"); }
+      finally { deleting = false; }
+    }
+
+    function exportToCSV(list, filename) {
+      const headers = [
+        "Employee ID","Last Name","First Name","Middle Name","Extension","Gender","DOB","Birth Place","Civil Status","Religion","Height (cm)","Weight (kg)","Blood Type",
+        "Employment Status","Designation","Department","Item No.","Date Employed","Date of Assumption","Salary Grade","Step No.","N.O.S.A. Date","Basic Salary","Eligibility","Duty Status",
+        "TIN No.","GSIS B.P. No.","PAG-IBIG No.","PHILHEALTH No.",
+        "House No./Street/Purok","Barangay","City/Municipality","Province","Zip Code","Complete Address",
+        "Spouse Last Name","Spouse First Name","Spouse Middle Name","Spouse Extension","Spouse Occupation","Spouse Employer/Business","Spouse Contact No.","Spouse Email",
+        "Landline No.","Mobile No. 1","Mobile No. 2","Email Address","Facebook","Instagram","Twitter/X",
+        "Education Level","Course","Last School Attended","Year Graduated","Flag Ceremony Records (JSON)","Uniform Records (JSON)"
+      ];
+
+      const rows = list.map(e => [
+        e.employee_id,e.last_name,e.first_name,e.middle_name,e.name_extension,e.gender,e.dob,e.pob,e.civil_status,pick(e,"religion"),pick(e,"height_cm","height"),pick(e,"weight_kg","weight"),e.blood_type,
+        e.employment_type,e.designation,e.department,e.item_code,e.date_employed,pick(e,"date_assumption","date_of_assumption"),e.salary_grade,pick(e,"step_no","salary_step"),pick(e,"nosa_date","nosa"),pick(e,"basic_salary"),pick(e,"eligibility"),e.duty_status,
+        pick(e,"tin_no","tin"),pick(e,"gsis_bp_no","gsis_no"),pick(e,"pagibig_no","pag_ibig_no"),pick(e,"philhealth_no","phil_health_no"),
+        pick(e,"house_street_purok","house_number","house_no_street_purok"),pick(e,"barangay"),pick(e,"city_municipality","municipality","city"),pick(e,"province"),pick(e,"zip_code","zipcode"),employeeStructuredAddress(e)||e.address,
+        pick(e,"spouse_last_name"),pick(e,"spouse_first_name"),pick(e,"spouse_middle_name"),pick(e,"spouse_extension","spouse_extension_name"),pick(e,"spouse_occupation"),pick(e,"spouse_employer_business","spouse_employer"),pick(e,"spouse_contact_no","spouse_contact"),pick(e,"spouse_email"),
+        pick(e,"landline","landline_no"),pick(e,"mobile","mobile_1","mobile_number_1"),pick(e,"mobile_2","mobile_number_2"),e.email,pick(e,"facebook"),pick(e,"instagram"),pick(e,"twitter","x_handle"),
+        pick(e,"education_level"),pick(e,"course"),pick(e,"last_school_attended","last_school"),pick(e,"year_graduated"), JSON.stringify(monitorRecords(e, "ceremony")), JSON.stringify(monitorRecords(e, "uniform"))
+      ]);
+
+      M.csv([headers, ...rows], filename);
+      M.audit("EXPORT_RECORDS", `${list.length} employee records exported`);
+    }
+
+    function exportMasterlist() {
+      if (!employees.length) {
+        showToast("No employee records to export.", "warning");
+        return;
+      }
+      exportToCSV(getFilteredEmployees(), `pgenro_employee_masterfile_${new Date().toISOString().slice(0, 10)}.csv`);
+      showToast("Employee masterfile exported as CSV.", "success");
+    }
+
+    /* ---------------- 14. QUICK ACTION HANDLERS ---------------- */
+    quickAddBtn?.addEventListener("click", () => openEmployeeModal());
+    addEmployeeBtn?.addEventListener("click", () => openEmployeeModal());
+    exportBtn?.addEventListener("click", exportMasterlist);
+    quickExportBtn?.addEventListener("click", exportMasterlist);
+
+    quickPrintBtn?.addEventListener("click", printEmployeeDirectory);
+    printDossierBtn?.addEventListener("click", () => {
+      M.audit("PRINT_RECORD", `Employee ${currentViewingId}: ${activeEmployeeTab}`);
+      window.print();
+    });
+    $("#clearEmployeeFormBtn")?.addEventListener("click", () => { if (M.canStartAction()) { employeeFormModal.querySelector("#toastContainer")?.replaceChildren(); openEmployeeModal(editingId); } });
+
+    refreshBtn?.addEventListener("click", async () => {
+      refreshBtn.disabled = true;
+      try { if (await loadEmployees()) showToast(supabase ? "Directory refreshed." : "Local directory refreshed."); } finally { refreshBtn.disabled = false; }
+    });
+
+    dossierEditBtn?.addEventListener("click", () => {
+      if (!currentViewingId) return;
+      closeModal("profileModal");
+      openEmployeeModal(currentViewingId);
+    });
+
+    quickFilterPermanent?.addEventListener("click", () => {
+      if (filterEmploymentType) filterEmploymentType.value = "PERMANENT";
+      currentPage = 1;
+      render();
+    });
+
+    quickFilterCasual?.addEventListener("click", () => {
+      if (filterEmploymentType) filterEmploymentType.value = "CASUAL_OR_JO";
+      currentPage = 1;
+      render();
+    });
+
+    quickFilterLeave?.addEventListener("click", () => {
+      if (filterStatus) filterStatus.value = "On Leave";
+      currentPage = 1;
+      render();
+    });
+
+    resetFiltersBtn?.addEventListener("click", () => {
+      if (searchInput) searchInput.value = "";
+      if (globalSearchInput) globalSearchInput.value = "";
+      if (filterEmploymentType) filterEmploymentType.value = "";
+      if (filterDepartment) filterDepartment.value = "";
+      if (filterStatus) filterStatus.value = "";
+      currentPage = 1;
+      render();
+    });
+
+    /* ---------------- 15. INPUT & KEYBOARD EVENTS ---------------- */
+    employeeForm?.addEventListener("submit", saveEmployee);
+
+    searchInput?.addEventListener("input", () => {
+      if (globalSearchInput) globalSearchInput.value = searchInput.value;
+      currentPage = 1;
+      render();
+    });
+
+    globalSearchInput?.addEventListener("input", (e) => {
+      if (searchInput) searchInput.value = e.target.value;
+      currentPage = 1;
+      render();
+    });
+
+    filterEmploymentType?.addEventListener("change", () => {
+      currentPage = 1;
+      render();
+    });
+
+    filterDepartment?.addEventListener("change", () => {
+      currentPage = 1;
+      render();
+    });
+
+    filterStatus?.addEventListener("change", () => {
+      currentPage = 1;
+      render();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      const isInput = /INPUT|TEXTAREA|SELECT/.test(e.target.tagName);
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        (globalSearchInput || searchInput)?.focus();
+      }
+      if (e.key === "/" && !isInput) {
+        e.preventDefault();
+        (globalSearchInput || searchInput)?.focus();
+      }
+      if (e.key === "Escape") {
+        $$(".modal-backdrop.open").forEach(m => closeModal(m.id));
+
+      }
+    });
+
+    /* ---------------- 16. TOAST MESSAGES ---------------- */
+    function showToast(message, type = "success") { M.toast(message,type); }
+
+    /* Legacy Employee Record: flag ceremony and prescribed uniform monitoring. */
+    const monitoringKinds = ["ceremony", "uniform"];
+    const monitoringFields = { ceremony: "ceremony_records", uniform: "uniform_records" };
+    const activityLabels = { "FLAG CEREMONY": "Flag Ceremony", "FLAG RETREAT": "Flag Retreat", "HOLIDAY CELEBRATION": "Holiday Celebration", "OTHERS": "Others" };
+    const statusLabels = { PRESENT: "Present", ABSENT: "Absent", "OFFICIAL BUSINESS": "Official Business", LEAVE: "Leave", LATE: "Late" };
+    const monitorEditing = { ceremony: null, uniform: null };
+    const monitoringDraft = { ceremony: null, uniform: null };
+    let activeEmployeeTab = "employeeDetailsPanel";
+    let monitorSaving = false;
+    let pendingMonitoringKind = null;
+    const monitorEl = (kind, suffix) => document.getElementById(kind + suffix);
+    const selectedEmployee = () => employees.find(emp => String(emp.id) === String(currentViewingId));
+    const parsedArray = value => {
+      if (Array.isArray(value)) return value;
+      if (typeof value === "string") { try { const result = JSON.parse(value); return Array.isArray(result) ? result : []; } catch {} }
+      return [];
+    };
+    const monitorRecords = (emp, kind) => parsedArray(emp?.[monitoringFields[kind]]).filter(row => row && typeof row === "object" && !Array.isArray(row));
+    const statusValue = row => {
+      const raw = String(row?.status || "").trim().toUpperCase();
+      return ["OB", "O.B.", "O.B", "OFFICIAL BUSINESS (O.B.)"].includes(raw) ? "OFFICIAL BUSINESS" : raw;
+    };
+    const complianceValue = row => typeof row?.compliant === "boolean" ? (row.compliant ? "YES" : "NO") : String(row?.compliant || "").trim().toUpperCase();
+    const activityValue = row => String(row?.activity || "").trim().toUpperCase().replace(/^0[1-4][.\s]+/, "");
+    const monitorRowKey = (row, index) => String(row.id ?? `legacy-${index}`);
+    const rowFingerprint = row => JSON.stringify(row);
+
+    function resetMonitorEditor(kind) {
+      monitorEditing[kind] = null;
+      monitoringDraft[kind] = null;
+      showFormFeedback(kind + "Feedback");
+      monitorEl(kind, "Form")?.reset();
+      monitorEl(kind, "Date").value = M.today();
+      monitorEl(kind, "EditorTitle").textContent = "Add Record";
+      monitorEl(kind, "EditTag").hidden = true;
+      monitorEl(kind, "Save").querySelector("span").textContent = "Save Record";
+      monitorEl(kind, "Clear").textContent = "Clear";
+      monitorEl(kind, "Form").querySelectorAll("[aria-invalid]").forEach(input => input.removeAttribute("aria-invalid"));
+      monitorEl(kind, "Control").setCustomValidity("");
+      monitorEl(kind, "Date").setCustomValidity("");
+    }
+
+    function selectEmployeeTab(panelId, focus = false) {
+      if (monitorSaving) return;
+      const tabs = $$(".employee-record-tab", profileModal);
+      const active = tabs.find(tab => tab.getAttribute("aria-controls") === panelId) || tabs[0];
+      activeEmployeeTab = active.getAttribute("aria-controls");
+      tabs.forEach(tab => {
+        const selected = tab === active;
+        tab.classList.toggle("active", selected);
+        tab.setAttribute("aria-selected", String(selected));
+        tab.tabIndex = selected ? 0 : -1;
+        document.getElementById(tab.getAttribute("aria-controls")).hidden = !selected;
+      });
+      $("#employeePrintLabel").textContent = activeEmployeeTab === "ceremonyPanel" ? "Print Flag Ceremony" : activeEmployeeTab === "uniformPanel" ? "Print Uniform Report" : "Print Employee Record";
+      profileModal.dataset.printTab = activeEmployeeTab;
+      if (focus) active.focus();
+    }
+
+    function initializeEmployeeMonitoring(emp, tab) {
+      for (const kind of monitoringKinds) {
+        resetMonitorEditor(kind);
+        monitorEl(kind, "Filters").reset();
+        monitorEl(kind, "From").value = "";
+        monitorEl(kind, "To").value = "";
+      }
+      selectEmployeeTab(tab);
+      renderEmployeeMonitoring();
+    }
+
+    function filteredMonitorRecords(kind, emp = selectedEmployee()) {
+      const from = monitorEl(kind, "From").value;
+      const to = monitorEl(kind, "To").value;
+      const filterStatusValue = monitorEl(kind, "FilterStatus").value;
+      const activity = kind === "ceremony" ? monitorEl(kind, "FilterActivity").value : "";
+      const search = monitorEl(kind, "Search").value.trim().toLowerCase();
+      const error = monitorEl(kind, "FilterError");
+      const invalid = from && to && from > to;
+      error.hidden = !invalid;
+      error.textContent = invalid ? "From date must be on or before To date." : "";
+      if (invalid) return [];
+      return monitorRecords(emp, kind).map((row, index) => ({row, key: monitorRowKey(row, index)})).filter(({row}) => {
+        const date = String(row.date || "").slice(0, 10);
+        const recordStatus = kind === "ceremony" ? statusValue(row) : complianceValue(row);
+        const recordActivity = kind === "ceremony" ? activityValue(row) : "";
+        const searchable = [row.control_number, date, formatLongDate(date), recordStatus, statusLabels[recordStatus], recordActivity, row.remarks].filter(Boolean).join(" ").toLowerCase();
+        return (!from || date >= from) && (!to || date <= to) && (!filterStatusValue || recordStatus === filterStatusValue) && (!activity || recordActivity === activity) && (!search || searchable.includes(search));
+      }).sort((a, b) => String(b.row.date || "").localeCompare(String(a.row.date || "")) || String(b.row.control_number || "").localeCompare(String(a.row.control_number || ""), undefined, {numeric: true}));
+    }
+
+    function renderEmployeeMonitoring() {
+      const emp = selectedEmployee();
+      if (!emp) return;
+      for (const kind of monitoringKinds) {
+        monitorEl(kind, "TabCount").textContent = monitorRecords(emp, kind).length;
+        const entries = filteredMonitorRecords(kind, emp);
+        const counts = {};
+        for (const {row} of entries) {
+          const value = kind === "ceremony" ? statusValue(row) : complianceValue(row);
+          counts[value] = (counts[value] || 0) + 1;
+        }
+        const values = kind === "ceremony" ? [counts.PRESENT || 0, counts.ABSENT || 0, counts["OFFICIAL BUSINESS"] || 0, counts.LEAVE || 0, counts.LATE || 0,
+          `${(counts.PRESENT || 0) + (counts["OFFICIAL BUSINESS"] || 0) + (counts.LEAVE || 0) + (counts.LATE || 0)} of ${entries.length}`]
+          : [counts.YES || 0, counts.NO || 0, entries.length, entries.length ? `${Math.round((counts.YES || 0) / entries.length * 100)}%` : "—"];
+        values.forEach((value, index) => { monitorEl(kind, `Summary${index}`).textContent = value; });
+        const from = monitorEl(kind, "From").value;
+        const to = monitorEl(kind, "To").value;
+        const criteria = [from || to ? `Dates: ${from ? formatLongDate(from) : "Beginning"} to ${to ? formatLongDate(to) : "Latest"}` : "All dates"];
+        if (kind === "ceremony") criteria.push(`Activity: ${activityLabels[monitorEl(kind, "FilterActivity").value] || "All activities"}`);
+        const filter = monitorEl(kind, "FilterStatus").value;
+        criteria.push(`Status: ${kind === "ceremony" ? statusLabels[filter] || "All statuses" : filter || "All records"}`);
+        if (monitorEl(kind, "Search").value.trim()) criteria.push(`Search: ${monitorEl(kind, "Search").value.trim()}`);
+        monitorEl(kind, "PrintScope").textContent = criteria.join(" · ");
+        monitorEl(kind, "RecordCount").textContent = `${entries.length} matching record${entries.length === 1 ? "" : "s"} / ${monitorRecords(emp, kind).length} total`;
+        monitorEl(kind, "TableBody").innerHTML = entries.length ? entries.map(({row, key}) => {
+          const status = kind === "ceremony" ? statusValue(row) : complianceValue(row);
+          const success = ["PRESENT", "YES"].includes(status);
+          const danger = ["ABSENT", "NO"].includes(status);
+          return `<tr data-monitor-key="${escapeHtml(key)}"><td><span class="id-badge">${escapeHtml(row.control_number || "—")}</span></td><td class="monitor-date-cell">${escapeHtml(formatLongDate(row.date))}</td><td><span class="badge-status ${success ? "success" : danger ? "urgent" : "info"}">${escapeHtml(kind === "ceremony" ? statusLabels[status] || status || "—" : status === "YES" ? "Yes" : status === "NO" ? "No" : "—")}</span></td>${kind === "ceremony" ? `<td>${escapeHtml(activityLabels[activityValue(row)] || row.activity || "—")}</td>` : ""}<td class="monitor-remarks">${escapeHtml(row.remarks || "—")}</td><td><div class="actions"><button class="btn-action" type="button" data-monitor-action="edit" data-key="${escapeHtml(key)}" title="Edit record" aria-label="Edit ${escapeHtml(row.control_number || "record")}"><i data-lucide="pencil"></i></button><button class="btn-action delete" type="button" data-monitor-action="delete" data-key="${escapeHtml(key)}" title="Delete record" aria-label="Delete ${escapeHtml(row.control_number || "record")}"><i data-lucide="trash-2"></i></button></div></td></tr>`;
+        }).join("") : `<tr><td colspan="${kind === "ceremony" ? 6 : 5}" class="monitor-empty">${monitorRecords(emp, kind).length ? "No records match the current filters." : `No ${kind === "ceremony" ? "ceremony attendance" : "uniform monitoring"} records yet. Add the first record using the form.`}</td></tr>`;
+      }
+      refreshIcons();
+    }
+
+    function editMonitoringRecord(kind, key) {
+      if (monitorSaving) return;
+      const rows = monitorRecords(selectedEmployee(), kind);
+      const index = rows.findIndex((row, i) => monitorRowKey(row, i) === key);
+      if (index < 0) { showToast("This record is no longer available. Refresh the directory.", "warning"); return; }
+      const row = rows[index];
+      resetMonitorEditor(kind);
+      monitorEditing[kind] = key;
+      monitoringDraft[kind] = {fingerprint: rowFingerprint(row), record: structuredClone(row)};
+      monitorEl(kind, "Control").value = row.control_number || "";
+      monitorEl(kind, "Date").value = String(row.date || "").slice(0, 10);
+      const selectOption = (element, value) => {
+        if (value && ![...element.options].some(option => option.value === value)) element.add(new Option(value, value));
+        element.value = value;
+      };
+      selectOption(monitorEl(kind, "Status"), kind === "ceremony" ? statusValue(row) : complianceValue(row));
+      if (kind === "ceremony") selectOption(monitorEl(kind, "Activity"), activityValue(row));
+      monitorEl(kind, "Remarks").value = row.remarks || "";
+      monitorEl(kind, "EditorTitle").textContent = "Edit Record";
+      monitorEl(kind, "EditTag").hidden = false;
+      monitorEl(kind, "Save").querySelector("span").textContent = "Update Record";
+      monitorEl(kind, "Clear").textContent = "Cancel Edit";
+      monitorEl(kind, "Form").scrollIntoView({block: "nearest", behavior: "auto"});
+      monitorEl(kind, "Date").focus();
+    }
+
+    function setMonitoringBusy(busy) {
+      monitorSaving = busy;
+      profileModal.dataset.busy = String(busy);
+      profileModal.setAttribute("aria-busy", String(busy));
+      if (pendingMonitoringKind) {
+        setSaveButtonState(monitorEl(pendingMonitoringKind, "Save"), busy, monitorEditing[pendingMonitoringKind] == null ? "Save Record" : "Update Record");
+        if (!busy) pendingMonitoringKind = null;
+      }
+      // Preserve controls already disabled by the shared authentication layer.
+      profileModal.querySelectorAll("button, input, select, textarea").forEach(control => {
+        if (busy && !control.disabled) { control.dataset.monitorDisabled = "true"; control.disabled = true; }
+        else if (!busy && control.dataset.monitorDisabled) { control.disabled = false; delete control.dataset.monitorDisabled; }
+      });
+    }
+
+    async function latestEmployeeForMonitoring(id) {
+      if (databaseMode !== "supabase") return employees.find(emp => String(emp.id) === String(id));
+      const response = await supabase.from("employees").select("*").eq("id", id).limit(1);
+      if (response.error) throw response.error;
+      if (!response.data?.length) throw new Error("This employee record is no longer available. Refresh the directory.");
+      return M.unwrap(response.data[0]);
+    }
+
+    // Read the latest employee before patching only the relevant history column.
+    // Conditional update prevents another administrator's concurrent edits being lost.
+    async function persistMonitoringHistory(latest, kind, rows) {
+      const field = monitoringFields[kind];
+      let updated = new Date().toISOString();
+      const id = latest.id;
+      if (databaseMode === "supabase") {
+        const shape = await supabase.from("employees").select("data").eq("id", id).limit(1);
+        const wrapped = !shape.error;
+        if (shape.error && !["42703", "PGRST204"].includes(shape.error.code)) throw shape.error;
+        await window.PGENRO_API?.requireAdmin?.();
+        const data = wrapped ? shape.data?.[0]?.data : latest;
+        if (wrapped && !shape.data?.length) throw new Error("This employee record is no longer available.");
+        if (wrapped && rowFingerprint(parsedArray(data?.[field])) !== rowFingerprint(monitorRecords(latest, kind))) throw new Error("This history changed in another session. Refresh before saving.");
+        const revision = wrapped ? data?.updated_at : latest.updated_at;
+        updated = new Date(Math.max(Date.now(), (Date.parse(revision) || 0) + 1)).toISOString();
+        const body = wrapped ? {data: {...(data || {}), [field]: rows, updated_at: updated}} : {[field]: rows, updated_at: updated};
+        let request = supabase.from("employees").update(body).eq("id", id);
+        const revisionColumn = wrapped ? "data->>updated_at" : "updated_at";
+        request = revision == null ? request.is(revisionColumn, null) : request.eq(revisionColumn, revision);
+        const result = await request.select("*");
+        if (result.error) throw result.error;
+        if (!result.data?.length) throw new Error("This record changed in another session or cannot be updated. Refresh before saving.");
+        employees = employees.map(emp => String(emp.id) === String(id) ? M.unwrap(result.data[0]) : emp);
+      } else {
+        employees = employees.map(emp => String(emp.id) === String(id) ? {...emp, [field]: rows, updated_at: updated} : emp);
+      }
+      saveLocalEmployees();
+    }
+
+    function nextMonitoringControl(rows, kind, date) {
+      const prefix = `${kind === "ceremony" ? "FC" : "UM"}-${date.slice(0, 4)}-`;
+      const numbers = rows.map(row => String(row.control_number || "").startsWith(prefix) ? Number(String(row.control_number).slice(prefix.length)) || 0 : 0);
+      return prefix + String(Math.max(0, ...numbers) + 1).padStart(4, "0");
+    }
+
+    async function saveMonitoringRecord(kind, event) {
+      event.preventDefault();
+      if (monitorSaving) return;
+      const emp = selectedEmployee();
+      if (!emp) return;
+      const form = monitorEl(kind, "Form");
+      showFormFeedback(kind + "Feedback");
+      monitorEl(kind, "Control").setCustomValidity("");
+      monitorEl(kind, "Date").setCustomValidity("");
+      if (!form.reportValidity()) return;
+      const employeeId = emp.id;
+      const editKey = monitorEditing[kind];
+      const draft = monitoringDraft[kind];
+      const date = monitorEl(kind, "Date").value;
+      const control = monitorEl(kind, "Control").value.trim();
+      const recordStatus = monitorEl(kind, "Status").value;
+      const activity = kind === "ceremony" ? monitorEl(kind, "Activity").value : "";
+      const remarks = monitorEl(kind, "Remarks").value.trim();
+      const previousEmployees = employees;
+      pendingMonitoringKind = kind;
+      setMonitoringBusy(true);
+      let saved = false;
+      try {
+        requireWritable();
+        const latest = await latestEmployeeForMonitoring(employeeId);
+        if (!latest) throw new Error("This employee record is no longer available.");
+        const rows = monitorRecords(latest, kind).map(row => ({...row}));
+        const index = editKey == null ? -1 : rows.findIndex((row, i) => monitorRowKey(row, i) === editKey);
+        if (editKey != null && (index < 0 || rowFingerprint(rows[index]) !== draft?.fingerprint)) throw new Error("This monitoring record changed in another session. Cancel the edit and select it again.");
+        const controlNumber = control || nextMonitoringControl(rows, kind, date);
+        if (rows.some((row, i) => i !== index && String(row.control_number || "").toLowerCase() === controlNumber.toLowerCase())) throw new Error("This control number already exists for this employee. Use a unique control number.");
+        if (rows.some((row, i) => i !== index && String(row.date || "").slice(0, 10) === date && (kind === "uniform" || activityValue(row) === activity))) throw new Error(kind === "uniform" ? "A uniform record already exists for this employee on this date. Edit that record instead." : "This employee already has a record for this activity on this date. Edit that record instead.");
+        const timestamp = new Date().toISOString();
+        const entry = {...(index >= 0 ? rows[index] : {}), id: index >= 0 ? rows[index].id || M.uuid() : M.uuid(), control_number: controlNumber, date, remarks, updated_at: timestamp};
+        if (kind === "ceremony") { entry.status = recordStatus; entry.activity = activity; }
+        else entry.compliant = recordStatus;
+        if (index >= 0) rows[index] = entry;
+        else { entry.created_at = timestamp; rows.unshift(entry); }
+        await persistMonitoringHistory(latest, kind, rows);
+        saved = true;
+        resetMonitorEditor(kind);
+        render();
+        M.audit(editKey == null ? "ADD_RECORD" : "EDIT_RECORD", `${kind === "ceremony" ? "Flag ceremony" : "Uniform"}: employee ${latest.employee_id}, control ${controlNumber}`);
+        showToast(editKey == null ? "Monitoring record saved." : "Monitoring record updated.");
+      } catch (error) {
+        employees = previousEmployees;
+        const message = error?.message || "Monitoring record could not be saved.";
+        const schemaHint = /column|schema cache|PGRST204|42703/i.test(message) ? " Run employee-record-supabase-migration.sql, then refresh." : "";
+        showFormFeedback(kind + "Feedback", message + schemaHint);
+        showToast(message + schemaHint, "error");
+      } finally {
+        setMonitoringBusy(false);
+        if (saved) monitorEl(kind, "Date").focus();
+      }
+    }
+
+    async function deleteMonitoringRecord(kind, key) {
+      if (monitorSaving) return;
+      const emp = selectedEmployee();
+      const before = monitorRecords(emp, kind);
+      const beforeIndex = before.findIndex((row, i) => monitorRowKey(row, i) === key);
+      if (!emp || beforeIndex < 0) return;
+      const target = before[beforeIndex];
+      if (!confirm(`Delete ${kind === "ceremony" ? "ceremony" : "uniform"} record ${target.control_number || ""} for ${emp.employee_id}?`)) return;
+      const previousEmployees = employees;
+      setMonitoringBusy(true);
+      try {
+        requireWritable();
+        const latest = await latestEmployeeForMonitoring(emp.id);
+        const rows = monitorRecords(latest, kind);
+        const index = rows.findIndex((row, i) => monitorRowKey(row, i) === key);
+        if (index < 0 || rowFingerprint(rows[index]) !== rowFingerprint(target)) throw new Error("This record changed in another session. Refresh before deleting.");
+        await persistMonitoringHistory(latest, kind, rows.filter((_, i) => i !== index));
+        if (monitorEditing[kind] === key) resetMonitorEditor(kind);
+        render();
+        M.audit("DELETE_RECORD", `${kind === "ceremony" ? "Flag ceremony" : "Uniform"}: employee ${latest.employee_id}, control ${target.control_number}`);
+        showToast("Monitoring record deleted.");
+      } catch (error) { employees = previousEmployees; showToast(error?.message || "Record could not be deleted.", "error"); }
+      finally { setMonitoringBusy(false); }
+    }
+
+    function exportMonitoringRecords(kind) {
+      const emp = selectedEmployee();
+      const entries = filteredMonitorRecords(kind, emp);
+      if (!emp || !entries.length) { showToast("No matching monitoring records to export.", "warning"); return; }
+      const name = [emp.last_name, emp.first_name, emp.middle_name, emp.name_extension].filter(Boolean).join(" ");
+      const header = ["Employee ID", "Employee Name", "Control Number", "Date", kind === "ceremony" ? "Status" : "Compliant"];
+      if (kind === "ceremony") header.push("Activity");
+      header.push("Remarks");
+      const rows = entries.map(({row}) => {
+        const values = [emp.employee_id, name, row.control_number, row.date, kind === "ceremony" ? statusValue(row) : complianceValue(row)];
+        if (kind === "ceremony") values.push(row.activity);
+        values.push(row.remarks);
+        return values;
+      });
+      const safeId = String(emp.employee_id || "employee").replace(/[^a-z0-9_-]/ig, "_");
+      M.csv([header, ...rows], `pgenro_${safeId}_${kind}_${M.today()}.csv`);
+      M.audit("EXPORT_RECORDS", `${entries.length} ${kind} records for employee ${emp.employee_id}`);
+      showToast(`${entries.length} monitoring record${entries.length === 1 ? "" : "s"} exported.`);
+    }
+
+    const recordTabs = $$(".employee-record-tab", profileModal);
+    recordTabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => selectEmployeeTab(tab.getAttribute("aria-controls")));
+      tab.addEventListener("keydown", event => {
+        let next;
+        if (event.key === "ArrowRight") next = (index + 1) % recordTabs.length;
+        else if (event.key === "ArrowLeft") next = (index + recordTabs.length - 1) % recordTabs.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = recordTabs.length - 1;
+        else return;
+        event.preventDefault();
+        selectEmployeeTab(recordTabs[next].getAttribute("aria-controls"), true);
+      });
+    });
+    for (const kind of monitoringKinds) {
+      monitorEl(kind, "Form").addEventListener("submit", event => saveMonitoringRecord(kind, event));
+      monitorEl(kind, "Clear").addEventListener("click", () => { if (!monitorSaving) resetMonitorEditor(kind); });
+      monitorEl(kind, "Control").addEventListener("input", () => monitorEl(kind, "Control").setCustomValidity(""));
+      monitorEl(kind, "Filters").addEventListener("submit", event => { event.preventDefault(); renderEmployeeMonitoring(); });
+      monitorEl(kind, "Filters").addEventListener("input", () => { if (!monitorSaving) renderEmployeeMonitoring(); });
+      monitorEl(kind, "Filters").addEventListener("change", () => { if (!monitorSaving) renderEmployeeMonitoring(); });
+      monitorEl(kind, "Filters").addEventListener("reset", event => {
+        event.preventDefault();
+        monitorEl(kind, "Filters").querySelectorAll("input, select").forEach(input => { input.value = ""; });
+        renderEmployeeMonitoring();
+      });
+      monitorEl(kind, "Export").addEventListener("click", () => exportMonitoringRecords(kind));
+      monitorEl(kind, "TableBody").addEventListener("click", event => {
+        const button = event.target.closest("[data-monitor-action]");
+        if (!button) return;
+        if (button.dataset.monitorAction === "edit") editMonitoringRecord(kind, button.dataset.key);
+        if (button.dataset.monitorAction === "delete") deleteMonitoringRecord(kind, button.dataset.key);
+      });
+    }
+
+    function printEmployeeDirectory() {
+      if (!M.canStartAction()) return;
+      const list = getFilteredEmployees();
+      if (!list.length) { showToast("No matching employee records to print.", "warning"); return; }
+      const printRoot = document.getElementById("employeePrintArea");
+      const fullName = emp => [emp.last_name, emp.first_name, emp.middle_name, emp.name_extension].filter(Boolean).join(" ");
+      printRoot.innerHTML = `<h1>PGENRO IMS · Employee Masterlist</h1><p>${list.length} matching employee record${list.length === 1 ? "" : "s"} · Generated ${escapeHtml(formatLongDate(M.today()))}</p><table><thead><tr><th>Employee ID</th><th>Employee Name</th><th>Designation</th><th>Employment Status</th><th>Division / Department</th><th>Duty Status</th><th>Contact</th></tr></thead><tbody>${list.map(emp => `<tr><td>${escapeHtml(emp.employee_id)}</td><td>${escapeHtml(fullName(emp))}</td><td>${escapeHtml(emp.designation)}</td><td>${escapeHtml(emp.employment_type)}</td><td>${escapeHtml(emp.department)}</td><td>${escapeHtml(emp.duty_status)}</td><td>${escapeHtml([emp.mobile, emp.email].filter(Boolean).join(" / "))}</td></tr>`).join("")}</tbody></table>`;
+      document.body.classList.add("employee-directory-print");
+      printRoot.setAttribute("aria-hidden", "false");
+      M.audit("PRINT_RECORD", `${list.length} employee records printed`);
+      window.print();
+    }
+    window.addEventListener("afterprint", () => {
+      document.body.classList.remove("employee-directory-print");
+      document.getElementById("employeePrintArea").setAttribute("aria-hidden", "true");
+      document.getElementById("employeePrintArea").replaceChildren();
+    });
+
+    /* ---------------- 18. INITIALIZE ---------------- */
+    await loadEmployees();
+
+    if (supabase) {
+      try {
+        const channel = supabase
+          .channel("admin-employees")
+          .on("postgres_changes", { event: "*", schema: "public", table: "employees" }, () => {
+            loadEmployees();
+          })
+          .subscribe();
+        window.addEventListener("pagehide",(event)=>{if(event.persisted)return; loadVersion++; supabase.removeChannel(channel); });
+      } catch (e) {
+        console.warn("Realtime channel notice:", e);
+      }
+    }
+
+    refreshIcons();
+  }
+})();
+/* Module-owned motion; content remains visible if JavaScript is unavailable. */
+/* Progressive, one-time entrance effects for the administrator workspace. */
+(() => {
+  'use strict';
+  const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  const targets = [
+    '.main-content > .page-header',
+    '.main-content > .ics-admin-header',
+    '.main-content :is(.kpi-grid,.stats-grid,.metrics-grid,.ics-kpi-grid) > *',
+    '.main-content .module-control-grid > *',
+    '.main-content :is(.section-header,.panel-header,.ics-panel-header)',
+    '.main-content :is(.chart-card,.table-card,.ics-panel,.service-form-card)'
+  ].join(',');
+
+  function init() {
+    if (motionQuery?.matches || !('IntersectionObserver' in window)) return;
+    const seen = new WeakSet();
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        entry.target.classList.add('is-visible');
+        observer.unobserve(entry.target);
+      }
+    }, { threshold: .04, rootMargin: '0px 0px -18px 0px' });
+
+    const register = root => {
+      const elements = root.matches?.(targets) ? [root] : [...root.querySelectorAll(targets)];
+      for (const element of elements) {
+        if (seen.has(element) || element.closest('[hidden],.modal-backdrop,.modal-overlay')) continue;
+        seen.add(element);
+        const siblings = [...element.parentElement.children].filter(el => el.matches(targets));
+        element.style.setProperty('--admin-stagger', `${Math.min(siblings.indexOf(element), 5) * 45}ms`);
+        element.classList.add('admin-motion-pending');
+        observer.observe(element);
+      }
+    };
+
+    register(document.querySelector('.main-content') || document.body);
+    const main = document.querySelector('.main-content');
+    if (main) {
+      const changes = new MutationObserver(records => {
+        for (const record of records) for (const node of record.addedNodes) {
+          if (node.nodeType === 1) register(node);
+        }
+      });
+      changes.observe(main, { childList: true, subtree: true });
+      window.addEventListener('pagehide',(event)=>{if(event.persisted)return; changes.disconnect(); observer.disconnect(); });
+    }
+    motionQuery?.addEventListener?.('change', event => {
+      if (!event.matches) return;
+      observer.disconnect();
+      document.querySelectorAll('.admin-motion-pending').forEach(el => el.classList.add('is-visible'));
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else init();
+})();
+
+
+
+})();
+
+/* Page-owned workspace interactions. No additional shared application file. */
+(() => {
+  'use strict';
+  function init() {
+    const M = window.PGENRO_Module;
+    if (!M) return;
+    const $ = id => document.getElementById(id);
+    const modal = $('workspaceJumpModal'), input = $('workspaceJumpSearch'), results = $('workspaceJumpResults');
+    const links = [...document.querySelectorAll('.sidebar-nav a[href]')].map(a => ({
+      name: a.textContent.trim(), href: a.getAttribute('href'), icon: a.querySelector('svg')?.outerHTML || '',
+      group: a.closest('.nav-group')?.querySelector('.nav-label')?.textContent || 'Workspace'
+    }));
+    const isBusy = () => Boolean(document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]'));
+    let active = -1;
+    function render() {
+      const query = input.value.trim().toLowerCase(), words = query.split(/\s+/).filter(Boolean);
+      const matches = links.filter(a => words.every(word => `${a.name} ${a.group} ${a.href}`.toLowerCase().includes(word)));
+      active = -1;
+      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">↗</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try “memo”, “inventory”, or “users”.</p>';
+      $('workspaceJumpCount').textContent = `${matches.length} destination${matches.length === 1 ? '' : 's'}`;
+    }
+    function open() {
+      if (isBusy()) return;
+      // Keep a record draft open; the module switcher is intended for the workspace.
+      if (document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open')) return;
+      input.value = ''; render(); M.openModal('workspaceJumpModal'); input.focus();
+    }
+    $('workspaceJumpBtn')?.addEventListener('click', open);
+    $('workspaceJumpClose')?.addEventListener('click', () => M.closeModal('workspaceJumpModal'));
+    input?.addEventListener('input', render);
+    modal?.addEventListener('keydown', event => {
+      const items = [...results.querySelectorAll('a')];
+      if (['ArrowDown','ArrowUp','Home','End'].includes(event.key) && items.length) {
+        event.preventDefault();
+        active = event.key === 'Home' ? 0 : event.key === 'End' ? items.length-1 : active < 0 ? (event.key === 'ArrowUp' ? items.length-1 : 0) : (active + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+        items.forEach((a,i) => a.classList.toggle('is-active', i === active));
+        items[active].focus(); items[active].scrollIntoView({block:'nearest'});
+      } else if (event.key === 'Enter' && event.target === input && items.length) {
+        event.preventDefault(); items[Math.max(0,active)].click();
+      }
+    });
+    document.addEventListener('keydown', event => {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault(); event.stopImmediatePropagation();
+        if (modal.classList.contains('open')) input.focus(); else open();
+      }
+    }, true);
+    // Programmatic clicks must respect the same busy boundary as native inert content.
+    document.addEventListener('click', event => {
+      const busy = document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]');
+      if (busy && !busy.contains(event.target)) { event.preventDefault(); event.stopImmediatePropagation(); }
+    }, true);
+    const busyObservers = [];
+    document.querySelectorAll('.modal-overlay,.modal-backdrop,.admin-modal').forEach(surface => {
+      const dialog = surface.querySelector('[role="dialog"]'), form = surface.querySelector('form');
+      if (!dialog || !surface.querySelector('.modal-header')) return;
+      const status = document.createElement('p'); status.className = 'workspace-busy-message'; status.hidden = true; status.setAttribute('role','status');
+      surface.querySelector('.modal-header').after(status);
+      let locked = false, wasInert = false, focus = null;
+      const update = () => {
+        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Working… Please wait before making more changes.' : '';
+        if (busy && !locked && form) { locked = true; wasInert = form.inert; focus = document.activeElement; form.inert = true; }
+        if (!busy && locked) { locked = false; form.inert = wasInert; if (surface.classList.contains('open') && focus?.isConnected && !focus.disabled) focus.focus({preventScroll:true}); }
+      };
+      const observer = new MutationObserver(update); observer.observe(surface,{attributes:true,attributeFilter:['data-busy']}); busyObservers.push(observer); update();
+    });
+    window.addEventListener('pagehide', event => {if(!event.persisted)busyObservers.forEach(o => o.disconnect());});
+    window.addEventListener('pageshow',event => {
+      if(!event.persisted||document.querySelector('.modal-overlay.open,.modal-backdrop.open,.admin-modal.open'))return;
+      const refresh=document.querySelector('#refreshBtn,#refreshMemosBtn,#syncCommunicationsBtn,#refreshUsersBtn,#refreshRequestsBtn,#refreshServicesBtn,#refreshIcsBtn');
+      if(refresh&&!refresh.disabled)refresh.click();
+    });
+    const date = $('workspaceToday');
+    if (date) {
+      const updateDate = () => { const d = new Date(); date.dateTime = M.today(); date.textContent = d.toLocaleDateString('en-PH',{weekday:'short',month:'short',day:'numeric',year:'numeric'}); };
+      updateDate(); document.addEventListener('visibilitychange', () => { if (!document.hidden) updateDate(); });
+    }
+    // Surface native validation messages beside the field, including after scrolling.
+    document.addEventListener('invalid', event => {
+      const field = event.target, group = field.closest('.form-group,.field-group');
+      if (!group) return;
+      field.setAttribute('aria-invalid','true');
+      let message = group.querySelector('.workspace-field-error');
+      if (!message) { message = document.createElement('span'); message.className = 'workspace-field-error'; message.id = `workspace-error-${M.uuid()}`; group.append(message); }
+      message.textContent = field.validationMessage;
+      const descriptions = new Set((field.getAttribute('aria-describedby') || '').split(' ').filter(Boolean)); descriptions.add(message.id); field.setAttribute('aria-describedby',[...descriptions].join(' '));
+    }, true);
+    document.addEventListener('input', event => {
+      const field = event.target, group = field.closest?.('.form-group,.field-group'), message = group?.querySelector('.workspace-field-error');
+      if (message && field.validity?.valid) { field.removeAttribute('aria-invalid'); field.setAttribute('aria-describedby',(field.getAttribute('aria-describedby') || '').split(' ').filter(id => id !== message.id).join(' ')); message.remove(); }
+    });
+    document.addEventListener('reset', event => {
+      event.target.querySelectorAll('[aria-invalid="true"]').forEach(field => { field.removeAttribute('aria-invalid'); const message = field.closest('.form-group,.field-group')?.querySelector('.workspace-field-error'); if(message) { field.setAttribute('aria-describedby',(field.getAttribute('aria-describedby') || '').split(' ').filter(id => id !== message.id).join(' ')); message.remove(); } });
+    });
+    // Horizontal controls make wide registries usable on touch and keyboard screens.
+    const observers = [];
+    document.querySelectorAll('.table-responsive,.analytics-table-scroll,.table-scroll').forEach((region,index) => {
+      if (!region.querySelector('table')) return;
+      if (!region.id) region.id = `workspace-table-${index}`;
+      region.setAttribute('tabindex','0'); region.setAttribute('role','region');
+      if (!region.hasAttribute('aria-label')) region.setAttribute('aria-label','Registry table; scroll horizontally to see all columns');
+      const controls = document.createElement('div'); controls.className = 'workspace-table-controls'; controls.hidden = true;
+      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">←</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">→</button></div>`;
+      region.after(controls); const [left,right] = controls.querySelectorAll('button');
+      let scheduled = 0;
+      const measure = () => {
+        scheduled = 0;
+        const width = region.clientWidth, scrollWidth = region.scrollWidth, scrollLeft = region.scrollLeft;
+        const hidden = scrollWidth <= width + 2, atStart = scrollLeft <= 2, atEnd = scrollLeft + width >= scrollWidth - 2;
+        if (controls.hidden !== hidden) controls.hidden = hidden;
+        if (left.disabled !== atStart) left.disabled = atStart;
+        if (right.disabled !== atEnd) right.disabled = atEnd;
+      };
+      const update = () => { if (!scheduled) scheduled = requestAnimationFrame(measure); };
+      window.addEventListener('pagehide', () => { if (scheduled) cancelAnimationFrame(scheduled); scheduled = 0; });
+      const motion = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+      left.onclick = () => region.scrollBy({left:-region.clientWidth*.75,behavior:motion}); right.onclick = () => region.scrollBy({left:region.clientWidth*.75,behavior:motion});
+      region.addEventListener('scroll',update,{passive:true});
+      if ('ResizeObserver' in window) { const resize = new ResizeObserver(update); resize.observe(region); resize.observe(region.querySelector('table')); observers.push(resize); }
+      const changes = new MutationObserver(update); changes.observe(region,{childList:true,subtree:true}); observers.push(changes); update();
+    });
+    window.addEventListener('pagehide', event => {if(!event.persisted)observers.forEach(o => o.disconnect());});
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',init,{once:true}); else init();
+})();
+
+
+/* PGENRO Modern Workspace: page-owned appearance and presentation enhancements. */
+(() => {
+  'use strict';
+  function initModernWorkspace() {
+    if (!document.querySelector('.page-heading-mark')) return;
+    const renderIcons = () => window.PGENRO_Module?.renderIcons?.();
+    const themeButton = document.getElementById('appearanceThemeBtn');
+    const themeSelect = document.getElementById('appearanceThemeSelect');
+    const preferenceKey = 'pgenro_admin_preferences';
+    const themeKey = 'pgenro_admin_theme';
+    function readPreferences() {
+      try { const value = JSON.parse(localStorage.getItem(preferenceKey) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
+      catch { return {}; }
+    }
+    function applyTheme(value, remember = false) {
+      const theme = value === 'dark' ? 'dark' : 'light';
+      document.documentElement.dataset.theme = theme;
+      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0f1d18' : '#f5f7f8');
+      if (remember) { try { localStorage.setItem(themeKey, theme); } catch {} }
+      if (themeButton) {
+        const label = theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance';
+        themeButton.setAttribute('aria-label', label);
+        themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
+        themeButton.title = label;
+        const icon = document.createElement('i');
+        icon.dataset.lucide = theme === 'dark' ? 'sun' : 'moon';
+        themeButton.replaceChildren(icon);
+      }
+      if (themeSelect) themeSelect.value = theme;
+      renderIcons();
+    }
+    applyTheme(document.documentElement.dataset.theme);
+    themeButton?.addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
+    themeSelect?.addEventListener('change', () => applyTheme(themeSelect.value, true));
+
+    function syncDensity() {
+      const compact = Boolean(readPreferences().compact);
+      document.body.classList.toggle('compact-mode', compact);
+      const existingToggle = document.getElementById('compactModeToggle');
+      if (existingToggle) existingToggle.checked = compact;
+      document.querySelectorAll('.modern-density-switch').forEach(button => {
+        button.setAttribute('aria-pressed', String(compact));
+        button.setAttribute('aria-label', compact ? 'Use comfortable table spacing' : 'Use compact table spacing');
+        button.title = compact ? 'Use comfortable table spacing' : 'Use compact table spacing';
+        button.querySelector('span').textContent = compact ? 'Compact' : 'Comfortable';
+      });
+    }
+    document.querySelectorAll('.main-content .data-table, .main-content .analytics-table').forEach(table => {
+      const wrapper = table.closest('.table-responsive, .table-wrap, .table-wrapper, .table-container, .analytics-table-scroll, .ws-table-scroll') || table;
+      if (wrapper.dataset.modernTable) return;
+      wrapper.dataset.modernTable = 'true';
+      const toolbar = document.createElement('div');
+      toolbar.className = 'modern-table-toolbar';
+      toolbar.innerHTML = '<span class="modern-table-toolbar-label"><i data-lucide="columns-3"></i>Registry view</span><button class="modern-density-switch" type="button" aria-pressed="false"><i data-lucide="rows-3"></i><span>Comfortable</span></button>';
+      wrapper.before(toolbar);
+      toolbar.querySelector('button').addEventListener('click', () => {
+        const preferences = readPreferences();
+        preferences.compact = !document.body.classList.contains('compact-mode');
+        try { localStorage.setItem(preferenceKey, JSON.stringify(preferences)); }
+        catch { return; }
+        syncDensity();
+      });
+    });
+    syncDensity();
+    document.getElementById('compactModeToggle')?.addEventListener('change', syncDensity);
+    document.getElementById('resetAdminPrefsBtn')?.addEventListener('click', () => {
+      try { localStorage.removeItem(themeKey); } catch {}
+      applyTheme('light'); syncDensity();
+    });
+    window.addEventListener('storage', event => {
+      if (event.key === themeKey || event.key === null) applyTheme(event.newValue);
+      if (event.key === preferenceKey || event.key === null) syncDensity();
+    });
+
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarCollapseBtn');
+    let currentSidebarIcon = '';
+    function syncSidebarIcon() {
+      if (!sidebar || !sidebarToggle) return;
+      const mobile = innerWidth <= 900;
+      const name = mobile ? 'x' : sidebar.classList.contains('collapsed') ? 'panel-left-open' : 'panel-left-close';
+      if (name !== currentSidebarIcon) {
+        currentSidebarIcon = name;
+        const icon = document.createElement('i'); icon.dataset.lucide = name;
+        const label=document.createElement('span');label.className='navigation-button-label';label.textContent='Menu';sidebarToggle.replaceChildren(icon,label); renderIcons();
+      }
+      if (mobile) { sidebarToggle.setAttribute('aria-label', 'Close navigation'); sidebarToggle.title = 'Close navigation'; }
+    }
+    syncSidebarIcon();
+    const sidebarObserver = typeof MutationObserver === 'function' ? new MutationObserver(syncSidebarIcon) : null;
+    if (sidebar) sidebarObserver?.observe(sidebar, { attributes: true, attributeFilter: ['class'] });
+    window.addEventListener('resize', syncSidebarIcon);
+
+    function enhanceEmptyStates() {
+      document.querySelectorAll('.main-content .data-table tbody tr:only-child td[colspan]').forEach(cell => {
+        if (cell.dataset.modernEmpty || cell.childElementCount) return;
+        const message = cell.textContent.trim();
+        if (!message || !/\b(no |not found|empty|waiting|loading|unavailable|failed|error)/i.test(message)) return;
+        cell.dataset.modernEmpty = 'true';
+        const content = document.createElement('div'); content.className = 'modern-empty-state';
+        const icon = document.createElement('i'); icon.dataset.lucide = /failed|error|unavailable/i.test(message) ? 'file-search' : 'inbox';
+        const copy = document.createElement('p'); copy.textContent = message;
+        content.append(icon, copy); cell.replaceChildren(content);
+      });
+    }
+    enhanceEmptyStates();
+    const profileName = document.getElementById('dropdownUserName');
+    const profileRole = document.getElementById('dropdownUserRole');
+    const buttonName = document.querySelector('.profile-button-name');
+    const buttonRole = document.querySelector('.profile-button-role');
+    function syncProfileCopy() {
+      if (buttonName && profileName) buttonName.textContent = profileName.textContent.trim() || 'PGENRO Admin';
+      if (buttonRole && profileRole) buttonRole.textContent = profileRole.textContent.trim() || 'Administrator';
+    }
+    syncProfileCopy();
+    const profileObserver = typeof MutationObserver === 'function' ? new MutationObserver(syncProfileCopy) : null;
+    if (profileName) profileObserver?.observe(profileName, { childList: true, characterData: true, subtree: true });
+    if (profileRole) profileObserver?.observe(profileRole, { childList: true, characterData: true, subtree: true });
+
+    // Keep the genuine seal when available; show a simple letter mark if missing.
+    const seal = document.querySelector('.logo-image');
+    function showSealFallback() {
+      if (!seal || !seal.parentElement) return;
+      seal.hidden = true;
+      const host = seal.parentElement;
+      host.classList.add('logo-fallback');
+      if (!host.querySelector('.logo-fallback-mark')) {
+        const mark = document.createElement('span');
+        mark.textContent = 'P';
+        mark.className = 'logo-fallback-mark';
+        host.append(mark);
+        renderIcons();
+      }
+    }
+    seal?.addEventListener('error', showSealFallback);
+    if (seal?.complete && !seal.naturalWidth) showSealFallback();
+    renderIcons();
+
+    // Table rows, OCR states and attachment controls create icons after page load.
+    const iconObserver = typeof MutationObserver === 'function' ? new MutationObserver(records => {
+      const hasIcons = records.some(record => [...record.addedNodes].some(node =>
+        node.nodeType === 1 && (node.matches('i[data-lucide]') || node.querySelector('i[data-lucide]'))
+      ));
+      if (hasIcons) renderIcons();
+      if (records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.matches('tr,tbody') || node.querySelector('tbody'))))) enhanceEmptyStates();
+    }) : null;
+    iconObserver?.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener('pagehide', event => { if (!event.persisted) { profileObserver?.disconnect(); iconObserver?.disconnect(); sidebarObserver?.disconnect(); } });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initModernWorkspace, { once: true });
+  else initModernWorkspace();
+})();
+
+/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT · module-owned presentation ===== */
+(() => {
+  'use strict';
+  function initWorkspaceNavigation() {
+    const body = document.body;
+    if (!body?.classList.contains('depth-workspace') || body.dataset.navigationReady) return;
+    body.dataset.navigationReady = 'true';
+    const surface = document.querySelector('main');
+    const media = matchMedia('(prefers-reduced-motion: reduce)');
+    const reduced = () => media.matches || body.classList.contains('pgenro-reduced-motion');
+    let navigationPending = false, navigationTimer = 0, entranceTimer = 0;
+
+    function resetTransition() {
+      clearTimeout(entranceTimer);
+      clearTimeout(navigationTimer);
+      navigationPending = false;
+      surface?.classList.remove('workspace-slide-enter', 'workspace-slide-leave');
+      body.classList.remove('workspace-transitioning');
+      body.dataset.pageTransition = 'idle';
+    }
+    function enter() {
+      resetTransition();
+      if (!surface || reduced()) return;
+      body.classList.add('workspace-transitioning');
+      body.dataset.pageTransition = 'entering';
+      surface.classList.add('workspace-slide-enter');
+      entranceTimer = setTimeout(resetTransition, 280);
+    }
+    // One short compositor animation, with no continuous rendering loop.
+    enter();
+    window.addEventListener('pageshow', event => { if (event.persisted) enter(); });
+    media.addEventListener?.('change', () => { if (!navigationPending) resetTransition(); });
+
+    window.addEventListener('click', event => {
+      if (event.defaultPrevented || event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const link = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (!link || link.hasAttribute('download') || (link.target && link.target !== '_self') || link.getAttribute('aria-disabled') === 'true') return;
+      const destination = new URL(link.href, location.href);
+      if (destination.origin !== location.origin || !/\/(?:admin|User|SettingIMS)\/[^/]+\.html$/i.test(destination.pathname)) return;
+      if (destination.pathname === location.pathname && destination.search === location.search) return;
+      event.preventDefault();
+      if (navigationPending || document.querySelector('dialog[open]')) return;
+      navigationPending = true;
+      clearTimeout(entranceTimer);
+      const go = () => location.assign(destination.href);
+      if (reduced() || !surface) { go(); return; }
+      surface.classList.remove('workspace-slide-enter');
+      surface.classList.add('workspace-slide-leave');
+      body.classList.add('workspace-transitioning');
+      body.dataset.pageTransition = 'leaving';
+      navigationTimer = setTimeout(go, 140);
+    });
+
+    let dialog = null, resolveConfirmation = null, confirmationPromise = null, busy = false, returnFocus = null;
+    function setBusy(value) {
+      busy = value;
+      dialog.classList.toggle('is-busy', value);
+      dialog.setAttribute('aria-busy', String(value));
+      dialog.querySelector('[data-workspace-logout-cancel]').disabled = value;
+      dialog.querySelector('[data-workspace-logout-confirm]').disabled = value;
+      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging out…' : 'Yes, log out';
+    }
+    function dismiss() {
+      if (busy) return;
+      const done = resolveConfirmation;
+      resolveConfirmation = null; confirmationPromise = null;
+      dialog.close();
+      body.classList.remove('workspace-logout-open');
+      done?.(false);
+      if (returnFocus?.isConnected && returnFocus.getClientRects().length && !returnFocus.closest('[inert]')) returnFocus.focus({preventScroll: true});
+      else document.querySelector('#profileBtn, [data-pgenro-logout]')?.focus({preventScroll: true});
+    }
+    function confirmLogout() {
+      if (busy) return;
+      dialog.querySelector('.workspace-logout-error').textContent = '';
+      setBusy(true);
+      if (resolveConfirmation) {
+        const done = resolveConfirmation; resolveConfirmation = null; done(true);
+      } else {
+        // Retry uses the existing session gateway; never opens a second prompt.
+        window.PGENRO_API?.signOut?.({confirm: false, ask: false});
+      }
+    }
+    function createDialog() {
+      if (dialog) return;
+      dialog = document.createElement('dialog');
+      dialog.id = 'workspaceLogoutDialog';
+      dialog.className = 'workspace-logout-dialog';
+      dialog.setAttribute('aria-labelledby', 'workspaceLogoutTitle');
+      dialog.setAttribute('aria-describedby', 'workspaceLogoutDescription');
+      dialog.innerHTML = `
+        <div class="workspace-logout-content">
+          <div class="workspace-logout-heading"><span class="workspace-logout-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg></span><span class="workspace-logout-brand">PGENRO IMS<span>Secure workspace</span></span></div>
+          <h2 id="workspaceLogoutTitle">Log out of your workspace?</h2>
+          <p id="workspaceLogoutDescription">You’ll need to sign in again to access your records and office modules.</p>
+          <p class="workspace-logout-error" role="alert"></p>
+          <div class="workspace-logout-actions"><button type="button" class="workspace-logout-cancel" data-workspace-logout-cancel autofocus>Cancel</button><button type="button" class="workspace-logout-confirm" data-workspace-logout-confirm><span>Yes, log out</span></button></div>
+        </div>`;
+      body.appendChild(dialog);
+      dialog.addEventListener('cancel', event => { event.preventDefault(); dismiss(); });
+      dialog.addEventListener('click', event => {
+        event.stopPropagation();
+        if (event.target.closest('[data-workspace-logout-cancel]')) dismiss();
+        else if (event.target.closest('[data-workspace-logout-confirm]')) confirmLogout();
+        else if (event.target === dialog) {
+          const rect = dialog.getBoundingClientRect();
+          if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) dismiss();
+        }
+      });
+    }
+    // The auth gateway asks this page-owned UI for confirmation before signing out.
+    window.PGENRO_ConfirmLogout = () => {
+      if (confirmationPromise) return confirmationPromise;
+      createDialog();
+      returnFocus = document.activeElement;
+      dialog.querySelector('.workspace-logout-error').textContent = '';
+      setBusy(false);
+      confirmationPromise = new Promise(resolve => { resolveConfirmation = resolve; });
+      if (!dialog.open) dialog.showModal();
+      body.classList.add('workspace-logout-open');
+      dialog.querySelector('[data-workspace-logout-cancel]').focus({preventScroll: true});
+      return confirmationPromise;
+    };
+    window.addEventListener('pgenro:logout-error', () => {
+      if (!dialog?.open) return;
+      confirmationPromise = null; resolveConfirmation = null;
+      setBusy(false);
+      dialog.querySelector('.workspace-logout-error').textContent = 'Could not log out. Check your connection and try again.';
+      dialog.querySelector('[data-workspace-logout-confirm]').focus({preventScroll: true});
+    });
+    window.addEventListener('keydown', event => {
+      if (!dialog?.open) return;
+      if (event.key === 'Escape') {
+        event.preventDefault(); event.stopImmediatePropagation(); dismiss();
+      } else if (event.key === 'Tab') {
+        const buttons = [...dialog.querySelectorAll('button:not(:disabled)')];
+        if (!buttons.length) { event.preventDefault(); return; }
+        if (event.shiftKey && document.activeElement === buttons[0]) { event.preventDefault(); buttons.at(-1).focus(); }
+        else if (!event.shiftKey && document.activeElement === buttons.at(-1)) { event.preventDefault(); buttons[0].focus(); }
+      }
+    }, true);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initWorkspaceNavigation, {once: true});
+  else initWorkspaceNavigation();
+})();
+/* ===== END PGENRO SLIDE NAVIGATION AND LOGOUT ===== */
+
+/* PGENRO module notifications, 10 October 2026. */
+/* Module-owned notifications: copies live inside each workspace page script. */
+(() => {
+  'use strict';
+  if (window.PGENRO_Notifications) return;
+  const modules = {
+    communications:['Communications','admincommunication.html','communication.html'],
+    travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
+    office_memos:['Office Memos','officememo-admin.html','officememo.html'],
+    employees:['Employees','employee-admin.html','employee.html'],
+    inventory:['Inventory','invetoryadmin.html','inventory.html'],
+    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
+    service_requests:['Service Requests','serviceAdmin.html','service.html'],
+    ics_records:['Property Slips','ics-admin.html','ics.html'],
+    user_accounts:['User Management','Usermanagement.html',null],
+    account_requests:['Account Requests','requestacc.html',null]
+  };
+  const empty=()=>({total:0,counts:{},items:[],workspace:'user'});
+  let feed=empty(),status='loading',db,userId='',generation=0,loading=false,again=false,disposed=false;
+  let wrapper,button,panel,list,count,markAll,badge,channel,timer,debounce,authSubscription;
+  const element=(tag,className,text)=>{const el=document.createElement(tag);el.className=className||'';if(text!==undefined)el.textContent=text;return el;};
+  function destination(module){
+    const info=modules[module],admin=feed.workspace==='admin',file=info?.[admin?1:2];
+    return file?new URL(`../${admin?'admin':'User'}/${file}`,location.href).href:null;
+  }
+  function render(){
+    if(!button)return;
+    const total=Number(feed.total)||0;
+    badge.textContent=total>99?'99+':String(total);badge.hidden=!total;
+    count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
+    button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
+    list.replaceChildren();
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications…'));
+    else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
+    else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
+    for(const item of feed.items||[]){
+      const href=destination(item.module);if(!href)continue;
+      const link=element('a','module-notification-item');link.href=href;link.dataset.notificationId=item.id;
+      const dot=element('span','module-notification-dot');dot.setAttribute('aria-hidden','true');
+      const copy=element('span','module-notification-copy');copy.append(element('strong','',modules[item.module][0]));
+      copy.append(element('span','module-notification-title',item.title||'New record added'));
+      const date=new Date(item.createdAt);copy.append(element('small','',Number.isNaN(date.getTime())?'New record':date.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'})));
+      link.append(dot,copy);link.addEventListener('click',async event=>{
+        event.preventDefault();link.setAttribute('aria-busy','true');
+        try{await markRead({p_ids:[item.id]});}catch{/* The destination remains usable if marking read fails. */}
+        location.assign(href);
+      });list.append(link);
+    }
+    if(total>(feed.items||[]).length&&status==='ready')list.append(element('p','module-notification-more',`Showing the latest ${(feed.items||[]).length} new records`));
+    document.querySelectorAll('aside a[href], .sidebar a[href]').forEach(link=>{
+      const path=new URL(link.getAttribute('href'),location.href).pathname;
+      const module=Object.keys(modules).find(key=>destination(key)&&new URL(destination(key)).pathname===path);
+      let chip=link.querySelector('.module-new-badge');
+      if(!module){chip?.remove();return;}
+      const value=Number(feed.counts?.[module])||0;
+      if(!chip){chip=element('span','module-new-badge');link.append(chip);}
+      chip.dataset.module=module;chip.hidden=!value;chip.textContent=value>99?'99+':String(value);
+      chip.setAttribute('aria-label',`${value} new ${modules[module][0]} records`);
+    });
+    document.body.dataset.notificationsState=status;
+  }
+  function close(){if(!panel)return;panel.hidden=true;button.setAttribute('aria-expanded','false');}
+  function position(){
+    const rect=button.getBoundingClientRect(),width=Math.min(390,innerWidth-24);
+    panel.style.width=`${width}px`;panel.style.right=`${Math.min(Math.max(12,innerWidth-rect.right),innerWidth-width-12)}px`;
+    panel.style.top=`${Math.min(Math.max(12,rect.bottom+10),innerHeight-160)}px`;
+  }
+  async function refresh(){
+    if(disposed||!db||!userId)return;
+    if(loading){again=true;return;}
+    loading=true;const token=generation;
+    try{
+      const result=await db.rpc('pgenro_get_module_notifications',{p_limit:30});
+      if(token!==generation||disposed)return;
+      if(result.error)throw result.error;
+      const data=result.data;
+      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      feed=data;status='ready';render();
+    }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
+    finally{loading=false;if(again){again=false;scheduleRefresh();}}
+  }
+  function scheduleRefresh(){clearTimeout(debounce);debounce=setTimeout(refresh,250);}
+  async function markRead(args={}){
+    const result=await db.rpc('pgenro_mark_notifications_read',args);if(result.error)throw result.error;
+    await refresh();
+  }
+  async function attachSession(user){
+    if(disposed)return;
+    if(!user?.id){generation++;userId='';feed=empty();status='unavailable';close();render();if(channel)db.removeChannel(channel);channel=null;return;}
+    if(userId===user.id){scheduleRefresh();return;}
+    generation++;userId=user.id;feed=empty();status='loading';render();
+    if(channel)db.removeChannel(channel);
+    channel=db.channel(`pgenro-module-notifications-${user.id}`)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_module_notifications'},scheduleRefresh)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'pgenro_notification_reads',filter:`user_id=eq.${user.id}`},scheduleRefresh)
+      .subscribe(state=>{if(state==='SUBSCRIBED')scheduleRefresh();});
+    await refresh();
+  }
+  function init(){
+    const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
+    document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
+    wrapper=element('div','module-notifications');button=element('button','module-notification-button');button.type='button';button.id='moduleNotificationButton';
+    button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','moduleNotificationPanel');
+    button.innerHTML='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9Z"/><path d="M10 21h4"/></svg>';
+    badge=element('span','module-notification-badge');badge.hidden=true;button.append(badge);wrapper.append(button);
+    if(header.classList.contains('settings-topbar'))header.insertBefore(wrapper,header.lastElementChild);else header.prepend(wrapper);
+    panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
+    const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
+    count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
+    const closeBtn=element('button','module-notification-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
+    markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
+    tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
+    button.addEventListener('click',()=>{const open=panel.hidden;close();if(open){panel.hidden=false;position();button.setAttribute('aria-expanded','true');closeBtn.focus();refresh();}});
+    document.addEventListener('click',event=>{if(!wrapper.contains(event.target)&&!panel.contains(event.target))close();});
+    document.addEventListener('keydown',event=>{if(event.key==='Escape'&&!panel.hidden){close();button.focus();}});
+    window.addEventListener('resize',()=>{if(!panel.hidden)position();});
+    window.addEventListener('focus',scheduleRefresh);document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleRefresh();});
+    window.addEventListener('pageshow',event=>{if(event.persisted)scheduleRefresh();});
+    render();db=window.pgenroSupabase||window.PGENRO_DB?.client;
+    if(!db){status='unavailable';render();return;}
+    db.auth.getUser().then(result=>attachSession(result.data?.user)).catch(()=>attachSession(null));
+    const subscription=db.auth.onAuthStateChange((_event,session)=>{setTimeout(()=>attachSession(session?.user),0);});authSubscription=subscription.data?.subscription;
+    timer=setInterval(()=>{if(!document.hidden&&navigator.onLine!==false)refresh();},60000);
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
+  }
+  window.PGENRO_Notifications={refresh,scheduleRefresh};
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+/* Page-owned layout helpers; do not change record permissions or data writes. */
+(() => {
+  'use strict';
+  function init() {
+    if (document.body.dataset.unifiedLayoutReady) return;
+    document.body.dataset.unifiedLayoutReady = 'true';
+    // A wide registry scrolls within its own region, including dynamically mounted tables.
+    function containTables() {
+      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
+        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.audit-scroll-box,.monitor-table-scroll')) return;
+        const region = document.createElement('div'); region.className = 'ui-table-scroll';
+        table.before(region); region.append(table);
+      });
+    }
+    containTables();
+    let tableFrame;
+    const insertedTables = new MutationObserver(records => {
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    });
+    insertedTables.observe(document.body, {childList:true,subtree:true});
+    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
+    // Account Settings and the module pages use one saved user appearance.
+    let appearanceObserver;
+    if (document.body.classList.contains('pgenro-user')) {
+      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
+      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+      function applyAppearance(theme) {
+        theme=theme==='dark'?'dark':'light';
+        if(html.dataset.theme!==theme)html.dataset.theme=theme;
+        const dark=theme==='dark';
+        if(button&&button.dataset.appearance!==theme) {
+          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
+          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
+        }
+        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
+        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
+      }
+      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
+      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
+      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
+      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
+      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
+      button?.addEventListener('click',()=>{
+        const theme=html.dataset.theme==='dark'?'light':'dark';
+        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
+        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
+        html.dataset.pgenroTheme=theme;applyAppearance(theme);
+      });
+      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
+    }
+    // The existing user page controls continue to open and close its module menu.
+    const sidebar = document.querySelector('.pgenro-user .sidebar');
+    if (sidebar) {
+      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
+      let previouslyOpen = false;
+      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
+      function desktopNavigation() {
+        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
+        collapsed=!media.matches&&collapsed;
+        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
+        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
+      }
+      menu?.addEventListener('click',event=>{
+        if(media.matches)return;
+        event.preventDefault();event.stopImmediatePropagation();
+        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
+        desktopNavigation();
+      },true);
+      function sync() {
+        const open = media.matches && sidebar.classList.contains('open');
+        sidebar.inert = media.matches && !open;
+        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
+        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
+        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
+        previouslyOpen = open;
+      }
+      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
+      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
+      let navigationFrame;
+      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
+      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
+      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
+      document.addEventListener('keydown',event=>{
+        if(!media.matches||!sidebar.classList.contains('open')) return;
+        if(event.key==='Escape') {menu?.click();return;}
+        if(event.key!=='Tab')return;
+        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
+        if(!items.length)return;
+        const first=items[0],last=items.at(-1);
+        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
+        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+      });
+    }
+    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
+
+/* Module-owned consistent layout, viewport sizing, and dialog surfaces. */
+(() => {
+ 'use strict';
+ function initUnifiedUI(){
+  if(document.body.dataset.unifiedUiBound)return;document.body.dataset.unifiedUiBound='true';
+  let viewportFrame=0;
+  const fit=()=>{viewportFrame=0;const height=window.visualViewport?.height||innerHeight;document.documentElement.style.setProperty('--ui-viewport-height',`${Math.round(height)}px`);};
+  const scheduleFit=()=>{if(!viewportFrame)viewportFrame=requestAnimationFrame(fit);};fit();
+  window.addEventListener('resize',scheduleFit,{passive:true});window.visualViewport?.addEventListener('resize',scheduleFit,{passive:true});
+  // Assign the same surfaces without changing IDs, field mapping, or event handlers.
+  document.querySelectorAll('.modal-overlay,.modal-backdrop').forEach(surface=>{
+   surface.classList.add('unified-dialog-overlay');
+   const dialog=surface.querySelector(':scope > [role="dialog"],:scope > .modal-card,:scope > .modal-container,:scope > .ics-modal');
+   if(!dialog)return;dialog.classList.add('unified-dialog');
+   dialog.querySelectorAll('.modal-header,.admin-modal-header,.ics-modal-header').forEach(el=>el.classList.add('unified-dialog-header'));
+   dialog.querySelectorAll('.modal-body,.admin-modal-body,.ics-modal-body').forEach(el=>el.classList.add('unified-dialog-body'));
+   dialog.querySelectorAll('.modal-actions,.modal-footer,.admin-modal-footer,.ics-modal-footer').forEach(el=>el.classList.add('unified-dialog-footer'));
+  });
+  const main=document.querySelector('main.main-content'),metrics=main?.querySelector(':scope > .kpi-grid,:scope > .audit-metrics');
+  const quick=main?.querySelector(':scope > .quick-actions-strip,:scope > .quick-actions-section,:scope > .quick-actions-panel');
+  if(metrics&&quick&&quick.compareDocumentPosition(metrics)&Node.DOCUMENT_POSITION_FOLLOWING)metrics.after(quick);
+  // Only vertical chrome is standardized; each module retains its record actions.
+  document.querySelectorAll('.modal-close,.modal-close-btn,.admin-modal-close').forEach(button=>{if(!button.hasAttribute('aria-label'))button.setAttribute('aria-label','Close dialog');});
+  window.addEventListener('pagehide',event=>{if(!event.persisted&&viewportFrame)cancelAnimationFrame(viewportFrame);});
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initUnifiedUI,{once:true});else initUnifiedUI();
+})();

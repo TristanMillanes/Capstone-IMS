@@ -1,0 +1,103 @@
+{
+  "method": "Actual Chromium; simulated Supabase; no live records changed",
+  "checks": [
+    {
+      "scenario": "admin/Usermanagement.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/admin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/admincommunication.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/employee-admin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/ics-admin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/invetoryadmin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/officememo-admin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/requestacc.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/serviceAdmin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/travelOR-admin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/visitors-admin.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/communication.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/employee.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/homepage.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/ics.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/inventory.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/officememo.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/service.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/travelOR.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/visitorsView.html 3D motion, hover reset, profiles, mobile navigation, reduced motion and aligned metrics",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Admin dark/light appearance, sidebar collapse and keyboard module navigation",
+      "result": "PASS",
+      "details": {
+        "surface": "#173128",
+        "title": "rgb(244, 250, 246)"
+      }
+    },
+    {
+      "scenario": "User/homepage.html account settings and return navigation",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/communication.html account settings and return navigation",
+      "result": "PASS"
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

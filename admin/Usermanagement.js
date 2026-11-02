@@ -1,4 +1,5 @@
-/* User Management access and persistent role fix, 11 October 2026. */
+/* User Management: canonical account service and legacy-directory compatibility. */
+window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
 /* Module-owned runtime. Kept inside each module; no extra shared file required. */
 
 (() => {
@@ -315,7 +316,7 @@
 
 /* ===== Page module ===== */
 /**
- * PGENRO IMS â€” User Management Controller
+ * PGENRO IMS — User Management Controller
  * Manages Account Authentication users and administrator-controlled PGENRO profiles.
  * Reads a protected Supabase registry; account changes use the admin-users Edge Function.
  */
@@ -325,6 +326,8 @@
   const $ = id => document.getElementById(id);
   let authSubscription = null, connecting = false, realtimeTimer = null, authVersion = 0, reconnectRequested = false, accessTimer = null;
   let accountServiceReadyUntil = 0;
+  let directoryAPI = 'current';
+  const missingRPC = error => ['PGRST202','42883'].includes(error?.code);
   const els = {};
   const state = {
     users: [],
@@ -342,7 +345,8 @@
   };
   // Remove the older unscoped directory cache; users are loaded after authorization.
   try { localStorage.removeItem('pgenro_admin_users_cache'); } catch {}
-  document.addEventListener('DOMContentLoaded', init, { once: true });
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
+  else queueMicrotask(init);
   function init() {
     cacheElements();
     bindShell();
@@ -447,7 +451,7 @@
   };
   function directoryError(error) {
     if (['PGRST202','PGRST204','42883','42P01','42703','42804'].includes(error?.code)) {
-      return 'Run the entire UserManagement_Admin_Role_Fix.sql in Supabase SQL Editor, then refresh this page.';
+      return 'Install the included supabase/ADMIN_USER_ACCESS_PATCH.sql and ADMIN_USER_DIRECTORY_RPC_FIX.sql, then refresh User Management.';
     }
     if (error?.code === '40001') return 'This account changed while you were editing it. Reopen it and review the current values.';
     if (error?.code === '23505') return 'Email or username already belongs to another account.';
@@ -464,7 +468,7 @@
     state.page = 1; state.online = false; state.loading = false; adminId = null;
     state.editingSnapshot = null; state.editingId = null; state.pending = 0;
     setSaving(false); acting = false;
-    if (els.statPendingRequests) els.statPendingRequests.textContent = 'â€”';
+    if (els.statPendingRequests) els.statPendingRequests.textContent = '—';
     state.error = message; feedback(message);
     document.body.dataset.directoryState = 'unavailable';
     clearInterval(accessTimer); accessTimer = null;
@@ -480,8 +484,22 @@
       throw Object.assign(Error('Your session expired. Sign in again.'), { code: 'UM_SIGN_IN' });
     }
     const response = await state.db.rpc('pgenro_um_context');
-    if (response.error) throw response.error;
-    const context = response.data;
+    let context = response.data;
+    if (response.error) {
+      if (!missingRPC(response.error)) throw response.error;
+      directoryAPI = 'legacy';
+      const [access, own] = await Promise.all([
+        state.db.rpc('pgenro_is_admin'),
+        state.db.from('profiles').select('*').eq('user_id',identity.data.user.id).maybeSingle()
+      ]);
+      if (access.error) throw access.error;
+      if (own.error) throw own.error;
+      const profile = own.data;
+      const role = String(profile?.role || '').trim().toLowerCase();
+      const active = profile?.is_active === true && ['active','approved'].includes(String(profile?.status || '').toLowerCase());
+      context = {authorized:access.data === true && role === 'admin' && active, profile,
+        reason:!profile ? 'PROFILE_MISSING' : role === 'user' && active ? 'USER' : 'INACTIVE'};
+    }
     if (!context || typeof context.authorized !== 'boolean') throw Error('The access service returned an invalid response. Run the updated SQL patch.');
     if (!context.authorized) {
       const reason = context.reason || 'INACTIVE';
@@ -503,8 +521,27 @@
     try {
       const access = await readCurrentAccess();
       if (generation !== authVersion) return;
-      if (access.user.id !== adminId) { clearDirectory('Checking the new accountâ€™s access.'); await connectDatabase(); }
+      if (access.user.id !== adminId) { clearDirectory('Checking the new account’s access.'); await connectDatabase(); }
     } catch (error) { if (generation === authVersion) handleAccessFailure(error); }
+  }
+  async function directoryPage(offset, limit) {
+    if (directoryAPI !== 'legacy') {
+      const response = await state.db.rpc('pgenro_um_directory', {p_offset:offset,p_limit:limit});
+      if (!missingRPC(response.error)) return response;
+      directoryAPI = 'legacy';
+    }
+    const response = await state.db.rpc('pgenro_admin_list_users', {p_offset:offset,p_limit:limit});
+    if (response.error) return response;
+    if (!Array.isArray(response.data)) throw Error('The account directory did not return records. Refresh or check the included SQL setup.');
+    let pending = state.pending;
+    if (offset === 0) {
+      const count = await state.db.rpc('pgenro_admin_pending_count');
+      if (count.error) throw count.error;
+      pending = Number(count.data) || 0;
+    }
+    const items = response.data;
+    return {error:null,data:{items,offset,pending,total:offset+items.length,
+      hasMore:items.length === limit}};
   }
   async function refreshUsers() {
     if (!state.db || !adminId) return false;
@@ -513,7 +550,7 @@
     try {
       const rows = []; let offset = 0;
       while (true) {
-        const response = await state.db.rpc('pgenro_um_directory', { p_offset: offset, p_limit: 500 });
+        const response = await directoryPage(offset, 500);
         if (response.error) throw response.error;
         if (version !== loadVersion) return false;
         const page = response.data;
@@ -545,11 +582,11 @@
   async function refreshPending() {
     const actor = adminId; if (!actor) return;
     try {
-      const response = await state.db.rpc('pgenro_um_directory', { p_offset: 0, p_limit: 1 });
+      const response = await directoryPage(0, 1);
       if (actor !== adminId) return;
       if (response.error?.code === '42501') { clearDirectory(directoryError(response.error)); return; }
-      if (els.statPendingRequests) els.statPendingRequests.textContent = response.error ? 'â€”' : String(response.data?.pending ?? 0);
-    } catch { if (actor === adminId && els.statPendingRequests) els.statPendingRequests.textContent = 'â€”'; }
+      if (els.statPendingRequests) els.statPendingRequests.textContent = response.error ? '—' : String(response.data?.pending ?? 0);
+    } catch { if (actor === adminId && els.statPendingRequests) els.statPendingRequests.textContent = '—'; }
   }
   async function connectDatabase(notify = false) {
     if (connecting) return;
@@ -562,7 +599,7 @@
         const registration = db.auth.onAuthStateChange((event, next) => {
           if (event === 'INITIAL_SESSION') return;
           if (!next?.user) { clearDirectory(); location.replace('../User/login.html'); return; }
-          if (adminId && next.user.id !== adminId) clearDirectory('Checking the new accountâ€™s access.');
+          if (adminId && next.user.id !== adminId) clearDirectory('Checking the new account’s access.');
           if (connecting) reconnectRequested = true; else setTimeout(() => connectDatabase(), 0);
         });
         authSubscription = registration.data?.subscription;
@@ -614,14 +651,14 @@
     // replaying a mutation when the browser blocks a CORS preflight response.
     try { response = await fetch(url, { method: 'GET', mode: 'cors', credentials: 'omit', cache: 'no-store' }); }
     catch { throw accountConnectionError(); }
-    if (response.status === 404) throw Error(`The ${accountServiceName()} Edge Function is not deployed in this Supabase project. Deploy supabase/functions/admin-users/index.ts before creating accounts, changing credentials or suspending/activating users.`);
+    if (response.status === 404) throw Error(`The ${accountServiceName()} Edge Function could not be found at ${url}. Check that the function name and Supabase project match the deployed function.`);
     // Older deployed versions have no health route but do return readable
     // HTTP responses. Keep them compatible; mutation authorization is intact.
     if ([401,403,405].includes(response.status)) { accountServiceReadyUntil = Date.now() + 30000; return; }
     let result;
     try { result = await response.json(); } catch { throw accountConnectionError(); }
-    if (!response.ok || result?.success !== true || result?.service !== 'admin-users') {
-      throw Error(result?.error || 'The account service is unavailable. Redeploy the supplied admin-users Edge Function.');
+    if (!response.ok || result?.success !== true || !['admin-user','admin-users'].includes(result?.service)) {
+      throw Error(result?.error || `The account service is unavailable. Redeploy the supplied ${accountServiceName()} Edge Function.`);
     }
     accountServiceReadyUntil = Date.now() + 30000;
   }
@@ -653,9 +690,9 @@
       if (!status && (response.error.name === 'FunctionsFetchError' || /Failed to send|Failed to fetch|NetworkError|Load failed/i.test(response.error.message || ''))) throw accountConnectionError();
       if (status === 401 || status === 403) {
         try { await readCurrentAccess(); } catch (error) { handleAccessFailure(error); throw error; }
-        throw Error(`The admin-users service rejected this request: ${body?.error || body?.message || response.error.message}. Check its Admin/User authorization and JWT configuration; your database Admin access is still valid.`);
+        throw Error(`The ${accountServiceName()} service rejected this request: ${body?.error || body?.message || response.error.message}. Check its Admin/User authorization and JWT configuration; your database Admin access is still valid.`);
       }
-      if (status === 404 && (!body?.error && !body?.message || /function.*not found/i.test(body?.message || body?.error || ''))) throw Error('Deploy the existing admin-users Edge Function to create/delete Auth accounts or change email/password/status.');
+      if (status === 404 && (!body?.error && !body?.message || /function.*not found/i.test(body?.message || body?.error || ''))) throw Error(`Check that ${accountServiceName()} is deployed in the same Supabase project used by this website.`);
       throw Error(body?.error || body?.message || response.error.message || 'The account service could not complete this action.');
     }
     const result = response.data;
@@ -739,7 +776,7 @@
     const start = (state.page - 1) * state.pageSize;
     const pageRows = state.filtered.slice(start, start + state.pageSize);
     if (!pageRows.length) {
-      const title = state.loading ? 'Loading personnel accountsâ€¦' : state.error ? 'User directory unavailable' : 'No personnel accounts found';
+      const title = state.loading ? 'Loading personnel accounts…' : state.error ? 'User directory unavailable' : 'No personnel accounts found';
       const detail = state.loading ? 'Please wait while accounts are retrieved.' : state.error || (state.users.length ? 'Try changing the current filters.' : 'No Supabase Auth accounts are registered.');
       els.userTableBody.innerHTML = `<tr><td colspan="7"><div class="admin-empty-state"><i data-lucide="users-round"></i><strong>${html(title)}</strong><span>${html(detail)}</span></div></td></tr>`;
     } else {
@@ -882,7 +919,7 @@
       position: els.positionInput?.value.trim() || '',
       contact: els.contactInput?.value.trim() || ''
     };
-    if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(userInput.username)) { showToast('Username must be 1â€“60 letters, numbers, dots, underscores or hyphens.', 'warning'); return; }
+    if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(userInput.username)) { showToast('Username must be 1–60 letters, numbers, dots, underscores or hyphens.', 'warning'); return; }
     if(state.users.some(u=>u.id!==state.editingId&&(u.email.toLowerCase()===userInput.email||u.username.toLowerCase()===userInput.username.toLowerCase()))){showToast('Email or username already exists.','warning');return;}
     if (!['Admin','User'].includes(userInput.role)) { showToast('Choose Admin or User.', 'warning'); return; }
     setSaving(true); feedback();
@@ -890,7 +927,9 @@
     let committed = false;
     try {
       let result;
-      if (isEdit) {
+      if (isEdit && directoryAPI === 'legacy') {
+        result = await invoke('update', {userId:editingId,user:userInput});
+      } else if (isEdit) {
         if (!original) throw Error('Reopen this account before saving.');
         let expectedVersion = original.updatedAt || null;
         const credentialOrStatusChange = userInput.email !== original.email.toLowerCase() || Boolean(password) || userInput.status !== original.status;
@@ -957,7 +996,7 @@
       });
       if (!await refreshUsers()) throw Error('The service responded, but the directory could not confirm the saved status. Refresh before retrying.');
       const confirmed = state.users.find(item => item.id === user.id);
-      if (!confirmed || confirmed.status !== next) throw Error('The saved account status does not match the requested status. Check the admin-users service.');
+      if (!confirmed || confirmed.status !== next) throw Error(`The saved account status does not match the requested status. Check the ${accountServiceName()} service.`);
       showToast(`${user.fullName} is now ${next}.`);
     } catch (err) {
       await refreshUsers();
@@ -971,7 +1010,7 @@
     try {
       await invoke('delete', { userId: user.id });
       if (!await refreshUsers()) throw Error('The service responded, but deletion could not be verified. Refresh before retrying.');
-      if (state.users.some(item => item.id === user.id)) throw Error('The account still exists. Check the admin-users deletion service.');
+      if (state.users.some(item => item.id === user.id)) throw Error(`The account still exists. Check the ${accountServiceName()} deletion service.`);
       state.selected.delete(user.id); applyFilters(); showToast('User account permanently removed.');
     } catch (err) {
       await refreshUsers();
@@ -1067,7 +1106,7 @@
 
       active = -1;
 
-      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">â†—</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try â€œmemoâ€, â€œinventoryâ€, or â€œusersâ€.</p>';
+      results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">↗</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try “memo”, “inventory”, or “users”.</p>';
 
       $('workspaceJumpCount').textContent = `${matches.length} destination${matches.length === 1 ? '' : 's'}`;
 
@@ -1151,7 +1190,7 @@
 
       const update = () => {
 
-        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Workingâ€¦ Please wait before making more changes.' : '';
+        const busy = surface.dataset.busy === 'true'; dialog.setAttribute('aria-busy',String(busy)); status.hidden = !busy; status.textContent = busy ? 'Working… Please wait before making more changes.' : '';
 
         if (busy && !locked && form) { locked = true; wasInert = form.inert; focus = document.activeElement; form.inert = true; }
 
@@ -1235,7 +1274,7 @@
 
       const controls = document.createElement('div'); controls.className = 'workspace-table-controls'; controls.hidden = true;
 
-      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">â†</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">â†’</button></div>`;
+      controls.innerHTML = `<span>Scroll to see all columns</span><div><button type="button" aria-controls="${region.id}" aria-label="Scroll table left">←</button><button type="button" aria-controls="${region.id}" aria-label="Scroll table right">→</button></div>`;
 
       region.after(controls); const [left,right] = controls.querySelectorAll('button');
 
@@ -1276,7 +1315,8 @@
 (() => {
   'use strict';
   function initModernWorkspace() {
-    if (!document.querySelector('.page-heading-mark')) return;
+    if (!document.body.classList.contains('pgenro-admin') || document.body.dataset.modernWorkspaceReady) return;
+    document.body.dataset.modernWorkspaceReady = 'true';
     const renderIcons = () => window.PGENRO_Module?.renderIcons?.();
     const themeButton = document.getElementById('appearanceThemeBtn');
     const themeSelect = document.getElementById('appearanceThemeSelect');
@@ -1426,7 +1466,7 @@
   else initModernWorkspace();
 })();
 
-/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT Â· module-owned presentation ===== */
+/* ===== PGENRO SLIDE NAVIGATION AND LOGOUT · module-owned presentation ===== */
 (() => {
   'use strict';
   function initWorkspaceNavigation() {
@@ -1486,7 +1526,7 @@
       dialog.setAttribute('aria-busy', String(value));
       dialog.querySelector('[data-workspace-logout-cancel]').disabled = value;
       dialog.querySelector('[data-workspace-logout-confirm]').disabled = value;
-      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging outâ€¦' : 'Yes, log out';
+      dialog.querySelector('[data-workspace-logout-confirm] span').textContent = value ? 'Logging out…' : 'Yes, log out';
     }
     function dismiss() {
       if (busy) return;
@@ -1520,7 +1560,7 @@
         <div class="workspace-logout-content">
           <div class="workspace-logout-heading"><span class="workspace-logout-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M10 17l5-5-5-5M15 12H3M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/></svg></span><span class="workspace-logout-brand">PGENRO IMS<span>Secure workspace</span></span></div>
           <h2 id="workspaceLogoutTitle">Log out of your workspace?</h2>
-          <p id="workspaceLogoutDescription">Youâ€™ll need to sign in again to access your records and office modules.</p>
+          <p id="workspaceLogoutDescription">You’ll need to sign in again to access your records and office modules.</p>
           <p class="workspace-logout-error" role="alert"></p>
           <div class="workspace-logout-actions"><button type="button" class="workspace-logout-cancel" data-workspace-logout-cancel autofocus>Cancel</button><button type="button" class="workspace-logout-confirm" data-workspace-logout-confirm><span>Yes, log out</span></button></div>
         </div>`;
@@ -1605,7 +1645,7 @@
     count.textContent=`${total} unread`;markAll.disabled=!total||status!=='ready';
     button.setAttribute('aria-label',`Notifications${total?`, ${total} unread`:''}`);
     list.replaceChildren();
-    if(status==='loading')list.append(element('p','module-notification-empty','Loading notificationsâ€¦'));
+    if(status==='loading')list.append(element('p','module-notification-empty','Loading notifications…'));
     else if(status==='unavailable')list.append(element('p','module-notification-empty','Notifications are unavailable. Try again.'));
     else if(!total)list.append(element('p','module-notification-empty','No new notifications'));
     for(const item of feed.items||[]){
@@ -1682,7 +1722,7 @@
     panel=element('section','module-notification-panel');panel.id='moduleNotificationPanel';panel.hidden=true;panel.setAttribute('role','dialog');panel.setAttribute('aria-labelledby','moduleNotificationTitle');
     const top=element('div','module-notification-heading'),heading=element('div');const title=element('h3','','Notifications');title.id='moduleNotificationTitle';
     count=element('small','','0 unread');count.setAttribute('aria-live','polite');heading.append(title,count);
-    const closeBtn=element('button','module-notification-close','Ã—');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
+    const closeBtn=element('button','module-notification-close','×');closeBtn.type='button';closeBtn.setAttribute('aria-label','Close notifications');closeBtn.onclick=()=>{close();button.focus();};top.append(heading,closeBtn);
     const tools=element('div','module-notification-tools'),retry=element('button','','Refresh');retry.type='button';retry.onclick=refresh;
     markAll=element('button','','Mark all read');markAll.type='button';markAll.onclick=async()=>{markAll.disabled=true;try{await markRead();}catch{count.textContent='Could not mark read. Try again.';}finally{markAll.disabled=!feed.total;}};
     tools.append(retry,markAll);list=element('div','module-notification-list');panel.append(top,tools,list);document.body.append(panel);
@@ -1702,6 +1742,7 @@
   window.PGENRO_Notifications={refresh,scheduleRefresh};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
+
 /* Page-owned layout helpers; do not change record permissions or data writes. */
 (() => {
   'use strict';

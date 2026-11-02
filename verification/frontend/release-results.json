@@ -1,0 +1,15 @@
+{
+  "build": "20261103-frontend-fix",
+  "passed": true,
+  "functionalScenarios": 21,
+  "layoutPages": 28,
+  "viewportChecks": 140,
+  "localAssetReferences": 201,
+  "backend": "Local simulated Supabase/Auth/Storage only; no hosted data changed",
+  "reports": [
+    "integration-results.json",
+    "layout-results.json",
+    "server-assets-results.json",
+    "../current/source-results.json"
+  ]
+}

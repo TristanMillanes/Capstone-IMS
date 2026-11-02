@@ -1,0 +1,91 @@
+{
+  "passed": true,
+  "method": "Production Flask and page code with fixture Supabase/Auth/Storage",
+  "checks": [
+    {
+      "scenario": "Production Flask serves chart, PDF modules/workers and official PDF/Word assets",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User Management current RPC: one confirmed create, matching service, authorization denial blocks fallback",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User Management bundled SQL compatibility: one confirmed create, matching service, authorization denial blocks fallback",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User accounts cannot enter or mutate the Admin account directory",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User settings appearance preview/save/reload and correct workspace return",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Admin settings appearance preview/save/reload and correct workspace return",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admincommunication.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "employee-admin.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "ics-admin.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "invetoryadmin.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "officememo-admin.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "serviceAdmin.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "travelOR-admin.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "visitors-admin.html: responsive Admin editor and record save through fixture database",
+      "result": "PASS"
+    },
+    {
+      "scenario": "communication: mobile private attachment signing, real three-page PDF and viewer-only controls",
+      "result": "PASS"
+    },
+    {
+      "scenario": "officememo: mobile private attachment signing, real three-page PDF and viewer-only controls",
+      "result": "PASS"
+    },
+    {
+      "scenario": "travelOR: mobile private attachment signing, real three-page PDF and viewer-only controls",
+      "result": "PASS"
+    },
+    {
+      "scenario": "service: mobile private attachment signing, real three-page PDF and viewer-only controls",
+      "result": "PASS"
+    },
+    {
+      "scenario": "ics: mobile private attachment signing, real three-page PDF and viewer-only controls",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Official Service Request PDF/Word generation and rendered document preview through the production server",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Desktop/mobile navigation and logout cancel/confirm use one dialog and one sign-out",
+      "result": "PASS"
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,26 @@
+PGENRO IMS — VIEWER UPDATE
+2 November 2026
+
+PAANO IKABIT
+1. I-backup ang kasalukuyang User folder.
+2. I-extract ang ZIP.
+3. Palitan ang User folder gamit ang kasamang User folder. Isama ang vendor
+   folder at lahat ng bagong CSS/JS files.
+4. Panatilihin ang existing shared, SettingIMS, admin, logo, database settings,
+   at iba pang files ng main project. User folder lang ang nasa original upload.
+5. Patakbuhin sa dati mong local web server. Mag-login at pindutin ang Ctrl + F5.
+
+BAGO SA VIEWER
+- Mas malinis na layout; wala na ang connection/live labels at animation controls.
+- View file agad mula sa listahan kapag may naka-attach na file.
+- PDF pages, zoom, rotate, expand, download, open in tab, at print.
+- Saved references, sorting, With files filter, Clear filters, at 10/25/50 rows.
+- Search at status filter sa Travel Orders.
+- Record cards sa phone; table sa malalaking screen.
+- Walang add/edit/delete o ICS submission sa authenticated viewer workspace.
+
+Ang standalone public forms ay para pa rin sa hiwalay na public workflow.
+Ang actual database permissions ay galing pa rin sa existing backend policies.
+Walang binagong database role o live record sa update na ito.
+
+Basahin ang USER_UI_UPDATE.md at VERIFICATION.md para sa detalye.

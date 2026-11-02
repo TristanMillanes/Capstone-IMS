@@ -1,0 +1,2599 @@
+[
+  {
+    "page": "admin/Usermanagement.html",
+    "url": "/admin/Usermanagement.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 742
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1111
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1097
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1341
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1410
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/admin.html",
+    "url": "/admin/admin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 3884
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 5318
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 5496
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 7640
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 8014
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/admincommunication.html",
+    "url": "/admin/admincommunication.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 805
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1117
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1103
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1222
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1331
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/employee-admin.html",
+    "url": "/admin/employee-admin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 1238
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1775
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1761
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 2284
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 2571
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/ics-admin.html",
+    "url": "/admin/ics-admin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 844
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1202
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1248
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1494
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1561
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/invetoryadmin.html",
+    "url": "/admin/invetoryadmin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 1353
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1684
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1670
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1861
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 2015
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/officememo-admin.html",
+    "url": "/admin/officememo-admin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 1255
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1760
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1746
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1909
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 2025
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/requestacc.html",
+    "url": "/admin/requestacc.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 783
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1139
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1059
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1175
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1203
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/serviceAdmin.html",
+    "url": "/admin/serviceAdmin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 779
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1148
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1086
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1163
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1297
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/travelOR-admin.html",
+    "url": "/admin/travelOR-admin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 1006
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1407
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1393
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1560
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1739
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "admin/visitors-admin.html",
+    "url": "/admin/visitors-admin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 1165,
+          "height": 1046
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 1165,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 275,
+          "y": 70,
+          "width": 749,
+          "height": 1474
+        },
+        "topbar": {
+          "x": 275,
+          "y": 0,
+          "width": 749,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 70,
+          "width": 768,
+          "height": 1436
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 70
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 390,
+          "height": 1750
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -275,
+          "y": 0,
+          "width": 275,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 64,
+          "width": 320,
+          "height": 1927
+        },
+        "topbar": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 64
+        },
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/communication.html",
+    "url": "/User/communication.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 1018
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1018
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 1418
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 1477
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/employee.html",
+    "url": "/User/employee.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 1018
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1018
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 1403
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 1485
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/homepage.html",
+    "url": "/User/homepage.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 1907
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 2872
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 2904
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 3846
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 3995
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/ics.html",
+    "url": "/User/ics.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1005
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 1413
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 1492
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/inventory.html",
+    "url": "/User/inventory.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 1018
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1018
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 1409
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 1474
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/login.html",
+    "url": "/User/homepage.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 1907
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 2872
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 2904
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 3846
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 3995
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/officememo.html",
+    "url": "/User/officememo.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 1164
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 1245
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/requestacc.html",
+    "url": "/User/requestacc.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/service.html",
+    "url": "/User/service.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 1012
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1201
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 1511
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 1632
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/travelOR.html",
+    "url": "/User/travelOR.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 604
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 642
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 642
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 939
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 991
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "User/visitorsView.html",
+    "url": "/User/visitorsView.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": {
+          "x": 0,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 270,
+          "y": 0,
+          "width": 1170,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 1024,
+          "height": 980
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 768,
+          "height": 1233
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 390,
+          "height": 1465
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": {
+          "x": -283,
+          "y": 0,
+          "width": 270,
+          "height": 980
+        },
+        "main": {
+          "x": 0,
+          "y": 0,
+          "width": 320,
+          "height": 1507
+        },
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "SettingIMS/Settings.html",
+    "url": "/SettingIMS/Settings.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  },
+  {
+    "page": "VisitorsLog/visitorsLogin.html",
+    "url": "/VisitorsLog/visitorsLogin.html",
+    "errors": [],
+    "missing": [],
+    "layouts": [
+      {
+        "width": 1440,
+        "pageWidth": 1440,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 1024,
+        "pageWidth": 1024,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 768,
+        "pageWidth": 768,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 390,
+        "pageWidth": 390,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      },
+      {
+        "width": 320,
+        "pageWidth": 320,
+        "sidebar": null,
+        "main": null,
+        "topbar": null,
+        "overflow": [],
+        "unrenderedIcons": 0
+      }
+    ]
+  }
+]

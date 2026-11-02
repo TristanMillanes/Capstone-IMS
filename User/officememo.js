@@ -1,67 +1,5 @@
 /* Page-owned UI helpers: render new placeholders without rebuilding existing SVGs. */
-const PGENRO_PageUI = (() => {
-  function icons() {
-    if (!window.lucide?.createIcons) return;
-    const pending = document.querySelectorAll('i[data-lucide]');
-    if (!pending.length) return;
-    pending.forEach(el => el.setAttribute('data-pgenro-pending', el.getAttribute('data-lucide')));
-    window.lucide.createIcons({nameAttr: 'data-pgenro-pending'});
-    document.querySelectorAll('svg[data-pgenro-pending]').forEach(el => el.removeAttribute('data-pgenro-pending'));
-  }
-
-  const pages = new Map();
-  let printing = false;
-  function search(render) {
-    let timer;
-    return () => { clearTimeout(timer); timer = setTimeout(render, 100); };
-  }
-  function paginate(rows, tbody, render) {
-    if (printing) return rows;
-    let state = pages.get(tbody);
-    if (!state) {
-      const nav = document.createElement('nav');
-      nav.className = 'registry-pagination';
-      nav.setAttribute('aria-label', 'Registry pagination');
-      nav.innerHTML = '<span class="registry-range" role="status" aria-live="polite"></span><div class="registry-page-controls"><button type="button" data-page="first" aria-label="First page">«</button><button type="button" data-page="previous">Previous</button><span class="registry-page-label"></span><button type="button" data-page="next">Next</button><button type="button" data-page="last" aria-label="Last page">»</button></div>';
-      const table = tbody.closest('table');
-      const region = table.closest('.table-wrapper, .table-responsive, .table-wrap, .table-container, .table-scroll, .table-frame') || table;
-      region.after(nav);
-      state = {page: 1, totalPages: 1, key: null, nav, render};
-      pages.set(tbody, state);
-      nav.addEventListener('click', event => {
-        const button = event.target.closest('button[data-page]');
-        if (!button || button.disabled) return;
-        const action = button.dataset.page;
-        state.page = action === 'first' ? 1 : action === 'last' ? state.totalPages : state.page + (action === 'next' ? 1 : -1);
-        state.render();
-      });
-    }
-    // Filter changes start at page one; realtime updates clamp the current page.
-    const key = [...document.querySelectorAll('main input, main select, main .tab-btn.active')]
-      .map(el => `${el.id}:${el.value || el.dataset.filter || ''}`).join('\u001f');
-    if (state.key !== key) state.page = 1;
-    state.key = key;
-    state.render = render;
-    state.totalPages = Math.max(1, Math.ceil(rows.length / 25));
-    state.page = Math.max(1, Math.min(state.page, state.totalPages));
-    const start = (state.page - 1) * 25;
-    state.nav.hidden = rows.length === 0;
-    const range = `${rows.length ? start + 1 : 0}–${Math.min(start + 25, rows.length)} of ${rows.length.toLocaleString()} records`;
-    const label = `Page ${state.page} of ${state.totalPages}`;
-    const rangeEl = state.nav.querySelector('.registry-range');
-    const labelEl = state.nav.querySelector('.registry-page-label');
-    if (rangeEl.textContent !== range) rangeEl.textContent = range;
-    if (labelEl.textContent !== label) labelEl.textContent = label;
-    state.nav.querySelectorAll('button').forEach(button => {
-      button.disabled = ['first', 'previous'].includes(button.dataset.page) ? state.page === 1 : state.page === state.totalPages;
-    });
-    return rows.slice(start, start + 25);
-  }
-  // Registry printing and export retain the complete filtered dataset.
-  window.addEventListener('beforeprint', () => { printing = true; pages.forEach(state => state.render()); });
-  window.addEventListener('afterprint', () => { printing = false; pages.forEach(state => state.render()); });
-  return {icons, paginate, search};
-})();
+const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
 (() => {
   "use strict";
@@ -627,7 +565,7 @@ const PGENRO_PageUI = (() => {
     function renderTable() {
       if (!ui.recordsTable) return;
 
-      const records = getFilteredRecords();
+      const records = PGENRO_PageUI.filter(getFilteredRecords(), ui.recordsTable, renderTable);
       const pageRows = PGENRO_PageUI.paginate(records, ui.recordsTable, renderTable);
 
       if (ui.resultCount) {
@@ -1380,106 +1318,6 @@ const PGENRO_PageUI = (() => {
     window.addEventListener('pagehide',event=>{if(event.persisted)return;disposed=true;generation++;clearInterval(timer);clearTimeout(debounce);authSubscription?.unsubscribe();if(channel)db.removeChannel(channel);});
   }
   window.PGENRO_Notifications={refresh,scheduleRefresh};
-  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
-})();
-
-/* Page-owned layout helpers; do not change record permissions or data writes. */
-(() => {
-  'use strict';
-  function init() {
-    if (document.body.dataset.unifiedLayoutReady) return;
-    document.body.dataset.unifiedLayoutReady = 'true';
-    // A wide registry scrolls within its own region, including dynamically mounted tables.
-    function containTables() {
-      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
-        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
-        const region = document.createElement('div'); region.className = 'ui-table-scroll';
-        table.before(region); region.append(table);
-      });
-    }
-    containTables();
-    let tableFrame;
-    const insertedTables = new MutationObserver(records => {
-      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
-      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
-    });
-    insertedTables.observe(document.body, {childList:true,subtree:true});
-    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
-    // Account Settings and the module pages use one saved user appearance.
-    let appearanceObserver;
-    if (document.body.classList.contains('pgenro-user')) {
-      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
-      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
-      function applyAppearance(theme) {
-        theme=theme==='dark'?'dark':'light';
-        if(html.dataset.theme!==theme)html.dataset.theme=theme;
-        const dark=theme==='dark';
-        if(button&&button.dataset.appearance!==theme) {
-          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
-          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
-        }
-        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
-      }
-      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
-      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
-      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
-      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
-      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
-      button?.addEventListener('click',()=>{
-        const theme=html.dataset.theme==='dark'?'light':'dark';
-        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
-        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
-        html.dataset.pgenroTheme=theme;applyAppearance(theme);
-      });
-      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
-    }
-    // The existing user page controls continue to open and close its module menu.
-    const sidebar = document.querySelector('.pgenro-user .sidebar');
-    if (sidebar) {
-      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
-      let previouslyOpen = false;
-      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
-      function desktopNavigation() {
-        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
-        collapsed=!media.matches&&collapsed;
-        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
-        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
-      }
-      menu?.addEventListener('click',event=>{
-        if(media.matches)return;
-        event.preventDefault();event.stopImmediatePropagation();
-        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
-        desktopNavigation();
-      },true);
-      function sync() {
-        const open = media.matches && sidebar.classList.contains('open');
-        sidebar.inert = media.matches && !open;
-        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
-        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
-        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
-        previouslyOpen = open;
-      }
-      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
-      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
-      let navigationFrame;
-      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
-      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
-      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
-      document.addEventListener('keydown',event=>{
-        if(!media.matches||!sidebar.classList.contains('open')) return;
-        if(event.key==='Escape') {menu?.click();return;}
-        if(event.key!=='Tab')return;
-        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
-        if(!items.length)return;
-        const first=items[0],last=items.at(-1);
-        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
-        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
-        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
-      });
-    }
-    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
-  }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 

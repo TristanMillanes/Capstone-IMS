@@ -1,3 +1,148 @@
+/* Fixed emerald surroundings and light forms. No stored or system appearance settings. */
+(() => {
+  'use strict';
+  let leaving=false;
+  let exitAnimation=null;
+  const canAnimate = () => !matchMedia('(prefers-reduced-motion: reduce)').matches && !navigator.connection?.saveData;
+  function restorePage() {
+    leaving=false;
+    exitAnimation?.cancel();
+    exitAnimation=null;
+    document.body.dataset.routeMotion='ready';
+  }
+  async function navigate(destination) {
+    if(leaving)return;
+    leaving=true;
+    const viewport=document.querySelector('.portal-viewport');
+    if(canAnimate()&&viewport?.animate){
+      document.body.dataset.routeMotion='leaving';
+      exitAnimation=viewport.animate([{opacity:1,transform:'translateY(0)'},{opacity:0,transform:'translateY(-8px)'}],{duration:170,easing:'ease-in',fill:'forwards'});
+      try{await exitAnimation.finished;}catch{}
+    }
+    window.location.assign(destination);
+    // Restore the old document if a navigation is cancelled or fails to leave it.
+    setTimeout(()=>{if(!document.hidden)restorePage();},1800);
+  }
+  function init() {
+    const protectedPasswords=[...document.querySelectorAll('input[data-empty-on-open]')];
+    function clearPassword(field) {
+      field.value='';field.defaultValue='';field.type='password';field.readOnly=true;
+      field.setAttribute('aria-invalid','false');field.classList.remove('invalid-field');
+      field.closest('.input-box')?.classList.remove('invalid');
+      const error=document.getElementById(field.id+'Error');if(error)error.textContent='';
+      const button=document.querySelector(`button[aria-controls="${field.id}"]`);
+      if(button){
+        button.setAttribute('aria-pressed','false');button.setAttribute('aria-label','Show password');
+        const use=button.querySelector('use');
+        if(use)use.setAttribute('href','#icon-eye');
+        else {const svg=button.querySelector('svg');if(svg)svg.innerHTML='<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>';}
+      }
+      field.dispatchEvent(new CustomEvent('portal:password-cleared',{bubbles:true}));
+    }
+    protectedPasswords.forEach(field=>{
+      clearPassword(field);
+      const unlock=()=>{
+        if(field.readOnly){field.value='';field.defaultValue='';field.readOnly=false;}
+      };
+      field.addEventListener('focus',unlock);
+      field.addEventListener('pointerdown',unlock);
+      field.addEventListener('keydown',unlock);
+      field.addEventListener('input',()=>{if(field.readOnly&&field.value)clearPassword(field);});
+    });
+    const forms=new Set(protectedPasswords.map(field=>field.form).filter(Boolean));
+    forms.forEach(form=>form.addEventListener('reset',()=>queueMicrotask(()=>protectedPasswords.filter(field=>field.form===form).forEach(clearPassword))));
+    window.addEventListener('pagehide',()=>protectedPasswords.forEach(clearPassword));
+    window.addEventListener('pageshow',event=>{
+      restorePage();
+      protectedPasswords.filter(field=>event.persisted||field.readOnly).forEach(clearPassword);
+      if(event.persisted&&canAnimate())document.querySelector('.portal-viewport')?.animate([{opacity:0,transform:'translateY(6px)'},{opacity:1,transform:'translateY(0)'}],{duration:280,easing:'ease-out'});
+    });
+    document.addEventListener('click',event=>{
+      const link=event.target instanceof Element?event.target.closest('a[href]'):null;
+      if(!link||event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey||link.download||link.target&&link.target!=='_self')return;
+      const url=new URL(link.href,location.href);
+      if(!['http:','https:','file:'].includes(url.protocol)||url.origin!==location.origin||url.pathname===location.pathname&&url.search===location.search)return;
+      if(!canAnimate()||document.querySelector('form[aria-busy="true"]'))return;
+      event.preventDefault();void navigate(url.href);
+    });
+    document.querySelectorAll('[data-brand-seal]').forEach(image => {
+      const loaded = () => { image.hidden = !image.naturalWidth; };
+      image.addEventListener('load', loaded);
+      image.addEventListener('error', () => { image.hidden = true; });
+      if (image.complete) loaded();
+    });
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const connection = navigator.connection;
+    const syncMotion = () => {
+      document.body.dataset.sceneMotion = document.hidden || reduced.matches || connection?.saveData ? 'paused' : 'running';
+    };
+    reduced.addEventListener?.('change',syncMotion);
+    connection?.addEventListener?.('change',syncMotion);
+    document.addEventListener('visibilitychange',syncMotion);
+    window.addEventListener('pageshow',syncMotion);
+    syncMotion();
+  }
+  const normalizePhone = value => {
+    const digits = String(value || '').replace(/\D/g, '');
+    if (/^639\d{9}$/.test(digits)) return '0' + digits.slice(2);
+    if (/^9\d{9}$/.test(digits)) return '0' + digits;
+    return digits;
+  };
+  async function timedFetch(input, options = {}) {
+    const controller = new AbortController();
+    const upstream = options.signal || (input instanceof Request ? input.signal : null);
+    const abort = () => controller.abort(upstream?.reason);
+    if (upstream?.aborted) abort();
+    else upstream?.addEventListener('abort', abort, {once:true});
+    const timer = setTimeout(() => controller.abort(new DOMException('Request timed out','TimeoutError')), 20000);
+    try { return await fetch(input, {...options, signal:controller.signal}); }
+    finally { clearTimeout(timer); upstream?.removeEventListener('abort', abort); }
+  }
+  const uuid = () => {
+    if (crypto.randomUUID) return crypto.randomUUID();
+    const bytes = crypto.getRandomValues(new Uint8Array(16));
+    bytes[6] = (bytes[6] & 15) | 64; bytes[8] = (bytes[8] & 63) | 128;
+    const hex = [...bytes].map(byte => byte.toString(16).padStart(2,'0')).join('');
+    return `${hex.slice(0,8)}-${hex.slice(8,12)}-${hex.slice(12,16)}-${hex.slice(16,20)}-${hex.slice(20)}`;
+  };
+  window.PortalUI = Object.freeze({normalizePhone, timedFetch, uuid, navigate});
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
+  else init();
+})();
+
+/* Visual feedback follows the existing async state; it never submits a form. */
+(() => {
+  'use strict';
+  if(window.PGENRO_ButtonFeedback)return;
+  window.PGENRO_ButtonFeedback=true;
+  function init(){
+    const submitFor={loginForm:'loginBtn',accessForm:'submitBtn',publicServiceRequestForm:'submitServiceRequestBtn',visitorForm:'submitBtn'};
+    Object.entries(submitFor).forEach(([formId,buttonId])=>{
+      const form=document.getElementById(formId),button=document.getElementById(buttonId);if(!form||!button)return;
+      const status=document.createElement('p');status.className='sr-only ui-async-status';status.setAttribute('role','status');status.setAttribute('aria-live','polite');status.setAttribute('aria-atomic','true');form.after(status);
+      const labels={loginForm:'Signing in. Please wait.',accessForm:'Sending your account request. Please wait.',publicServiceRequestForm:'Sending your service request. Please wait.',visitorForm:'Saving your visit. Please wait.'};
+      const sync=()=>{const busy=form.getAttribute('aria-busy')==='true';button.setAttribute('aria-busy',String(busy));button.classList.toggle('ui-button-busy',busy);status.textContent=busy?labels[formId]:'';};
+      sync();new MutationObserver(sync).observe(form,{attributes:true,attributeFilter:['aria-busy']});
+    });
+    if(document.body.dataset.recordAccess==='view-only'){
+      document.querySelectorAll('#refreshDashboardBtn,#refreshRecordsBtn,#refreshBtn,#travelRefresh').forEach(button=>{
+        let previous='';
+        const sync=()=>{const busy=button.disabled||button.classList.contains('is-loading'),key=String(busy);if(key===previous)return;previous=key;button.setAttribute('aria-busy',key);button.classList.toggle('ui-button-busy',busy);};
+        sync();new MutationObserver(sync).observe(button,{attributes:true,attributeFilter:['disabled','class']});
+      });
+    }
+    const eligible='.primary-sign-btn,.submit-btn,.btn-solid,.primary-action,.secondary-action,.btn-outline,.refresh-btn,.secondary-btn';
+    document.addEventListener('pointerdown',event=>{
+      const button=event.target.closest('button');if(!button||!button.matches(eligible)||button.disabled||event.button!==0||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      const r=button.getBoundingClientRect(),wave=document.createElement('span');wave.className='ui-tap-wave';wave.setAttribute('aria-hidden','true');
+      wave.style.setProperty('--tap-x',event.clientX-r.left+'px');wave.style.setProperty('--tap-y',event.clientY-r.top+'px');wave.style.setProperty('--tap-size',Math.max(r.width,r.height)*2+'px');
+      button.append(wave);wave.addEventListener('animationend',()=>wave.remove(),{once:true});setTimeout(()=>wave.remove(),700);
+    },true);
+    document.body.dataset.buttonFeedbackReady='true';
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+
 (() => {
   "use strict";
   // Existing Supabase project and insert payload are preserved.
@@ -23,7 +168,8 @@
       if (typeof window.supabase?.createClient !== "function") return false;
       try {
         db = window.supabase.createClient(CONFIG.url, CONFIG.publishableKey, {
-          auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+          auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+          global: { fetch: window.PortalUI.timedFetch }
         });
         sdkFailed = !db;
       } catch {
@@ -250,7 +396,9 @@
         state.saveSucceeded = true;
       } catch (error) {
         state.saveFailed = true;
-        const message = error?.code === "42501"
+        const message = /Abort|Timeout/.test(error?.name || "")
+          ? "The connection timed out. Ask the front desk to check whether your visit was recorded before trying again."
+          : error?.code === "42501"
           ? "Registration is unavailable. Please ask the front desk for assistance."
           : error?.code === "23502"
             ? "Your entry could not be saved. Please ask the front desk for assistance."
@@ -401,103 +549,37 @@
   }
 })();
 
-/* Page-owned layout helpers; do not change record permissions or data writes. */
+/* Presentation enhancements only. Existing validation and submissions own the forms. */
 (() => {
   'use strict';
-  function init() {
-    if (document.body.dataset.unifiedLayoutReady) return;
-    document.body.dataset.unifiedLayoutReady = 'true';
-    // A wide registry scrolls within its own region, including dynamically mounted tables.
-    function containTables() {
-      document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
-        if (table.closest('.table-responsive,.table-wrapper,.table-container,.table-scroll,.responsive-table,.ui-table-scroll,.ws-table-scroll,.audit-table-scroll,.monitor-table-scroll')) return;
-        const region = document.createElement('div'); region.className = 'ui-table-scroll';
-        table.before(region); region.append(table);
+  function init(){
+    if(document.body.dataset.portalDesign!=='v4')return;
+    const visitor=document.getElementById('visitorForm');
+    if(visitor){
+      const update=()=>document.querySelectorAll('[data-visit-preview]').forEach(output=>{
+        const input=document.getElementById(output.dataset.visitPreview);if(!input)return;
+        const value=input.value.trim();let text=value||(input.tagName==='SELECT'?'Not selected yet':'Not provided yet');
+        if(value&&input.tagName==='SELECT')text=input.selectedOptions[0]?.textContent.trim()||value;
+        if(input.id==='purposeCategory'&&value==='Other Service not listed')text=document.getElementById('otherPurposeSpecific')?.value.trim()||text;
+        output.textContent=text;
       });
+      visitor.addEventListener('input',update);visitor.addEventListener('change',update);visitor.addEventListener('blur',()=>queueMicrotask(update),true);visitor.addEventListener('reset',()=>queueMicrotask(update));update();
     }
-    containTables();
-    let tableFrame;
-    const insertedTables = new MutationObserver(records => {
-      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
-      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+    // Restore a single decorative arrow after the existing controller resets a label.
+    for(const id of ['submitBtn','submitServiceRequestBtn']){
+      const button=document.getElementById(id);if(!button||button.closest('#visitorForm'))continue;
+      const form=button.form;if(!form)continue;
+      const sync=()=>{
+        if(form.getAttribute('aria-busy')==='true'||button.querySelector('svg,i'))return;
+        const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.setAttribute('class','v4-action-arrow');svg.innerHTML='<path d="M5 12h14m-6-6 6 6-6 6"/>';button.append(svg);
+      };
+      new MutationObserver(sync).observe(form,{attributes:true,attributeFilter:['aria-busy']});sync();
+    }
+    document.querySelectorAll('input:not([type="password"]):not([type="checkbox"]),textarea').forEach(field=>{
+      const sync=()=>field.classList.toggle('v4-has-entry',Boolean(field.value.trim()));
+      field.addEventListener('input',sync);field.form?.addEventListener('reset',()=>queueMicrotask(sync));sync();
     });
-    insertedTables.observe(document.body, {childList:true,subtree:true});
-    document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
-    // Account Settings and the module pages use one saved user appearance.
-    let appearanceObserver;
-    if (document.body.classList.contains('pgenro-user')) {
-      const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
-      const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
-      function applyAppearance(theme) {
-        theme=theme==='dark'?'dark':'light';
-        if(html.dataset.theme!==theme)html.dataset.theme=theme;
-        const dark=theme==='dark';
-        if(button&&button.dataset.appearance!==theme) {
-          button.dataset.appearance=theme;button.innerHTML=icon(dark);button.setAttribute('aria-pressed',String(dark));
-          button.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode');button.title=button.getAttribute('aria-label');
-        }
-        document.querySelector('meta[name="color-scheme"]')?.setAttribute('content',theme);
-        document.querySelector('meta[name="theme-color"]')?.setAttribute('content',dark?'#0d2119':'#f4f7f5');
-      }
-      let saved={};try{saved=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};}catch{}
-      let localTheme;try{localTheme=localStorage.getItem('pgenro_user_theme');}catch{}
-      applyAppearance(localTheme||html.dataset.pgenroTheme||saved.theme||html.dataset.theme);
-      appearanceObserver=new MutationObserver(()=>{let selected;try{selected=localStorage.getItem('pgenro_user_theme');}catch{}applyAppearance(selected||html.dataset.pgenroTheme||html.dataset.theme);});
-      appearanceObserver.observe(html,{attributes:true,attributeFilter:['data-pgenro-theme']});
-      button?.addEventListener('click',()=>{
-        const theme=html.dataset.theme==='dark'?'light':'dark';
-        try{const prefs=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}')||{};localStorage.setItem('pgenro_preferences',JSON.stringify({...prefs,theme}));localStorage.setItem('pgenro_user_theme',theme);}catch{}
-        const preferenceRadio=document.querySelector(`input[name="theme"][value="${theme}"]`);if(preferenceRadio)preferenceRadio.checked=true;
-        html.dataset.pgenroTheme=theme;applyAppearance(theme);
-      });
-      window.addEventListener('storage',event=>{if(event.key==='pgenro_user_theme')applyAppearance(event.newValue);else if(event.key==='pgenro_preferences'){try{html.dataset.pgenroTheme=JSON.parse(event.newValue||'{}').theme||'light';}catch{}}});
-    }
-    // The existing user page controls continue to open and close its module menu.
-    const sidebar = document.querySelector('.pgenro-user .sidebar');
-    if (sidebar) {
-      const media = matchMedia('(max-width: 900px)'), menu = document.getElementById('hamburgerMenu');
-      let previouslyOpen = false;
-      sidebar.querySelectorAll('.modules-list a').forEach(link=>link.title=link.textContent.trim());
-      function desktopNavigation() {
-        let collapsed=false;try{collapsed=localStorage.getItem('pgenro_user_sidebar')==='collapsed';}catch{}
-        collapsed=!media.matches&&collapsed;
-        sidebar.classList.toggle('collapsed',collapsed);document.body.classList.toggle('user-sidebar-collapsed',collapsed);
-        if(!media.matches&&menu){menu.setAttribute('aria-expanded',String(!collapsed));menu.setAttribute('aria-label',collapsed?'Expand module menu':'Collapse module menu');menu.title=menu.getAttribute('aria-label');}
-      }
-      menu?.addEventListener('click',event=>{
-        if(media.matches)return;
-        event.preventDefault();event.stopImmediatePropagation();
-        try{localStorage.setItem('pgenro_user_sidebar',sidebar.classList.contains('collapsed')?'expanded':'collapsed');}catch{}
-        desktopNavigation();
-      },true);
-      function sync() {
-        const open = media.matches && sidebar.classList.contains('open');
-        sidebar.inert = media.matches && !open;
-        sidebar.setAttribute('aria-hidden', String(media.matches && !open));
-        if (open && !previouslyOpen) sidebar.querySelector('.user-sidebar-close,a[href]')?.focus({preventScroll:true});
-        if (!open && previouslyOpen) menu?.focus({preventScroll:true});
-        previouslyOpen = open;
-      }
-      const state = new MutationObserver(sync); state.observe(sidebar,{attributes:true,attributeFilter:['class']});
-      media.addEventListener('change',()=>{desktopNavigation();sync();});desktopNavigation();sync();
-      let navigationFrame;
-      window.addEventListener('resize',()=>{cancelAnimationFrame(navigationFrame);navigationFrame=requestAnimationFrame(desktopNavigation);});
-      window.addEventListener('pagehide',()=>cancelAnimationFrame(navigationFrame));
-      document.querySelector('.user-sidebar-close')?.addEventListener('click',()=>{ if(sidebar.classList.contains('open')) menu?.click(); });
-      document.addEventListener('keydown',event=>{
-        if(!media.matches||!sidebar.classList.contains('open')) return;
-        if(event.key==='Escape') {menu?.click();return;}
-        if(event.key!=='Tab')return;
-        const items=[...sidebar.querySelectorAll('a[href],button:not(:disabled),[tabindex="0"]')].filter(el=>el.getClientRects().length && !el.closest('[inert]'));
-        if(!items.length)return;
-        const first=items[0],last=items.at(-1);
-        if(!sidebar.contains(document.activeElement)){event.preventDefault();(event.shiftKey?last:first).focus();}
-        else if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
-        else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
-      });
-    }
-    window.addEventListener('pagehide',event=>{if(event.persisted)return;insertedTables.disconnect();appearanceObserver?.disconnect();cancelAnimationFrame(tableFrame);});
+    document.body.dataset.portalSurfaceReady='true';
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
-

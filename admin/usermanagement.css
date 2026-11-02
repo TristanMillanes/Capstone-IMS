@@ -2471,3 +2471,17 @@ html body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[dat
 html body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui="20261013"][data-design="emerald-v6"] .modern-dashboard-hero :is(h1,p){color:#111}
 }
 
+
+/* Account filters have their own grid; global full-width form fields stay in their cells. */
+body.pgenro-admin .account-directory-filters {display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;}
+body.pgenro-admin .account-directory-filters .controls-left {display:grid;grid-template-columns:minmax(200px,1.5fr) repeat(3,minmax(110px,1fr));gap:10px;min-width:0;width:100%;}
+body.pgenro-admin .account-directory-filters .filter-search-box {width:100%;min-width:0;min-height:44px;}
+body.pgenro-admin .account-directory-filters .controls-right {justify-content:flex-end;}
+@media (max-width:1200px) {
+  body.pgenro-admin .account-directory-filters {grid-template-columns:minmax(0,1fr);}
+  body.pgenro-admin .account-directory-filters .controls-left {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+@media (max-width:600px) {
+  body.pgenro-admin .account-directory-filters .controls-left {grid-template-columns:minmax(0,1fr);}
+  body.pgenro-admin .account-directory-filters .controls-right button {width:100%;}
+}

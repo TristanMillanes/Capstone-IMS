@@ -1,0 +1,369 @@
+{
+  "method": "Local Chromium with simulated records and missing-logo fallback",
+  "scenarios": [
+    {
+      "page": "Usermanagement.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 390,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 390,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 1440,
+      "theme": "light",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": false,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 390,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 390,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 1440,
+      "theme": "light",
+      "form": true,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 1440,
+      "theme": "dark",
+      "form": true,
+      "result": "PASS"
+    }
+  ]
+}

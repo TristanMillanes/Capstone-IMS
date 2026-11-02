@@ -1,0 +1,38 @@
+{
+  "homepage": {
+    "shared_css_removed": 95820,
+    "module_details": 3872
+  },
+  "communication": {
+    "shared_css_removed": 94461,
+    "module_details": 2513
+  },
+  "travelOR": {
+    "shared_css_removed": 101380,
+    "module_details": 9432
+  },
+  "officememo": {
+    "shared_css_removed": 91991,
+    "module_details": 43
+  },
+  "employee": {
+    "shared_css_removed": 91991,
+    "module_details": 43
+  },
+  "inventory": {
+    "shared_css_removed": 91991,
+    "module_details": 43
+  },
+  "visitorsView": {
+    "shared_css_removed": 91991,
+    "module_details": 43
+  },
+  "service": {
+    "shared_css_removed": 91991,
+    "module_details": 43
+  },
+  "ics": {
+    "shared_css_removed": 96421,
+    "module_details": 4473
+  }
+}

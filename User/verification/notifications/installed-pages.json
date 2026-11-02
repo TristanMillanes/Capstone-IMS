@@ -1,0 +1,23 @@
+[
+  "admin/Usermanagement.html",
+  "admin/admin.html",
+  "admin/admincommunication.html",
+  "admin/employee-admin.html",
+  "admin/ics-admin.html",
+  "admin/invetoryadmin.html",
+  "admin/officememo-admin.html",
+  "admin/requestacc.html",
+  "admin/serviceAdmin.html",
+  "admin/travelOR-admin.html",
+  "admin/visitors-admin.html",
+  "User/communication.html",
+  "User/employee.html",
+  "User/homepage.html",
+  "User/ics.html",
+  "User/inventory.html",
+  "User/officememo.html",
+  "User/service.html",
+  "User/travelOR.html",
+  "User/visitorsView.html",
+  "SettingIMS/Settings.html"
+]

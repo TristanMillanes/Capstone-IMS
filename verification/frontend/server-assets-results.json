@@ -1,0 +1,9 @@
+{
+  "passed": true,
+  "htmlPages": 28,
+  "localScriptAndStylesheetReferences": 201,
+  "binaryAndModuleAssets": 6,
+  "legacyRedirects": 6,
+  "blockedSourcePaths": 7,
+  "errors": []
+}

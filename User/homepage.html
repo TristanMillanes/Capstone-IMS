@@ -2,19 +2,30 @@
 
 <html data-theme="light" lang="en">
 <head>
-<meta charset="utf-8"/><script id="moduleThemeBoot">try{const p=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}');const t=(localStorage.getItem('pgenro_user_theme')||p.theme)==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.dataset.pgenroTheme=t;}catch(e){document.documentElement.dataset.theme='light';}</script>
+<meta charset="utf-8"/><script src="user-theme.js?v=20261103-frontend-fix"></script>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="PGENRO Information Management System dashboard." name="description"/>
-<meta content="light" name="color-scheme"/>
+<meta content="light dark" name="color-scheme"/>
 <title>PGENRO IMS | Dashboard</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<link href="homepage.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+<link href="homepage.css?v=20261102-viewer" rel="stylesheet"/>
+<link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
+<link rel="stylesheet" href="homepage-details.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
+<script defer src="user-refresh.js?v=20261102-viewer"></script>
+<script defer src="user-workspace.js?v=20261102-viewer"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
+<script src="vendor/lucide/lucide.min.js"></script>
+<link rel="stylesheet" href="user-viewer.css?v=20261102-viewer">
+<script defer src="user-viewer.js?v=20261102-viewer"></script>
+<script defer src="user-documents.js?v=20261102-viewer"></script>
 </head>
-<body class="pgenro-user workspace-dashboard depth-workspace ui-unified" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+<body class="pgenro-user workspace-dashboard depth-workspace ui-unified user-refresh" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
+
 <div aria-hidden="true" class="overlay" id="overlay"></div>
+<a class="user-skip-link" href="#mainContent">Skip to main content</a>
 <div class="app-container">
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-brand"><button aria-label="Close module menu" class="user-sidebar-close" type="button">×</button>
@@ -44,10 +55,7 @@
 </ul>
 </nav>
 <div class="sidebar-footer">
-<div class="system-status" role="status">
-<span class="status-indicator standby" id="dbStatusIndicator"></span>
-<span class="status-text" id="dbStatusText">Connecting to office records…</span>
-</div>
+
 <div class="profile-menu" id="profileMenu">
 <button aria-expanded="false" aria-haspopup="true" aria-label="Open account menu" class="profile-btn" id="profileBtn" type="button">
 <span class="profile-avatar"><i data-lucide="user"></i></span>
@@ -81,7 +89,7 @@
 </div>
 </div>
 </aside>
-<main class="main-content" id="mainContent">
+<main class="main-content" id="mainContent" tabindex="-1">
 <header aria-label="Workspace toolbar" class="depth-user-topbar">
 <button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button">
 <span></span>
@@ -89,7 +97,7 @@
 <span></span>
 </button>
 <nav aria-label="Breadcrumb" class="depth-topbar-breadcrumb"><a href="homepage.html">Workspace</a><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m9 5 7 7-7 7"></path></svg><span>Office Dashboard</span></nav>
-<div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer workspace</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
+<div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
 </header>
 <div class="content-shell">
 <section class="page-header reveal depth-hero" id="home">
@@ -117,7 +125,7 @@
 </a>
 <button class="secondary-action" id="refreshDashboardBtn" type="button">
 <i data-lucide="refresh-cw"></i>
-<span>Sync Dashboard</span>
+<span>Refresh</span>
 </button>
 </div>
 </div>
@@ -129,23 +137,14 @@
 <span class="summary-label">Total monitored records</span>
 <strong class="font-mono" id="heroTotalRecords">0</strong>
 <span class="summary-caption">Across active PGENRO modules</span>
-<div class="summary-status">
-<span class="summary-status-dot"></span>
-<span>Live dashboard overview</span>
-</div>
+
 </aside>
-<div aria-hidden="true" class="depth-scene">
-<span class="depth-orbit"></span><span class="depth-orb"></span>
-<div class="depth-stack">
-<span class="depth-sheet depth-sheet-back"></span>
-<span class="depth-sheet depth-sheet-middle"></span>
-<span class="depth-sheet depth-sheet-front">
-<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-</span>
-</div><span class="depth-scene-dot"></span>
-</div>
+
 </section>
+<nav class="user-shortcuts" aria-label="Quick actions"><div class="user-shortcut-heading"><span class="section-kicker">YOUR WORKSPACE</span><h2>What would you like to do?</h2></div>
+
+<a href="communication.html"><span class="shortcut-symbol"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></span><span><strong>Browse communications</strong><small>Find correspondence and files</small></span><span aria-hidden="true">↗</span></a>
+<a href="officememo.html"><span class="shortcut-symbol"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 3H6v18h12V7Z"/><path d="M9 11h6m-6 4h6"/></svg></span><span><strong>Read office memos</strong><small>Stay updated with the office</small></span><span aria-hidden="true">↗</span></a><a href="service.html"><span class="shortcut-symbol"><i data-lucide="wrench"></i></span><span><strong>Track service requests</strong><small>Review progress and status</small></span><span aria-hidden="true">↗</span></a></nav>
 <section class="overview-section reveal" id="kpiOverview">
 <div class="section-heading">
 <div>
@@ -269,7 +268,7 @@
 </div>
 <a class="panel-link" href="service.html">
 
-                Manage
+                View all
 
                 <i data-lucide="arrow-right"></i>
 </a>
@@ -311,45 +310,7 @@
 </div>
 </div>
 </section>
-<section class="workflow-section reveal" id="process">
-<div class="section-heading">
-<div>
-<span class="section-kicker">Workspace guide</span>
-<h2>Using the IMS</h2>
-<p>A simple flow for navigating and maintaining office records.</p>
-</div>
-</div>
-<div class="workflow-grid">
-<article class="workflow-card">
-<span class="workflow-number">01</span>
-<div>
-<h3>Select a Module</h3>
-<p>Choose the office module you need from the left sidebar.</p>
-</div>
-</article>
-<article class="workflow-card">
-<span class="workflow-number">02</span>
-<div>
-<h3>Review Records</h3>
-<p>Search, inspect, or encode transactions based on your access.</p>
-</div>
-</article>
-<article class="workflow-card">
-<span class="workflow-number">03</span>
-<div>
-<h3>Inspect Details</h3>
-<p>Review record details and available attachments.</p>
-</div>
-</article>
-<article class="workflow-card">
-<span class="workflow-number">04</span>
-<div>
-<h3>Monitor the Dashboard</h3>
-<p>Return here for a consolidated view of current office activity.</p>
-</div>
-</article>
-</div>
-</section>
+
 <footer class="footer">
 <div>
 <strong>PGENRO IMS</strong>
@@ -364,10 +325,10 @@
 <i data-lucide="chevron-up"></i>
 </button>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
-<script src="https://unpkg.com/lucide@latest"></script>
+
 <script defer="" src="../vendor/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer="" src="homepage.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="homepage.js?v=20261102-viewer"></script>
 </body>
 </html>

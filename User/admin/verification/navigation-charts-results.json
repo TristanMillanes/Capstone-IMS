@@ -1,0 +1,427 @@
+{
+  "method": "Local Chromium with simulated Supabase responses; production services were not contacted",
+  "scenarios": [
+    {
+      "page": "Usermanagement.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 320,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 768,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 1024,
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "width": 1440,
+      "result": "PASS"
+    },
+    {
+      "page": "Usermanagement.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "audittrail-admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "backup-admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "employee-admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "ics-admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "invetoryadmin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "officememo-admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "requestacc.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "serviceAdmin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "travelOR-admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "visitors-admin.html",
+      "theme": "dark",
+      "result": "PASS"
+    },
+    {
+      "page": "admin.html",
+      "width": 844,
+      "height": 390,
+      "result": "PASS"
+    },
+    {
+      "page": "admincommunication.html",
+      "width": 844,
+      "height": 390,
+      "result": "PASS"
+    },
+    {
+      "scenario": "history",
+      "result": "PASS"
+    },
+    {
+      "scenario": "empty",
+      "result": "PASS"
+    },
+    {
+      "scenario": "many-divisions",
+      "result": "PASS"
+    },
+    {
+      "scenario": "cache",
+      "result": "PASS"
+    },
+    {
+      "scenario": "fallback",
+      "result": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,54 @@
+PGENRO IMS - USER INTERFACE & SERVICE REQUEST REFRESH
+29 October 2026
+
+INSTALL
+1. Back up your current User folder.
+2. Extract this ZIP.
+3. Copy the included User folder into your existing PGENRO IMS project,
+   replacing matching files and including user-refresh.css and user-refresh.js.
+4. Open your usual project URL and press Ctrl + F5 to load the new design.
+
+The supplied upload contains the User folder only. Keep it beside your existing
+logo, shared, vendor, SettingIMS, admin, and VisitorsLog folders. Do not move
+individual HTML files out of User. A generic leaf mark appears if the main
+project seal is unavailable.
+
+WHAT CHANGED
+- Light green interface across Dashboard, Communications, Travel Orders,
+  Office Memos, Employees, Inventory, Visitors, Service Requests, and ICS.
+- Consistent navigation, headings, table styling, controls and mobile layouts.
+- Local CSS 3D seedling and service document, with a pause/play button.
+- Motion pauses offscreen and respects reduced-motion preferences.
+- Dashboard shortcuts and a New service request link in the service tracker.
+- Matching artwork on sign-in and account-request pages; lighter ICS form.
+- Four-step public service request: Your details, Choose a service,
+  Request details, Review & send.
+- Field errors, back/edit navigation, review summary, submission receipt,
+  copy-service-number and print-receipt actions.
+
+INTEGRATION
+All 15 official service form field names and the original category option
+values are retained. The form still calls the existing Supabase RPC:
+submit_public_service_request, with p_data and p_submission_id.
+The existing database function must already be available in your installation.
+No database migration is included or required by this interface update.
+The other module scripts, account scripts, OCR files, uploads, and the supplied
+Python environment are retained. Parent-project dependencies were not in the
+uploaded folder and are not replaced by this package.
+
+CHECKED
+- JavaScript syntax and official field/option compatibility.
+- All nine module layouts at a 320-pixel phone frame; dashboard/form also at
+  larger widths, with theme and navigation checks.
+- Required fields, optional email format, empty categories, other-service-only
+  requests, past dates, review edits, and reset.
+- Simulated successful, server-error and network-error submission responses.
+- Failed requests retain their entries; unchanged retries reuse a submission ID.
+- Receipt display, service number copying, and starting another request.
+
+Live account sign-in and real database submission were not tested. Browser
+checks used a separate local review copy with simulated submission responses.
+No test records or mock scripts are included in this package.
+
+If an old design remains visible, hard refresh with Ctrl + F5 and ensure the
+new shared CSS/JS files were copied into the same User folder.

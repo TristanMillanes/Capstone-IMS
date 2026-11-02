@@ -481,7 +481,7 @@ body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.btn-primary
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.btn-primary,.primary-btn,.primary-action):hover {background:#217551;border-color:#217551;color:#fff;}
 
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-topbar{position:sticky;top:0;z-index:850;flex-wrap:wrap;gap:12px;background:var(--bg-surface);border-color:var(--border-color);}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-shell{min-width:0;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-layout{grid-template-columns:230px minmax(0,1fr);gap:22px;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-panel{padding:26px;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-heading>div:first-child{flex:1 1 300px;min-width:0;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-heading .settings-status{position:static;max-width:100%;white-space:normal;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-nav-card{position:sticky;top:100px;align-self:start;}@media(max-width:900px){body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-layout{grid-template-columns:minmax(0,1fr);}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-nav-card{position:static;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-nav{display:flex;flex-wrap:wrap;gap:5px;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-nav>*{flex:1 1 130px;}}@media(max-width:600px){body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-shell{padding:20px 14px;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-brand{display:none;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-topbar{padding:14px;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-panel{padding:20px;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-form .form-grid{grid-template-columns:minmax(0,1fr);}}
-body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-topbar-actions {display:flex;align-items:center;gap:10px;}
+body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-topbar-actions {display:flex;align-items:center;justify-self:end;gap:10px;min-width:0;}
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .user-appearance-toggle {display:grid;place-items:center;flex:0 0 36px;width:36px;height:36px;padding:8px;border:1px solid var(--border-strong);border-radius:10px;background:var(--bg-soft);color:var(--text-main);}
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .user-appearance-toggle svg {width:18px;height:18px;}
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-profile-summary,
@@ -497,4 +497,9 @@ body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-signou
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-nav .tab-btn {color:var(--text-muted);}
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .settings-nav .tab-btn.active {color:var(--green-700);background:var(--depth-tint);}
 
+}
+
+/* Keep the three header groups on one row after notifications initialize. */
+@media (max-width:600px) {
+  body.pgenro-settings.depth-workspace.ui-unified[data-requires-auth] .settings-topbar {grid-template-columns:auto minmax(0,1fr);}
 }

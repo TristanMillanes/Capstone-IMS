@@ -1,0 +1,570 @@
+/* PGENRO IMS — calm, light interface refinement
+   Visual-only overrides for the user workspace, sign-in, and public request forms.
+   Intentionally keeps the existing HTML, JavaScript, routes, and form behavior intact. */
+
+:root {
+  --pgenro-light-page: #f4f7f5;
+  --pgenro-light-surface: #ffffff;
+  --pgenro-light-soft: #f8faf8;
+  --pgenro-light-ink: #25382e;
+  --pgenro-light-muted: #68786e;
+  --pgenro-light-border: #dfe7e1;
+  --pgenro-light-green: #236847;
+  --pgenro-light-green-dark: #185238;
+  --pgenro-light-green-tint: #edf5ef;
+  --pgenro-light-shadow: 0 2px 8px rgba(28, 58, 41, .045);
+}
+
+/* Workspace modules: plain light background, clear navigation, restrained cards. */
+html:not([data-theme="dark"]) body.depth-workspace {
+  --depth-bg: var(--pgenro-light-page);
+  --depth-surface: var(--pgenro-light-surface);
+  --depth-soft: var(--pgenro-light-soft);
+  --depth-text: var(--pgenro-light-ink);
+  --depth-muted: var(--pgenro-light-muted);
+  --depth-border: var(--pgenro-light-border);
+  --depth-brand: var(--pgenro-light-green);
+  --depth-tint: var(--pgenro-light-green-tint);
+  --depth-hero: #ffffff;
+  --depth-shadow: var(--pgenro-light-shadow);
+  background: var(--pgenro-light-page) !important;
+  color: var(--pgenro-light-ink) !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .depth-ambient,
+html:not([data-theme="dark"]) body.depth-workspace .depth-scene {
+  display: none !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .sidebar {
+  background: #fff !important;
+  border-right: 1px solid var(--pgenro-light-border) !important;
+  box-shadow: 1px 0 4px rgba(28, 58, 41, .025) !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .sidebar-brand {
+  border-bottom-color: var(--pgenro-light-border) !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .modules-list a {
+  border-radius: 8px !important;
+  color: #53645a !important;
+  font-weight: 600 !important;
+  transition: background-color .16s ease, color .16s ease, border-color .16s ease !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .modules-list a:hover {
+  background: #f6f9f6 !important;
+  border-color: #e5ece7 !important;
+  color: var(--pgenro-light-green-dark) !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .modules-list a.active,
+html:not([data-theme="dark"]) body.depth-workspace .modules-list a[aria-current="page"] {
+  background: #eaf3ed !important;
+  border-color: #d5e5da !important;
+  color: #185238 !important;
+  box-shadow: inset 3px 0 0 #2c7752 !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .depth-user-topbar {
+  border-bottom-color: var(--pgenro-light-border) !important;
+  background: transparent !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .depth-hero {
+  min-height: 0 !important;
+  padding: 25px 28px !important;
+  border: 1px solid var(--pgenro-light-border) !important;
+  border-left: 4px solid #347b56 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 1px 3px rgba(28, 58, 41, .035) !important;
+  overflow: visible !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .depth-hero::before,
+html:not([data-theme="dark"]) body.depth-workspace .depth-hero::after {
+  display: none !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .depth-hero :is(h1, .header-copy h1) {
+  color: #213b2d !important;
+  font-size: clamp(26px, 2.3vw, 34px) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.65px !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .depth-hero :is(p, .header-copy p) {
+  color: #68786e !important;
+  font-size: 13px !important;
+  line-height: 1.7 !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.kpi-card, .stat-card, .metric-card, .records-card, .chart-card, .table-card, .panel, .module-control-card, .tracker-card, .workflow-card, .system-tool-card, .settings-panel-card, .memo-dashboard-card) {
+  border: 1px solid var(--pgenro-light-border) !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: var(--pgenro-light-shadow) !important;
+  transition: border-color .16s ease, box-shadow .16s ease !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.kpi-card, .stat-card, .metric-card, .records-card, .chart-card, .table-card, .panel, .module-control-card, .tracker-card, .workflow-card, .system-tool-card, .settings-panel-card, .memo-dashboard-card):hover {
+  box-shadow: 0 4px 12px rgba(28, 58, 41, .065) !important;
+  transform: none !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.kpi-icon, .stat-icon, .metric-icon) {
+  border: 1px solid #e0e9e3 !important;
+  border-radius: 10px !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.btn, .primary-action, .secondary-action, .refresh-btn, .primary-btn, .outline-btn, .ghost-btn, .btn-primary, .btn-secondary) {
+  min-height: 40px !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  transform: none !important;
+  transition: background-color .16s ease, border-color .16s ease, color .16s ease !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.btn-primary, .primary-action, .primary-btn) {
+  border: 1px solid #236847 !important;
+  background: #236847 !important;
+  color: #fff !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.btn-primary, .primary-action, .primary-btn):hover:not(:disabled) {
+  background: #185238 !important;
+  border-color: #185238 !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.btn-secondary, .secondary-action, .refresh-btn, .outline-btn, .ghost-btn) {
+  border: 1px solid #d6e1d9 !important;
+  background: #fff !important;
+  color: #365342 !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.btn-secondary, .secondary-action, .refresh-btn, .outline-btn, .ghost-btn):hover:not(:disabled) {
+  background: #f5f9f6 !important;
+  border-color: #bfcfc3 !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea, .form-control, .filter-input, .filter-select, .form-select) {
+  border: 1px solid #d5e0d8 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #25382e !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(input, select, textarea):focus {
+  border-color: #39805b !important;
+  box-shadow: 0 0 0 3px rgba(57, 128, 91, .11) !important;
+  outline: none !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.records-table, .data-table, .analytics-table, .ics-admin-table, .table-wrapper > table, .table-container > table) {
+  border-color: var(--pgenro-light-border) !important;
+  font-size: 13px !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.records-table, .data-table, .analytics-table, .ics-admin-table, .table-wrapper > table, .table-container > table) th {
+  background: #f6f8f6 !important;
+  color: #56685d !important;
+  font-size: 11px !important;
+  letter-spacing: .25px !important;
+  font-weight: 700 !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.records-table, .data-table, .analytics-table, .ics-admin-table, .table-wrapper > table, .table-container > table) td {
+  border-color: #e7ede8 !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace :is(.modal-panel, .modal-container, .modal-card, .admin-modal-dialog, .viewer-panel, .inspect-modal-card) {
+  border: 1px solid #dfe7e1 !important;
+  border-radius: 14px !important;
+  box-shadow: 0 16px 42px rgba(20, 43, 29, .14) !important;
+}
+
+html:not([data-theme="dark"]) body.depth-workspace .depth-entered {
+  animation: none !important;
+}
+
+/* Public ICS and service request forms: simple paper-like cards and calm fields. */
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) {
+  background: #f4f7f5 !important;
+  color: #25382e !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request)::before {
+  display: none !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .public-header {
+  position: relative !important;
+  background: #fff !important;
+  border-bottom: 1px solid #e0e7e2 !important;
+  box-shadow: 0 1px 3px rgba(28, 58, 41, .035) !important;
+  backdrop-filter: none !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .public-brand img {
+  border: 1px solid #e0e8e2 !important;
+  border-radius: 50% !important;
+  box-shadow: none !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .public-main {
+  margin-top: 32px !important;
+  margin-bottom: 52px !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .public-intro {
+  margin-bottom: 22px !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .public-intro h1,
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) h1 {
+  color: #213b2d !important;
+  font-weight: 750 !important;
+  letter-spacing: -.55px !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .public-card {
+  border: 1px solid #dfe7e1 !important;
+  border-radius: 12px !important;
+  background: #fff !important;
+  box-shadow: 0 2px 8px rgba(28, 58, 41, .045) !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) :is(.ics-form-section, .service-form-section) {
+  border: 1px solid #e2e9e4 !important;
+  border-radius: 9px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) :is(.ics-form-section legend, .service-form-section legend) {
+  color: #294a37 !important;
+  font-weight: 700 !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), select, textarea) {
+  min-height: 43px;
+  border: 1px solid #d4dfd7 !important;
+  border-radius: 7px !important;
+  background: #fff !important;
+  color: #25382e !important;
+  box-shadow: none !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) textarea {
+  min-height: 100px;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) :is(input, select, textarea):focus {
+  border-color: #39805b !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(57, 128, 91, .11) !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) :is(.primary-action, .secondary-action, button[type="submit"]) {
+  min-height: 42px;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  transform: none !important;
+  transition: background-color .16s ease, border-color .16s ease !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .primary-action,
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) button[type="submit"] {
+  background: #236847 !important;
+  border-color: #236847 !important;
+  color: #fff !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .primary-action:hover:not(:disabled),
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) button[type="submit"]:hover:not(:disabled) {
+  background: #185238 !important;
+  border-color: #185238 !important;
+}
+
+body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .secondary-action {
+  background: #fff !important;
+  border-color: #d4dfd7 !important;
+  color: #365342 !important;
+}
+
+/* Sign-in page: keep the existing two-column layout but replace the dramatic scene. */
+html:not([data-theme="dark"]) body.pgenro-login {
+  background: #f2f6f3 !important;
+  color: #25382e !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .ambient-background {
+  background: #f2f6f3 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .ambient-background > * {
+  display: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .portal-viewport {
+  padding-top: 22px !important;
+  padding-bottom: 22px !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .brand-wordmark h1,
+html:not([data-theme="dark"]) body.pgenro-login .province-label strong {
+  color: #1e4732 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .brand-wordmark p,
+html:not([data-theme="dark"]) body.pgenro-login .province-label {
+  color: #63766a !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .auth-wrapper {
+  border-radius: 16px !important;
+  box-shadow: 0 12px 34px rgba(27, 59, 40, .10) !important;
+  animation: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .login-panel {
+  border: 1px solid #dfe7e1 !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .portal-story {
+  background: #edf5ef !important;
+  border-right: 1px solid #dfe8e1 !important;
+  color: #253e30 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .portal-story::before,
+html:not([data-theme="dark"]) body.pgenro-login .portal-story::after {
+  display: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .story-heading h2 {
+  color: #1f4531 !important;
+  font-weight: 700 !important;
+  letter-spacing: -.5px !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .story-heading h2 span {
+  color: #347650 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .story-heading p,
+html:not([data-theme="dark"]) body.pgenro-login .story-eyebrow {
+  color: #5e7365 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .story-art {
+  opacity: .78 !important;
+  filter: saturate(.78) !important;
+  animation: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .story-details > span {
+  border: 1px solid #dce8df !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  color: #365342 !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .auth-content,
+html:not([data-theme="dark"]) body.pgenro-login .card-header {
+  background: #fff !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .card-header {
+  min-height: 0 !important;
+  padding-top: 26px !important;
+  padding-bottom: 20px !important;
+  border-bottom: 1px solid #edf1ee !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .card-header-art {
+  opacity: .06 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .card-header h2 {
+  color: #213b2d !important;
+  font-weight: 700 !important;
+  letter-spacing: -.45px !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .card-header p,
+html:not([data-theme="dark"]) body.pgenro-login .input-label {
+  color: #617367 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .input-box {
+  min-height: 49px !important;
+  border: 1px solid #d5e0d8 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .input-box:focus-within {
+  border-color: #39805b !important;
+  box-shadow: 0 0 0 3px rgba(57, 128, 91, .11) !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .primary-sign-btn {
+  min-height: 49px !important;
+  border: 1px solid #236847 !important;
+  border-radius: 8px !important;
+  background: #236847 !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .primary-sign-btn:hover:not(:disabled) {
+  background: #185238 !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-login .secondary-access a {
+  border-radius: 8px !important;
+  box-shadow: none !important;
+}
+
+/* Request-an-account page: light sage introduction with a clean white form panel. */
+html:not([data-theme="dark"]) body.pgenro-request {
+  background: #f2f6f3 !important;
+  color: #25382e !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .ambient-background {
+  background: #f2f6f3 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .ambient-background > * {
+  display: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .app-shell {
+  border: 1px solid #dfe7e1 !important;
+  border-radius: 16px !important;
+  background: #fff !important;
+  box-shadow: 0 12px 34px rgba(27, 59, 40, .09) !important;
+  animation: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .hero-panel {
+  background: #edf5ef !important;
+  color: #253e30 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .hero-texture {
+  display: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .hero-main h1 {
+  color: #1f4531 !important;
+  font-weight: 700 !important;
+  letter-spacing: -.5px !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .hero-main h1 span {
+  color: #347650 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request :is(.hero-lede, .hero-bottom, .hero-main .eyebrow) {
+  color: #5e7365 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .request-illustration {
+  opacity: .78 !important;
+  filter: saturate(.78) !important;
+  animation: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .hero-points {
+  border-top-color: #dbe7de !important;
+  border-bottom-color: #dbe7de !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .hero-point :is(strong, span) {
+  color: #365342 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .hero-point-icon {
+  background: #fff !important;
+  border: 1px solid #dce8df !important;
+  color: #347650 !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .form-panel,
+html:not([data-theme="dark"]) body.pgenro-request .form-panel-header {
+  background: #fff !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .form-panel-header {
+  border-bottom: 1px solid #edf1ee !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .form-panel-header h2 {
+  color: #213b2d !important;
+  font-weight: 700 !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .input-wrapper {
+  border: 1px solid #d5e0d8 !important;
+  border-radius: 8px !important;
+  background: #fff !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .input-wrapper:focus-within {
+  border-color: #39805b !important;
+  box-shadow: 0 0 0 3px rgba(57, 128, 91, .11) !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .btn-solid {
+  border: 1px solid #236847 !important;
+  border-radius: 8px !important;
+  background: #236847 !important;
+  box-shadow: none !important;
+}
+
+html:not([data-theme="dark"]) body.pgenro-request .btn-solid:hover:not(:disabled) {
+  background: #185238 !important;
+  box-shadow: none !important;
+}
+
+/* Responsive spacing and reduced motion for a calmer experience. */
+@media (max-width: 700px) {
+  html:not([data-theme="dark"]) body.depth-workspace .depth-hero {
+    padding: 20px 18px !important;
+  }
+  body:not(.depth-workspace):not(.pgenro-login):not(.pgenro-request) .public-main {
+    margin-top: 24px !important;
+  }
+  html:not([data-theme="dark"]) body.pgenro-login .portal-viewport,
+  html:not([data-theme="dark"]) body.pgenro-request .portal-viewport {
+    padding: 16px 14px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .light-user-refresh *,
+  body.depth-workspace *,
+  body.pgenro-login *,
+  body.pgenro-request * {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

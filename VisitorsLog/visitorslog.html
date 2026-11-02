@@ -1,20 +1,26 @@
 <!DOCTYPE html>
-
-<html data-css-scope="public-visitors" data-visitor-design="emerald-motion-v1" lang="en">
+<html lang="en" data-palette="emerald">
 <head>
-<meta charset="utf-8"/><script>try{const p=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}');document.documentElement.dataset.theme=(localStorage.getItem('pgenro_user_theme')||p.theme)==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
-<meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
-<meta content="#053d31" name="theme-color"/>
-<meta content="Register your visit to PGENRO, Province of Quezon." name="description"/>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f1f8f4">
 <title>PGENRO IMS | Visitor registration</title>
-<link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect"/>
-<link crossorigin="" href="https://zssrxubajhqryrwijyzm.supabase.co" rel="preconnect"/>
-<link href="visitorslog.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
-<script async="" data-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" id="supabaseSdk"></script>
-<script defer="" src="visitorslog.js?v=20261011-navigation-pdf-v2"></script>
+<meta name="description" content="Visitor registration — Provincial Government Environment and Natural Resources Office, Quezon.">
+<link rel="stylesheet" href="visitorslog.css?v=20261102-portal-modern-v4">
+
+<script defer src="visitorslog.js?v=20261102-portal-modern-v4"></script><script async data-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" id="supabaseSdk"></script>
 </head>
-<body class="pgenro-public-visitor ui-unified" data-entry="active" data-motion="paused">
-<svg aria-hidden="true" class="icon-definitions" xmlns="http://www.w3.org/2000/svg">
+<body data-portal-ui="v3" class="pgenro-public-visitor" data-portal-design="v4">
+<svg class="icon-definitions" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><defs>
+<symbol id="ui-leaf" viewbox="0 0 24 24"><path d="M20 3C11 3 4 7 4 14a6 6 0 0 0 6 6c7 0 10-8 10-17Z"></path><path d="m3 21 12-12"></path></symbol>
+<symbol id="ui-arrow" viewbox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"></path></symbol>
+<symbol id="ui-check" viewbox="0 0 24 24"><path d="m5 12 4 4L19 6"></path></symbol>
+<symbol id="ui-file" viewbox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Zm0 0v6h6M8 13h8m-8 4h5"></path></symbol>
+<symbol id="ui-people" viewbox="0 0 24 24"><circle cx="9" cy="7" r="4"></circle><path d="M2 21v-2a7 7 0 0 1 14 0v2m1-16a4 4 0 0 1 0 8m2 4a6 6 0 0 1 3 4"></path></symbol>
+<symbol id="ui-grid" viewbox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></symbol>
+<symbol id="ui-lock" viewbox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"></path></symbol>
+</defs></svg><svg aria-hidden="true" class="icon-definitions" xmlns="http://www.w3.org/2000/svg">
 <symbol id="icon-leaf" viewbox="0 0 24 24"><path d="M20 3c-7-1-14 2-14 9a6 6 0 0 0 6 6c7 0 9-8 8-15Z"></path><path d="m4 21 11-11M9 16v-5m4 1h5"></path></symbol>
 <symbol id="icon-login" viewbox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M3 12h12m-5-5 5 5-5 5"></path></symbol>
 <symbol id="icon-user" viewbox="0 0 24 24"><circle cx="12" cy="8" r="3.5"></circle><path d="M5 21v-2a7 7 0 0 1 14 0v2"></path></symbol>
@@ -30,96 +36,67 @@
 <symbol id="icon-alert" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v6m0 4h.01"></path></symbol>
 <symbol id="icon-close" viewbox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"></path></symbol>
 <symbol id="icon-clock" viewbox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></symbol>
-</svg>
-<div aria-hidden="true" class="ambient-background" inert="">
-<div class="ambient-aurora aurora-one"></div>
-<div class="ambient-aurora aurora-two"></div>
-<div class="ambient-grid"></div>
-<svg class="ambient-graph" fill="none" focusable="false" preserveaspectratio="xMidYMid slice" viewbox="0 0 1440 900">
-<path d="M-270 622C84 610 162 191 437-48M-251 650C103 638 181 219 456-20M-232 678C122 666 200 247 475 8M-213 706C141 694 219 275 494 36M-194 734C160 722 238 303 513 64M-175 762C179 750 257 331 532 92M-156 790C198 778 276 359 551 120"></path>
-<path class="graph-lines" d="m1096-49 53 191 225 83 127-53M1149 142l-118 204 343-121M1031 346l158 172 276-42M1189 518l-88 230 364-272M1101 748l185 155"></path>
-<path class="graph-flow" d="M-270 622C84 610 162 191 437-48M-194 734C160 722 238 303 513 64m583-113 53 191-118 204 158 172-88 230 185 155"></path>
-<path class="graph-facet" d="m1031 346 343-121-185 293Z"></path>
-<g class="graph-joints"><circle cx="342" cy="171" r="2.5"></circle><circle cx="217" cy="398" r="2"></circle><circle cx="1149" cy="142" r="2.5"></circle><circle cx="1031" cy="346" r="2.5"></circle><circle cx="1189" cy="518" r="2.5"></circle><circle cx="1101" cy="748" r="2"></circle></g>
-</svg>
-<svg class="ambient-terrain" fill="none" focusable="false" preserveaspectratio="none" viewbox="0 0 1440 900">
-<defs>
-<lineargradient gradientunits="userSpaceOnUse" id="ribbonMint" x1="0" x2="1270" y1="470" y2="780"><stop stop-color="#91c5ae" stop-opacity=".22"></stop><stop offset=".48" stop-color="#287c5b" stop-opacity=".06"></stop><stop offset="1" stop-color="#86b697" stop-opacity=".14"></stop></lineargradient>
-<lineargradient gradientunits="userSpaceOnUse" id="ribbonEmerald" x1="140" x2="1270" y1="860" y2="390"><stop stop-color="#063b2d"></stop><stop offset=".6" stop-color="#12644b" stop-opacity=".85"></stop><stop offset="1" stop-color="#438f70" stop-opacity=".45"></stop></lineargradient>
-<lineargradient gradientunits="userSpaceOnUse" id="ribbonEdge" x1="0" x2="1440" y1="490" y2="730"><stop stop-color="#bddec9" stop-opacity=".35"></stop><stop offset=".5" stop-color="#92c4ad" stop-opacity=".06"></stop><stop offset="1" stop-color="#c0d9ac" stop-opacity=".25"></stop></lineargradient>
-</defs>
-<path d="M-120 455C97 315 241 589 443 634S764 596 971 713 1306 686 1550 406V1020H-120Z" fill="url(#ribbonMint)"></path>
-<path d="M-120 455C97 315 241 589 443 634S764 596 971 713 1306 686 1550 406" stroke="url(#ribbonEdge)" stroke-width="1.2"></path>
-<g class="terrain-contours">
-<path d="M-120 478C97 338 241 612 443 657S764 619 971 736 1306 709 1550 429"></path>
-<path d="M-120 501C97 361 241 635 443 680S764 642 971 759 1306 732 1550 452"></path>
-<path d="M-120 524C97 384 241 658 443 703S764 665 971 782 1306 755 1550 475"></path>
-<path d="M-120 547C97 407 241 681 443 726S764 688 971 805 1306 778 1550 498"></path>
-<path d="M-120 570C97 430 241 704 443 749S764 711 971 828 1306 801 1550 521"></path>
-</g>
-<path d="M-120 981C131 756 391 838 594 892S924 783 1031 548 1290 439 1550 514V1020H-120Z" fill="url(#ribbonEmerald)"></path>
-<path d="M-120 981C131 756 391 838 594 892S924 783 1031 548 1290 439 1550 514" stroke="url(#ribbonEdge)" stroke-width="1"></path>
-<g class="foreground-contours"><path d="M-120 1004C131 779 391 861 594 915S924 806 1031 571 1290 462 1550 537"></path><path d="M-120 1027C131 802 391 884 594 938S924 829 1031 594 1290 485 1550 560"></path></g>
-</svg>
-<svg class="falling-leaf leaf-one" focusable="false" viewbox="0 0 24 24"><path d="M20 3C11 3 4 7 4 14a6 6 0 0 0 6 6c7 0 10-8 10-17Zm-17 18L15 9"></path></svg>
-<svg class="falling-leaf leaf-two" focusable="false" viewbox="0 0 24 24"><path d="M20 3C11 3 4 7 4 14a6 6 0 0 0 6 6c7 0 10-8 10-17Zm-17 18L15 9"></path></svg>
-<div class="ambient-particles"><span></span><span></span><span></span><span></span><span></span><span></span></div>
-</div>
-<a class="skip-link" href="#visitorForm">Skip to registration</a>
-<div class="app-frame" id="pageShell">
-<header class="page-header">
-<div class="page-identity">
-<span class="brand-logo">
-<img alt="PGENRO seal" height="48" id="officeLogo" src="../logo/enro.png" width="48"/>
-<svg aria-hidden="true" class="icon logo-fallback"><use href="#icon-leaf"></use></svg>
-</span>
-<span class="brand-copy"><span class="brand-title">PGENRO <span class="brand-badge">Visitor log</span></span><span class="brand-subtitle">Information Management System</span></span>
-</div>
-<nav aria-label="Page actions" class="page-actions">
-<a class="admin-login-btn" href="../User/login.html"><svg aria-hidden="true" class="icon"><use href="#icon-login"></use></svg><span>Staff login</span></a>
-</nav>
-</header>
-<main class="registration-shell">
-<section aria-labelledby="welcomeTitle" class="hero-panel">
-<div aria-hidden="true" class="hero-texture"></div>
-<div class="hero-content">
-<div class="welcome-text">
-<span class="hero-eyebrow"><span aria-hidden="true" class="welcome-dot"></span>Province of Quezon</span>
-<h1 id="welcomeTitle">Welcome to<br/><span>PGENRO.</span></h1>
-<p>Please register your visit.<br/>We’re happy to assist you.</p>
-</div>
-<div aria-hidden="true" class="visitor-art">
-<svg fill="none" focusable="false" viewbox="0 0 420 270">
-<defs><lineargradient gradientunits="userSpaceOnUse" id="visitorLeaf" x1="169" x2="276" y1="196" y2="52"><stop stop-color="#72a780"></stop><stop offset="1" stop-color="#e1ecc9"></stop></lineargradient><lineargradient gradientunits="userSpaceOnUse" id="visitorArch" x1="92" x2="318" y1="39" y2="237"><stop stop-color="#ddedca" stop-opacity=".22"></stop><stop offset="1" stop-color="#79b58d" stop-opacity=".03"></stop></lineargradient></defs>
-<path d="M94 230V123a116 116 0 0 1 232 0v107" fill="url(#visitorArch)" stroke="#c2dcba" stroke-opacity=".18"></path>
-<path d="M108 230V125a102 102 0 0 1 204 0v105" stroke="#c2dcba" stroke-opacity=".12"></path>
-<ellipse class="art-shadow ambient-motion" cx="210" cy="245" fill="#022c22" fill-opacity=".42" rx="143" ry="17"></ellipse>
-<g class="art-leaf ambient-motion"><path d="M212 209c-35-14-36-51-9-92 22-34 56-61 98-83 8 52 5 94-17 133-18 32-43 49-72 42Z" fill="url(#visitorLeaf)"></path><path d="M193 232c11-37 50-98 89-164m-56 111-19-37m42 5 32-9" stroke="#e2eed0" stroke-linecap="round" stroke-opacity=".6" stroke-width="2"></path></g>
-<g class="art-pass ambient-motion"><g transform="rotate(-7 163 149)"><rect fill="#01291f66" height="175" rx="19" width="171" x="79" y="64"></rect><rect fill="#f8fcf2" height="175" rx="19" stroke="#e4efda" width="171" x="76" y="56"></rect><rect fill="#e5f0df" height="28" rx="8" width="141" x="91" y="71"></rect><path d="M110 78c-6 0-10 3-10 7a4 4 0 0 0 4 4c5 0 7-6 6-11Zm-11 13 7-7" stroke="#598661" stroke-linecap="round" stroke-width="1.3"></path><text fill="#40694a" font-size="13" font-weight="600" x="122" y="90">PGENRO</text><circle cx="160" cy="131" fill="#80a889" r="17"></circle><path d="M135 176v-9a25 25 0 0 1 50 0v9" stroke="#80a889" stroke-linecap="round" stroke-width="8"></path><text fill="#45694c" font-size="12" font-weight="600" letter-spacing="1" x="136" y="201">VISITOR</text><path d="M103 214h110" stroke="#c7dcc2" stroke-linecap="round" stroke-width="3"></path></g></g>
-<g class="art-confirmation ambient-motion"><rect fill="#022b2166" height="77" rx="17" width="81" x="265" y="130"></rect><rect fill="#e9f4de" height="77" rx="17" stroke="#f0f8e7" width="81" x="262" y="123"></rect><circle cx="302" cy="153" fill="#397b51" r="18"></circle><path d="m293 153 6 6 12-13" stroke="#f7fcf1" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path><path d="M285 185h35" stroke="#94b38c" stroke-linecap="round" stroke-width="3.5"></path></g>
-<path d="M51 117V99h18m289 111v18h-18" stroke="#cce0bc" stroke-linecap="round" stroke-opacity=".38"></path><circle cx="350" cy="73" fill="#cddfad" r="2.5"></circle><circle cx="63" cy="225" fill="#cddfad" r="2"></circle>
-</svg>
-</div>
-<div class="front-desk-note"><span class="front-desk-icon"><svg aria-hidden="true" class="icon"><use href="#icon-pin"></use></svg></span><div><strong>You’re in the right place.</strong><span>After registering, please proceed to the front desk.</span></div></div>
-<div class="clock-widget">
-<div class="clock-caption"><svg aria-hidden="true" class="icon"><use href="#icon-clock"></use></svg><span>Manila time</span></div>
-<time class="office-time" id="officeTime">--:-- <span>--</span></time>
-<p class="office-date" id="todayDate">Office visitor registration</p>
+</svg><div class="emerald-scene" aria-hidden="true" inert>
+<div class="scene-glow scene-glow-one"></div>
+<div class="scene-glow scene-glow-two"></div>
+<div class="scene-aurora scene-aurora-one"></div>
+<div class="scene-aurora scene-aurora-two"></div>
+<div class="scene-grid"></div>
+<div class="scene-orbit scene-orbit-one"></div>
+<div class="scene-orbit scene-orbit-two"></div>
+<svg class="scene-ribbons" viewbox="0 0 1440 1000" preserveaspectratio="xMidYMid slice" fill="none" focusable="false">
+<defs><lineargradient id="sceneRibbon" x1="0" y1="110" x2="1440" y2="990" gradientunits="userSpaceOnUse"><stop stop-color="#6ee7b7" stop-opacity=".02"></stop><stop offset=".5" stop-color="#a7f3d0" stop-opacity=".2"></stop><stop offset="1" stop-color="#34d399" stop-opacity=".03"></stop></lineargradient><lineargradient id="sceneSilk" x1="100" y1="100" x2="1400" y2="900" gradientunits="userSpaceOnUse"><stop stop-color="#a7f3d0" stop-opacity=".10"></stop><stop offset=".4" stop-color="#34d399" stop-opacity=".025"></stop><stop offset="1" stop-color="#d1fae5" stop-opacity=".08"></stop></lineargradient></defs>
+<g class="scene-silk"><path d="M-160 490C160 95 310 100 700 250S1110 500 1600 70L1600 210C1120 640 940 460 620 325S130 220-160 640Z" fill="url(#sceneSilk)"></path><path class="scene-trace" d="M-160 490C160 95 310 100 700 250S1110 500 1600 70" stroke="#b7f7d5" stroke-opacity=".16" stroke-width="1.2"></path></g>
+<g class="scene-ribbon-upper" stroke="url(#sceneRibbon)"><path d="M-160 650C180 610 190-130 620-100S1090 340 1630 100"></path><path d="M-160 674C180 634 190-106 620-76S1090 364 1630 124"></path><path d="M-160 698C180 658 190-82 620-52S1090 388 1630 148"></path><path d="M-160 722C180 682 190-58 620-28S1090 412 1630 172"></path></g>
+<g class="scene-ribbon-lower" stroke="url(#sceneRibbon)"><path d="M-140 950C260 560 640 1110 1010 740S1230 370 1630 580"></path><path d="M-140 974C260 584 640 1134 1010 764S1230 394 1630 604"></path><path d="M-140 998C260 608 640 1158 1010 788S1230 418 1630 628"></path><path d="M-140 1022C260 632 640 1182 1010 812S1230 442 1630 652"></path></g>
+</svg><div class="scene-dust">
+<i></i><i></i><i></i><i></i><i></i>
 </div>
 </div>
-</section>
-<section aria-labelledby="registrationTitle" class="form-panel">
-<div class="form-container" id="visitorCard">
-<div class="form-heading-row">
-<div class="form-heading">
-<h2 id="registrationTitle">Register your visit<span>.</span></h2>
-<p>Tell us who you are and how we can help.</p>
+<div class="portal-viewport" id="pageShell">
+<a class="skip-link" href="#mainContent">Skip to main content</a><header class="portal-topbar"><div class="brand" aria-label="PGENRO IMS, Province of Quezon">
+<span class="brand-mark"><svg class="icon " aria-hidden="true"><use href="#ui-leaf"></use></svg><img data-brand-seal src="../logo/enro.png" alt="PGENRO seal" width="40" height="40" hidden></span><span class="brand-copy"><strong>PGENRO <b>IMS</b></strong><small>Province of Quezon</small></span>
 </div>
-<span class="heading-icon"><svg aria-hidden="true" class="icon"><use href="#icon-clipboard"></use></svg></span>
+<span class="portal-office">Provincial Government<br><strong>of Quezon</strong></span></header><main class="portal-shell visitor-shell" id="mainContent"><aside class="portal-hero"><div class="hero-heading">
+<span class="hero-eyebrow">PGENRO · VISITOR DESK</span><h1 class="v4-hero-title">A warm welcome.<br> <em>A simpler visit.</em>
+</h1>
+<p>Tell us who you’re meeting and what brings you here. We’ll help you find the right desk.</p>
 </div>
-<div class="progress-block">
-<div class="progress-meta"><span>Visitor information</span><span id="progressCount">0 of 5 complete</span></div>
-<div aria-label="Registration completion" aria-valuemax="100" aria-valuemin="0" aria-valuenow="0" class="progress-track" id="registrationProgress" role="progressbar"><div class="progress-fill" id="progressBar"></div></div>
+<div class="v4-workspace-art" aria-hidden="true"><svg viewbox="0 0 420 300" fill="none" focusable="false">
+<defs><lineargradient id="v4WorkspaceGlass" x1="80" y1="40" x2="320" y2="270" gradientunits="userSpaceOnUse"><stop stop-color="#fff" stop-opacity=".22"></stop><stop offset="1" stop-color="#fff" stop-opacity=".035"></stop></lineargradient><lineargradient id="v4WorkspaceMint" x1="170" y1="100" x2="250" y2="190"><stop stop-color="#d2f7df"></stop><stop offset="1" stop-color="#9de7bb"></stop></lineargradient></defs>
+<circle cx="210" cy="150" r="125" stroke="#b5ebc9" stroke-opacity=".12"></circle><circle cx="210" cy="150" r="96" stroke="#b5ebc9" stroke-opacity=".11" stroke-dasharray="3 9"></circle>
+<path d="M91 92 210 150 337 93M210 150l1 98M80 224l130-74 132 74" stroke="#c9f3d8" stroke-opacity=".23" stroke-dasharray="4 6"></path>
+<g class="v4-art-main"><rect x="134" y="66" width="152" height="172" rx="26" fill="url(#v4WorkspaceGlass)" stroke="#e0ffeb" stroke-opacity=".32"></rect><rect x="166" y="96" width="88" height="88" rx="23" fill="url(#v4WorkspaceMint)"></rect>
+<g stroke="#14744f" stroke-width="2"><rect x="183" y="114" width="18" height="18" rx="4"></rect><rect x="212" y="114" width="25" height="18" rx="4"></rect><rect x="183" y="144" width="18" height="23" rx="4"></rect><rect x="212" y="144" width="25" height="23" rx="4"></rect></g><text x="210" y="207" text-anchor="middle" fill="#e7fff0" font-family="Segoe UI,Arial,sans-serif" font-size="12" font-weight="650" letter-spacing="1.2">PGENRO IMS</text><path d="M181 220h58" stroke="#c3ecd1" stroke-opacity=".4" stroke-width="3" stroke-linecap="round"></path></g>
+<g class="v4-art-float-a"><rect x="27" y="60" width="113" height="78" rx="17" fill="#f2fbf5"></rect><rect x="41" y="74" width="29" height="29" rx="9" fill="#dcefe3"></rect><path d="M51 81h8l4 4v12H51Zm8 0v4h4" stroke="#24704d" stroke-width="1.5"></path><path d="M80 83h44m-44 9h29M44 119h64" stroke="#7ca48b" stroke-width="3" stroke-linecap="round"></path><circle cx="121" cy="120" r="4" fill="#359567"></circle></g>
+<g class="v4-art-float-b"><rect x="282" y="160" width="112" height="78" rx="17" fill="#e6f5eb"></rect><circle cx="305" cy="184" r="11" fill="#cbe6d4"></circle><circle cx="305" cy="181" r="3" stroke="#28714d" stroke-width="1.4"></circle><path d="M299 190a6 6 0 0 1 12 0" stroke="#28714d" stroke-width="1.4"></path><path d="M325 180h49m-49 10h34M299 219h53" stroke="#78a18a" stroke-width="3" stroke-linecap="round"></path><circle cx="375" cy="217" r="9" fill="#17774f"></circle><path d="m371 217 3 3 5-6" stroke="#fff" stroke-width="1.6" stroke-linecap="round"></path></g>
+<circle cx="342" cy="76" r="5" fill="#c6e9a5"></circle><circle cx="84" cy="230" r="4" fill="#c6e9a5"></circle><path d="M318 51h10m-5-5v10M104 263h10m-5-5v10" stroke="#d3f4df" stroke-opacity=".65" stroke-linecap="round"></path>
+</svg></div>
+<ol class="hero-points">
+<li>
+<span class="hero-point-number">01</span><div>
+<strong>Fill in your details</strong><p>Your name, contact, and purpose of visit.</p>
+</div>
+</li>
+<li>
+<span class="hero-point-number">02</span><div>
+<strong>Head to the front desk</strong><p>Our staff will assist you after registration.</p>
+</div>
+</li>
+</ol>
+<div class="visitor-clock">
+<span>QUEZON, PHILIPPINES</span><time id="officeTime"></time><p id="todayDate"></p>
+</div>
+<div class="hero-bottom">
+<svg class="icon " aria-hidden="true"><use href="#ui-leaf"></use></svg><span>Glad to have you here.</span>
+</div></aside><section class="portal-panel" aria-labelledby="visitorHeading"><header class="panel-heading"><span class="eyebrow"><svg class="icon " aria-hidden="true"><use href="#ui-people"></use></svg>VISITOR REGISTRATION</span><h2 id="visitorHeading">Register your visit<span>.</span>
+</h2>
+<p>A few details before you head in. <span class="required-note">* Required</span></p>
+<a class="panel-return" href="../User/login.html">Back to sign in</a></header><div class="progress-block">
+<div class="progress-meta">
+<span>Registration progress</span><span id="progressCount">0 of 5 complete</span>
+</div>
+<div class="progress-track" id="registrationProgress" role="progressbar" aria-label="Registration completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="progressBar"></div></div>
 </div>
 <form id="visitorForm" novalidate="">
 <div class="form-alert" hidden="" id="formAlert" role="alert">
@@ -127,28 +104,36 @@
 <span id="formAlertMessage"></span>
 <button aria-label="Dismiss error" class="alert-close icon-button" id="dismissAlert" type="button"><svg aria-hidden="true" class="icon"><use href="#icon-close"></use></svg></button>
 </div>
-<fieldset disabled="" id="visitorFields">
+<fieldset disabled id="visitorFields">
 <legend class="sr-only">Visitor information. All fields are required.</legend>
 <div class="form-row">
 <div class="input-group">
 <label for="fullName">Full name <span aria-hidden="true" class="required-mark">*</span></label>
-<div class="input-wrap"><svg aria-hidden="true" class="icon field-icon"><use href="#icon-user"></use></svg><input aria-describedby="fullNameError" autocomplete="name" id="fullName" maxlength="100" name="fullName" placeholder="Your full name" required="" type="text"/></div>
+<div class="input-wrap">
+<svg aria-hidden="true" class="icon field-icon"><use href="#icon-user"></use></svg><input aria-describedby="fullNameError" autocomplete="name" id="fullName" maxlength="100" name="fullName" placeholder="Your full name" required="" type="text">
+</div>
 <span aria-live="polite" class="error-msg" id="fullNameError"></span>
 </div>
 <div class="input-group">
 <label for="contact">Mobile number <span aria-hidden="true" class="required-mark">*</span></label>
-<div class="input-wrap"><svg aria-hidden="true" class="icon field-icon"><use href="#icon-phone"></use></svg><input aria-describedby="contactError" autocomplete="tel" id="contact" inputmode="tel" maxlength="20" name="contact" placeholder="09123456789" required="" type="tel"/></div>
+<div class="input-wrap">
+<svg aria-hidden="true" class="icon field-icon"><use href="#icon-phone"></use></svg><input aria-describedby="contactError" autocomplete="tel" id="contact" inputmode="tel" maxlength="20" name="contact" placeholder="09123456789" required="" type="tel">
+</div>
 <span aria-live="polite" class="error-msg" id="contactError"></span>
 </div>
 </div>
 <div class="input-group">
 <label for="address">Address / agency / office <span aria-hidden="true" class="required-mark">*</span></label>
-<div class="input-wrap"><svg aria-hidden="true" class="icon field-icon"><use href="#icon-pin"></use></svg><input aria-describedby="addressError" autocomplete="street-address" id="address" maxlength="160" name="address" placeholder="Your address or office" required="" type="text"/></div>
+<div class="input-wrap">
+<svg aria-hidden="true" class="icon field-icon"><use href="#icon-pin"></use></svg><input aria-describedby="addressError" autocomplete="street-address" id="address" maxlength="160" name="address" placeholder="Your address or office" required="" type="text">
+</div>
 <span aria-live="polite" class="error-msg" id="addressError"></span>
 </div>
 <div class="input-group">
 <label for="personToVisit">Person / department to visit <span aria-hidden="true" class="required-mark">*</span></label>
-<div class="input-wrap"><svg aria-hidden="true" class="icon field-icon"><use href="#icon-building"></use></svg><input aria-describedby="personToVisitError" autocomplete="off" id="personToVisit" maxlength="100" name="personToVisit" placeholder="Name or department" required="" type="text"/></div>
+<div class="input-wrap">
+<svg aria-hidden="true" class="icon field-icon"><use href="#icon-building"></use></svg><input aria-describedby="personToVisitError" autocomplete="off" id="personToVisit" maxlength="100" name="personToVisit" placeholder="Name or department" required="" type="text">
+</div>
 <span aria-live="polite" class="error-msg" id="personToVisitError"></span>
 </div>
 <div class="input-group">
@@ -156,7 +141,7 @@
 <div class="input-wrap select-wrap">
 <svg aria-hidden="true" class="icon field-icon"><use href="#icon-clipboard"></use></svg>
 <select aria-describedby="purposeCategoryError" id="purposeCategory" name="purposeCategory" required="">
-<option disabled="" selected="" value="">Select a service</option>
+<option disabled selected value="">Select a service</option>
 <optgroup label="Technical Assistance">
 <option value="Technical Assistance - Tree Planting">Tree Planting</option>
 <option value="Technical Assistance - WACS">WACS</option>
@@ -192,29 +177,51 @@
 </div>
 <div class="input-group other-purpose-group" hidden="" id="otherPurposeGroup">
 <label for="otherPurposeSpecific">Please specify <span aria-hidden="true" class="required-mark">*</span></label>
-<div class="input-wrap"><svg aria-hidden="true" class="icon field-icon"><use href="#icon-edit"></use></svg><input aria-describedby="otherPurposeSpecificError" disabled="" id="otherPurposeSpecific" maxlength="180" name="otherPurposeSpecific" placeholder="Tell us the purpose of your visit" type="text"/></div>
+<div class="input-wrap">
+<svg aria-hidden="true" class="icon field-icon"><use href="#icon-edit"></use></svg><input aria-describedby="otherPurposeSpecificError" disabled id="otherPurposeSpecific" maxlength="180" name="otherPurposeSpecific" placeholder="Tell us the purpose of your visit" type="text">
+</div>
 <span aria-live="polite" class="error-msg" id="otherPurposeSpecificError"></span>
 </div>
 </fieldset>
-<button class="submit-btn" disabled="" id="submitBtn" type="submit"><span class="submit-btn-label">Register visit</span><svg aria-hidden="true" class="icon submit-arrow"><use href="#icon-arrow"></use></svg><span aria-hidden="true" class="submit-spinner"></span></button>
+<details class="v4-visit-preview" id="visitPreview"><summary><span><svg viewbox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 3H5v18h14V8Zm0 0v5h5M9 12h6m-6 4h6"></path></svg>Review your visit details</span><b aria-hidden="true">+</b></summary><p>Check your details before registering.</p>
+<dl>
+<div>
+<dt>Full name</dt>
+<dd data-visit-preview="fullName">Not provided yet</dd>
+</div>
+<div>
+<dt>Contact</dt>
+<dd data-visit-preview="contact">Not provided yet</dd>
+</div>
+<div>
+<dt>Address</dt>
+<dd data-visit-preview="address">Not provided yet</dd>
+</div>
+<div>
+<dt>Person / office</dt>
+<dd data-visit-preview="personToVisit">Not provided yet</dd>
+</div>
+<div>
+<dt>Purpose</dt>
+<dd data-visit-preview="purposeCategory">Not selected yet</dd>
+</div>
+</dl></details><button class="submit-btn" disabled id="submitBtn" type="submit"><span class="submit-btn-label">Register visit</span><svg aria-hidden="true" class="icon submit-arrow"><use href="#icon-arrow"></use></svg><span aria-hidden="true" class="submit-spinner"></span></button>
 <p class="security-note"><svg aria-hidden="true" class="icon"><use href="#icon-lock"></use></svg><span>For office visitor monitoring and assistance.</span></p>
 </form>
 <div class="form-footer">
 <span class="connection-pill is-connecting" id="dbConnectionStatus" role="status"><span aria-hidden="true" class="connection-dot"></span><span class="connection-label">Loading registration…</span></span>
 <span class="required-note"><span class="required-mark">*</span> Required fields</span>
 </div>
-<noscript><p class="noscript-message">Please enable JavaScript to register your visit, or ask the front desk for assistance.</p></noscript>
+<div class="visitor-office-seal" aria-hidden="true">
+<span><img id="officeLogo" src="../logo/enro.png" alt="" width="24" height="24"></span><small>PGENRO • Province of Quezon</small>
+</div></section></main><footer class="portal-footer">© 2026 PGENRO <span>•</span> Provincial Government of Quezon</footer>
 </div>
-</section>
-</main>
-<footer class="page-footer">Provincial Government of Quezon <span aria-hidden="true">·</span> PGENRO IMS</footer>
-</div>
-<div aria-hidden="true" class="modal-fallback-backdrop" hidden="" id="modalFallbackBackdrop"></div>
+<div id="modalFallbackBackdrop" class="modal-fallback-backdrop" hidden></div>
 <dialog aria-describedby="successDescription" aria-labelledby="successTitle" aria-modal="true" class="success-modal" id="successModal">
 <div class="success-icon"><svg aria-hidden="true" class="icon"><use href="#icon-check"></use></svg></div>
 <span class="modal-kicker">Registration complete</span>
 <h2 id="successTitle">Your visit is recorded.</h2>
-<p id="successDescription">Thank you, <strong id="visitorNameDisplay">Visitor</strong>.<br/>Please proceed to the front desk.</p>
+<p id="successDescription">Thank you, <strong id="visitorNameDisplay">Visitor</strong>.<br>Please proceed to the front desk.</p>
 <button class="submit-btn" id="closeModalBtn" type="button">Done <svg aria-hidden="true" class="icon"><use href="#icon-check"></use></svg></button>
 </dialog>
 </body>

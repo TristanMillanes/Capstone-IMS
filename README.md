@@ -1,3 +1,7 @@
+# PGENRO IMS — latest corrected build
+
+**Start with [START_HERE.md](START_HERE.md)** for the 3 November 2026 frontend repairs, Windows startup and current verification results. Extract the complete project into a clean folder. The earlier setup notes below remain available for existing backend features.
+
 # Administrator Service Request update
 
 See [ADMIN_SERVICE_REQUEST_UPDATE.md](ADMIN_SERVICE_REQUEST_UPDATE.md) for the public-form review queue, filters, status updates, document downloads, and Print Form. Existing public Service Request setup instructions remain in [PUBLIC_SERVICE_REQUEST_SETUP.md](PUBLIC_SERVICE_REQUEST_SETUP.md).

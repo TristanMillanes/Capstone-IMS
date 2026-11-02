@@ -1,0 +1,99 @@
+{
+  "method": "Production Python parsers and both Flask test clients; real PDF/TXT/DOCX and system Tesseract",
+  "testsRun": 14,
+  "headerScenarios": [
+    {
+      "scenario": "Office Order body reference does not change classification",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Explicit sender wins over TO and letterhead",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Issue and registry dates are separate",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Body dates and labels cannot supply header fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Ambiguous issue date does not fall back to a later date",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Explicit control number has priority over reference",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Memo heading number remains distinct from registry control",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Known heading and subject OCR errors preserve data",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Bare labels with blank rows and wrapped recipients",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Table cells without colons keep their labels",
+      "result": "PASS"
+    },
+    {
+      "scenario": "A recipient office after a standalone date is not the sender",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Wrapped subject can cross an OCR blank row with clear continuation",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Later pages cannot supply missing header fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "No heading detection from subject or filename-like body text",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Invalid calendar date is left empty",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unambiguous numeric date and full-width labels",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Printed author after a closing fills sender rather than TO",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Second-page printed signatory supplements only the sender",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An annex signatory is never the main letter sender",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Recipient and CC names cannot become the author",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unreadable numeric pen strokes are not a sender name",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Explicit printed FROM retains its sender priority",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Mixed-case printed name with designation is recognized",
+      "result": "PASS"
+    }
+  ],
+  "passed": true
+}

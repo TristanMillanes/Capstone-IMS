@@ -5,8 +5,8 @@
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | User Management</title>
 <meta content="#063d32" name="theme-color">
-<meta content="20261011-admin-user-v7" name="pgenro-user-management-build">
-<script>window.PGENRO_ADMIN_FUNCTION='admin-user';window.PGENRO_USER_MANAGEMENT_BUILD='20261011-admin-user-v7';</script>
+<meta content="20261103-frontend-fix" name="pgenro-user-management-build">
+<script>window.PGENRO_ADMIN_FUNCTION=window.PGENRO_ADMIN_FUNCTION||'admin-users';window.PGENRO_USER_MANAGEMENT_BUILD='20261103-frontend-fix';</script>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
@@ -14,7 +14,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <!-- Lucide Icons -->
 <!-- CSS -->
-<link href="Usermanagement.css?v=20261027-emerald-v6" rel="stylesheet">
+<link href="Usermanagement.css?v=20261103-frontend-fix" rel="stylesheet">
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="Usermanagement.html" data-css-scope="admin-users" data-user-management-access="admin" data-unified-ui="20261013" data-module-title="User Management" data-design="emerald-v6">
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
@@ -281,7 +281,7 @@
 <section class="dashboard-section">
 <div aria-live="polite" class="user-management-feedback" hidden="" id="userManagementFeedback" role="status"></div>
 <!-- Filter Controls Bar -->
-<div class="table-controls-card">
+<div class="table-controls-card account-directory-filters">
 <div class="controls-left">
 <div class="filter-search-box ui-affixed-control">
 <i data-lucide="search" class="ui-field-icon"></i>
@@ -437,7 +437,7 @@
 <!-- JS -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- This module owns its Supabase session/access controller in the versioned script below. -->
-<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management v7 script is missing. Upload Usermanagement.admin-user.v7.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.admin-user.v7.js?v=20261027-emerald-v6"></script>
+<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management script is missing. Upload Usermanagement.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.js?v=20261103-frontend-fix"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 

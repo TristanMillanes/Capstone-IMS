@@ -23,11 +23,14 @@ STATIC_ROOTS = {
     "SettingIMS",
     "VisitorsLog",
     "account",
+    "vendor",
 }
 STATIC_ROOTS_BY_CASEFOLD = {name.casefold(): name for name in STATIC_ROOTS}
 STATIC_EXTENSIONS = {
     ".html", ".css", ".js", ".json", ".png", ".jpg", ".jpeg", ".gif",
     ".webp", ".svg", ".ico", ".txt", ".map", ".woff", ".woff2", ".ttf",
+    ".mjs", ".wasm", ".bcmap", ".pfb", ".otf", ".icc",
+    ".pdf", ".docx", ".xlsx", ".pptx",
 }
 
 # Friendly and legacy URLs that may already be bookmarked or present in older
@@ -64,6 +67,15 @@ def _canonical_alias(asset_path: str) -> str | None:
     if direct:
         return direct
 
+    # Recover bookmarks from an accidentally nested ZIP extraction. Redirect
+    # the HTML entry to the canonical tree before resolving relative assets.
+    if key.endswith(".html") and key.startswith((
+        "user/user/", "user/admin/", "user/settingims/", "user/visitorslog/"
+    )):
+        nested = _resolve_case_insensitive(clean.split("/", 1)[1])
+        if nested:
+            return nested.relative_to(ROOT).as_posix()
+
     # Legacy spelling/case aliases that include .html.
     html_aliases = {
         "user/travelor.html": "User/travelOR.html",
@@ -72,7 +84,7 @@ def _canonical_alias(asset_path: str) -> str | None:
         "admin/usermanagement.html": "admin/Usermanagement.html",
         "admin/inventoryadmin.html": "admin/invetoryadmin.html",
         "settingims/settings.html": "SettingIMS/Settings.html",
-        "visitorslog/visitorslogin.html": "VisitorsLog/visitorsLogin.html",
+        "visitorslog/visitorslogin.html": "VisitorsLog/visitorslog.html",
     }
     return html_aliases.get(key)
 

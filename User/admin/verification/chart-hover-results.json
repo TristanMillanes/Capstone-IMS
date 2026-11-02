@@ -1,0 +1,71 @@
+{
+  "method": "Actual Playwright mouse movements and touch tap in local Chromium with fixture data",
+  "pointerTargets": 345,
+  "maxPointerAnchorErrorCssPixels": 0.9989279066044787,
+  "scenarios": [
+    {
+      "width": 320,
+      "dpr": 1,
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "width": 390,
+      "dpr": 3,
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "width": 768,
+      "dpr": 2,
+      "theme": "dark",
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "width": 1024,
+      "dpr": 1.25,
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "width": 1440,
+      "dpr": 1,
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "width": 1440,
+      "dpr": 2,
+      "theme": "dark",
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "width": 1440,
+      "dpr": 2,
+      "collapsed": true,
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "width": 1916,
+      "dpr": 1.25,
+      "collapsed": true,
+      "scenario": "all chart targets",
+      "result": "PASS"
+    },
+    {
+      "scenario": "personnel inner scroll and long labels",
+      "result": "PASS"
+    },
+    {
+      "scenario": "CSS zoom, sidebar resize and new period",
+      "result": "PASS"
+    },
+    {
+      "scenario": "touch selection",
+      "result": "PASS"
+    }
+  ]
+}

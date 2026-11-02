@@ -1,0 +1,32 @@
+Bundled tools
+
+Chart.js 4.5.1
+https://github.com/chartjs/Chart.js
+MIT license. See chartjs-LICENSE.md.
+The bundled UMD build is served locally by the admin dashboard.
+
+JSZip 3.10.1
+https://github.com/Stuk/jszip
+Used under the MIT license. See jszip-LICENSE.txt.
+
+pdf-lib 1.17.1
+https://github.com/Hopding/pdf-lib
+MIT license. See pdf-lib-LICENSE.txt.
+
+@pdf-lib/fontkit 1.1.1
+https://github.com/Hopding/fontkit
+MIT license, as declared in the upstream package metadata and README.
+Author: Andrew Dillon. Contributor: Devon Govett.
+The unchanged upstream README and package metadata are included as
+fontkit-README.md and fontkit-package.json.
+
+PDF.js 5.6.205
+https://github.com/mozilla/pdf.js
+Apache License 2.0. See pdfjs-dist-LICENSE.txt.
+
+DejaVu Sans
+https://dejavu-fonts.github.io/
+See DejaVu-Fonts-LICENSE.txt for the font redistribution terms.
+
+The document template and its logos are derived from the file supplied for this
+PGENRO module update.

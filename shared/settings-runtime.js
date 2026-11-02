@@ -2,12 +2,16 @@
 (() => {
   'use strict';
   const safeParse = (v, fallback={}) => { try { return JSON.parse(v) ?? fallback; } catch { return fallback; } };
-  const cached = safeParse(localStorage.getItem('pgenro_preferences'), {});
+  const stored = key => { try { return localStorage.getItem(key); } catch { return null; } };
+  const cached = safeParse(stored('pgenro_preferences'), {});
   let inactivityTimer = null;
   let lastActivityReset = 0;
 
   function applyPreferences(prefs={}) {
-    const theme = ['light','dark'].includes(prefs.theme) ? prefs.theme : 'light';
+    const admin = /\/admin\//i.test(location.pathname) || (/\/SettingIMS\//i.test(location.pathname) && new URLSearchParams(location.search).get('from') === 'admin');
+    const selected = stored(admin ? 'pgenro_admin_theme' : 'pgenro_user_theme');
+    const theme = ['light','dark'].includes(selected) ? selected : ['light','dark'].includes(prefs.theme) ? prefs.theme : 'light';
+    window.PGENRO_UserTheme?.sync(prefs);
     document.documentElement.dataset.pgenroTheme = theme;
     document.body?.classList.toggle('pgenro-compact', !!prefs.compact);
     document.body?.classList.toggle('pgenro-reduced-motion', !!prefs.reduceMotion);
@@ -105,7 +109,7 @@
       if (!user) return;
       const { data: profile, error } = await sb.from('profiles').select('preferences').eq('user_id', user.id).maybeSingle();
       if (!error && profile?.preferences) {
-        localStorage.setItem('pgenro_preferences', JSON.stringify(profile.preferences));
+        try { localStorage.setItem('pgenro_preferences', JSON.stringify(profile.preferences)); } catch {}
         applyPreferences(profile.preferences);
       }
     } catch (err) {

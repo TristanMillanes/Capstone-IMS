@@ -1,0 +1,12 @@
+{
+  "method": "Real production browser form, local HTTP Flask service, Tesseract executable and Tesseract.js fallback; mock Supabase and real IndexedDB; no live data writes",
+  "checks": [
+    "Stop Reading cancels the actual Python job and keeps unread fields empty",
+    "Real two-page printed Office Order retries accurately and stays in Communications",
+    "Real Python scanned letter fills sender and registry date while keeping manual corrections",
+    "An unheaded printed request suggests type and subject and highlights them for confirmation",
+    "Real scanned memorandum fills its form, saves to Office Memos and redirects",
+    "A stalled health check falls back to real browser OCR after the availability timeout"
+  ],
+  "uncaughtErrors": []
+}

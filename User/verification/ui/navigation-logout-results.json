@@ -1,0 +1,115 @@
+{
+  "method": "Chromium with simulated Supabase, including sign-out failure/delay; no live data",
+  "checks": [
+    {
+      "scenario": "admin/Usermanagement.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/admin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/admincommunication.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/employee-admin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/ics-admin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/invetoryadmin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/officememo-admin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/requestacc.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/serviceAdmin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/travelOR-admin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/visitors-admin.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/communication.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/employee.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/homepage.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/ics.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/inventory.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/officememo.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/service.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/travelOR.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/visitorsView.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "SettingIMS/Settings.html custom confirmation, cancellation, focus, responsive bounds and one confirmed logout",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/admin.html logout failure stays open and retry succeeds",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/communication.html logout failure stays open and retry succeeds",
+      "result": "PASS"
+    },
+    {
+      "scenario": "SettingIMS/Settings.html logout failure stays open and retry succeeds",
+      "result": "PASS"
+    },
+    {
+      "scenario": "admin/admincommunication.html slide navigation, arrival, browser back and reduced motion",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/communication.html slide navigation, arrival, browser back and reduced motion",
+      "result": "PASS"
+    },
+    {
+      "scenario": "SettingIMS/Settings.html?from=user slide navigation, arrival, browser back and reduced motion",
+      "result": "PASS"
+    }
+  ],
+  "errors": [],
+  "passed": true
+}

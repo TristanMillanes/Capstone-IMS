@@ -2,16 +2,16 @@
 
 <html data-css-scope="user-settings" data-theme="light" lang="en">
 <head>
-<meta charset="utf-8"/><script id="moduleThemeBoot">try{const p=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}');const t=(localStorage.getItem('pgenro_user_theme')||p.theme)==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.dataset.pgenroTheme=t;}catch(e){document.documentElement.dataset.theme='light';}</script>
+<meta charset="utf-8"/><script src="../User/user-theme.js?v=20261103-frontend-fix"></script>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>PGENRO IMS | Account &amp; System Settings</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link href="Setting.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+<script src="../User/vendor/lucide/lucide.min.js"></script>
+<link href="Setting.css?v=20261103-frontend-fix" rel="stylesheet"/>
 </head>
-<body class="pgenro-user pgenro-settings depth-workspace ui-unified" data-css-scope="user-settings" data-requires-auth="user">
+<body class="pgenro-user pgenro-settings depth-workspace ui-unified" data-css-scope="user-settings" data-requires-auth="authenticated">
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <header class="settings-topbar">
 <a class="settings-back" href="../User/homepage.html" id="backToWorkspace">
@@ -128,7 +128,7 @@
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script src="../shared/settings-runtime.js?v=20261011-navigation-pdf-v2"></script>
-<script src="Settings.js?v=20261011-navigation-pdf-v2"></script>
+<script src="../shared/settings-runtime.js?v=20261103-frontend-fix"></script>
+<script src="Settings.js?v=20261103-frontend-fix"></script>
 </body>
 </html>

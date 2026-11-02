@@ -2,18 +2,23 @@
 
 <html data-css-scope="auth-login" data-login-design="emerald-motion-v16" lang="en">
 <head>
-<meta charset="utf-8"/><script>try{const p=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}');document.documentElement.dataset.theme=(localStorage.getItem('pgenro_user_theme')||p.theme)==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+<script src="user-theme.js?v=20261103-frontend-fix"></script>
+<meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="#053d31" name="theme-color"/>
 <meta content="Sign in to the PGENRO Information Management System." name="description"/>
 <title>PGENRO IMS | Sign in</title>
 <link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect"/>
 <link crossorigin="" href="https://zssrxubajhqryrwijyzm.supabase.co" rel="preconnect"/>
-<link href="login-modern.css?v=20261026-public-service" rel="stylesheet"/>
+<link href="login-modern.css?v=20261101-user-ui" rel="stylesheet"/>
 <script defer="" src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="login-modern.js?v=20261026-public-service"></script>
+<script defer="" src="login-modern.js?v=20261101-user-ui"></script>
+<link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui">
+<script defer src="user-refresh.js?v=20261101-user-ui"></script>
+<script defer src="user-workspace.js?v=20261101-user-ui"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261101-user-ui">
 </head>
-<body class="pgenro-auth pgenro-login ui-unified" data-css-scope="auth-login" data-motion="paused">
+<body class="pgenro-auth pgenro-login ui-unified user-refresh" data-css-scope="auth-login" data-motion="paused">
 <svg aria-hidden="true" class="icon-definitions" focusable="false" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <symbol id="icon-mail" viewbox="0 0 24 24"><rect height="14" rx="3" width="18" x="3" y="5"></rect><path d="m3 7 9 6 9-6"></path></symbol>
@@ -95,49 +100,17 @@
 <h2 id="workspaceIntro">Your work,<br/><span>connected.</span></h2>
 <p>Documents, personnel, and inventory.<br/>Together in one PGENRO workspace.</p>
 </div>
-<svg aria-hidden="true" class="story-art" fill="none" focusable="false" viewbox="0 0 400 330">
-<defs>
-<lineargradient gradientunits="userSpaceOnUse" id="storyTile" x1="92" x2="312" y1="152" y2="286"><stop stop-color="#4e9a77"></stop><stop offset="1" stop-color="#144f3c"></stop></lineargradient>
-<lineargradient gradientunits="userSpaceOnUse" id="storyLeaf" x1="148" x2="260" y1="120" y2="34"><stop stop-color="#84b995"></stop><stop offset="1" stop-color="#e0ebc0"></stop></lineargradient>
-<lineargradient gradientunits="userSpaceOnUse" id="storyLeafShade" x1="155" x2="239" y1="70" y2="137"><stop stop-color="#57996e"></stop><stop offset="1" stop-color="#a2c698"></stop></lineargradient>
-</defs>
-<ellipse class="story-shadow" cx="207" cy="263" fill="#023323" fill-opacity=".34" rx="149" ry="29"></ellipse>
-<path d="m200 161 122 69-122 70-122-70Z" fill="#124d39" stroke="#589578" stroke-opacity=".45"></path>
-<path d="m200 146 122 69-122 70-122-70Z" fill="#286b50" stroke="#79b390" stroke-opacity=".5"></path>
-<path d="m200 131 122 69-122 70-122-70Z" fill="url(#storyTile)" stroke="#91c2a0" stroke-opacity=".65"></path>
-<path d="m200 152 86 48-86 49-86-49Z" stroke="#c9dfb8" stroke-opacity=".2"></path>
-<g class="story-leaf-motion">
-<path d="M160 179c-35-20-31-61 4-91 28-24 64-35 103-47 0 52-8 93-36 126-20 23-46 29-71 12Z" fill="url(#storyLeaf)"></path>
-<path d="M160 179c-35-20-31-61 4-91 28-24 64-35 103-47-31 55-74 93-107 138Z" fill="url(#storyLeafShade)"></path>
-<path d="M146 209c16-49 57-72 97-134" stroke="#e5efd1" stroke-linecap="round" stroke-opacity=".75" stroke-width="2"></path>
-<path d="m172 164-12-37m35 14 31 1m-14-29-6-32" stroke="#e3ebc9" stroke-linecap="round" stroke-opacity=".5" stroke-width="1.4"></path>
-</g>
-<g class="story-document-motion">
-<g transform="rotate(-6 96 205)">
-<rect fill="#022c21" fill-opacity=".28" height="105" rx="16" width="148" x="25" y="165"></rect>
-<rect fill="#f7fcf6" height="105" rx="16" stroke="#d9ebdc" width="148" x="22" y="157"></rect>
-<rect fill="#dbeee0" height="28" rx="8" width="28" x="37" y="173"></rect>
-<path d="M45 180h8l4 4v10H45Zm8 0v4h4" stroke="#28764f" stroke-linejoin="round" stroke-width="1.6"></path>
-<text fill="#285c43" font-size="14" font-weight="600" x="75" y="190">Documents</text>
-<path d="M39 218h111M39 230h84M39 242h101" stroke="#82aa91" stroke-linecap="round" stroke-opacity=".7" stroke-width="4"></path>
-</g>
-</g>
-<g class="story-personnel-motion">
-<g transform="rotate(6 316 150)">
-<rect fill="#022c21" fill-opacity=".25" height="81" rx="14" width="108" x="271" y="117"></rect>
-<rect fill="#e8f4e7" height="81" rx="14" stroke="#f7fcf0" width="108" x="268" y="109"></rect>
-<circle cx="289" cy="131" fill="#478d66" r="8"></circle>
-<path d="M280 153v-3a9 9 0 0 1 18 0v3" stroke="#478d66" stroke-linecap="round" stroke-width="3"></path>
-<path d="M312 128h45M312 138h31" stroke="#83a992" stroke-linecap="round" stroke-width="3"></path>
-<text fill="#285c43" font-size="14" font-weight="600" x="283" y="176">Personnel</text>
-</g>
-</g>
-<path d="M50 115V94h21M337 211v22h-22" stroke="#b9d6ad" stroke-linecap="round" stroke-opacity=".5" stroke-width="1.2"></path>
-<circle cx="91" cy="91" fill="#d0dfad" r="3"></circle>
-<circle cx="334" cy="83" fill="#bbd7af" r="2"></circle>
-<path d="M324 197h8m-4-4v8M107 266h8m-4-4v8" stroke="#bed6a8" stroke-linecap="round" stroke-opacity=".7"></path>
-</svg>
-<div aria-label="Workspace areas" class="story-details">
+<div class="eco-scene" aria-hidden="true">
+  <div class="eco-halo"></div><span class="eco-spark eco-spark-one"></span><span class="eco-spark eco-spark-two"></span>
+  <div class="eco-world">
+    <div class="eco-platform"><span></span></div>
+    <div class="eco-plant"><div class="eco-stem"></div><span class="eco-leaf leaf-one"></span><span class="eco-leaf leaf-two"></span><span class="eco-leaf leaf-three"></span><span class="eco-leaf leaf-four"></span><div class="eco-pot"><span></span></div></div>
+    <div class="eco-document"><span class="eco-document-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8m-8 4h5"/></svg></span><span class="eco-document-line"></span><span class="eco-document-line short"></span><span class="eco-document-line"></span><span class="eco-document-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 12 4 4 8-8"/></svg></span></div>
+    <div class="eco-orbit-dot"></div>
+  </div>
+  <span class="eco-caption">A greener way to work.</span>
+</div>
+<button class="eco-motion-toggle" type="button" aria-pressed="false" aria-label="Pause decorative animation" title="Pause decorative animation"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path class="eco-pause-icon" d="M9 5v14M15 5v14"/><path class="eco-play-icon" d="m9 5 10 7-10 7Z"/></svg><span>Pause animation</span></button><div aria-label="Workspace areas" class="story-details">
 <span><svg aria-hidden="true" class="icon"><use href="#icon-folder"></use></svg>Documents</span>
 <span><svg aria-hidden="true" class="icon"><use href="#icon-user-plus"></use></svg>Personnel</span>
 <span><svg aria-hidden="true" class="icon"><use href="#icon-grid"></use></svg>Inventory</span>

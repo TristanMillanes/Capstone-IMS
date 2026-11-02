@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="user-theme.js?v=20261101-user-ui"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#1b6a4c"><meta name="description" content="Request environmental assistance from PGENRO Quezon. Complete your details, select a service, and review before submitting.">
+<title>PGENRO IMS | Service Request Form</title>
+<link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui"><link rel="stylesheet" href="service-request-form.css?v=20261101-user-ui">
+<script defer src="user-refresh.js?v=20261101-user-ui"></script><script defer src="service-request-form.js?v=20261101-user-ui"></script>
+<script defer src="user-workspace.js?v=20261101-user-ui"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261101-user-ui">
+</head><body class="user-refresh service-request-page">
+<a class="user-skip-link" href="#publicServiceRequestForm">Skip to request form</a>
+<header class="public-header"><a class="public-brand" href="login.html" aria-label="PGENRO IMS home"><span class="public-seal"><img src="../logo/enro.png" alt="PGENRO seal" width="44" height="44"></span><span><strong>PGENRO IMS</strong><small>Province of Quezon</small></span></a><div class="public-header-links"><span class="public-portal-label">Citizen services</span><a class="staff-link" href="login.html">Staff sign in <span aria-hidden="true">↗</span></a></div></header>
+<main class="public-main">
+<section class="public-intro" aria-labelledby="requestPageTitle"><div class="request-intro-copy"><p class="public-eyebrow"><span></span> ENVIRONMENTAL ACTION DESK</p><h1 id="requestPageTitle">Better service.<br><em>A greener Quezon.</em></h1><p>Request environmental assistance, planting materials, or help with a concern. Tell us what you need, and send it to PGENRO for review.</p><div class="request-intro-points"><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg>No account needed</span><span><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h12v18H6Z"/><path d="M9 8h6m-6 4h6m-6 4h3"/></svg>Reference after submission</span></div></div><div class="eco-scene" aria-hidden="true">
+  <div class="eco-halo"></div><span class="eco-spark eco-spark-one"></span><span class="eco-spark eco-spark-two"></span>
+  <div class="eco-world">
+    <div class="eco-platform"><span></span></div>
+    <div class="eco-plant"><div class="eco-stem"></div><span class="eco-leaf leaf-one"></span><span class="eco-leaf leaf-two"></span><span class="eco-leaf leaf-three"></span><span class="eco-leaf leaf-four"></span><div class="eco-pot"><span></span></div></div>
+    <div class="eco-document"><span class="eco-document-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8m-8 4h5"/></svg></span><span class="eco-document-line"></span><span class="eco-document-line short"></span><span class="eco-document-line"></span><span class="eco-document-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="m6 12 4 4 8-8"/></svg></span></div>
+    <div class="eco-orbit-dot"></div>
+  </div>
+  <span class="eco-caption">A greener way to work.</span>
+</div><div class="request-motion"><button class="eco-motion-toggle" type="button" aria-pressed="false" aria-label="Pause decorative animation" title="Pause decorative animation"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path class="eco-pause-icon" d="M9 5v14M15 5v14"/><path class="eco-play-icon" d="m9 5 10 7-10 7Z"/></svg><span>Pause animation</span></button></div></section>
+<noscript><p class="service-form-feedback">Please enable JavaScript to complete and submit this form.</p></noscript>
+<form id="publicServiceRequestForm" class="request-workspace" novalidate tabindex="-1">
+<aside class="request-guide"><p class="request-guide-kicker">LET'S GET STARTED</p><h2>Service request</h2><p class="request-guide-description">A few details to help us assist you.</p>
+<nav aria-label="Request form steps" id="requestStepNavigation" hidden><ol class="request-steps">
+<li><button type="button" data-go-step="0" aria-current="step" aria-controls="requestStep0"><span class="step-number">1</span><span><strong>Your details</strong><small>Client &amp; organization</small></span></button></li>
+<li><button type="button" data-go-step="1" aria-controls="requestCategories" disabled><span class="step-number">2</span><span><strong>Choose a service</strong><small>What you need help with</small></span></button></li>
+<li><button type="button" data-go-step="2" aria-controls="requestStep2" disabled><span class="step-number">3</span><span><strong>Request details</strong><small>Location &amp; schedule</small></span></button></li>
+<li><button type="button" data-go-step="3" aria-controls="requestReview" disabled><span class="step-number">4</span><span><strong>Review &amp; send</strong><small>Check before submitting</small></span></button></li>
+</ol></nav><div class="request-progress-wrap"><div><span>Your progress</span><output id="requestProgressText">Step 1 of 4</output></div><progress id="requestProgress" max="4" value="1" aria-label="Request form progress"></progress></div>
+<div class="request-guide-note"><span class="request-note-icon" aria-hidden="true">i</span><strong>What happens next?</strong><p>The office will assess your request. Keep the service number you receive for follow-up.</p><span class="request-guide-status">Pending Review after submission</span></div>
+<a class="request-back-link" href="login.html"><span aria-hidden="true">←</span> Back to start</a></aside>
+<div class="request-form-main"><div class="request-form-heading"><div><p class="public-eyebrow">PUBLIC SUBMISSION</p><h2 id="activeStepTitle" tabindex="-1">Tell us about yourself</h2></div><span class="required-note"><span>*</span> Required fields</span></div>
+<div id="serviceRequestFeedback" class="service-form-feedback" role="alert" tabindex="-1" hidden></div>
+<p class="service-info"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg>Your service number and request date are assigned after you submit.</p>
+<fieldset data-step="0" id="requestStep0" class="service-form-section wizard-panel"><legend><span class="request-section-number">01</span>Tell us about yourself</legend>
+<p>Provide your name, requesting organization, and contact information.</p>
+<div class="service-form-grid">
+<div class="service-form-field">
+<label for="request-clientName">Full Name of Client / Requestor <span aria-hidden="true">*</span></label>
+<input type="text" autocomplete="name" id="request-clientName" name="clientName" required aria-required="true" maxlength="180" placeholder="e.g., Juan Dela Cruz">
+</div>
+<div class="service-form-field">
+<label for="request-organization">Organization / LGU / Barangay <span aria-hidden="true">*</span></label>
+<input type="text" autocomplete="organization" id="request-organization" name="organization" required aria-required="true" maxlength="240" placeholder="e.g., LGU Lucena / DepEd Quezon">
+</div>
+<div class="service-form-field">
+<label for="request-contactNo">Contact Number</label>
+<input type="tel" autocomplete="tel" inputmode="tel" id="request-contactNo" name="contactNo" maxlength="60" placeholder="Mobile number or landline">
+</div>
+<div class="service-form-field">
+<label for="request-emailAddress">Email Address</label>
+<input type="email" autocomplete="email" inputmode="email" id="request-emailAddress" name="emailAddress" maxlength="254" placeholder="client.email@example.com">
+</div>
+
+</div></fieldset>
+<fieldset data-step="1" class="service-form-section wizard-panel" id="requestCategories" aria-describedby="categoryHelp"><legend><span class="request-section-number">02</span>How can we help?</legend>
+<p id="categoryHelp">Select at least one service, or describe another service below. You may select more than one category.</p>
+<div class="service-form-grid">
+<div class="service-form-field">
+<label for="request-technicalAssistance">Technical Assistance</label>
+<select id="request-technicalAssistance" name="technicalAssistance">
+<option value="">-- Select Technical Assistance Scope --</option>
+<option value="Tree Growing">Tree Growing</option>
+<option value="Waste Analysis and Characterization Study">Waste Analysis and Characterization Study</option>
+<option value="Formulation/Review of 10-Year SWM Plan">Formulation/Review of 10-Year SWM Plan</option>
+<option value="Tree Trimming &amp; Tree Risk Assessment">Tree Trimming &amp; Tree Risk Assessment</option>
+<option value="Environmental Impact / Pollution Inspection">Environmental Impact / Pollution Inspection</option>
+<option value="Solid Waste Management Advisory">Solid Waste Management Advisory</option>
+<option value="Watershed &amp; Coastal Rehabilitation">Watershed &amp; Coastal Rehabilitation</option>
+<option value="Geohazard &amp; Site Suitability Survey">Geohazard &amp; Site Suitability Survey</option>
+</select>
+</div>
+<div class="service-form-field">
+<label for="request-iecService">Information, Education &amp; Communication (IEC)</label>
+<select id="request-iecService" name="iecService">
+<option value="">-- Select IEC Scope --</option>
+<option value="Request for Speaker">Request for Speaker</option>
+<option value="Request for Information">Request for Information</option>
+<option value="Request for Interview">Request for Interview</option>
+<option value="Environmental Symposium / School Lecture">Environmental Symposium / School Lecture</option>
+<option value="Climate Change Adaptation Workshop">Climate Change Adaptation Workshop</option>
+<option value="Distribution of IEC Campaign Materials">Distribution of IEC Campaign Materials</option>
+</select>
+</div>
+<div class="service-form-field">
+<label for="request-plantingMaterials">Provision of Planting Materials</label>
+<select id="request-plantingMaterials" name="plantingMaterials">
+<option value="">-- Select Planting Materials Species --</option>
+<option value="Forest Tree Seedlings (Narra, Mahogany, etc.)">Forest Tree Seedlings (Narra, Mahogany, etc.)</option>
+<option value="Fruit-bearing Tree Seedlings">Fruit-bearing Tree Seedlings</option>
+<option value="Mangrove Propagules">Mangrove Propagules</option>
+<option value="Bamboo Culms &amp; Propagules">Bamboo Culms &amp; Propagules</option>
+</select>
+</div>
+<div class="service-form-field">
+<label for="request-environmentalConcerns">Environmental Concerns &amp; Complaints</label>
+<select id="request-environmentalConcerns" name="environmentalConcerns">
+<option value="">-- Select Concern Nature --</option>
+<option value="Solid Waste">Solid Waste</option>
+<option value="Air Quality">Air Quality</option>
+<option value="Water Quality">Water Quality</option>
+<option value="Wildlife">Wildlife</option>
+<option value="Natural Resources">Natural Resources</option>
+<option value="Illegal Tree Cutting / Balling">Illegal Tree Cutting / Balling</option>
+<option value="Illegal Dumping / Open Burning">Illegal Dumping / Open Burning</option>
+<option value="Waterway Encroachment &amp; Quarrying">Waterway Encroachment &amp; Quarrying</option>
+<option value="Industrial Air / Odor Pollution">Industrial Air / Odor Pollution</option>
+</select>
+</div>
+<div class="service-form-field">
+<label for="request-certifications">Certifications</label>
+<select id="request-certifications" name="certifications">
+<option value="">-- Select Certificate Type --</option>
+<option value="SWM Compliance">SWM Compliance</option>
+<option value="Environmental Compliance Certificate (ECC) Endorsement">Environmental Compliance Certificate (ECC) Endorsement</option>
+<option value="Tree Cutting / Trimming Clearance Inspection">Tree Cutting / Trimming Clearance Inspection</option>
+<option value="Quarry / Sand &amp; Gravel Clearance">Quarry / Sand &amp; Gravel Clearance</option>
+</select>
+</div><div class="service-form-field">
+<label for="request-otherServices">Other Services Not Listed Above</label>
+<textarea id="request-otherServices" name="otherServices" maxlength="1000" placeholder="Specify any other assistance you need." rows="4"></textarea>
+</div>
+
+</div></fieldset>
+<fieldset data-step="2" id="requestStep2" class="service-form-section wizard-panel"><legend><span class="request-section-number">03</span>Add your request details</legend>
+<p>Describe the assistance, quantities, project site, and preferred date.</p>
+<div class="service-form-grid">
+<div class="service-form-field service-form-wide">
+<label for="request-requestDetails">Detailed Request Notes &amp; Quantities <span aria-hidden="true">*</span></label>
+<textarea id="request-requestDetails" name="requestDetails" required aria-required="true" maxlength="4000" placeholder="Include the scope, quantities, and other details of your request." rows="4"></textarea>
+</div>
+<div class="service-form-field">
+<label for="request-location">Location / Project Site <span aria-hidden="true">*</span></label>
+<input type="text" id="request-location" name="location" required aria-required="true" maxlength="500" placeholder="Barangay, municipality, and specific landmark">
+</div>
+<div class="service-form-field">
+<label for="request-dateNeeded">Date Needed</label>
+<input type="date" id="request-dateNeeded" name="dateNeeded">
+</div>
+<div class="service-form-field">
+<label for="request-requestedBy">Requested By (Name &amp; Designation)</label>
+<input type="text" id="request-requestedBy" name="requestedBy" maxlength="180" placeholder="Leave blank to use the client / requestor name">
+</div>
+<div class="service-form-field">
+<label for="request-notedBy">Noted / Endorsed By</label>
+<input type="text" id="request-notedBy" name="notedBy" maxlength="180" placeholder="Barangay captain / LGU head, if applicable">
+</div>
+
+</div></fieldset>
+<section class="wizard-panel request-review" id="requestReview" data-step="3" aria-labelledby="reviewTitle" hidden><h3 id="reviewTitle">Ready when you are.</h3><p>Check the details below. You can still edit any section before sending your request.</p><div id="requestReviewContent"></div><p class="request-review-note">Submitting sends this request to the office for assessment. Service availability and scheduling are subject to review.</p></section>
+<div class="request-form-navigation"><button class="secondary-action" id="requestBackBtn" type="button" hidden><span aria-hidden="true">←</span> Back</button><button class="text-action" type="reset">Clear form</button><button class="primary-action" id="requestNextBtn" type="button" hidden>Continue <span aria-hidden="true">→</span></button><button class="primary-action" id="submitServiceRequestBtn" type="submit">Submit service request <span aria-hidden="true">↗</span></button></div>
+<p class="service-submit-note" id="requestSaveNote">Review your entries before sending your request.</p></div></form>
+<section id="serviceRequestReceipt" class="public-receipt" tabindex="-1" aria-labelledby="receiptTitle" hidden><span class="receipt-success" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg></span><p class="public-eyebrow">REQUEST RECEIVED</p><h2 id="receiptTitle">You're all set.</h2><p>Your service request has been sent to PGENRO.<br>Keep these details for your follow-up with the office.</p><span class="pending-label">Pending Review</span><dl><div><dt>Service number</dt><dd id="receiptServiceNo"></dd></div><div><dt>Date of request</dt><dd id="receiptRequestDate"></dd></div><div><dt>Submission reference</dt><dd id="receiptReference"></dd></div></dl><p id="receiptCopyFeedback" class="receipt-copy-feedback" role="status"></p><div class="receipt-actions"><button class="secondary-action" id="copyServiceNumberBtn" type="button">Copy service number</button><button class="secondary-action" id="printReceiptBtn" type="button">Print receipt</button><button class="primary-action" id="anotherServiceRequestBtn" type="button">Submit another request</button></div><a class="request-back-link" href="login.html">← Return to start</a></section>
+</main><footer class="public-footer"><span><strong>PGENRO IMS</strong> <span>Province of Quezon</span></span><p>Provincial Government Environment &amp; Natural Resources Office</p></footer></body></html>

@@ -1,0 +1,234 @@
+{
+  "method": "Headless Chromium, 4× CPU slowdown, 800 simulated records per registry; no live data",
+  "label": "after",
+  "results": [
+    {
+      "file": "User/communication.html",
+      "initialRows": 25,
+      "idle": {
+        "TaskDuration": 0.6,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": {
+        "elapsedMs": 396,
+        "TaskDuration": 144.2,
+        "ScriptDuration": 21.7,
+        "LayoutDuration": 16.2,
+        "RecalcStyleDuration": 16,
+        "LayoutCount": 9,
+        "RecalcStyleCount": 27
+      },
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 25,
+      "pagination": "1–25 of 800 records«PreviousPage 1 of 32Next»",
+      "errors": []
+    },
+    {
+      "file": "User/inventory.html",
+      "initialRows": 25,
+      "idle": {
+        "TaskDuration": 0.7,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": {
+        "elapsedMs": 389,
+        "TaskDuration": 144.5,
+        "ScriptDuration": 10.4,
+        "LayoutDuration": 14.5,
+        "RecalcStyleDuration": 15.3,
+        "LayoutCount": 9,
+        "RecalcStyleCount": 25
+      },
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 25,
+      "pagination": "1–25 of 800 records«PreviousPage 1 of 32Next»",
+      "errors": []
+    },
+    {
+      "file": "User/employee.html",
+      "initialRows": 25,
+      "idle": {
+        "TaskDuration": 0.3,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": {
+        "elapsedMs": 403,
+        "TaskDuration": 190.4,
+        "ScriptDuration": 16.5,
+        "LayoutDuration": 22.2,
+        "RecalcStyleDuration": 21.2,
+        "LayoutCount": 9,
+        "RecalcStyleCount": 25
+      },
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 25,
+      "pagination": "1–25 of 800 records«PreviousPage 1 of 32Next»",
+      "errors": []
+    },
+    {
+      "file": "User/ics.html",
+      "initialRows": 25,
+      "idle": {
+        "TaskDuration": 0.4,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": {
+        "elapsedMs": 385,
+        "TaskDuration": 171.3,
+        "ScriptDuration": 18.8,
+        "LayoutDuration": 17.6,
+        "RecalcStyleDuration": 18.3,
+        "LayoutCount": 9,
+        "RecalcStyleCount": 24
+      },
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 25,
+      "pagination": "1–25 of 800 records«PreviousPage 1 of 32Next»",
+      "errors": []
+    },
+    {
+      "file": "User/service.html",
+      "initialRows": 25,
+      "idle": {
+        "TaskDuration": 0.2,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": {
+        "elapsedMs": 391,
+        "TaskDuration": 176.5,
+        "ScriptDuration": 15.1,
+        "LayoutDuration": 17.6,
+        "RecalcStyleDuration": 18.9,
+        "LayoutCount": 9,
+        "RecalcStyleCount": 27
+      },
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 25,
+      "pagination": "1–25 of 800 records«PreviousPage 1 of 32Next»",
+      "errors": []
+    },
+    {
+      "file": "User/officememo.html",
+      "initialRows": 25,
+      "idle": {
+        "TaskDuration": 0.2,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": {
+        "elapsedMs": 390,
+        "TaskDuration": 163,
+        "ScriptDuration": 22.8,
+        "LayoutDuration": 14.1,
+        "RecalcStyleDuration": 14.6,
+        "LayoutCount": 9,
+        "RecalcStyleCount": 26
+      },
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 25,
+      "pagination": "1–25 of 800 records«PreviousPage 1 of 32Next»",
+      "errors": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "initialRows": 25,
+      "idle": {
+        "TaskDuration": 0.8,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": null,
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 25,
+      "pagination": "1–25 of 800 records«PreviousPage 1 of 32Next»",
+      "errors": []
+    },
+    {
+      "file": "admin/admin.html",
+      "initialRows": 7,
+      "idle": {
+        "TaskDuration": 1.5,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": {
+        "elapsedMs": 528,
+        "TaskDuration": 350.3,
+        "ScriptDuration": 23.7,
+        "LayoutDuration": 46.7,
+        "RecalcStyleDuration": 20.9,
+        "LayoutCount": 17,
+        "RecalcStyleCount": 38
+      },
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 7,
+      "pagination": null,
+      "errors": []
+    },
+    {
+      "file": "User/homepage.html",
+      "initialRows": 0,
+      "idle": {
+        "TaskDuration": 0.5,
+        "ScriptDuration": 0,
+        "LayoutDuration": 0,
+        "RecalcStyleDuration": 0,
+        "LayoutCount": 0,
+        "RecalcStyleCount": 0
+      },
+      "typing": null,
+      "svgChanges": 0,
+      "longTasks": [],
+      "activeInfiniteAnimations": 0,
+      "registryRows": 0,
+      "pagination": null,
+      "errors": []
+    }
+  ],
+  "passed": true
+}

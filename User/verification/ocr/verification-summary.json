@@ -1,0 +1,64 @@
+{
+  "release": "v6 Functional printed-document OCR",
+  "checkedAt": "2026-10-02T06:49:32.910024+00:00",
+  "allReportedChecksPassed": true,
+  "passedScenarioChecks": 128,
+  "scenarioGroups": {
+    "header": {
+      "passedScenarios": 24,
+      "report": "verification/ocr/header-results.json"
+    },
+    "printedSender": {
+      "passedScenarios": 7,
+      "report": "verification/ocr/printed-sender-results.json"
+    },
+    "parserDashboard": {
+      "passedScenarios": 11,
+      "report": "admin/verification/parser-results.json"
+    },
+    "memoRouting": {
+      "passedScenarios": 25,
+      "report": "admin/verification/memorandum_routing.json"
+    },
+    "incomingBrowser": {
+      "passedScenarios": 31,
+      "report": "verification/ocr/incoming-browser-results.json"
+    },
+    "uiWorkflow": {
+      "passedScenarios": 8,
+      "report": "verification/ocr/ui-speed-results.json"
+    },
+    "functionalPython": {
+      "passedScenarios": 16,
+      "report": "verification/ocr/functional-server-results.json"
+    },
+    "realServiceBrowser": {
+      "passedScenarios": 6,
+      "report": "verification/ocr/functional-service-browser-results.json"
+    }
+  },
+  "pythonRegressionTestMethods": 14,
+  "functionalPythonTestMethods": 9,
+  "javascriptSyntaxFiles": 37,
+  "duplicatePageIds": [],
+  "missingCommunicationsLocalTargets": [],
+  "missingOriginalProjectFiles": [],
+  "database": "Authenticated flat/JSON Supabase simulations and real IndexedDB; no live writes",
+  "integration": "Real production browser form, actual local HTTP Python service, Tesseract executable and Tesseract.js fallback",
+  "limits": [
+    "The Windows launcher was reviewed on Linux, not executed on Windows.",
+    "The configured deployed account/database and host browser permissions require checking on the actual installation.",
+    "OCR targets printed text; obscured or ambiguous print still requires manual review."
+  ],
+  "productionChanged": [
+    "User/OCR.py",
+    "User/requirements-ocr.txt",
+    "admin/admincommunication.html",
+    "admin/admincommunication.js"
+  ],
+  "productionAdded": [
+    "ocr_server.py",
+    "START_OCR.bat"
+  ],
+  "retainedEarlierReports": "Other unchanged memo dashboard/layout reports and v5 UI benchmark measurements are retained from earlier releases."
+}

@@ -1,0 +1,130 @@
+{
+  "method": "Actual production browser readers and module controllers; local pinned assets, simulated flat/JSON Supabase and real IndexedDB",
+  "scenarios": [
+    {
+      "scenario": "Incoming mapping from real incoming.txt",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.pdf",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.docx",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.png",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real scanned-incoming.pdf",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real mixed-incoming.pdf",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real unordered-incoming.pdf",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming-sideways.png",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.jpg",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.webp",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.bmp",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.gif",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming.tiff",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming-deflate.tiff",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming-multipage.tiff",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming-scan.docx",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming mapping from real incoming-banner-scan.docx",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Actual included two-page scanned Office Order stays in Communications",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Printed author fills Received From and retains TO as recipient evidence",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Mixed native PDF reads an image-only printed name and preserves native fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Legacy Incoming TO contamination is repaired without overwriting manual edits",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Outgoing uses TO and date released; received date is not reused",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Changing direction remaps only untouched office and registry date",
+      "result": "PASS"
+    },
+    {
+      "scenario": "All manual corrections and deliberately empty fields survive a rerun",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Rechecking corrected OCR clears stale fields and does not invent a sender",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Removing an attachment clears automatic values while retaining manual ones",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming save retains fields, raw text and original attachment (flat)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Incoming save retains fields, raw text and original attachment (JSON data)",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Unreadable/corrupt files recover all controls and keep the draft",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Memo review preserves deliberately cleared fields and clears old values for a letter",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Communications extraction cards fit mobile and tablet forms",
+      "result": "PASS"
+    }
+  ],
+  "uncaughtErrors": []
+}

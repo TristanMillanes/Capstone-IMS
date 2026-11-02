@@ -1,0 +1,27 @@
+{
+  "passed": true,
+  "method": "Actual Chromium forms, strict simulated Supabase validation, real IndexedDB and byte-verified PNG/PDF/TXT attachments; no hosted records changed",
+  "scenarios": [
+    {
+      "scenario": "Incoming PNG saves and opens with communicationType validation at 390 px",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Outgoing PDF saves and opens with communication_type validation at 1440 px",
+      "result": "PASS"
+    },
+    {
+      "scenario": "TXT upload and Incoming to Outgoing edit synchronize comm_type and preserve attachment at 320 px",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Rejected save retains draft and attachment, unlocks the form, and retries once successfully",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Profile-based administrator guard blocks direct writes after role change",
+      "result": "PASS"
+    }
+  ],
+  "uncaughtErrors": []
+}

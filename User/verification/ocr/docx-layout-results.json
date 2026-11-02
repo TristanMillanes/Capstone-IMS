@@ -1,0 +1,14 @@
+{
+  "method": "Production Mammoth browser conversion and admin parser; real table and page-break DOCX fixtures",
+  "scenarios": [
+    {
+      "scenario": "DOCX table headers preserve recipient, issuer, date and subject",
+      "result": "PASS"
+    },
+    {
+      "scenario": "DOCX explicit page breaks protect first-page fields from an annex",
+      "result": "PASS"
+    }
+  ],
+  "uncaughtErrors": []
+}

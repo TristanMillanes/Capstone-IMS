@@ -12,7 +12,8 @@ if not exist ".venv\Scripts\python.exe" (
 )
 ".venv\Scripts\python.exe" -m pip install -r requirements-ocr.txt
 if errorlevel 1 goto setup_error
-".venv\Scripts\python.exe" OCR.py
+rem Serve the complete frontend and OCR API from the canonical project root.
+".venv\Scripts\python.exe" "..\ocr_server.py"
 if errorlevel 1 goto setup_error
 exit /b 0
 :setup_error

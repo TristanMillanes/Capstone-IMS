@@ -2,19 +2,28 @@
 
 <html data-css-scope="user-inventory" data-theme="light" lang="en">
 <head>
-<meta charset="utf-8"/><script id="moduleThemeBoot">try{const p=JSON.parse(localStorage.getItem('pgenro_preferences')||'{}');const t=(localStorage.getItem('pgenro_user_theme')||p.theme)==='dark'?'dark':'light';document.documentElement.dataset.theme=t;document.documentElement.dataset.pgenroTheme=t;}catch(e){document.documentElement.dataset.theme='light';}</script>
+<meta charset="utf-8"/><script src="user-theme.js?v=20261103-frontend-fix"></script>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
-<meta content="light" name="color-scheme"/>
+<meta content="light dark" name="color-scheme"/>
 <title>PGENRO IMS | Inventory</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/lucide@latest"></script>
-<link href="inventory.css?v=20261011-navigation-pdf-v2" rel="stylesheet"/>
+<script src="vendor/lucide/lucide.min.js"></script>
+<link href="inventory.css?v=20261102-viewer" rel="stylesheet"/>
+<link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
+<script defer src="user-refresh.js?v=20261102-viewer"></script>
+<script defer src="user-workspace.js?v=20261102-viewer"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-viewer.css?v=20261102-viewer">
+<script defer src="user-viewer.js?v=20261102-viewer"></script>
+<script defer src="user-documents.js?v=20261102-viewer"></script>
 </head>
-<body class="pgenro-user depth-workspace ui-unified" data-css-scope="user-inventory" data-page-data-owner="module" data-requires-auth="user">
-<div aria-hidden="true" class="depth-ambient"><span></span><span></span></div>
+<body class="pgenro-user depth-workspace ui-unified user-refresh" data-css-scope="user-inventory" data-page-data-owner="module" data-requires-auth="user">
+
 <div aria-hidden="true" class="overlay" id="overlay"></div>
+<a class="user-skip-link" href="#mainContent">Skip to main content</a>
 <div class="app-container">
 <aside class="sidebar" id="sidebar">
 <div class="sidebar-brand"><button aria-label="Close module menu" class="user-sidebar-close" type="button">×</button>
@@ -44,10 +53,7 @@
 </ul>
 </nav>
 <div class="sidebar-footer">
-<div class="system-status" role="status">
-<span class="status-indicator standby" id="dbStatusIndicator"></span>
-<span class="status-text" id="dbStatusText">Connecting to inventory…</span>
-</div>
+
 <div class="profile-menu" id="profileMenu">
 <button aria-expanded="false" aria-haspopup="true" class="profile-btn" id="profileBtn" type="button">
 <span class="profile-avatar"><i data-lucide="user"></i></span>
@@ -74,13 +80,13 @@
 </div>
 </div>
 </aside>
-<main class="main-content" id="mainContent">
+<main class="main-content" id="mainContent" tabindex="-1">
 <header aria-label="Workspace toolbar" class="depth-user-topbar">
 <button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button">
 <span></span><span></span><span></span>
 </button>
 <nav aria-label="Breadcrumb" class="depth-topbar-breadcrumb"><a href="homepage.html">Workspace</a><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m9 5 7 7-7 7"></path></svg><span>Office Inventory</span></nav>
-<div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer workspace</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
+<div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
 </header>
 <div class="content-shell">
 <section class="page-header reveal depth-hero">
@@ -90,20 +96,10 @@
 <p>View office supplies, available balances, consumption, and low-stock levels. Records are maintained by administrators.</p>
 </div>
 <div class="header-meta">
-<span class="access-pill"><span class="status-dot"></span>Inventory access</span>
+
 <span class="last-updated" id="lastUpdated">Waiting for records</span>
 </div>
-<div aria-hidden="true" class="depth-scene">
-<span class="depth-orbit"></span><span class="depth-orb"></span>
-<div class="depth-stack">
-<span class="depth-sheet depth-sheet-back"></span>
-<span class="depth-sheet depth-sheet-middle"></span>
-<span class="depth-sheet depth-sheet-front">
-<span class="depth-sheet-seal"><svg fill="none" viewbox="0 0 24 24"><path d="M19 4c-7 0-13 3-13 9a5 5 0 0 0 5 5c6 0 8-7 8-14Z"></path><path d="M5 21c1-5 4-8 9-12"></path></svg></span>
-<span class="depth-sheet-line"></span><span class="depth-sheet-line"></span><span class="depth-sheet-line"></span>
-</span>
-</div><span class="depth-scene-dot"></span>
-</div>
+
 </section>
 <section aria-label="Inventory summary" class="stats-grid reveal">
 <article class="stat-card">
@@ -161,7 +157,7 @@
 <th>Total Qty</th>
 <th>Used</th>
 <th>Balance / Status</th>
-<th class="action-column">Access</th>
+<th class="action-column">Details</th>
 </tr>
 </thead>
 <tbody id="recordsTable">
@@ -180,89 +176,7 @@
 </div>
 </main>
 </div>
-<section aria-hidden="true" aria-labelledby="formTitle" aria-modal="true" class="form-modal" hidden="" id="formModal" inert="" role="dialog">
-<div class="modal-panel">
-<div class="modal-header">
-<div class="modal-heading">
-<span class="modal-icon"><i data-lucide="package-plus"></i></span>
-<div>
-<span class="modal-kicker">Inventory Record</span>
-<h2 id="formTitle">Encode Inventory Item</h2>
-</div>
-</div>
-<button aria-label="Close inventory form" class="modal-close" id="formModalClose" type="button">
-<i data-lucide="x"></i>
-</button>
-</div>
-<form id="inventoryForm">
-<div class="modal-body">
-<input id="editIndex" type="hidden"/>
-<div class="form-section">
-<div class="form-section-title"><i data-lucide="tag"></i><h3>Item Information</h3></div>
-<div class="form-grid">
-<div class="field">
-<label for="itemId">Item ID / Control No.</label>
-<input id="itemId" placeholder="Auto-generated" readonly="" type="text"/>
-</div>
-<div class="field">
-<label for="itemName">Item Name <span>*</span></label>
-<input id="itemName" maxlength="120" placeholder="e.g. A4 Bond Paper" required="" type="text"/>
-</div>
-<div class="field">
-<label for="itemCategory">Category <span>*</span></label>
-<select id="itemCategory" required="">
-<option value="Office Supplies">Office Supplies</option>
-<option value="Equipment">Equipment</option>
-<option value="Consumables">Consumables</option>
-<option value="Maintenance">Maintenance</option>
-<option value="Other">Other</option>
-</select>
-</div>
-<div class="field">
-<label for="itemUnit">Unit <span>*</span></label>
-<input id="itemUnit" maxlength="30" placeholder="e.g. REAM, BOX, PCS" required="" type="text"/>
-</div>
-<div class="field field-wide">
-<label for="itemDesc">Description</label>
-<input id="itemDesc" maxlength="240" placeholder="Size, color, brand, or other details" type="text"/>
-</div>
-</div>
-</div>
-<div class="form-section">
-<div class="form-section-title"><i data-lucide="chart-no-axes-column"></i><h3>Stock Information</h3></div>
-<div class="form-grid three-columns">
-<div class="field">
-<label for="itemQty">Total Quantity <span>*</span></label>
-<input id="itemQty" min="0" required="" step="1" type="number" value="0"/>
-</div>
-<div class="field">
-<label for="itemUsed">Total Used <span>*</span></label>
-<input id="itemUsed" min="0" required="" step="1" type="number" value="0"/>
-</div>
-<div class="field">
-<label for="itemBalance">Remaining Balance</label>
-<input id="itemBalance" readonly="" type="number" value="0"/>
-</div>
-<div class="field">
-<label for="itemThreshold">Low-Stock Threshold <span>*</span></label>
-<input id="itemThreshold" min="0" required="" step="1" type="number" value="5"/>
-</div>
-<div class="field field-span-two">
-<label for="itemRemarks">Remarks</label>
-<textarea id="itemRemarks" maxlength="500" placeholder="Restock date, location, condition, or internal notes"></textarea>
-</div>
-</div>
-</div>
-</div>
-<div class="modal-footer">
-<button class="secondary-btn" id="clearFormBtn" type="button">Reset</button>
-<button class="primary-btn" id="submitBtn" type="submit">
-<i data-lucide="save"></i><span>Save Record</span>
-</button>
-</div>
-</form>
-</div>
-</section>
+
 <section aria-hidden="true" aria-labelledby="reportTitle" aria-modal="true" class="form-modal" id="reportModal" role="dialog">
 <div class="modal-panel report-panel">
 <div class="modal-header">
@@ -308,6 +222,6 @@
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer="" src="inventory.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="inventory.js?v=20261102-viewer"></script>
 </body>
 </html>

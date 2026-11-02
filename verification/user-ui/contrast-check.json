@@ -1,0 +1,57 @@
+{
+  "method": "Computed text colors against solid ancestor backgrounds in the local dark-mode fixture. Gradient, image, disabled and hidden text are not a full accessibility certification.",
+  "pages": [
+    {
+      "file": "login",
+      "found": []
+    },
+    {
+      "file": "travelOR",
+      "found": []
+    },
+    {
+      "file": "homepage",
+      "found": []
+    },
+    {
+      "file": "communication",
+      "found": []
+    },
+    {
+      "file": "employee",
+      "found": []
+    },
+    {
+      "file": "inventory",
+      "found": []
+    },
+    {
+      "file": "officememo",
+      "found": []
+    },
+    {
+      "file": "visitorsView",
+      "found": []
+    },
+    {
+      "file": "service",
+      "found": []
+    },
+    {
+      "file": "ics",
+      "found": []
+    },
+    {
+      "file": "requestacc",
+      "found": []
+    },
+    {
+      "file": "ics-form",
+      "found": []
+    },
+    {
+      "file": "service-request-form",
+      "found": []
+    }
+  ]
+}

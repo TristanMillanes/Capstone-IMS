@@ -1,0 +1,219 @@
+[
+  {
+    "name": "Office Order body reference does not change classification",
+    "text": "ENVIRONMENT AND NATURAL RESOURCES OFFICE\nPG ENRO OFFICE ORDER NO. 25-002\nSeries of 2025\n\nTO: ALL PERSONNEL\nPG ENRO\nSUBJECT: WORK AUGMENTATION AND SUPPORT\nDURING OFFICIAL TRAVEL\nDATE: 02 January 2025\n\nIn light of the need, this memorandum serves as a directive.",
+    "expected": {
+      "docType": "Office Order",
+      "isMemo": false,
+      "controlNo": "25-002, s. 2025",
+      "subject": "WORK AUGMENTATION AND SUPPORT DURING OFFICIAL TRAVEL",
+      "date": "2025-01-02",
+      "sender": "ENVIRONMENT AND NATURAL RESOURCES OFFICE",
+      "addressedTo": "ALL PERSONNEL PG ENRO",
+      "issuedBy": ""
+    }
+  },
+  {
+    "name": "Explicit sender wins over TO and letterhead",
+    "text": "OFFICE OF THE GOVERNOR\nREQUEST LETTER\nTO: ENRO\nFROM: MUNICIPAL MAYOR\nDATE: October 1, 2026\nSUBJECT: Technical assistance\n\nDear Sir,\nFROM: Referenced office",
+    "expected": {
+      "docType": "Request Letter",
+      "sender": "MUNICIPAL MAYOR",
+      "addressedTo": "ENRO",
+      "subject": "Technical assistance",
+      "date": "2026-10-01"
+    }
+  },
+  {
+    "name": "Issue and registry dates are separate",
+    "text": "REQUEST LETTER\nFROM: Mayor\nDATE: September 20, 2026\nDATE RECEIVED: October 1, 2026\nDATE RELEASED: October 2, 2026\nSUBJECT: Request",
+    "expected": {
+      "date": "2026-09-20",
+      "receivedDate": "2026-10-01",
+      "releasedDate": "2026-10-02"
+    }
+  },
+  {
+    "name": "Body dates and labels cannot supply header fields",
+    "text": "REQUEST LETTER\nSUBJECT: Request\n\nAn inspection is scheduled on October 5, 2026.\nDATE: 2026-10-05\nFROM: Other office",
+    "expected": {
+      "date": "",
+      "sender": "",
+      "issuedBy": "",
+      "subject": "Request"
+    }
+  },
+  {
+    "name": "Ambiguous issue date does not fall back to a later date",
+    "text": "MEMORANDUM NO. 012\nTO: Personnel\nDATE: 09/10/2026\nSUBJECT: Meeting\n\nPlease attend on October 2, 2026.",
+    "expected": {
+      "docType": "Memorandum",
+      "isMemo": true,
+      "memoNo": "012",
+      "date": ""
+    }
+  },
+  {
+    "name": "Explicit control number has priority over reference",
+    "text": "REQUEST LETTER\nReference No.: OLD-022\nControl No.: CURRENT-018\nSUBJECT: Follow up",
+    "expected": {
+      "controlNo": "CURRENT-018"
+    }
+  },
+  {
+    "name": "Memo heading number remains distinct from registry control",
+    "text": "MEMORANDUM NO. 007, s. 2026\nCONTROL NO.: COMM-99\nTO: Chiefs\nDATE: October 1, 2026\nSUBJECT: Report",
+    "expected": {
+      "memoNo": "007, s. 2026",
+      "controlNo": "COMM-99"
+    }
+  },
+  {
+    "name": "Known heading and subject OCR errors preserve data",
+    "text": "PG ENRO MEM0RANDUM N0. 2026-005\nT0\uff1a All Personnel\nDATE\uff1a October 1, 2026\nSUBJECI: Monthly reports",
+    "expected": {
+      "docType": "Memorandum",
+      "memoNo": "2026-005",
+      "subject": "Monthly reports",
+      "addressedTo": "All Personnel"
+    }
+  },
+  {
+    "name": "Bare labels with blank rows and wrapped recipients",
+    "text": "MEMORANDUM\nNo. 031\nTO\n\nALL DIVISION HEADS\nAND SECTION CHIEFS\nFROM\nProvincial ENRO\nSUBJECT\n\nWORK PLAN\nFOR FY 2027\nDATE\nOctober 1, 2026",
+    "expected": {
+      "memoNo": "031",
+      "addressedTo": "ALL DIVISION HEADS AND SECTION CHIEFS",
+      "issuedBy": "Provincial ENRO",
+      "subject": "WORK PLAN FOR FY 2027",
+      "date": "2026-10-01"
+    }
+  },
+  {
+    "name": "Table cells without colons keep their labels",
+    "text": "OFFICE MEMORANDUM NO. 033\nTO  All Personnel\nFROM  ENRO\nDATE  October 1, 2026\nSUBJECT  Work plan",
+    "expected": {
+      "memoNo": "033",
+      "addressedTo": "All Personnel",
+      "issuedBy": "ENRO",
+      "date": "2026-10-01",
+      "subject": "Work plan"
+    }
+  },
+  {
+    "name": "A recipient office after a standalone date is not the sender",
+    "text": "OFFICE OF THE MUNICIPAL MAYOR\n\nOctober 1, 2026\n\nEngr. Sample Officer\nENVIRONMENT AND NATURAL RESOURCES OFFICE\n\nDear Sir,\nPlease assist.",
+    "expected": {
+      "sender": "OFFICE OF THE MUNICIPAL MAYOR",
+      "date": "2026-10-01",
+      "addressedTo": ""
+    }
+  },
+  {
+    "name": "Wrapped subject can cross an OCR blank row with clear continuation",
+    "text": "MEMORANDUM NO. 035\nTO: Personnel\nSUBJECT: SUBMISSION OF REPORTS\n\nFOR FY 2027\nDATE: October 1, 2026\n\nPlease submit.",
+    "expected": {
+      "subject": "SUBMISSION OF REPORTS FOR FY 2027",
+      "date": "2026-10-01"
+    }
+  },
+  {
+    "name": "Later pages cannot supply missing header fields",
+    "text": "MEMORANDUM NO. 036\nTO: All Personnel\nSUBJECT: Plans\n\f\nMEMORANDUM NO. 2025-002\nFROM: Another office\nDATE: 2025-01-01",
+    "expected": {
+      "memoNo": "036",
+      "date": "",
+      "issuedBy": ""
+    }
+  },
+  {
+    "name": "No heading detection from subject or filename-like body text",
+    "text": "TO: ENRO\nSUBJECT: Copy of OFFICE MEMORANDUM NO. 002\n\nPlease send the attachment.\nMEMORANDUM",
+    "expected": {
+      "isMemo": false,
+      "docType": ""
+    }
+  },
+  {
+    "name": "Invalid calendar date is left empty",
+    "text": "MEMORANDUM\nTO: Personnel\nDATE: February 30, 2026\nSUBJECT: Report",
+    "expected": {
+      "date": ""
+    }
+  },
+  {
+    "name": "Unambiguous numeric date and full-width labels",
+    "text": "MEMORANDUM NO. 038\nTO\uff1a Personnel\nDATE\uff1a 30/09/2026\nSUBJECT\uff1a Monthly report",
+    "expected": {
+      "memoNo": "038",
+      "date": "2026-09-30",
+      "subject": "Monthly report"
+    }
+  },
+  {
+    "name": "Printed author after a closing fills sender rather than TO",
+    "text": "OFFICE OF THE MUNICIPAL MAYOR\nREQUEST LETTER\nTO: PROVINCIAL ENRO\nSUBJECT: Assistance\n\nDear Sir,\nWe request assistance.\n\nRespectfully yours,\n\nMARIA L. SANTOS\nMunicipal Mayor\n\nCC: JUAN REYES\nDirector",
+    "expected": {
+      "sender": "MARIA L. SANTOS",
+      "signatory": "MARIA L. SANTOS",
+      "addressedTo": "PROVINCIAL ENRO",
+      "issuedBy": "MARIA L. SANTOS"
+    }
+  },
+  {
+    "name": "Second-page printed signatory supplements only the sender",
+    "text": "ENVIRONMENT AND NATURAL RESOURCES OFFICE\nPG ENRO OFFICE ORDER NO. 25-002\nSeries of 2025\nTO: ALL PERSONNEL\nPG ENRO\nSUBJECT: Work augmentation\nDATE: 02 January 2025\n\nIn light of the need, work continues.\n\f\nENVIRONMENT AND NATURAL RESOURCES OFFICE\nWork continues on this page.\n\nFor your compliance.\n\nEnP JOHN FRANCIS L.. LUZANO, MPA\nPGDH PG ENRO\n\nGround Floor, Social Services Building",
+    "expected": {
+      "sender": "EnP JOHN FRANCIS L. LUZANO, MPA",
+      "signatory": "EnP JOHN FRANCIS L. LUZANO, MPA",
+      "addressedTo": "ALL PERSONNEL PG ENRO",
+      "date": "2025-01-02",
+      "docType": "Office Order",
+      "isMemo": false
+    }
+  },
+  {
+    "name": "An annex signatory is never the main letter sender",
+    "text": "OFFICE OF THE GOVERNOR\nREQUEST LETTER\nTO: ENRO\nSUBJECT: Request\n\nDear Sir,\nPlease see the annex.\n\f\nANNEX A\nRespectfully yours,\nWRONG PERSON\nDirector",
+    "expected": {
+      "sender": "OFFICE OF THE GOVERNOR",
+      "signatory": "",
+      "issuedBy": ""
+    }
+  },
+  {
+    "name": "Recipient and CC names cannot become the author",
+    "text": "REQUEST LETTER\nTO: MARIA L. SANTOS\nSUBJECT: Request\n\nDear Madam,\nPlease see the named contact JUAN REYES.\n\nSincerely yours,\n\nCC: JUAN REYES\nDirector",
+    "expected": {
+      "sender": "",
+      "signatory": "",
+      "issuedBy": ""
+    }
+  },
+  {
+    "name": "Unreadable numeric pen strokes are not a sender name",
+    "text": "OFFICE OF THE GOVERNOR\nREQUEST LETTER\nSUBJECT: Request\n\nDear Sir,\nRespectfully yours,\nEnP RA 0, MPA\nDirector",
+    "expected": {
+      "sender": "OFFICE OF THE GOVERNOR",
+      "signatory": ""
+    }
+  },
+  {
+    "name": "Explicit printed FROM retains its sender priority",
+    "text": "REQUEST LETTER\nFROM: SENDING OFFICE\nTO: Recipient\nSUBJECT: Request\n\nDear Sir,\nRespectfully yours,\nMARIA L. SANTOS\nMunicipal Mayor",
+    "expected": {
+      "sender": "SENDING OFFICE",
+      "signatory": "MARIA L. SANTOS",
+      "issuedBy": "SENDING OFFICE"
+    }
+  },
+  {
+    "name": "Mixed-case printed name with designation is recognized",
+    "text": "REQUEST LETTER\nTO: ENRO\nSUBJECT: Assistance\n\nDear Sir,\nWe request assistance.\n\nSincerely yours,\nJuan dela Cruz\nMunicipal Mayor",
+    "expected": {
+      "sender": "Juan dela Cruz",
+      "signatory": "Juan dela Cruz",
+      "issuedBy": "Juan dela Cruz"
+    }
+  }
+]

@@ -1,0 +1,10408 @@
+[
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "Usermanagement.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "admin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "admin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "admin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "admincommunication.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "employee-admin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 358.25,
+      "right": 308,
+      "bottom": 419.75
+    },
+    "button": {
+      "x": 21,
+      "y": 366.75,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 410.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 376,
+      "bottom": 419.75
+    },
+    "button": {
+      "x": 65,
+      "y": 366.75,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 410.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 586,
+      "bottom": 419.75
+    },
+    "button": {
+      "x": 275,
+      "y": 366.75,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 410.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 748,
+      "bottom": 422.75
+    },
+    "button": {
+      "x": 437,
+      "y": 369.75,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 413.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 880,
+      "bottom": 422.75
+    },
+    "button": {
+      "x": 569,
+      "y": 369.75,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 413.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 873,
+      "bottom": 422.75
+    },
+    "button": {
+      "x": 562,
+      "y": 369.75,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 413.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 996,
+      "bottom": 422.75
+    },
+    "button": {
+      "x": 685,
+      "y": 369.75,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 413.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 1412,
+      "bottom": 422.75
+    },
+    "button": {
+      "x": 1101,
+      "y": 369.75,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 413.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 358.25,
+      "right": 1888,
+      "bottom": 422.75
+    },
+    "button": {
+      "x": 1577,
+      "y": 369.75,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 413.75
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "ics-admin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "invetoryadmin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "officememo-admin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "requestacc.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "serviceAdmin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "travelOR-admin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 356,
+      "right": 308,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 21,
+      "y": 364.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 568,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 421,
+      "right": 308,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 21,
+      "y": 429.5,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 568
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 376,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 65,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 390,
+    "height": 844,
+    "bounds": {
+      "x": 56,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 376,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 65,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 367,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 356,
+      "right": 586,
+      "bottom": 417.5
+    },
+    "button": {
+      "x": 275,
+      "y": 364.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 408.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 600,
+    "height": 900,
+    "bounds": {
+      "x": 266,
+      "y": 61.5,
+      "width": 320,
+      "height": 421,
+      "right": 586,
+      "bottom": 482.5
+    },
+    "button": {
+      "x": 275,
+      "y": 429.5,
+      "width": 302,
+      "height": 44,
+      "right": 577,
+      "bottom": 473.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 600,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 748,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 437,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 768,
+    "height": 1024,
+    "bounds": {
+      "x": 428,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 748,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 437,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 739,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 768,
+      "height": 1024
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 880,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 569,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 900,
+    "height": 600,
+    "bounds": {
+      "x": 560,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 880,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 569,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 871,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 900,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 873,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 562,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 901,
+    "height": 600,
+    "bounds": {
+      "x": 553,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 873,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 562,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 864,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 901,
+      "height": 600
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 996,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 685,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1024,
+    "height": 768,
+    "bounds": {
+      "x": 676,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 996,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 685,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 987,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1024,
+      "height": 768
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1412,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1440,
+    "height": 900,
+    "bounds": {
+      "x": 1092,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1412,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1101,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1403,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 356,
+      "right": 1888,
+      "bottom": 420.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 367.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 411.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 1916,
+    "height": 968,
+    "bounds": {
+      "x": 1568,
+      "y": 64.5,
+      "width": 320,
+      "height": 421,
+      "right": 1888,
+      "bottom": 485.5
+    },
+    "button": {
+      "x": 1577,
+      "y": 432.5,
+      "width": 302,
+      "height": 44,
+      "right": 1879,
+      "bottom": 476.5
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 1916,
+      "height": 968
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 844,
+    "height": 390,
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 568,
+    "height": 320,
+    "bounds": {
+      "x": 234,
+      "y": 61.5,
+      "width": 320,
+      "height": 246.5,
+      "right": 554,
+      "bottom": 308
+    },
+    "button": {
+      "x": 243,
+      "y": 255,
+      "width": 302,
+      "height": 44,
+      "right": 545,
+      "bottom": 299
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 568,
+      "height": 320
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "normal-profile",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "long-profile-after-scroll",
+    "width": 320,
+    "height": 256,
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn",
+    "errors": []
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "cached-account-details",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "rotate-open-profile",
+    "bounds": {
+      "x": 504,
+      "y": 64.5,
+      "width": 320,
+      "height": 313.5,
+      "right": 824,
+      "bottom": 378
+    },
+    "button": {
+      "x": 513,
+      "y": 325,
+      "width": 302,
+      "height": 44,
+      "right": 815,
+      "bottom": 369
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 844,
+      "height": 390
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "resize-open-profile-to-short-viewport",
+    "bounds": {
+      "x": 12,
+      "y": 61.5,
+      "width": 296,
+      "height": 182.5,
+      "right": 308,
+      "bottom": 244
+    },
+    "button": {
+      "x": 21,
+      "y": 191,
+      "width": 278,
+      "height": 44,
+      "right": 299,
+      "bottom": 235
+    },
+    "viewport": {
+      "x": 0,
+      "y": 0,
+      "width": 320,
+      "height": 256
+    },
+    "gap": 12,
+    "overflows": [],
+    "passed": true,
+    "focus": "profileBtn"
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "escape-returns-focus",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "keyboard-opens-first-profile-link",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "reverse-tab-returns-to-profile-trigger",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "keyboard-reaches-sign-out",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "tab-continues-to-workspace",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "outside-click-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "one-header-panel-at-a-time",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "short-viewport-notifications-scroll",
+    "passed": true,
+    "bounds": {
+      "x": 164,
+      "y": 61.5,
+      "right": 504,
+      "bottom": 308
+    },
+    "list": {
+      "height": 196,
+      "scrollHeight": 3045,
+      "scrollTop": 2849,
+      "count": 30
+    },
+    "open": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "mobile-navigation-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "dialog-closes-profile",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "missing-client-retains-session",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "pending-sign-out-prevents-duplicates",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "failed-sign-out-retains-session-and-enables-retry",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "successful-retry-signs-out-and-opens-login",
+    "passed": true
+  },
+  {
+    "file": "visitors-admin.html",
+    "kind": "no-uncaught-browser-errors",
+    "passed": true,
+    "errors": []
+  }
+]

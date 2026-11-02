@@ -1,0 +1,21 @@
+{
+  "verified_on": "2026-10-01",
+  "pages": 11,
+  "workspace_scenarios": 16,
+  "memo_browser_scenarios": 17,
+  "parser_dashboard_scenarios": 11,
+  "routing_failure_scenarios": 21,
+  "uncaught_browser_errors": 0,
+  "method": "Actual Chromium with simulated Supabase; production document reader libraries served locally; Node VM parser and routing regressions",
+  "limitations": "Live Supabase configuration, authorization policies and server services were not supplied and require deployment verification.",
+  "reports": [
+    "verification/access_service_travel.json",
+    "verification/dashboard_tools.json",
+    "verification/employee_communication.json",
+    "verification/memo_browser.json",
+    "verification/memorandum_routing.json",
+    "verification/parser-results.json",
+    "verification/registry_workflows.json",
+    "verification/workspace.json"
+  ]
+}

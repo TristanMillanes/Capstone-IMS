@@ -1,0 +1,31 @@
+/* Page-owned module notification presentation. */
+.module-notifications { flex: 0 0 auto; position: relative; }
+.module-notification-button { position: relative; display: grid; place-items: center; width: 42px; height: 42px; padding: 9px; border: 1px solid #dce9e2; border-radius: 13px; background: #fff; color: #355e4c; cursor: pointer; transition: background .18s, box-shadow .18s; }
+.module-notification-button:hover, .module-notification-button[aria-expanded="true"] { background: #eaf5ed; box-shadow: 0 4px 12px #183e2712; }
+.module-notification-button svg { width: 21px; height: 21px; }
+.module-notification-badge { position: absolute; top: -5px; right: -5px; min-width: 19px; height: 19px; display: grid; place-items: center; padding: 0 4px; border: 2px solid #fff; border-radius: 12px; background: #cc553a; color: white; font: 700 10px/1 system-ui,sans-serif; }
+.module-notification-panel { position: fixed; z-index: 1600; top: 80px; right: 16px; width: min(390px,calc(100vw - 24px)); max-height: min(580px,calc(100dvh - 100px)); overflow: auto; overscroll-behavior: contain; border: 1px solid #dae7df; border-radius: 20px; background: #fff; color: #21392d; box-shadow: 0 18px 64px #183b2929,0 4px 12px #183b2910; text-align: left; }
+.module-notification-heading { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 12px; gap: 14px; }
+.module-notification-heading h3 { margin: 0; color: inherit; font: 750 17px/1.4 system-ui,sans-serif; letter-spacing: -.4px; }
+.module-notification-heading small { display: block; color: #73857a; font-size: 12px; margin-top: 4px; }
+.module-notification-close { border: 0; background: #f0f5f2; color: #54695b; border-radius: 10px; width: 32px; height: 32px; font-size: 23px; cursor: pointer; }
+.module-notification-tools { display: flex; justify-content: space-between; gap: 12px; padding: 0 20px 14px; border-bottom: 1px solid #e6eee9; }
+.module-notification-tools button { border: 0; border-radius: 8px; padding: 6px 9px; background: #edf5f0; color: #246b49; font: 650 12px/1.4 system-ui,sans-serif; cursor: pointer; }
+.module-notification-tools button:disabled { opacity: .45; cursor: default; }
+.module-notification-item { display: flex; align-items: flex-start; gap: 12px; padding: 15px 20px; color: inherit; text-decoration: none; border-bottom: 1px solid #eef3f0; transition: background .16s; }
+.module-notification-item:hover { background: #f2f8f4; }
+.module-notification-dot { width: 7px; height: 7px; flex: 0 0 auto; margin-top: 7px; border-radius: 50%; background: #308d61; box-shadow: 0 0 0 4px #eaf5ee; }
+.module-notification-copy { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.module-notification-copy strong { font-size: 12px; color: #26704e; }
+.module-notification-title { font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.module-notification-copy small { color: #849189; font-size: 11px; }
+.module-notification-empty,.module-notification-more { padding: 24px 20px; margin: 0; color: #75877b; font-size: 13px; line-height: 1.6; text-align: center; }
+.module-notification-more { padding: 13px 20px; font-size: 11px; }
+.module-new-badge { margin-inline-start: auto; flex: 0 0 auto; min-width: 21px; padding: 3px 5px; border-radius: 7px; background: #d9eddb; color: #185e3b; font: 750 10px/1.2 system-ui,sans-serif; text-align: center; }
+.module-notification-panel[hidden],.module-notification-panel [hidden],.module-notifications [hidden],.module-new-badge[hidden] { display: none !important; }
+.module-notification-button:focus-visible,.module-notification-panel :is(button,a):focus-visible { outline: 3px solid #5aab7f; outline-offset: 3px; }
+html[data-theme="dark"] .module-notification-panel,body[data-theme="dark"] .module-notification-panel { background: #152e24; color: #e6efe9; border-color: #355345; }
+html[data-theme="dark"] .module-notification-item:hover,body[data-theme="dark"] .module-notification-item:hover { background: #1e3b2c; }
+@media(max-width:620px) { .depth-topbar-actions { gap: 8px !important; } .depth-topbar-actions .depth-access-label { display: none !important; } .module-notification-button { width: 38px; height: 38px; } .settings-topbar { gap: 9px; } .settings-topbar .settings-brand span { display: none; } }
+@media print { .module-notifications,.module-notification-panel,.module-new-badge { display: none !important; } }
+@media(prefers-reduced-motion:reduce) { .module-notification-button,.module-notification-item { transition: none; } }

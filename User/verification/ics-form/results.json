@@ -1,0 +1,108 @@
+{
+  "method": "Local application source with intercepted API responses; no live records submitted.",
+  "checks": [
+    {
+      "name": "light initial layout at 1440px",
+      "passed": true
+    },
+    {
+      "name": "light initial layout at 1024px",
+      "passed": true
+    },
+    {
+      "name": "light initial layout at 768px",
+      "passed": true
+    },
+    {
+      "name": "light initial layout at 390px",
+      "passed": true
+    },
+    {
+      "name": "light initial layout at 320px",
+      "passed": true
+    },
+    {
+      "name": "light section validation and accessible error reset",
+      "passed": true
+    },
+    {
+      "name": "light full wizard, calculated total, and review layout",
+      "passed": true
+    },
+    {
+      "name": "light review edit keeps data; reset returns to first section",
+      "passed": true
+    },
+    {
+      "name": "dark initial layout at 1440px",
+      "passed": true
+    },
+    {
+      "name": "dark initial layout at 1024px",
+      "passed": true
+    },
+    {
+      "name": "dark initial layout at 768px",
+      "passed": true
+    },
+    {
+      "name": "dark initial layout at 390px",
+      "passed": true
+    },
+    {
+      "name": "dark initial layout at 320px",
+      "passed": true
+    },
+    {
+      "name": "dark section validation and accessible error reset",
+      "passed": true
+    },
+    {
+      "name": "dark full wizard, calculated total, and review layout",
+      "passed": true
+    },
+    {
+      "name": "dark review edit keeps data; reset returns to first section",
+      "passed": true
+    },
+    {
+      "name": "Successful API payload, receipt, print and another-form workflow",
+      "passed": true
+    },
+    {
+      "name": "Unchanged failed submission retries reuse the request ID and keep entries",
+      "passed": true
+    },
+    {
+      "name": "A changed retry uses a new request ID",
+      "passed": true
+    },
+    {
+      "name": "Repeated submit events send one request while busy",
+      "passed": true
+    },
+    {
+      "name": "Unconfirmed API response stays on the form and reports the error",
+      "passed": true
+    },
+    {
+      "name": "Offline submission preserves the review and sends no request",
+      "passed": true
+    },
+    {
+      "name": "Review values render as text and previous invalid sections are revisited",
+      "passed": true
+    },
+    {
+      "name": "Quantity and unit-cost bounds stop invalid steps",
+      "passed": true
+    },
+    {
+      "name": "Staff ICS entry dialog fits desktop and phone in both appearances",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "passed": true
+}

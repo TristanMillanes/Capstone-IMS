@@ -66,6 +66,7 @@ const PGENRO_PageUI = (() => {
   function populateProfile(p) {
     profile = p;
     isAdmin = ADMIN_ROLES.has(normalizeRole(p?.role));
+    window.PGENRO_UserTheme?.setScope(isAdmin ? 'admin' : 'user');
     $('#profileNameDisplay').textContent = p?.full_name || p?.username || 'PGENRO User';
     $('#profileRoleDisplay').textContent = p?.role || p?.position || 'Authorized Personnel';
     $('#profileInitials').textContent = initials(p?.full_name || p?.username);
@@ -86,7 +87,7 @@ const PGENRO_PageUI = (() => {
 
     const prefs = p?.preferences && typeof p.preferences === 'object' ? p.preferences : {};
     const storedPrefs = safeStoredPreferences();
-    const selectedTheme=localStorage.getItem('pgenro_user_theme');
+    const selectedTheme=window.PGENRO_UserTheme?.get() || localStorage.getItem(isAdmin ? 'pgenro_admin_theme' : 'pgenro_user_theme');
     const theme = ['dark','light'].includes(selectedTheme) ? selectedTheme : ['dark','light'].includes(prefs.theme) ? prefs.theme : (['dark','light'].includes(storedPrefs.theme) ? storedPrefs.theme : 'light');
     const themeInput = $(`input[name="theme"][value="${theme}"]`);
     if (themeInput) themeInput.checked = true;
@@ -126,9 +127,9 @@ const PGENRO_PageUI = (() => {
   }
 
   function applyPreferences(prefs) {
-    prefs={...prefs,theme:prefs.theme||localStorage.getItem('pgenro_user_theme')||'light'};
+    prefs={...prefs,theme:prefs.theme||window.PGENRO_UserTheme?.get()||'light'};
     localStorage.setItem('pgenro_preferences', JSON.stringify(prefs));
-    localStorage.setItem('pgenro_user_theme', prefs.theme || 'light');
+    window.PGENRO_UserTheme?.set(prefs.theme || 'light');
     document.documentElement.dataset.pgenroTheme = prefs.theme || 'light';
     document.body.classList.toggle('pgenro-compact', !!prefs.compact);
     document.body.classList.toggle('pgenro-reduced-motion', !!prefs.reduceMotion);
@@ -199,8 +200,8 @@ const PGENRO_PageUI = (() => {
       } finally { if (button) button.disabled = false; }
     });
 
-    $('input[name="theme"][value="light"]')?.addEventListener('change', () => { if ($('input[name="theme"][value="light"]').checked) document.documentElement.dataset.pgenroTheme='light'; });
-    $('input[name="theme"][value="dark"]')?.addEventListener('change', () => { if ($('input[name="theme"][value="dark"]').checked) document.documentElement.dataset.pgenroTheme='dark'; });
+    $('input[name="theme"][value="light"]')?.addEventListener('change', () => { if ($('input[name="theme"][value="light"]').checked) window.PGENRO_UserTheme?.set('light'); });
+    $('input[name="theme"][value="dark"]')?.addEventListener('change', () => { if ($('input[name="theme"][value="dark"]').checked) window.PGENRO_UserTheme?.set('dark'); });
 
     $('#systemSettingsForm')?.addEventListener('submit', async e => {
       e.preventDefault();
@@ -546,7 +547,7 @@ const PGENRO_PageUI = (() => {
     await refresh();
   }
   function init(){
-    const header=document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
+    const header=document.querySelector('.settings-topbar-actions')||document.querySelector('.topbar-right,.depth-topbar-actions,.settings-topbar');if(!header)return;
     document.getElementById('notificationsBtn')?.closest('.notification-wrapper')?.remove();
     wrapper=element('div','module-notifications');button=element('button','module-notification-button');button.type='button';button.id='moduleNotificationButton';
     button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');button.setAttribute('aria-controls','moduleNotificationPanel');
@@ -601,7 +602,7 @@ const PGENRO_PageUI = (() => {
     document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());
     // Account Settings and the module pages use one saved user appearance.
     let appearanceObserver;
-    if (document.body.classList.contains('pgenro-user')) {
+    if (document.body.classList.contains('pgenro-user') && !window.PGENRO_UserTheme) {
       const html=document.documentElement, button=document.getElementById('userAppearanceBtn');
       const icon=dark=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark?'<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>':'<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
       function applyAppearance(theme) {

@@ -18,7 +18,7 @@ python -m pip install -r requirements.txt
 python ocr_server.py
 ```
 
-Open `http://127.0.0.1:5000/User/login.html`. On Windows, `py -3` can replace `python`. Set `TESSERACT_CMD` if Tesseract is installed outside PATH. The existing `User/START_OCR.bat` remains available for a separate local OCR service. Serving the combined application through `ocr_server.py` gives the frontend direct access to `/ocr`, live progress and cancellation.
+Open `http://127.0.0.1:5000/User/login.html`. On Windows, `py -3` can replace `python`. Set `TESSERACT_CMD` if Tesseract is installed outside PATH. `START_SYSTEM.bat` and `User/START_OCR.bat` both start the combined application through `ocr_server.py`, giving the frontend direct access to `/ocr`, live progress and cancellation. See `START_HERE.md` for this build's startup and frontend corrections.
 
 Keep your existing database/Edge Function setup. If the supplied operational read-only policies have not yet been applied, use `supabase/READONLY_USER_PATCH.sql` after the original setup. Account management continues to use the supplied `admin-users` Edge Function.
 

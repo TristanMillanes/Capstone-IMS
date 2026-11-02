@@ -1,0 +1,18 @@
+{
+  "name": "pgenro-ui-verification",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node browser-audit.cjs current && node functional-browser.cjs",
+    "test:ocr": "node ocr-ui.cjs",
+    "test:upload": "node communication-upload-browser.cjs",
+    "test:depth": "node depth-workspace.cjs",
+    "test:performance": "node performance-workspace.cjs after",
+    "test:navigation": "node navigation-logout.cjs",
+    "test:unified": "node unified-layout.cjs && node unified-workflows.cjs && node unified-navigation-pdf.cjs"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1",
+    "lucide": "1.8.0"
+  }
+}

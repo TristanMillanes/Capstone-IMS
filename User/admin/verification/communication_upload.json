@@ -1,0 +1,85 @@
+{
+  "method": "Production module and attachment handling with simulated strict database validators; hosted trigger definition was not available",
+  "scenarios": [
+    {
+      "scenario": "JSON upload passes communicationType validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes communicationType validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes communication_type validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes communication_type validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes type validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes type validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes direction validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes direction validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes recordType validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes recordType validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes record_type validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes record_type validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes commType validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes commType validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes comm_type validation for Incoming",
+      "result": "PASS"
+    },
+    {
+      "scenario": "JSON upload passes comm_type validation for Outgoing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Flat-column attachment upload preserves type schema",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Flat-column attachment upload preserves communication_type schema",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Direction change updates every legacy JSON alias while retaining other fields",
+      "result": "PASS"
+    },
+    {
+      "scenario": "A failed attachment save keeps the draft and succeeds on retry",
+      "result": "PASS"
+    }
+  ]
+}

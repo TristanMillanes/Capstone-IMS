@@ -912,7 +912,8 @@ function escapeHTML(v) {
 (() => {
   'use strict';
   function initModernWorkspace() {
-    if (!document.querySelector('.page-heading-mark')) return;
+    if (!document.body.classList.contains('pgenro-admin') || document.body.dataset.modernWorkspaceReady) return;
+    document.body.dataset.modernWorkspaceReady = 'true';
     const renderIcons = () => window.PGENRO_Module?.renderIcons?.();
     const themeButton = document.getElementById('appearanceThemeBtn');
     const themeSelect = document.getElementById('appearanceThemeSelect');

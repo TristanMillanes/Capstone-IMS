@@ -1,0 +1,76 @@
+{
+  "method": "Production page code with simulated Supabase; no live records changed",
+  "passed": false,
+  "findings": [
+    {
+      "scenario": "admincommunication.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "encodingModal",
+      "writes": [
+        "communications"
+      ]
+    },
+    {
+      "scenario": "employee-admin.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "employeeFormModal",
+      "writes": [
+        "employees"
+      ]
+    },
+    {
+      "scenario": "ics-admin.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "editorModal",
+      "writes": [
+        "ics_records"
+      ]
+    },
+    {
+      "scenario": "invetoryadmin.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "itemModal",
+      "writes": [
+        "inventory"
+      ]
+    },
+    {
+      "scenario": "officememo-admin.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "memoFormModal",
+      "writes": [
+        "office_memos"
+      ]
+    },
+    {
+      "scenario": "serviceAdmin.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "serviceFormModal",
+      "writes": [
+        "service_requests"
+      ]
+    },
+    {
+      "scenario": "travelOR-admin.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "orderModal",
+      "writes": [
+        "travel_orders"
+      ]
+    },
+    {
+      "scenario": "visitors-admin.html centered form, responsive editor and save",
+      "result": "PASS",
+      "actualModal": "visitorModalBackdrop",
+      "writes": [
+        "visitors"
+      ]
+    },
+    {
+      "scenario": "Usermanagement.html editor + save",
+      "result": "FAIL",
+      "error": "Saving sends a record write: {\"writes\":[],\"messages\":[\"Unable to save account: Could not reach admin-user. Deploy the supplied Supabase Edge Function and check the website origin/CORS and network connection. Refresh the directory before retrying; this request was not confirmed.\"]}"
+    }
+  ],
+  "uncaughtErrors": []
+}

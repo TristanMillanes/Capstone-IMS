@@ -1,0 +1,2008 @@
+{
+  "method": "Production source with a simulated Supabase client and local fixture records; no live database access.",
+  "pages": [
+    {
+      "file": "homepage",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 574,
+              "host": 574.078125
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 574,
+              "host": 574.078125
+            }
+          ]
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 574,
+              "host": 628
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 574,
+              "host": 628
+            }
+          ]
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 628,
+              "host": 646
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 628,
+              "host": 646
+            }
+          ]
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 288,
+              "host": 288
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 288,
+              "host": 288
+            }
+          ]
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 218,
+              "host": 218
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 218,
+              "host": 218
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "communication",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "travelOR",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "officememo",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "employee",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "inventory",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "visitorsView",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "service",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "ics",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": "rgb(255, 255, 255)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "login",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "requestacc",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "ics-form",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "service-request-form",
+      "theme": "light",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "light",
+          "otherTheme": "light",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(243, 246, 245)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "homepage",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 574,
+              "host": 574.078125
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 574,
+              "host": 574.078125
+            }
+          ]
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 574,
+              "host": 628
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 574,
+              "host": 628
+            }
+          ]
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 628,
+              "host": 646
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 628,
+              "host": 646
+            }
+          ]
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 288,
+              "host": 288
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 288,
+              "host": 288
+            }
+          ]
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": [
+            {
+              "id": "commCompareChart",
+              "instance": true,
+              "width": 218,
+              "host": 218
+            },
+            {
+              "id": "operationsDistChart",
+              "instance": true,
+              "width": 218,
+              "host": 218
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "file": "communication",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "travelOR",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "officememo",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "employee",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "inventory",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "visitorsView",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "service",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "ics",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 1,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": "rgb(24, 42, 38)",
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "login",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "requestacc",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "ics-form",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    },
+    {
+      "file": "service-request-form",
+      "theme": "dark",
+      "views": [
+        {
+          "width": 1440,
+          "scroll": 1440,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 1024,
+          "scroll": 1024,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 768,
+          "scroll": 768,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 390,
+          "scroll": 390,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        },
+        {
+          "width": 320,
+          "scroll": 320,
+          "theme": "dark",
+          "otherTheme": "dark",
+          "duplicateIds": [],
+          "toggleCount": 1,
+          "notificationCount": 0,
+          "bodyBg": "rgb(16, 29, 27)",
+          "surfaceBg": null,
+          "charts": []
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "name": "homepage light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "communication light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "travelOR light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "officememo light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "employee light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "inventory light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "visitorsView light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "service light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "ics light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "login light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "requestacc light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "ics-form light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "service-request-form light responsive UI",
+      "passed": true
+    },
+    {
+      "name": "homepage dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "communication dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "travelOR dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "officememo dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "employee dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "inventory dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "visitorsView dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "service dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "ics dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "login dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "requestacc dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "ics-form dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "service-request-form dark responsive UI",
+      "passed": true
+    },
+    {
+      "name": "communication read-only details",
+      "passed": true
+    },
+    {
+      "name": "employee read-only details",
+      "passed": true
+    },
+    {
+      "name": "visitorsView read-only details",
+      "passed": true
+    },
+    {
+      "name": "ics read-only details",
+      "passed": true
+    },
+    {
+      "name": "service read-only details",
+      "passed": true
+    },
+    {
+      "name": "officememo read-only details",
+      "passed": true
+    },
+    {
+      "name": "Search, repeated refresh, and read-only inventory",
+      "passed": true
+    },
+    {
+      "name": "Public forms: validation, calculations, and reset",
+      "passed": true
+    },
+    {
+      "name": "Sign-in password visibility and actual cross-tab theme persistence",
+      "passed": true
+    },
+    {
+      "name": "Sign-in and account pages keep a valid theme when preferences are malformed",
+      "passed": true
+    },
+    {
+      "name": "Early theme boot and blocked storage fallback",
+      "passed": true
+    },
+    {
+      "name": "Malformed preferences, theme synchronization, and one click handler",
+      "passed": true
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "passed": true
+}
