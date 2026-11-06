@@ -1,12 +1,12 @@
 @layer viewer {
 /* Final, quiet viewer layout; shared by the nine authenticated registry pages. */
 body.pgenro-user {
-  --viewer-bg:#f4f6f5!important;--viewer-surface:#fff!important;--viewer-text:#22352d!important;--viewer-muted:#65766c!important;
+  --viewer-bg:#f4f6f5!important;--viewer-surface:#fff!important;--viewer-text:#22352d!important;--viewer-muted:var(--appearance-viewer-muted,#65766c)!important;
   --viewer-line:#dfe7e2!important;--viewer-tint:#edf5f0!important;--viewer-green:#206344!important;
   background:var(--viewer-bg)!important;color:var(--viewer-text)!important;
 }
 html[data-theme=dark] body.pgenro-user {
-  --viewer-bg:#101b17!important;--viewer-surface:#192720!important;--viewer-text:#e7f0eb!important;--viewer-muted:#a4b8aa!important;
+  --viewer-bg:#101b17!important;--viewer-surface:#192720!important;--viewer-text:#e7f0eb!important;--viewer-muted:var(--appearance-viewer-muted,#a4b8aa)!important;
   --viewer-line:#34463b!important;--viewer-tint:#233e2d!important;--viewer-green:#94d6ae!important;
 }
 body.pgenro-user::before,body.pgenro-user::after,
@@ -98,11 +98,11 @@ body.pgenro-user::before,body.pgenro-user::after,
 .pgenro-user .viewer-pagination .registry-range,.pgenro-user .registry-page-label {font-size:11px!important;color:var(--viewer-muted)!important}
 .pgenro-user .registry-page-controls {display:flex!important;align-items:center!important;gap:12px!important}
 .pgenro-user .viewer-button:disabled {opacity:.45!important;cursor:default!important}
-.pgenro-user .footer {border-top:0!important;color:var(--viewer-muted)!important;opacity:.8!important;padding:12px 0!important;font-size:10px!important;gap:10px!important}
+.pgenro-user .footer {border-top:0!important;color:var(--viewer-muted)!important;opacity:1!important;padding:12px 0!important;font-size:10px!important;gap:10px!important}
 .pgenro-user .dashboard-summary {background:var(--viewer-surface)!important;border:1px solid var(--viewer-line)!important;border-radius:10px!important;box-shadow:none!important;padding:18px 24px!important;min-width:200px!important;width:auto!important;min-height:0!important}
 .pgenro-user .dashboard-summary strong {font-size:32px!important;color:var(--viewer-text)!important}
 .pgenro-user .summary-label,.pgenro-user .summary-caption,.pgenro-user .summary-date {color:var(--viewer-muted)!important;font-size:11px!important}
-.pgenro-user .user-shortcuts {margin:0!important;border:1px solid var(--viewer-line)!important;box-shadow:none!important;border-radius:10px!important;background:var(--viewer-surface)!important}
+.pgenro-user .user-shortcuts {margin:0!important;border:1px solid var(--viewer-line)!important;box-shadow:none!important;border-radius:10px!important;background:var(--viewer-surface)!important;padding:20px!important;gap:14px!important}
 .pgenro-user .user-shortcut-heading h2 {font-size:14px!important}
 .pgenro-user .user-shortcuts a {background:transparent!important;box-shadow:none!important}
 .pgenro-user .viewer-notice {position:fixed!important;bottom:24px!important;left:50%!important;transform:translateX(-50%)!important;z-index:200000!important;background:#143c2b!important;color:#fff!important;padding:13px 20px!important;border-radius:8px!important;box-shadow:0 6px 24px #0003!important;font:500 13px/1.5 system-ui,sans-serif!important;max-width:calc(100vw - 32px)!important}

@@ -45,12 +45,12 @@ except ImportError:
 MAX_BYTES = 50 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'tif', 'tiff', 'docx', 'txt', 'csv', 'xlsx', 'pptx'}
 OCR_LANG_REQUESTED = os.getenv('OCR_LANG', 'eng+fil').strip() or 'eng'
-OCR_PARSER_VERSION = 20
+OCR_PARSER_VERSION = 21
 OCR_TIMEOUT = max(5, int(os.getenv('OCR_TIMEOUT', '45')))
-OCR_DOCUMENT_TIMEOUT = max(OCR_TIMEOUT, int(os.getenv('OCR_DOCUMENT_TIMEOUT', '140')))
+OCR_DOCUMENT_TIMEOUT = max(OCR_TIMEOUT, int(os.getenv('OCR_DOCUMENT_TIMEOUT', '180')))
 OCR_WORKERS = max(1, min(4, int(os.getenv('OCR_WORKERS', str(min(2, os.cpu_count() or 1))))))
-OCR_DPI = max(150, min(400, int(os.getenv('OCR_DPI', '260'))))
-OCR_MAX_SIDE = max(1600, min(5000, int(os.getenv('OCR_MAX_SIDE', '3200'))))
+OCR_DPI = max(150, min(400, int(os.getenv('OCR_DPI', '300'))))
+OCR_MAX_SIDE = max(1600, min(6000, int(os.getenv('OCR_MAX_SIDE', '4200'))))
 OCR_MIN_CONFIDENCE = float(os.getenv('OCR_MIN_CONFIDENCE', '60'))
 OCR_CACHE_SIZE = max(0, int(os.getenv('OCR_CACHE_SIZE', '25')))
 OCR_CACHE_TTL = max(0, int(os.getenv('OCR_CACHE_TTL', '600')))
@@ -228,7 +228,7 @@ CLOSING = re.compile(
 )
 
 ROLE = re.compile(
-    r'\b(?:PGDH|PGENRO|ENRO|OIC|OFFICER|DIRECTOR|CHIEF|MAYOR|GOVERNOR|ADMINISTRATOR|SUPERVISOR|MANAGER|'
+    r'\b(?:PGDH|PGENRO|PENRO|CENRO|MENRO|ENRO|OIC|OFFICER|DIRECTOR|CHIEF|MAYOR|GOVERNOR|ADMINISTRATOR|SUPERVISOR|MANAGER|'
     r'SECRETARY|SECRETARIAT|CONVENER|CONVENOR|FOCAL\s+PERSON|HEAD|PRESIDENT|CHAIRPERSON|CHAIRMAN|COORDINATOR|'
     r'PRINCIPAL|TEACHER|ENGINEER|TREASURER|REPRESENTATIVE|PROPRIETOR|OWNER|STUDENT|APPLICANT|DEAN|PROFESSOR|'
     r'SPECIALIST|STAFF|ASSISTANT|COUNCILOR|REGISTRAR|LIBRARIAN|CONSULTANT|AIDE|CLERK|ACCOUNTANT|AUDITOR|'
@@ -288,7 +288,7 @@ def split_signature_name_role(value):
         end = separators[i + 1].start() if i + 1 < len(separators) else len(value)
         if ROLE.search(value[separator.end():end]):
             return value[:separator.start()].strip(), value[separator.end():].strip()
-    trailing_role = re.search(r'\s+(?:(?:Acting|Assistant|Deputy|Municipal|Provincial|City|Regional|District|Division|Department|Administrative|School|General|Executive|Senior|Junior)\s+)*(?:PGDH(?:[-/][A-Z]+)?|PGENRO|ENRO|OIC|Officer|Director|Chief|Manager|Mayor|Governor|President|Secretary|Chairperson|Chairman|Coordinator|Principal|Superintendent|Engineer|Treasurer|Administrator|Clerk|Aide|Registrar|Librarian|Head)\b', value, re.I)
+    trailing_role = re.search(r'\s+(?:(?:Acting|Assistant|Deputy|Municipal|Provincial|City|Regional|District|Division|Department|Administrative|School|General|Executive|Senior|Junior)\s+)*(?:PGDH(?:[-/][A-Z]+)?|PGENRO|PENRO|CENRO|MENRO|ENRO|OIC|Officer|Director|Chief|Manager|Mayor|Governor|President|Secretary|Chairperson|Chairman|Coordinator|Principal|Superintendent|Engineer|Treasurer|Administrator|Clerk|Aide|Registrar|Librarian|Head)\b', value, re.I)
     if trailing_role and len(value[:trailing_role.start()].split()) >= 2:
         return value[:trailing_role.start()].strip(), value[trailing_role.start():].strip()
     return value, ''
@@ -353,11 +353,13 @@ def trim_blank_margins(image):
     gray = ImageOps.grayscale(image)
     if ImageStat.Stat(gray.resize((64, 64))).mean[0] < 110:
         return image
-    box = gray.point(lambda value: 255 if value < 245 else 0).getbbox()
+    # Use a more sensitive threshold so faint gray/blue signature ink near the
+    # bottom edge is not mistaken for blank paper and cropped away.
+    box = gray.point(lambda value: 255 if value < 252 else 0).getbbox()
     if box is None:
         return image
     left, top, right, bottom = box
-    pad = max(24, round(min(image.size) * .02))
+    pad = max(32, round(min(image.size) * .025))
     box = (max(0, left - pad), max(0, top - pad), min(image.width, right + pad), min(image.height, bottom + pad))
     return image.crop(box) if box[2] - box[0] >= 350 and box[3] - box[1] >= 100 else image
 
@@ -594,19 +596,92 @@ def scan_sender_candidates(text, signature_region=False):
 
 def parse_correspondence(text, signature_region=False):
     header, scan = parse_header(text), scan_sender_candidates(text, signature_region)
-    selected = scan['selected']
+    candidates = scan['candidates']
+
+    # Keep a tentative top candidate when several names are close in score.
+    # The value can then be shown in the form with a REVIEW state instead of
+    # silently leaving a useful field blank.
+    selected = scan['selected'] or (scan['primary'][0] if scan['primary'] else None)
+    source = selected['kind'] if scan['selected'] and selected else 'ambiguous' if scan['primary'] else 'missing'
     received = selected['name'] if selected else ''
-    source = selected['kind'] if selected else 'ambiguous' if scan['primary'] else 'missing'
+
+    # A document can name the originating sender in its FROM field and have a
+    # different person sign it. Keep those two people distinct.
+    signature_candidates = [c for c in candidates if c['kind'] == 'signature']
+    signatory_selected = signature_candidates[0] if signature_candidates else selected
+    signatory = signatory_selected['name'] if signatory_selected else ''
+    signatory_role = signatory_selected['role'] if signatory_selected else ''
+    signatory_source = signatory_selected['kind'] if signatory_selected else 'missing'
+
     reasons = []
-    review = not received or bool(selected and (selected['inkCleanup'] or source in ('footer-name', 'prepared-by', 'approval') or selected['score'] < 90))
-    if selected and selected['inkCleanup']: reasons.append('Signature ink affected the printed name. Confirm it against the document.')
-    if source == 'explicit-sender' and any(c['kind'] == 'signature' and sender_name_key(c['name']) != sender_name_key(received) for c in scan['candidates']):
-        review = True; reasons.append('The sender field and printed signatory differ. Confirm the originating person.')
-    if source == 'ambiguous': reasons.append('Several possible senders were found. Choose the originating person.')
-    elif not received: reasons.append('No readable sender name was identified. A signature alone cannot establish a person\'s name.')
-    elif source == 'footer-name': reasons.append('An unlabeled printed name was found. Confirm the originating person.')
-    elif source in ('prepared-by', 'approval'): reasons.append('A preparer or approver was found. Confirm the originating person.')
-    return dict(signatory=received, signatoryRole=selected['role'] if selected else '', signatoryCandidates=scan['candidates'], receivedFrom=received, receivedFromSource=source, receivedFromNeedsReview=review, senderConfidence=selected['confidence'] if selected else 'unknown', senderReviewReasons=reasons, sender=header['senderOffice'], recipient=header['recipient'], fieldEvidence={'receivedFrom': selected['evidence'] if selected else ''}, needsReview=['receivedFrom'] if review else [])
+    review = (
+        not received
+        or source == 'ambiguous'
+        or bool(selected and (
+            selected['inkCleanup']
+            or source in ('footer-name', 'prepared-by', 'approval')
+            or selected['score'] < 90
+        ))
+    )
+    signatory_review = (
+        not signatory
+        or (signatory_selected is not None and (
+            signatory_selected['inkCleanup']
+            or signatory_source in ('footer-name', 'prepared-by', 'approval')
+            or signatory_selected['score'] < 90
+            or (not signature_candidates and source == 'ambiguous')
+        ))
+        or (len(signature_candidates) > 1 and signature_candidates[0]['score'] - signature_candidates[1]['score'] < 10)
+    )
+
+    if selected and selected['inkCleanup']:
+        reasons.append('Signature ink affected the printed name. Confirm it against the document.')
+    if source == 'explicit-sender' and any(
+        c['kind'] == 'signature' and sender_name_key(c['name']) != sender_name_key(received)
+        for c in candidates
+    ):
+        review = True
+        reasons.append('The sender field and printed signatory differ. Confirm both names.')
+    if source == 'ambiguous':
+        reasons.append('Several possible senders were found. Confirm the suggested originating person.')
+    elif not received:
+        reasons.append('No readable sender name was identified. A signature mark alone cannot establish a person\'s name.')
+    elif source == 'footer-name':
+        reasons.append('An unlabeled printed name was found. Confirm the originating person.')
+    elif source in ('prepared-by', 'approval'):
+        reasons.append('A preparer or approver was found. Confirm the originating person.')
+    if signatory_review and signatory:
+        reasons.append('Confirm the suggested signatory and designation against the signature block.')
+    elif not signatory:
+        reasons.append('No readable printed signatory name was identified. A handwritten signature mark alone cannot establish a name.')
+
+    needs_review = []
+    if review:
+        needs_review.append('receivedFrom')
+    if signatory_review and signatory:
+        needs_review.append('signatory')
+
+    return dict(
+        signatory=signatory,
+        signatoryRole=signatory_role,
+        signatorySource=signatory_source,
+        signatoryConfidence=signatory_selected['confidence'] if signatory_selected else 'unknown',
+        signatoryNeedsReview=signatory_review,
+        signatoryCandidates=signature_candidates or candidates,
+        receivedFrom=received,
+        receivedFromSource=source,
+        receivedFromNeedsReview=review,
+        senderConfidence=selected['confidence'] if selected else 'unknown',
+        senderReviewReasons=reasons,
+        sender=header['senderOffice'],
+        recipient=header['recipient'],
+        fieldEvidence={
+            'receivedFrom': selected['evidence'] if selected else '',
+            'signatory': signatory_selected['evidence'] if signatory_selected else '',
+            'signatoryRole': signatory_role,
+        },
+        needsReview=needs_review,
+    )
 
 
 def extract_signatory_text(text):
@@ -1243,8 +1318,11 @@ def communication_form_payload(metadata, text, communication_type=''):
     direction = communication_type if communication_type in ('Incoming', 'Outgoing') else 'Incoming'
     memo = bool(metadata.get('isMemo') or metadata.get('documentType') == 'Memorandum')
     uncertain = set(metadata.get('needsReview') or [])
+    # Keep OCR suggestions visible even when confidence is imperfect. The UI
+    # receives a REVIEW state so staff can verify the value instead of losing it.
     received = metadata.get('receivedFrom') or ''
-    if 'receivedFrom' in uncertain: received = ''
+    signatory = metadata.get('signatory') or metadata.get('issuedBy') or ''
+    signatory_role = metadata.get('signatoryRole') or ''
 
     values = {
         'controlNoInput': (metadata.get('memoNo') if memo else '') or metadata.get('controlNo') or '',
@@ -1254,11 +1332,13 @@ def communication_form_payload(metadata, text, communication_type=''):
         'dateInput': (metadata.get('date') if memo else metadata.get('releasedDate' if direction == 'Outgoing' else 'receivedDate')) or metadata.get('date') or '',
         'statusSelect': metadata.get('status') or '',
         'actionTakenInput': metadata.get('actionTaken') or '',
-        'remarksInput': metadata.get('remarks') or ''
+        'remarksInput': metadata.get('remarks') or '',
+        'signatoryInput': signatory,
+        'signatoryRoleInput': signatory_role,
     }
     if memo:
         values['memoRecipientInput'] = metadata.get('recipient') or ''
-        values['memoIssuerInput'] = '' if 'receivedFrom' in uncertain else metadata.get('signatory') or metadata.get('issuedBy') or ''
+        values['memoIssuerInput'] = signatory
 
     states = {}
     office_key = 'recipient' if direction == 'Outgoing' else (
@@ -1267,10 +1347,15 @@ def communication_form_payload(metadata, text, communication_type=''):
     keys = {'controlNoInput': 'controlNo', 'docTypeSelect': 'documentType', 'subjectInput': 'subject',
             'officeInput': office_key, 'dateInput': 'date',
             'statusSelect': 'status', 'actionTakenInput': 'actionTaken', 'remarksInput': 'remarks',
-            'memoRecipientInput': 'recipient', 'memoIssuerInput': 'receivedFrom'}
+            'signatoryInput': 'signatory', 'signatoryRoleInput': 'signatoryRole',
+            'memoRecipientInput': 'recipient', 'memoIssuerInput': 'signatory'}
     for input_id, value in values.items():
         key = keys[input_id]
-        review = key in uncertain or (key == 'receivedFrom' and metadata.get('receivedFromNeedsReview'))
+        review = key in uncertain
+        if key == 'receivedFrom':
+            review = review or bool(metadata.get('receivedFromNeedsReview'))
+        if key in ('signatory', 'signatoryRole'):
+            review = review or bool(metadata.get('signatoryNeedsReview'))
         if input_id == 'dateInput' and not memo and not metadata.get('releasedDate' if direction == 'Outgoing' else 'receivedDate'):
             review = True
         states[input_id] = {
@@ -1293,13 +1378,59 @@ def communication_form_payload(metadata, text, communication_type=''):
 # =========================================================================
 
 def supplement_sender_evidence(base, extra, signature_region=False):
-    """Add only evidenced missing names, without duplicating whole-page OCR text."""
+    """Append only useful sender/signature evidence, not a duplicate page OCR pass."""
     existing = parse_correspondence(base)
-    if existing['receivedFrom'] or existing['receivedFromSource'] == 'ambiguous': return base
     candidates = scan_sender_candidates(extra, signature_region)['primary']
-    proof = '\n\n'.join(c['evidence'] for c in candidates)
-    if not proof: return base
-    if all(c['kind'] == 'explicit-sender' for c in candidates): return proof + '\n\n' + base
+    if not candidates:
+        return base
+
+    signature_candidates = [c for c in candidates if c['kind'] == 'signature']
+    if existing.get('signatory') and existing.get('signatoryRole') and not existing.get('signatoryNeedsReview'):
+        return base
+    if existing.get('receivedFrom') and not signature_candidates and not signature_region:
+        return base
+
+    # A targeted lower-page crop is allowed to contribute a printed name even
+    # when the body/header already supplied a sender. This is how a scanned
+    # signature block can fill the signatory fields independently.
+    useful = signature_candidates or candidates
+    if all(c['kind'] == 'explicit-sender' for c in useful) and not existing.get('receivedFrom'):
+        proof = '\n\n'.join(c['evidence'] for c in useful if c.get('evidence'))
+        return proof + '\n\n' + base if proof else base
+
+    # Add only lines that are not already present. Keep a closing/signature
+    # anchor when it is not close to the candidate in the base text, because
+    # the parser needs that relationship to distinguish a signer from a name
+    # elsewhere in the letter.
+    base_lines = [tidy(line) for line in base.splitlines() if tidy(line)]
+    all_norm = {re.sub(r'\W+', '', line.casefold()) for line in base_lines}
+    recent_norm = {
+        re.sub(r'\W+', '', line.casefold())
+        for line in base_lines[-7:]
+    }
+    proof_lines = []
+    seen = set()
+    for candidate in useful:
+        for line in str(candidate.get('evidence') or '').splitlines():
+            line = tidy(line)
+            if not line:
+                continue
+            norm = re.sub(r'\W+', '', line.casefold())
+            if not norm or norm in seen:
+                continue
+            is_anchor = bool(CLOSING.match(line) or SIGN_LABEL.match(line) or SENDER_MARK.match(line))
+            if is_anchor:
+                if norm in recent_norm:
+                    continue
+            elif norm in all_norm:
+                continue
+            seen.add(norm)
+            proof_lines.append(line)
+
+    proof = '\n'.join(proof_lines)
+    if not proof:
+        return base
+
     tail = re.search(r'^\s*(?:CC\s*:|COPY\s+(?:TO|FURNISHED)|ANNEX\b|APPENDIX\b|ATTACHMENTS?\s*:|ENCLOSURES?\s*:)', base, re.I|re.M)
     at = tail.start() if tail else len(base)
     return base[:at].rstrip() + '\n\n' + proof + '\n\n' + base[at:]
@@ -1372,6 +1503,65 @@ def _otsu_binarize(image):
     return gray.point(lambda pixel: 255 if pixel > threshold else 0)
 
 
+def _adaptive_binarize(image, radius=24, offset=8):
+    """Local-contrast thresholding for faint stamps, pencil and signature ink."""
+    gray = ImageOps.grayscale(image)
+    local_background = gray.filter(ImageFilter.BoxBlur(radius))
+    # Dark strokes are sufficiently darker than their local background.
+    ink_mask = ImageChops.subtract(local_background, gray)
+    dark_ink = ink_mask.point(lambda value: 255 if value > offset else 0)
+    return ImageOps.invert(dark_ink)
+
+
+def _signature_zone_score(candidate):
+    """Score a lower-page OCR pass by whether it recovers a plausible signatory."""
+    raw = candidate.get('text', '')
+    if not raw.strip():
+        return -1
+    scan = scan_sender_candidates(raw, signature_region=True)
+    if not scan['candidates']:
+        return _ocr_candidate_score(candidate) - 20
+    best = scan['candidates'][0]
+    score = float(best.get('score', 0)) + float(candidate.get('confidence') or 0) * 0.18
+    if best.get('role'):
+        score += 14
+    if best.get('kind') == 'signature':
+        score += 10
+    return score
+
+
+def _read_signature_zone(processed):
+    """Run focused OCR on the lower page where names and designations are signed."""
+    if processed.height < 500:
+        return None
+
+    top = int(processed.height * 0.42)
+    crop = processed.crop((0, top, processed.width, processed.height))
+    crop = trim_blank_margins(crop)
+    crop = ImageOps.grayscale(crop)
+    crop = ImageOps.autocontrast(crop, cutoff=0.25)
+    crop = crop.filter(ImageFilter.UnsharpMask(radius=1.2, percent=150, threshold=2))
+
+    variants = [
+        (crop, 11),                       # sparse signature/footer layout
+        (_adaptive_binarize(crop), 11),  # faint or colored signature ink
+        (_otsu_binarize(crop), 6),       # low-contrast printed name/designation
+    ]
+    best = None
+    best_score = -1
+    for variant, psm in variants:
+        check_budget()
+        candidate = run_tesseract(variant, psm, with_data=True)
+        score = _signature_zone_score(candidate)
+        if score > best_score:
+            best, best_score = candidate, score
+        scan = scan_sender_candidates(candidate.get('text', ''), signature_region=True)
+        strong = [c for c in scan['candidates'] if c['kind'] == 'signature']
+        if strong and any(c.get('role') for c in strong) and candidate.get('confidence', 0) >= 55:
+            break
+    return best
+
+
 def _ocr_candidate_score(candidate):
     """Prefer legible OCR that also captures useful letter-header evidence."""
     text = clean_text(candidate.get('text', ''))
@@ -1393,6 +1583,7 @@ def _ocr_candidate_score(candidate):
 
 def fast_ocr_image(image, header_metadata=None):
     check_budget()
+    allow_signature_scan = not isinstance(header_metadata, dict) or header_metadata.get('signature_scan', True)
     image = trim_blank_margins(resize_ocr_image(opaque_image(image)))
     processed = preprocess_image_for_ocr(image, resize=False)
     extrema = processed.getextrema()
@@ -1471,24 +1662,52 @@ def fast_ocr_image(image, header_metadata=None):
                         break
 
     corr = parse_correspondence(text)
-    # A cropped region needs an explicit signature marker or nearby role. Never
-    # promote an isolated recipient/body name merely because it appears in a crop.
-    if not corr['receivedFrom'] and corr['receivedFromSource'] != 'ambiguous' and processed.height > 500:
-        crop = processed.crop((0, int(processed.height * .48), processed.width, processed.height))
-        alternate = run_tesseract(crop, 11, with_data=True)
-        scan = scan_sender_candidates(alternate['text'], True)
-        strong = [c for c in scan['primary'] if c['kind'] == 'signature' and c['role']]
-        # A person already visible in the full page without sender evidence is
-        # probably an addressee/list entry. Do not upgrade it from a crop.
-        strong = [c for c in strong if sender_name_key(c['name']) not in sender_name_key(text)]
-        if strong:
-            proof = '\n\n'.join(c['evidence'] for c in strong)
-            supplemented = supplement_sender_evidence(text, proof, True)
-            if supplemented != text:
-                best, text = alternate, supplemented
+    signature_low = False
+    # Inspect the signature/footer even when a FROM field was already found.
+    # A digitally readable body may contain a scanned signature image that
+    # native PDF text extraction cannot see.
+    needs_signature_scan = allow_signature_scan and (
+        not corr.get('signatory')
+        or not corr.get('signatoryRole')
+        or corr.get('signatoryNeedsReview')
+    )
+    if needs_signature_scan and processed.height > 500:
+        signature_result = _read_signature_zone(processed)
+        if signature_result:
+            signature_scan = scan_sender_candidates(signature_result.get('text', ''), True)
+            strong = [
+                c for c in signature_scan['candidates']
+                if c['kind'] == 'signature'
+            ]
+            # A clear closing/signature anchor is useful even if the designation
+            # is absent. A name plus a role is also strong signature evidence.
+            strong = [
+                c for c in strong
+                if c.get('role') or re.search(
+                    r'(?i)sincerely|respectfully|faithfully|truly|signed|signature|signatory|s\.g\.d\.',
+                    c.get('evidence', '')
+                )
+            ]
+            if strong:
+                supplemented = supplement_sender_evidence(text, signature_result.get('text', ''), True)
+                if supplemented != text:
+                    text = supplemented
+                name_tokens = {
+                    token.casefold()
+                    for c in strong
+                    for token in re.findall(r'[^\W\d_]+', c.get('name', ''))
+                }
+                signature_word_conf = [
+                    word['conf'] for word in signature_result.get('words', [])
+                    if re.sub(r'[^\w]', '', word['text'].casefold()) in name_tokens
+                ]
+                signature_low = (
+                    signature_result.get('confidence', 0) < 55
+                    or bool(signature_word_conf and min(signature_word_conf) < 45)
+                )
 
     current = _state.get()
-    low = best.get('confidence', 0) < OCR_MIN_CONFIDENCE
+    low = best.get('confidence', 0) < OCR_MIN_CONFIDENCE or signature_low
     # Inspect confidence for the printed name itself, not only the body average.
     selected = parse_correspondence(text)['receivedFrom']
     if selected:
@@ -1514,8 +1733,10 @@ def fast_ocr_image(image, header_metadata=None):
 def mark_sender_ocr_review():
     current = _state.get()
     if current:
-        with current.lock: current.review_fields.add('receivedFrom')
-    warn('Some scanned text has low OCR confidence. Confirm the printed sender name against the original.')
+        with current.lock:
+            current.review_fields.add('receivedFrom')
+            current.review_fields.add('signatory')
+    warn('Some scanned text has low OCR confidence. Confirm the sender/signatory text against the original.')
 
 
 def extract_pdf(file_path):
@@ -1531,11 +1752,24 @@ def extract_pdf(file_path):
             # instead of accepting the body character count as proof of completeness.
             has_images = bool(page.get_images(full=True))
             sender = parse_correspondence(native)
-            needs_scan = not usable or (has_images and not sender['receivedFrom'])
+            signature_marker = bool(re.search(
+                r'(?i)\b(?:sincerely|respectfully|faithfully|truly yours|very truly yours|'
+                r'signed by|signatory|signature over printed name|lubos na gumagalang)\b',
+                native
+            ))
+            # Image-bearing pages may contain a signature that native PDF text
+            # extraction cannot see. Also inspect the final page and pages with
+            # printed closing/signature labels, without running a footer pass on
+            # every ordinary continuation page.
+            signature_page = i == len(doc) - 1 or signature_marker or has_images
+            needs_scan = not usable or has_images or (not sender.get('signatoryRole') and signature_page)
             if needs_scan:
                 scale = min(OCR_DPI/72, OCR_MAX_SIDE/max(page.rect.width, page.rect.height))
                 pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), colorspace=fitz.csRGB, alpha=False)
-                scanned = fast_ocr_image(Image.frombytes('RGB', (pix.width, pix.height), pix.samples))
+                scanned = fast_ocr_image(
+                    Image.frombytes('RGB', (pix.width, pix.height), pix.samples),
+                    header_metadata={'signature_scan': signature_page}
+                )
                 output[i] = supplement_sender_evidence(native, scanned) if usable else scanned or native
             else: output[i] = native
             reading_progress(completed=i+1)
@@ -1641,11 +1875,16 @@ def read_document(file_path, extension):
     text = clean_text(text)
     metadata = extract_document_metadata(text)
     current = _state.get()
-    if current and 'receivedFrom' in current.review_fields:
-        metadata['receivedFromNeedsReview'] = True
-        metadata['senderConfidence'] = 'low'
-        metadata['needsReview'] = list(dict.fromkeys(metadata['needsReview']+['receivedFrom']))
-        metadata['senderReviewReasons'].append('Confirm the name because part of the scan had low OCR confidence.')
+    if current:
+        if 'receivedFrom' in current.review_fields:
+            metadata['receivedFromNeedsReview'] = True
+            metadata['senderConfidence'] = 'low'
+            metadata['needsReview'] = list(dict.fromkeys(metadata['needsReview'] + ['receivedFrom']))
+            metadata['senderReviewReasons'].append('Confirm the originating name because part of the scan had low OCR confidence.')
+        if 'signatory' in current.review_fields:
+            metadata['signatoryNeedsReview'] = True
+            metadata['needsReview'] = list(dict.fromkeys(metadata['needsReview'] + ['signatory']))
+            metadata['senderReviewReasons'].append('Confirm the signatory and designation because the signature area had low OCR confidence.')
     if not text.strip():
         warn('No readable text was found. Upload a clearer scan or enter the fields manually.')
         raise ValueError('No readable text was found. Upload a clearer scan or enter the fields manually.')

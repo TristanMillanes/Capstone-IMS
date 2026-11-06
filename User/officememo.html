@@ -2,7 +2,7 @@
 
 <html data-css-scope="user-officememo" data-theme="light" lang="en">
 <head>
-<meta charset="utf-8"/><script src="user-theme.js?v=20261103-frontend-fix"></script>
+<meta charset="utf-8"/><script src="user-theme.js?v=20261106-theme-ui-1"></script>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="light dark" name="color-scheme"/>
 <title>PGENRO IMS | Office Memorandum</title>
@@ -14,11 +14,12 @@
 <link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
 <link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
 <script defer src="user-refresh.js?v=20261102-viewer"></script>
-<script defer src="user-workspace.js?v=20261102-viewer"></script>
+<script defer src="user-workspace.js?v=20261106-free-accounts-v1"></script>
 <link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
-<link rel="stylesheet" href="user-viewer.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
 <script defer src="user-viewer.js?v=20261102-viewer"></script>
 <script defer src="user-documents.js?v=20261102-viewer"></script>
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
 </head>
 <body class="pgenro-user depth-workspace ui-unified user-refresh" data-css-scope="user-officememo" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
 
@@ -71,18 +72,14 @@
 <span>Employee Profiles</span>
 </a>
 </li>
+<li><a href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
 <li>
 <a href="inventory.html">
 <i data-lucide="package"></i>
 <span>Supplies Inventory</span>
 </a>
 </li>
-<li>
-<a href="visitorsView.html">
-<i data-lucide="clipboard-signature"></i>
-<span>Visitors Log</span>
-</a>
-</li>
+
 <li>
 <a href="service.html">
 <i data-lucide="wrench"></i>
@@ -289,7 +286,7 @@
 </section>
 <div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer="" src="../shared/supabase.js?v=20261104-employee-account-1"></script>
 <script defer="" src="officememo.js?v=20261102-viewer"></script>
 </body>
 </html>

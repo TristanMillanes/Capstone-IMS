@@ -1,0 +1,318 @@
+/* Shared appearance corrections. Load last. Screen rules never recolor printed documents.
+   6 November 2026: paired component colors, dialogs, actions and native controls. */
+@media screen {
+html[data-theme="light"] {
+  --app-ink:#193b2d;--app-muted:#52695e;--app-subtle:#5b7166;
+  --app-surface:#fff;--app-soft:#f0f6f3;--app-border:#cbdcd2;--app-accent:#066c4f;
+  --app-tint:#e5f3eb;--app-danger:#b42335;--app-danger-bg:#fff0f3;--app-warning:#87500e;--app-warning-bg:#fff3da;
+  --app-info:#235f99;--app-info-bg:#e8f2ff;
+}
+html[data-theme="dark"] {
+  --app-ink:#ecf8f0;--app-muted:#b3cbbf;--app-subtle:#a4c1b1;
+  --app-surface:#102a23;--app-soft:#183a2f;--app-border:#3b6151;--app-accent:#8ee7bd;
+  --app-tint:#1d4936;--app-danger:#ffadb8;--app-danger-bg:#462d35;--app-warning:#ffda91;--app-warning-bg:#44351e;
+  --app-info:#b0d7ff;--app-info-bg:#193b53;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] {
+  --text-muted:var(--app-muted);--text-light:var(--app-subtle);
+  --ui-muted:var(--app-muted);--ui-subtle:var(--app-subtle);--ui-placeholder:var(--app-subtle);
+  --ui-surface:var(--app-surface);--ui-surface-muted:var(--app-soft);--ui-surface-raised:var(--app-surface);
+  --ui-text:var(--app-ink);--ui-border:var(--app-border);
+  --chart-label-color:var(--app-muted);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(input,textarea)::placeholder {color:var(--app-subtle);opacity:1;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.workspace-context-label,#workspaceToday,.modern-page-footer,.modern-page-footer a,.table-timezone,.chart-eyebrow,.employee-sub,.traveler-sub,.field-hint,.field-counter,.employee-section-link small) {color:var(--app-muted);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.badge-status.urgent,.badge-status.pending,.status-badge-dot.pending,.badge.pending,#displayActiveStatusBadge) {background:var(--app-warning-bg);color:var(--app-warning);border-color:var(--app-border);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .badge-status.info {background:var(--app-info-bg);color:var(--app-info);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.required,.required-mark,#passRequiredStar,#employeeForm label>span,#icsForm label>span) {color:var(--app-danger);}
+/* These panels formerly used white backgrounds with inherited pale dark-mode text. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.ics-form-progress,.form-progress-panel,.progress-panel,.calculated-field,.financial-summary,.financial-summary .total,.document-destination) {background:var(--app-soft);color:var(--app-ink);border-color:var(--app-border);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.progress-eyebrow,#icsProgressText,#totalValuePreview,#summaryTotal) {color:var(--app-ink);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(#icsProgressPercent,#employeeFormCompletionCount) {color:var(--app-accent);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .progress-step {background:var(--app-surface);color:var(--app-muted);border-color:var(--app-border);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .progress-step small {color:inherit;line-height:1.5;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .progress-step>span {background:var(--app-soft);color:var(--app-ink);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .progress-step.active {background:var(--app-tint);color:var(--app-ink);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .progress-step.active>span {background:#087b56;color:#fff;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.file-picker-button,.memo-upload-browse) {background:var(--app-tint);color:var(--app-ink);border-color:var(--app-border);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.memo-month-filter,.id-badge) {color:var(--app-accent);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .id-badge {background:var(--app-tint);border-color:var(--app-border);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .btn-view-row {display:inline-flex;align-items:center;justify-content:center;gap:7px;min-width:94px;white-space:nowrap;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .btn-view-row svg {width:17px;height:17px;flex:0 0 17px;}
+/* Numeric cards and field groups retain their baselines without squeezing labels. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.kpi-header,.unified-metric-heading) {align-items:flex-start;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.kpi-body h3,.metric-value,.calculated-field) {font-variant-numeric:tabular-nums;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.form-group,.field,.filter-group,.analytics-controls)>* {min-width:0;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .analytics-controls {display:flex;align-items:flex-end;flex-wrap:wrap;gap:10px;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .analytics-controls>.btn {flex:0 1 auto;min-width:max-content;white-space:nowrap;}
+/* Keyboard skip links use a stable color pair in both appearances. */
+html[data-theme] body :is(a.admin-ui-skip-link,a.user-skip-link) {background:#104b36;color:#fff;}
+html[data-theme] body a.user-skip-link:not(:focus) {transform:translateY(calc(-100% - 20px));}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] {--appearance-viewer-muted:var(--app-muted);}
+/* User inventory counters use a matched surface/text pair, including selected tabs. */
+html[data-theme] body.user-refresh.pgenro-user .tabs .tab-btn>span {background:var(--ui-tint);color:var(--ui-ink);min-width:24px;line-height:24px;text-align:center;}
+html[data-theme] body.user-refresh.pgenro-user .employee-contact span {color:var(--ui-muted);}
+/* Public forms keep placeholders, required marks and section badges readable. */
+html[data-theme] body.user-refresh :is(input,textarea)::placeholder {color:var(--ui-muted);opacity:1;}
+html[data-theme] body.user-refresh :is(.brand-subbadge,.request-section-number) {background:var(--ui-tint);color:var(--ui-accent);}
+html[data-theme] body.user-refresh .portal-footer {color:var(--ui-muted);}
+html[data-theme] body.user-refresh .request-form-main label>span {color:var(--app-danger);}
+/* Account Settings retains its legacy component variables in the current appearance. */
+html[data-theme] body.pgenro-settings {
+ --s-ink:var(--app-ink);--s-muted:var(--app-muted);--s-line:var(--app-border);--s-card:var(--app-surface);
+}
+html[data-theme] body.pgenro-settings.depth-workspace.ui-unified .field>span {color:var(--app-ink);}
+html[data-theme] body.pgenro-settings.depth-workspace.ui-unified .settings-tabs .tab-btn {color:var(--app-muted);}
+html[data-theme] body.pgenro-settings.depth-workspace.ui-unified .settings-tabs .tab-btn.active {background:var(--app-tint);color:var(--app-accent);}
+html[data-theme] body.pgenro-settings.depth-workspace.ui-unified :is(.account-meta span,#profileRoleDisplay) {color:var(--app-muted);}
+html[data-theme="dark"] body.pgenro-settings.depth-workspace.ui-unified :is(.security-note,.toggle-row,.settings-nav-card,.settings-panel,.settings-profile-summary) {background:var(--app-surface);color:var(--app-ink);border-color:var(--app-border);}
+html[data-theme] body.pgenro-settings :is(.security-note p,.toggle-row span) {color:var(--app-muted);}
+html[data-theme] body.pgenro-settings.depth-workspace.ui-unified[data-requires-auth] .settings-heading .eyebrow {color:var(--app-accent);}
+html[data-theme] body.pgenro-settings.depth-workspace.ui-unified[data-requires-auth] .settings-heading p {color:var(--app-muted);}
+html[data-theme] body.pgenro-settings #profileInitials {background:linear-gradient(135deg,#115c44,#176b52);color:#fff;}
+@media(max-width:600px) {
+ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .analytics-controls {width:100%;}
+ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .analytics-controls>label {flex:1 1 100%;}
+ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .analytics-controls>.btn {flex:1 1 130px;min-width:0;}
+}
+/* Local ID-based legacy rules need equally precise component selectors. */
+html[data-theme] body.pgenro-admin #employeeFormModal .form-control::placeholder,
+html[data-theme] body.pgenro-admin #profileModal .monitor-panel .form-control::placeholder {color:var(--app-subtle);opacity:1;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified #mainContent .tabs .tab-btn.active>span {color:var(--ui-ink);}
+html[data-theme] body.user-refresh.pgenro-user #mainContent .contact-cell span {color:var(--ui-muted);}
+html[data-theme] body.user-refresh.public-property-page.ics-entry-page .ics-form-field :is(input,textarea)::placeholder {color:var(--ui-muted);opacity:1;}
+html[data-theme] body.user-refresh.pgenro-request .topbar-sign-in strong {background:var(--ui-tint);color:var(--ui-accent);border-color:var(--ui-border);}
+html[data-theme] body.user-refresh.pgenro-request .input-container :is(label,legend)>span {color:var(--app-danger);}
+
+/* Legacy record viewers share the same readable surfaces as the registry. */
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.modal-body,.drawer-body) {background:var(--ui-soft);color:var(--ui-ink);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.modal-header,.modal-head,.modal-footer,.drawer-header,.drawer-footer,.record-identity) {background:var(--ui-surface);color:var(--ui-ink);border-color:var(--ui-border);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .record-identity {background:var(--ui-tint);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.modal-kicker,.record-identity>div>span) {color:var(--ui-accent);font-size:11px;line-height:1.5;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.detail-grid,.detail-stack) dt {color:var(--ui-muted);font-size:11px;line-height:1.5;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.detail-grid,.detail-stack) dd {color:var(--ui-ink);font-size:13px;line-height:1.6;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.long-value,.read-value-box,.ocr-content) {background:var(--ui-soft);color:var(--ui-ink);border-color:var(--ui-border);font-size:13px;line-height:1.6;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .field-label {color:var(--ui-muted);line-height:1.5;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .arrow-nav-btn {background:var(--ui-tint);color:var(--ui-accent);border-color:var(--ui-border);display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:normal;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .secondary-btn {background:var(--ui-surface);color:var(--ui-ink);border-color:var(--ui-border);display:inline-flex;align-items:center;justify-content:center;gap:8px;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(#viewAvatar,#drawerAvatar) {background:#147657;color:#fff;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] #viewHeadingDesignation {color:var(--ui-muted);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(#viewPillStatus,#drawerStatusBadge) {background:var(--ui-tint);color:var(--ui-accent);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .employee-name>span {color:var(--ui-muted);}
+/* Green theme tokens become pale in dark mode; avatar initials still need
+   a dark fill when their foreground stays white. */
+html[data-theme] body.user-refresh.pgenro-user .employee-avatar {background:#196a4b;color:#fff;}
+html[data-theme] body.user-refresh.service-request-page .review-group-heading h4 {color:var(--ui-ink);}
+html[data-theme] body.user-refresh.service-request-page .review-edit {background:var(--ui-tint);color:var(--ui-accent);}
+html[data-theme] body.user-refresh.service-request-page .request-review-note {background:var(--ui-soft);color:var(--ui-muted);border-color:var(--ui-border);}
+
+/* The visitor kiosk uses the same preference and native controls as the other public pages. */
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] {
+ --canvas:var(--app-soft);--surface:var(--app-surface);--surface-soft:var(--app-soft);--surface-raised:var(--app-surface);
+ --ink:var(--app-ink);--muted:var(--app-muted);--line:var(--app-border);--line-strong:var(--app-border);--input:var(--app-soft);
+ --danger:var(--app-danger);--danger-bg:var(--app-danger-bg);--danger-line:var(--app-border);--warning:var(--app-warning);--warning-bg:var(--app-warning-bg);--warning-line:var(--app-border);--success-line:var(--app-border);--success:var(--app-accent);--success-bg:var(--app-tint);--focus:var(--app-accent);
+ background:var(--app-soft);color:var(--app-ink);color-scheme:inherit;
+}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] .emerald-scene {background:var(--app-soft);}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(.portal-panel,.portal-dialog,#successModal) {background:var(--app-surface);color:var(--app-ink);border-color:var(--app-border);}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(.brand-copy>strong,.brand-copy b,.panel-heading h2,.input-group>label,.portal-office strong) {color:var(--app-ink);}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(.panel-heading>.eyebrow,.panel-return,.panel-heading h2>span) {color:var(--app-accent);}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(.brand-copy>small,.portal-office,.panel-heading>p,.progress-meta,.field-help,.v4-visit-preview dt,.v4-visit-preview>p,.form-footer-note,.portal-footer,.visitor-clock) {color:var(--app-muted);}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(.progress-block,.v4-visit-preview,.review-block,.input-wrap) {background:var(--app-soft);color:var(--app-ink);border-color:var(--app-border);}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(input,select,textarea) {background:var(--app-soft);color:var(--app-ink);border-color:var(--app-border);}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(input,textarea)::placeholder {color:var(--app-subtle);opacity:1;}
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] :is(.v4-visit-preview summary,.v4-visit-preview dd) {color:var(--app-ink);}
+html[data-theme] body.pgenro-public-visitor .user-appearance-toggle {display:inline-grid;place-items:center;width:40px;height:40px;flex:0 0 40px;padding:9px;border:1px solid var(--app-border);border-radius:11px;background:var(--app-surface);color:var(--app-ink);cursor:pointer;}
+html[data-theme] body.pgenro-public-visitor .user-appearance-toggle svg {width:20px;height:20px;}
+html[data-theme] body.pgenro-public-visitor .portal-office {margin-left:auto;}
+/* The welcome panel stays green in either appearance, including its clock. */
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] .hero-points p,
+html[data-theme] body.pgenro-public-visitor[data-portal-design="v4"] .visitor-clock :is(span,time,p,small) {color:#ecfdf5;}
+
+/* Paired foreground/background colors also cover the dashboard's gradient panels.
+   Small supporting text must not inherit the surrounding pale-card text color. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .modern-dashboard-hero {
+ background:linear-gradient(115deg,#064e3b,#065f46);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .modern-dashboard-hero :is(.breadcrumb a,.breadcrumb .active,p) {
+ color:#ecfdf5;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .analytics-metric:first-child {
+ background:linear-gradient(125deg,#065f46,#047857);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .analytics-metric:first-child :is(.analytics-metric-label,.analytics-comparison,small) {
+ color:#ecfdf5;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .sidebar .nav-label {color:#a4cbb7;}
+
+/* Center against the actual control height; the old fixed 22px offset drifts
+   when individual modules add padding or change their input height. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .ui-affixed-control>.ui-field-icon,
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .ui-affixed-control>.ui-field-hint {
+ top:50%;bottom:auto;transform:translateY(-50%);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .ui-affixed-control>input {
+ margin:0;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.toolbar,.controls-left,.controls-right,.filters)>select {
+ margin:0;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] td.inventory-unit {
+ min-width:70px;white-space:nowrap;word-break:normal;overflow-wrap:normal;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] td.inventory-reference .control {
+ white-space:nowrap;word-break:normal;overflow-wrap:normal;
+}
+/* In a horizontally scrollable ledger, centered empty-state text can sit
+   entirely beyond the phone viewport. Keep that message at the visible edge. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.table-wrap,.table-wrapper,.table-responsive) td.empty[colspan] {
+ text-align:left;padding-inline:18px;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.table-wrap,.table-wrapper,.table-responsive) .modern-empty-state {
+ align-items:flex-start;text-align:left;margin-inline:0;max-width:min(100%,calc(100vw - 100px));
+}
+@media(max-width:600px) {
+ html[data-theme] body.user-refresh.public-property-page.ics-entry-page .ics-step-navigation ol {grid-template-columns:repeat(3,minmax(0,1fr));}
+ html[data-theme] body.user-refresh.public-property-page.ics-entry-page .ics-step-copy {width:100%;min-width:0;}
+ html[data-theme] body.user-refresh.public-property-page.ics-entry-page .ics-step-copy strong {font-size:11px;overflow-wrap:anywhere;}
+ /* Row-oriented flex bases become tall controls when a toolbar stacks. */
+ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .toolbar>:is(select,input:not([type="hidden"]),.ui-affixed-control) {
+  flex:0 0 auto;width:100%;min-height:44px;height:44px;max-height:44px;
+ }
+ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .topbar #profileBtn {
+  min-width:44px;min-height:44px;width:44px;padding:4px;justify-content:center;
+ }
+ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .topbar #profileBtn .profile-avatar {
+  width:36px;height:36px;flex:0 0 36px;
+ }
+}
+@media(max-width:360px) {
+ html[data-theme] body.user-refresh.public-property-page.ics-entry-page .ics-step-navigation ol {grid-template-columns:repeat(2,minmax(0,1fr));}
+}
+
+}
+
+@media screen {
+/* Use a matched fill, border and text color for controls in every workspace.
+   Explicit component selectors leave logos and document paper untouched. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .nav-item.active {
+ background:#087b5a;color:#fff;border-color:#23956f;
+}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(footer,footer p,footer span) {color:var(--app-muted);opacity:1;}
+html[data-theme="dark"] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .modern-dashboard-hero .btn-primary {
+ background:#205c47;color:#ecfdf5;border-color:#568c74;
+}
+html[data-theme="dark"] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .modern-dashboard-hero .btn-primary:hover {
+ background:#2c6b53;color:#fff;border-color:#8ee7bd;
+}
+html[data-theme] body.user-refresh.pgenro-request .password-toggle {color:var(--ui-accent);}
+html[data-theme] body.user-refresh.pgenro-request .password-toggle:hover {background:var(--ui-tint);color:var(--ui-ink);}
+html[data-theme] body.user-refresh.pgenro-login .user-appearance-toggle {margin-left:0;}
+html[data-theme] body.user-refresh.pgenro-login .province-label {margin-left:auto;}
+html[data-theme] body.user-refresh.pgenro-login .secondary-access .access-arrow {background:var(--ui-tint);color:var(--ui-accent) !important;}
+html[data-theme="light"] body.user-refresh.pgenro-login .secondary-access :is(.access-copy strong,.access-copy small) {color:var(--ui-ink);}
+html[data-theme="light"] body.user-refresh.pgenro-login .brand-wordmark p {color:var(--ui-muted);}
+html[data-theme="light"] body.user-refresh.pgenro-login #portalTitle>span {background:var(--ui-tint);color:var(--ui-accent);border-color:var(--ui-border);}
+@media(max-width:720px) {
+ html[data-theme] body.user-refresh.pgenro-login .portal-topbar {justify-content:space-between;}
+ html[data-theme] body.user-refresh.pgenro-login .brand-showcase {gap:12px;}
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.btn-icon-action,.btn-action,.row-btn,.icon-btn-sm,.btn-danger-outline) {
+ background:var(--app-surface);color:var(--app-ink);border-color:var(--app-border);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.btn-icon-action,.btn-action,.row-btn,.icon-btn-sm):hover {
+ background:var(--app-tint);color:var(--app-accent);border-color:var(--app-accent);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.reject-quick-btn,.delete-btn,.delete-user-btn,.btn-danger-outline) {
+ color:var(--app-danger);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.reject-quick-btn,.delete-btn,.delete-user-btn,.btn-danger-outline):hover {
+ background:var(--app-danger-bg);color:var(--app-danger);border-color:var(--app-danger);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.modal-actions,.modal-footer,.admin-modal-footer,.unified-dialog-footer) {
+ background:var(--app-surface);color:var(--app-ink);border-color:var(--app-border);
+}
+html[data-theme] body.pgenro-admin #profileModal .modal-actions {
+ background:var(--app-surface);color:var(--app-ink);border-color:var(--app-border);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .modal-header-icon.danger {
+ background:var(--app-danger-bg);color:var(--app-danger);
+}
+/* The notification host is a layout container, not a notification itself. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .toast-container {
+ background:transparent;color:var(--app-ink);border:0;padding:0;box-shadow:none;opacity:1;transform:none;pointer-events:none;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .toast-container:empty {display:none;}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .toast-container .toast {
+ background:var(--app-surface);color:var(--app-ink);border-color:var(--app-border);border-left-color:var(--app-accent);pointer-events:auto;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .toast-container .toast.error {border-left-color:var(--app-danger);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .toast-container .toast.warning {border-left-color:var(--app-warning);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.toast,.tab-header-bar) {
+ background:var(--ui-surface);color:var(--ui-ink);border-color:var(--ui-border);
+}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .tab-header-bar .tab-btn {
+ background:var(--ui-surface);color:var(--ui-muted);border-color:var(--ui-border);
+}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .tab-header-bar .tab-btn.active {
+ background:var(--ui-tint);color:var(--ui-accent);border-color:var(--ui-border);
+}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] :is(.empty-icon,.status-badge) {
+ background:var(--ui-soft);color:var(--ui-muted);border-color:var(--ui-border);
+}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .status-badge.active {background:var(--ui-tint);color:var(--ui-accent);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .status-badge.on-leave {background:var(--ui-amber-bg);color:var(--ui-amber);}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .status-badge.inactive {background:var(--ui-red-bg);color:var(--ui-red);}
+html[data-theme] body.pgenro-settings.depth-workspace.ui-unified .panel-icon {background:var(--app-tint);color:var(--app-accent);}
+html[data-theme] body.user-refresh.pgenro-request :is(.first-admin-note,.first-admin-status) {
+ background:var(--ui-soft);color:var(--ui-ink);border-color:var(--ui-border);
+}
+html[data-theme] body.user-refresh.pgenro-request :is(.first-admin-note strong,.first-admin-success h3) {color:var(--ui-ink);}
+html[data-theme] body.user-refresh.pgenro-request .first-admin-success p {color:var(--ui-muted);}
+html[data-theme] body.user-refresh.pgenro-request .first-admin-status[data-kind="error"] {background:var(--ui-red-bg);color:var(--ui-red);border-color:var(--ui-red);}
+html[data-theme] body.user-refresh.pgenro-request .first-admin-status[data-kind="warning"] {background:var(--ui-amber-bg);color:var(--ui-amber);border-color:var(--ui-amber);}
+html[data-theme] body.user-refresh.pgenro-request .first-admin-status[data-kind="success"] {background:var(--ui-tint);color:var(--ui-accent);border-color:var(--ui-accent);}
+html[data-theme="dark"] body.user-refresh.public-property-page.ics-entry-page [aria-current="step"] .ics-step-number {
+ background:#2e5640;color:#e9f6ec;border-color:#638b70;
+}
+/* Native popups, dates, file buttons and autofill inherit the chosen mode. */
+html[data-theme] body :is(select option,select optgroup) {background:var(--app-surface);color:var(--app-ink);}
+html[data-theme] body :is(input,textarea)::selection {background:var(--app-accent);color:var(--app-surface);}
+html[data-theme] body :is(input[type="checkbox"],input[type="radio"]) {accent-color:#157554;}
+html[data-theme="dark"] body :is(input[type="checkbox"],input[type="radio"]) {accent-color:#8ee7bd;}
+html[data-theme] body :is(.form-control,.input-wrapper input,.input-box input):autofill {
+ box-shadow:0 0 0 100px var(--app-soft) inset;-webkit-text-fill-color:var(--app-ink);caret-color:var(--app-ink);
+}
+html[data-theme] body input[type="file"]::file-selector-button {
+ border:1px solid var(--app-border);border-radius:6px;padding:7px 10px;margin-right:10px;background:var(--app-tint);color:var(--app-ink);font:inherit;cursor:pointer;
+}
+/* Paper previews remain black-on-white in either screen appearance. */
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] #officialTorSheet :is(td,th,.tor-lbl) {
+ color:#17221b;border-color:#94a39b;
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] #officialTorSheet .tor-lbl {background:#f4f6f5;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] #printableSheet {
+ --text-main:#111;--green-900:#111;--ui-ink:#111;--ui-muted:#36443c;background:#fff;color:#111;color-scheme:light;
+}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] #printableSheet :is(h2,h3,strong,td,th) {color:#111;}
+html[data-theme] body.user-refresh.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .print-area-wrapper {
+ background:var(--ui-soft);border-color:var(--ui-border);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .btn.btn-danger {
+ background:var(--app-danger-bg);color:var(--app-danger);border-color:var(--app-danger);
+}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .btn.btn-danger:hover {
+ background:var(--app-danger);color:var(--app-surface);
+}
+@media(max-width:480px) {
+ html[data-theme] body.user-refresh.pgenro-login .portal-topbar {display:grid;grid-template-columns:minmax(0,1fr) 38px;gap:10px;}
+ html[data-theme] body.user-refresh.pgenro-login .brand-showcase {gap:10px;}
+ html[data-theme] body.user-refresh.pgenro-login .dual-seal-frame {gap:5px;}
+ html[data-theme] body.user-refresh.pgenro-login .seal-container {--seal-size:34px;}
+ /* The dark login's original brand rules used important sizing. */
+ html[data-theme] body.user-refresh.pgenro-login .brand-wordmark {padding-left:9px !important;}
+ html[data-theme] body.user-refresh.pgenro-login .brand-wordmark h1 {font-size:20px !important;gap:5px !important;}
+ html[data-theme] body.user-refresh.pgenro-login .brand-wordmark p {font-size:10px !important;line-height:1.4 !important;}
+ html[data-theme] body.user-refresh.pgenro-login .province-label {display:none;}
+}
+}

@@ -1,0 +1,31 @@
+{
+  "passed": true,
+  "date": "2026-11-04",
+  "canonicalPages": 28,
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    1440,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "pageGeometryAndContrastCases": 280,
+  "panelAndResponsiveCases": 390,
+  "legacyRedirects": 26,
+  "themeToggleReloadPages": 28,
+  "parserCases": 6,
+  "syntax": {
+    "passed": true,
+    "javascriptFiles": 43,
+    "stylesheets": 41,
+    "productionPythonFiles": 3,
+    "errors": []
+  },
+  "missingLocalAssets": 0,
+  "uncaughtJavascriptErrors": 0,
+  "method": "Local Chromium using production frontend with fixture Auth/database. No hosted records changed."
+}

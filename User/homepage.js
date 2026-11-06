@@ -55,7 +55,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       travelOrders: "travel_orders",
       inventory: "inventory",
       ics: "ics_records",
-      visitors: "visitors",
       memos: "office_memos"
     }
   });
@@ -2135,7 +2134,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       { key: "communications", sourceKey: "communications", label: "Communications", color: "#4b9da7" },
       { key: "memos", sourceKey: "memos", label: "Office Memos", color: "#278560" },
       { key: "travel", sourceKey: "travelOrders", label: "Travel Orders", color: "#8b7ac7" },
-      { key: "visitors", sourceKey: "visitors", label: "Visitors", color: "#c79b46" },
       { key: "services", sourceKey: "serviceRequests", label: "Service Requests", color: "#ce7d78" },
       { key: "ics", sourceKey: "ics", label: "ICS Property Slips", color: "#7caa9f" }
     ];
@@ -2299,7 +2297,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           datasets: [
             { label: "Documents & ICS", borderColor: "#278560", backgroundColor: window.PGENRO_ChartStyle.area, data: model.buckets.map((bucket) => bucket.documents), fill: true },
             { label: "Travel Orders", borderColor: "#8b7ac7", data: model.buckets.map((bucket) => bucket.travel) },
-            { label: "Visitors", borderColor: "#c79b46", data: model.buckets.map((bucket) => bucket.visitors) },
             { label: "Service Requests", borderColor: "#ce7d78", data: model.buckets.map((bucket) => bucket.services) }
           ].map((dataset) => ({ ...dataset, tension: 0.38, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5, pointHitRadius: 12 }))
         },
@@ -2333,7 +2330,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     function renderDashboardCharts() {
       const model = buildDashboardChartModel();
       const description=document.getElementById("dashboardTrendDescription");
-      if(description)description.textContent=`Documents, travel orders, visitors, and services in the last ${chartRangeDays} days.`;
+      if(description)description.textContent=`Documents, travel orders, and services in the last ${chartRangeDays} days.`;
       const missingNote = model.missingDates ? ` ${model.missingDates} records without valid dates are excluded.` : "";
       const availabilityNote = `${model.availableCount} of 6 activity modules available.`;
       const trendSummary = $("#dashboardTrendSummary");
@@ -2379,6 +2376,12 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     async function queryTable(
       table
     ) {
+      if (table === 'employees') {
+        const result = await client.rpc('pgenro_employee_directory');
+        if (result.error) throw result.error;
+        if (!Array.isArray(result.data)) throw new Error('The employee directory is not configured.');
+        return result.data.map(normalizeRow);
+      }
       const {
         data,
         error
@@ -3121,7 +3124,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     office_memos:['Office Memos','officememo-admin.html','officememo.html'],
     employees:['Employees','employee-admin.html','employee.html'],
     inventory:['Inventory','invetoryadmin.html','inventory.html'],
-    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
+    visitors:['Visitors','visitors-admin.html',null],
     service_requests:['Service Requests','serviceAdmin.html','service.html'],
     ics_records:['Property Slips','ics-admin.html','ics.html'],
     user_accounts:['User Management','Usermanagement.html',null],

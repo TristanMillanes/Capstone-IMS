@@ -125,6 +125,12 @@
     const [name, domain] = email.split("@");
     return `${name[0]}${"*".repeat(Math.max(1, name.length - 2))}${name.length > 2 ? name.at(-1) : ""}@${domain}`;
   }
+  function maskEmployeeNumber(value) {
+    const number = String(value || "").trim();
+    if (!number) return "***";
+    if (number.length <= 2) return "*".repeat(number.length);
+    return `${number[0]}${"*".repeat(Math.min(6, number.length - 2))}${number.at(-1)}`;
+  }
   async function recordAuditLog(action, email, status, details = "") {
     if (!client) return;
     try {
@@ -184,14 +190,14 @@
     initAmbientScene();
     initSealFallbacks();
     const el = Object.fromEntries([
-      "loginCard", "loginForm", "email", "password", "rememberMe", "togglePassword", "clearEmailBtn",
+      "loginCard", "loginForm", "employeeNumber", "password", "rememberMe", "togglePassword", "clearEmployeeNumberBtn",
       "messageBox", "messageContent", "dismissAlert", "capsLockWarning", "loadingOverlay", "loadingStatusHeading",
-      "loadingStatusText", "loginBtn", "btnLabel", "emailFieldBox", "passwordFieldBox", "emailError", "passwordError",
+      "loadingStatusText", "loginBtn", "btnLabel", "employeeNumberFieldBox", "passwordFieldBox", "employeeNumberError", "passwordError",
       "networkStatusBar", "lockoutNotice", "lockoutSeconds"
     ].map(id => [id, document.getElementById(id)]));
-    if (!el.loginForm || !el.email || !el.password) return;
+    if (!el.loginForm || !el.employeeNumber || !el.password) return;
     const accessLinks = document.querySelectorAll("[data-access-link]");
-    const controls = [el.email, el.password, el.rememberMe, el.togglePassword, el.clearEmailBtn, el.loginBtn];
+    const controls = [el.employeeNumber, el.password, el.rememberMe, el.togglePassword, el.clearEmployeeNumberBtn, el.loginBtn];
     let submitting = false;
     let operation = 0;
     let failedAttempts = Number(storage.get("pgenro_failed_attempts", true)) || 0;
@@ -220,7 +226,7 @@
       el[`${name}Error`].textContent = text;
       el[`${name}Error`].hidden = !text;
     };
-    const clearErrors = () => { hideMessage(); setFieldError("email"); setFieldError("password"); };
+    const clearErrors = () => { hideMessage(); setFieldError("employeeNumber"); setFieldError("password"); };
     const setBusy = value => {
       submitting = value;
       el.loginForm.setAttribute("aria-busy", String(value));
@@ -269,14 +275,22 @@
     updateNetwork();
     startCooldown();
 
-    const savedEmail = storage.get("pgenro_saved_email");
-    if (savedEmail) { el.email.value = savedEmail; el.rememberMe.checked = true; }
-    el.clearEmailBtn.hidden = !el.email.value;
-    el.email.addEventListener("input", () => { el.clearEmailBtn.hidden = !el.email.value; setFieldError("email"); hideMessage(); });
+    // Remember only the employee number on this device; never retain the password.
+    storage.remove("pgenro_saved_email");
+    const savedEmployeeNumber = storage.get("pgenro_saved_employee_number");
+    if (savedEmployeeNumber) { el.employeeNumber.value = savedEmployeeNumber; el.rememberMe.checked = true; }
+    el.clearEmployeeNumberBtn.hidden = !el.employeeNumber.value;
+    el.employeeNumber.addEventListener("input", () => {
+      el.clearEmployeeNumberBtn.hidden = !el.employeeNumber.value;
+      setFieldError("employeeNumber"); hideMessage();
+    });
     el.password.addEventListener("input", () => { setFieldError("password"); hideMessage(); });
-    el.rememberMe.addEventListener("change", () => { if (!el.rememberMe.checked) storage.remove("pgenro_saved_email"); });
-    el.clearEmailBtn.addEventListener("click", () => {
-      el.email.value = ""; el.clearEmailBtn.hidden = true; setFieldError("email"); hideMessage(); el.email.focus();
+    el.rememberMe.addEventListener("change", () => {
+      if (!el.rememberMe.checked) storage.remove("pgenro_saved_employee_number");
+    });
+    el.clearEmployeeNumberBtn.addEventListener("click", () => {
+      el.employeeNumber.value = ""; el.clearEmployeeNumberBtn.hidden = true;
+      setFieldError("employeeNumber"); hideMessage(); el.employeeNumber.focus();
     });
     el.togglePassword.addEventListener("click", () => {
       const visible = el.password.type === "password";
@@ -326,45 +340,70 @@
       clearErrors();
       if (locked()) { startCooldown(); return; }
       if (!navigator.onLine) { showMessage("error", "You're offline", "Check your internet connection and try again."); return; }
-      const email = el.email.value.trim().toLowerCase();
+
+      let employeeNumber = '';
+      try { employeeNumber = window.PGENRO_EMPLOYEE_ID.normalize(el.employeeNumber.value); }
+      catch (error) { setFieldError('employeeNumber', error.message); el.employeeNumber.focus(); return; }
+      el.employeeNumber.value = employeeNumber;
       const password = el.password.value;
-      const validEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-      if (!email) setFieldError("email", "Enter your email address.");
-      else if (!validEmail || el.email.validity.typeMismatch) setFieldError("email", "Enter a valid email address.");
+      if (!employeeNumber) setFieldError("employeeNumber", "Enter your employee number.");
+      else if (employeeNumber.length > 80) setFieldError("employeeNumber", "Employee number must not exceed 80 characters.");
       if (!password) setFieldError("password", "Enter your password.");
-      if (!email || !validEmail || el.email.validity.typeMismatch || !password) {
+      if (!employeeNumber || employeeNumber.length > 80 || !password) {
         document.querySelector(".input-box.invalid input")?.focus();
         return;
       }
-      if (!client) {
-        showMessage("error", "Sign-in service unavailable", "Reload the page and check your connection, then try again.");
+      if (!client || typeof client.functions?.invoke !== "function") {
+        showMessage("error", "Sign-in service unavailable", "Employee-number sign-in is not configured. Contact the system administrator.");
         return;
       }
-      if (el.rememberMe.checked) storage.set("pgenro_saved_email", email);
-      else storage.remove("pgenro_saved_email");
+      if (el.rememberMe.checked) storage.set("pgenro_saved_employee_number", employeeNumber);
+      else storage.remove("pgenro_saved_employee_number");
+
       let signedIn = false;
+      let authEmail = "";
       setBusy(true);
       try {
-        const { data, error } = await client.auth.signInWithPassword({ email, password });
-        if (error) {
-          const code = normalize(error.code);
-          const badCredentials = code === "invalid_credentials" || /invalid login credentials|invalid credentials/i.test(error.message || "");
-          if (badCredentials) {
+        // The Edge Function securely resolves the employee number to its Auth account.
+        // The account email is never requested from or displayed in the browser form.
+        const { data: loginData, error: loginError } = await client.functions.invoke("employee-login", {
+          body: { employee_number: employeeNumber, password }
+        });
+        if (loginError) {
+          let failure = null;
+          try {
+            const response = loginError.context;
+            if (response && typeof response.clone === "function") failure = await response.clone().json();
+          } catch { /* Use the generic sign-in error below. */ }
+          const status = Number(loginError.context?.status || loginError.status || failure?.status || 0);
+          const code = normalize(failure?.code || "");
+          if (status === 401 || code === "invalid_credentials") {
             recordFailedAttempt();
-            setFieldError("password", "Check your email address and password.");
-            showMessage("error", "Unable to sign in", "The email or password you entered is incorrect.");
+            setFieldError("employeeNumber", "Check your employee number and password.");
+            showMessage("error", "Unable to sign in", "The employee number or password you entered is incorrect.");
           } else if (code === "email_not_confirmed") {
-            showMessage("warning", "Email verification needed", "Verify your email or contact the administrator for help.");
-          } else if (error.status === 429 || /rate_limit|too_many_requests/.test(code)) {
-            showMessage("warning", "Please wait", "Too many sign-in requests. Wait a moment and try again.");
+            showMessage("warning", "Account confirmation needed", "Your account still needs confirmation. Contact the system administrator for assistance.");
+          } else if (status === 429) {
+            showMessage("warning", "Please wait", "Too many sign-in attempts. Wait a moment and try again.");
+          } else if (status === 503 || code === "employee_login_not_configured") {
+            showMessage("error", "Sign-in service unavailable", "Employee-number sign-in has not been installed in Supabase yet. Contact the system administrator.");
           } else {
             showMessage("error", "Sign-in unavailable", "Check your connection and try again.");
           }
-          void recordAuditLog("LOGIN_FAILED_AUTH", email, "Failed", error.message || code);
+          void recordAuditLog("LOGIN_FAILED_AUTH", "", "Failed", `Employee number: ${maskEmployeeNumber(employeeNumber)}`);
           return;
         }
-        const user = data?.user;
+        if (!loginData?.access_token || !loginData?.refresh_token) {
+          throw new Error("Employee sign-in did not return a valid session.");
+        }
+        const { data: sessionData, error: sessionError } = await client.auth.setSession({
+          access_token: loginData.access_token,
+          refresh_token: loginData.refresh_token
+        });
+        if (sessionError) throw sessionError;
+        const user = sessionData?.user || sessionData?.session?.user;
         if (!user) throw new Error("No authenticated user was returned.");
+        authEmail = user.email || "";
         signedIn = true;
         el.loadingStatusText.textContent = "Checking account approval…";
         const profile = await readProfile(user);
@@ -383,7 +422,7 @@
             suspended: ["error", "Account suspended", "Contact the administrator to restore access."]
           }[status] || ["error", "Account inactive", "Contact the administrator to restore access."];
           const action = ["pending", "rejected", "suspended"].includes(status) ? status.toUpperCase() : "INACTIVE";
-          void recordAuditLog(`LOGIN_BLOCKED_${action}`, email, "Blocked", `Status: ${profile.status || "Inactive"}`);
+          void recordAuditLog(`LOGIN_BLOCKED_${action}`, authEmail, "Blocked", `Employee number: ${maskEmployeeNumber(employeeNumber)}; Status: ${profile.status || "Inactive"}`);
           await client.auth.signOut();
           signedIn = false;
           clearCachedProfile();
@@ -394,8 +433,8 @@
         lockoutUntil = 0;
         storage.remove("pgenro_failed_attempts", true);
         storage.remove("pgenro_lockout_until", true);
-        const cached = cacheProfile(profile, user, email);
-        void recordSuccessfulAccess(email, cached.role);
+        const cached = cacheProfile(profile, user, authEmail);
+        void recordSuccessfulAccess(authEmail, cached.role);
         el.btnLabel.textContent = "Signed in";
         el.loadingStatusHeading.textContent = "Signed in.";
         el.loadingStatusText.textContent = "Opening your workspace…";
@@ -404,7 +443,7 @@
       } catch (error) {
         if (signedIn) { try { await client.auth.signOut(); } catch {} }
         clearCachedProfile();
-        void recordAuditLog("LOGIN_SYSTEM_ERROR", email, "Error", error?.message || "Unavailable");
+        void recordAuditLog("LOGIN_SYSTEM_ERROR", authEmail, "Error", `Employee number: ${maskEmployeeNumber(employeeNumber)}; ${error?.message || "Unavailable"}`);
         showMessage("error", "Unable to sign in", "Sign-in is unavailable right now. Check your connection and try again.");
       } finally {
         if (!redirected) {

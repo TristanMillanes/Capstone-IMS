@@ -2,3 +2,13 @@
 # current active Admin profile. Required for projects using publishable keys.
 [functions.admin-users]
 verify_jwt = false
+
+# Employee-number login resolves the private Auth email server-side and then
+# verifies the password through Supabase Auth. The function performs its own
+# request validation, so JWT verification is disabled for this public endpoint.
+[functions.employee-login]
+verify_jwt = false
+
+# Public one-time bootstrap endpoint; it validates a private setup key and closes after first Admin.
+[functions.bootstrap-first-admin]
+verify_jwt = false

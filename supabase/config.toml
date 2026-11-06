@@ -2,3 +2,11 @@
 # current active Admin profile. Required for projects using publishable keys.
 [functions.admin-users]
 verify_jwt = false
+
+# Public employee sign-in and registration validate the employee identity and
+# password inside the function. Registration always creates a Pending User.
+[functions.employee-login]
+verify_jwt = false
+
+[functions.employee-register]
+verify_jwt = false

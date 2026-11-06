@@ -1,0 +1,13 @@
+{
+  "name": "pgenro-frontend-checks",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test:employee-account": "node employee-account-database.cjs && node employee-account-browser.cjs",
+    "test:visual": "node visual-regression.cjs"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "0.5.15",
+    "playwright": "1.62.1"
+  }
+}

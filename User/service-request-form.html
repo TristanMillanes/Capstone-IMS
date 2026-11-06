@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="user-theme.js?v=20261103-frontend-fix"></script>
+<script src="user-theme.js?v=20261106-theme-ui-1"></script>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#1b6a4c"><meta name="description" content="Request environmental assistance from PGENRO Quezon. Complete your details, select a service, and review before submitting.">
 <title>PGENRO IMS | Service Request Form</title>
 <link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui"><link rel="stylesheet" href="service-request-form.css?v=20261101-user-ui">
-<script defer src="user-refresh.js?v=20261101-user-ui"></script><script defer src="service-request-form.js?v=20261101-user-ui"></script>
-<script defer src="user-workspace.js?v=20261101-user-ui"></script>
+<script defer src="user-refresh.js?v=20261101-user-ui"></script><script defer src="service-request-form.js?v=20261103-service-letter"></script>
+<script defer src="user-workspace.js?v=20261106-free-accounts-v1"></script>
 <link rel="stylesheet" href="user-polish.css?v=20261101-user-ui">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
 </head><body class="user-refresh service-request-page">
 <a class="user-skip-link" href="#publicServiceRequestForm">Skip to request form</a>
 <header class="public-header"><a class="public-brand" href="login.html" aria-label="PGENRO IMS home"><span class="public-seal"><img src="../logo/enro.png" alt="PGENRO seal" width="44" height="44"></span><span><strong>PGENRO IMS</strong><small>Province of Quezon</small></span></a><div class="public-header-links"><span class="public-portal-label">Citizen services</span><a class="staff-link" href="login.html">Staff sign in <span aria-hidden="true">↗</span></a></div></header>
@@ -33,19 +34,19 @@
 </ol></nav><div class="request-progress-wrap"><div><span>Your progress</span><output id="requestProgressText">Step 1 of 4</output></div><progress id="requestProgress" max="4" value="1" aria-label="Request form progress"></progress></div>
 <div class="request-guide-note"><span class="request-note-icon" aria-hidden="true">i</span><strong>What happens next?</strong><p>The office will assess your request. Keep the service number you receive for follow-up.</p><span class="request-guide-status">Pending Review after submission</span></div>
 <a class="request-back-link" href="login.html"><span aria-hidden="true">←</span> Back to start</a></aside>
-<div class="request-form-main"><div class="request-form-heading"><div><p class="public-eyebrow">PUBLIC SUBMISSION</p><h2 id="activeStepTitle" tabindex="-1">Tell us about yourself</h2></div><span class="required-note"><span>*</span> Required fields</span></div>
+<div class="request-form-main"><div class="request-form-heading"><div><p class="public-eyebrow">PUBLIC SUBMISSION</p><h2 id="activeStepTitle" tabindex="-1">Tell us about yourself</h2></div><span class="required-note">All fields are optional</span></div>
 <div id="serviceRequestFeedback" class="service-form-feedback" role="alert" tabindex="-1" hidden></div>
 <p class="service-info"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10v1"/></svg>Your service number and request date are assigned after you submit.</p>
 <fieldset data-step="0" id="requestStep0" class="service-form-section wizard-panel"><legend><span class="request-section-number">01</span>Tell us about yourself</legend>
 <p>Provide your name, requesting organization, and contact information.</p>
 <div class="service-form-grid">
 <div class="service-form-field">
-<label for="request-clientName">Full Name of Client / Requestor <span aria-hidden="true">*</span></label>
-<input type="text" autocomplete="name" id="request-clientName" name="clientName" required aria-required="true" maxlength="180" placeholder="e.g., Juan Dela Cruz">
+<label for="request-clientName">Full Name of Client / Requestor</label>
+<input type="text" autocomplete="name" id="request-clientName" name="clientName" maxlength="180" placeholder="e.g., Juan Dela Cruz">
 </div>
 <div class="service-form-field">
-<label for="request-organization">Organization / LGU / Barangay <span aria-hidden="true">*</span></label>
-<input type="text" autocomplete="organization" id="request-organization" name="organization" required aria-required="true" maxlength="240" placeholder="e.g., LGU Lucena / DepEd Quezon">
+<label for="request-organization">Organization / LGU / Barangay</label>
+<input type="text" autocomplete="organization" id="request-organization" name="organization" maxlength="240" placeholder="e.g., LGU Lucena / DepEd Quezon">
 </div>
 <div class="service-form-field">
 <label for="request-contactNo">Contact Number</label>
@@ -58,7 +59,7 @@
 
 </div></fieldset>
 <fieldset data-step="1" class="service-form-section wizard-panel" id="requestCategories" aria-describedby="categoryHelp"><legend><span class="request-section-number">02</span>How can we help?</legend>
-<p id="categoryHelp">Select at least one service, or describe another service below. You may select more than one category.</p>
+<p id="categoryHelp">Choose any services that apply, or leave this section blank. All selections are optional.</p>
 <div class="service-form-grid">
 <div class="service-form-field">
 <label for="request-technicalAssistance">Technical Assistance</label>
@@ -127,15 +128,24 @@
 
 </div></fieldset>
 <fieldset data-step="2" id="requestStep2" class="service-form-section wizard-panel"><legend><span class="request-section-number">03</span>Add your request details</legend>
-<p>Describe the assistance, quantities, project site, and preferred date.</p>
+<p>With or without a letter, you can type your request below. All fields are optional.</p>
 <div class="service-form-grid">
 <div class="service-form-field service-form-wide">
-<label for="request-requestDetails">Detailed Request Notes &amp; Quantities <span aria-hidden="true">*</span></label>
-<textarea id="request-requestDetails" name="requestDetails" required aria-required="true" maxlength="4000" placeholder="Include the scope, quantities, and other details of your request." rows="4"></textarea>
+<label for="request-hasAttachments">Attached letter or supporting documents (optional)</label>
+<select id="request-hasAttachments" name="hasAttachments" aria-describedby="request-letterHelp">
+<option value="">Not specified</option>
+<option value="true">WITH letter / documents</option>
+<option value="false">WITHOUT letter / documents</option>
+</select>
+<p id="request-letterHelp">No letter? Type the details below. You can leave the letter status and details blank.</p>
+</div>
+<div class="service-form-field service-form-wide">
+<label for="request-requestDetails">Detailed Request Notes &amp; Quantities</label>
+<textarea id="request-requestDetails" name="requestDetails" maxlength="4000" placeholder="No letter? Type your request here, including any scope or quantities (optional)." rows="4"></textarea>
 </div>
 <div class="service-form-field">
-<label for="request-location">Location / Project Site <span aria-hidden="true">*</span></label>
-<input type="text" id="request-location" name="location" required aria-required="true" maxlength="500" placeholder="Barangay, municipality, and specific landmark">
+<label for="request-location">Location / Project Site</label>
+<input type="text" id="request-location" name="location" maxlength="500" placeholder="Barangay, municipality, and specific landmark">
 </div>
 <div class="service-form-field">
 <label for="request-dateNeeded">Date Needed</label>

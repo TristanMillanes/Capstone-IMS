@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "scenario": "Registration starts with an employee ID and no self-selected role or personnel identity",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An unencoded employee ID cannot reach Auth signup",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An encoded employee ID, including leading zeroes, unlocks account creation",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Changing the verified ID immediately invalidates verification",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Mismatched passwords are rejected before signup",
+      "result": "PASS"
+    },
+    {
+      "scenario": "A failed signup retains the employee details and permits a retry",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Successful registration sends only the employee link and keeps password data inside Auth",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Registration fails closed while the employee-verification service is missing",
+      "result": "PASS"
+    },
+    {
+      "scenario": "A claimed employee ID remains blocked",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Personal attendance ignores URL employee IDs and never loads the raw employee table",
+      "result": "PASS"
+    },
+    {
+      "scenario": "Month and status filters update the personal record list and totals",
+      "result": "PASS"
+    },
+    {
+      "scenario": "The User can view their uniform records without employee encoding controls",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An employee with no monitoring entries receives a clear empty state",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An unlinked existing account sees no attendance data from another employee",
+      "result": "PASS"
+    },
+    {
+      "scenario": "An attendance service error clears records instead of showing cached attendance",
+      "result": "PASS"
+    },
+    {
+      "scenario": "A delayed response for a previous account cannot overwrite the current account attendance",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/requestacc.html fits desktop, tablet and phone widths in both appearances",
+      "result": "PASS"
+    },
+    {
+      "scenario": "The personal attendance profile menu and mobile navigation open and close correctly",
+      "result": "PASS"
+    },
+    {
+      "scenario": "User/my-attendance.html fits desktop, tablet and phone widths in both appearances",
+      "result": "PASS"
+    },
+    {
+      "scenario": "The existing Employee Directory uses the safe projection instead of raw attendance-bearing rows",
+      "result": "PASS"
+    }
+  ],
+  "errors": [],
+  "missing": [],
+  "method": "Actual Chromium; production frontend; fixture Auth/RPC; no live backend calls"
+}

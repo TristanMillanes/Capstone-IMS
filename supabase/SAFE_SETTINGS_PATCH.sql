@@ -1,6 +1,6 @@
 -- ============================================================================
 -- PGENRO IMS — SAFE ACCOUNT & SYSTEM SETTINGS PATCH
--- Idempotent: safe to run more than once after PGENRO_FULL_SETUP.sql.
+-- Idempotent: safe to run more than once after COMPLETE_SETUP.sql.
 -- Does not replace or drop operational tables.
 -- ============================================================================
 

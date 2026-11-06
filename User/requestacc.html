@@ -2,10 +2,12 @@
 
 <html data-css-scope="auth-request" data-request-design="emerald-workspace-v1" lang="en">
 <head>
-<script src="user-theme.js?v=20261103-frontend-fix"></script><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><meta content="#053d31" name="theme-color"/><meta content="Request a staff account for PGENRO Information Management System." name="description"/><title>PGENRO IMS | Request an account</title><link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect"/><link crossorigin="" href="https://zssrxubajhqryrwijyzm.supabase.co" rel="preconnect"/><link href="requestacc.css?v=20261101-user-ui" rel="stylesheet"/><link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui">
+<script src="user-theme.js?v=20261106-theme-ui-1"></script><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/><meta content="#053d31" name="theme-color"/><meta content="Request a staff account for PGENRO Information Management System." name="description"/><title>PGENRO IMS | Request an account</title><link crossorigin="" href="https://cdn.jsdelivr.net" rel="preconnect"/><link crossorigin="" href="https://zssrxubajhqryrwijyzm.supabase.co" rel="preconnect"/><link href="requestacc.css?v=20261105-employee-id" rel="stylesheet"/><link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui">
+<script src="vendor/lucide/lucide.min.js"></script>
 <script defer src="user-refresh.js?v=20261101-user-ui"></script>
-<script defer src="user-workspace.js?v=20261101-user-ui"></script>
+<script defer src="user-workspace.js?v=20261106-free-accounts-v1"></script>
 <link rel="stylesheet" href="user-polish.css?v=20261101-user-ui">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
 </head>
 <body class="pgenro-auth pgenro-request ui-unified user-refresh" data-css-scope="auth-request" data-motion="paused"><a class="skip-link" href="#accessForm">Skip to request form</a>
 <div aria-hidden="true" class="ambient-background">
@@ -57,313 +59,30 @@
 <g class="illustration-check"><rect fill="#022e2370" height="91" rx="17" width="87" x="257" y="121"></rect><rect fill="#e8f4e1" height="91" rx="17" stroke="#f5fcec" width="87" x="254" y="114"></rect><circle cx="297" cy="152" fill="#397b51" r="20"></circle><path d="m287 152 7 7 13-14" stroke="#f7fcf1" stroke-linecap="round" stroke-linejoin="round" stroke-width="3"></path><path d="M273 188h50" stroke="#8cad86" stroke-linecap="round" stroke-width="4"></path></g>
 <path d="M68 77V61h17m247 170v17h-17" stroke="#bdd7b6" stroke-linecap="round" stroke-opacity=".5"></path><circle cx="311" cy="66" fill="#cddfac" r="3"></circle><circle cx="78" cy="263" fill="#cddfac" r="2"></circle>
 </svg>
-<div aria-label="How to request an account" class="hero-points"><div class="hero-point"><span class="hero-point-icon"><i data-lucide="user"></i></span><div><strong>Complete your details</strong><span>Tell us about you and your assignment.</span></div></div><div class="hero-point"><span class="hero-point-icon"><i data-lucide="file-check"></i></span><div><strong>Submit for review</strong><span>Your administrator reviews the request.</span></div></div><div class="hero-point"><span class="hero-point-icon"><i data-lucide="check-circle-2"></i></span><div><strong>Sign in when approved</strong><span>Access your assigned workspace.</span></div></div></div>
-<div class="hero-bottom"><i data-lucide="leaf"></i><span>Provincial Government of Quezon</span></div></aside><section aria-labelledby="requestHeading" class="form-panel"><div aria-hidden="true" class="form-processing-overlay" id="formProcessingOverlay"><div aria-live="polite" class="processing-card" role="status"><span class="processing-icon" id="processingIcon"><i data-lucide="loader-2"></i></span><strong id="processingTitle">Submitting your request</strong><span id="processingMessage">Sending your details for administrator review…</span></div></div><div class="form-panel-header"><span class="section-kicker"><i data-lucide="user-check"></i>Staff account request</span><h2 id="requestHeading">Request an account<span>.</span></h2><p>A few details to get you started.</p></div><div class="request-form-body"><div class="progress-area"><div class="progress-meta"><span class="meta-step" id="progressLabel">Step 1 of 3</span><span class="meta-hint" id="progressHint">Your details</span></div><div aria-label="Application progress" aria-valuemax="3" aria-valuemin="1" aria-valuenow="1" class="progress-track" role="progressbar"><div class="progress-bar" id="stepperProgress"></div></div><nav aria-label="Registration stages" class="stepper">
-<button aria-controls="page1" aria-current="step" class="step active" data-step="1" type="button">
-<span class="step-indicator">
-<span class="step-number">1</span>
-<i class="step-done-icon" data-lucide="user-check"></i>
-</span>
-<span class="step-copy">
-<strong>Identity</strong>
-<small>Contact &amp; password</small>
-</span>
-</button>
-<button aria-controls="page2" class="step" data-step="2" type="button">
-<span class="step-indicator">
-<span class="step-number">2</span>
-<i class="step-done-icon" data-lucide="briefcase"></i>
-</span>
-<span class="step-copy">
-<strong>Assignment</strong>
-<small>Division &amp; role</small>
-</span>
-</button>
-<button aria-controls="page3" class="step" data-step="3" type="button">
-<span class="step-indicator">
-<span class="step-number">3</span>
-<i class="step-done-icon" data-lucide="badge-check"></i>
-</span>
-<span class="step-copy">
-<strong>Review</strong>
-<small>Check &amp; submit</small>
-</span>
-</button>
-</nav></div><div class="draft-banner" id="draftBanner" role="status" style="display:none"><span class="draft-icon"><i data-lucide="archive-restore"></i></span><div class="draft-message"><strong>A saved draft is ready</strong><span>Restore your details, or start fresh.</span></div><div class="draft-actions"><button class="btn-inline" id="restoreDraftBtn" type="button">Restore</button><button class="btn-inline danger" id="discardDraftBtn" type="button">Discard</button></div></div><div class="save-status-row"><div aria-live="polite" class="save-status" id="saveStatus" role="status"><i data-lucide="cloud"></i><span>Drafts stay on this device · Passwords excluded</span></div></div><div class="request-error" hidden="" id="requestError" role="alert"></div>
-<form autocomplete="on" class="form-content" id="accessForm" novalidate="">
-<section aria-label="Identity and security" class="form-page active" id="page1" role="tabpanel">
-<div class="page-header">
-<div class="section-badge">01</div>
-<div>
-<span class="form-kicker">Your details</span>
-<h3 tabindex="-1">Let’s get to know you.</h3>
-<p>Add your contact details and create a password.</p>
-</div>
+<div aria-label="How to request an account" class="hero-points"><div class="hero-point"><span class="hero-point-icon"><i data-lucide="user"></i></span><div><strong>Enter your employee ID</strong><span>Enter your employee number and account details.</span></div></div><div class="hero-point"><span class="hero-point-icon"><i data-lucide="file-check"></i></span><div><strong>Submit for review</strong><span>Your administrator reviews the request.</span></div></div><div class="hero-point"><span class="hero-point-icon"><i data-lucide="check-circle-2"></i></span><div><strong>Sign in when approved</strong><span>Access your assigned workspace.</span></div></div></div>
+<div class="hero-bottom"><i data-lucide="leaf"></i><span>Provincial Government of Quezon</span></div></aside><section aria-labelledby="requestHeading" class="form-panel employee-registration-panel">
+<div class="form-panel-header"><span class="section-kicker">EMPLOYEE ACCOUNT</span><h2 id="requestHeading">Request an account<span>.</span></h2><p>Enter your employee number and details. An administrator will review your request.</p></div>
+<div class="request-form-body">
+<div class="request-error" id="requestError" hidden role="alert"></div>
+<form class="form-content employee-registration-form" id="accessForm">
+<div class="form-grid">
+<div class="input-container full-width"><label for="employeeNumber">Employee ID number <span>*</span></label><div class="input-wrapper employee-login-identity"><input id="employeeNumber" name="employeeNumber" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="60" placeholder="e.g. 0007" required aria-describedby="employeeNumberHelp"><span class="account-domain-suffix">@pgenro.ims</span></div><span class="field-help" id="employeeNumberHelp">Enter only your employee ID, including leading zeroes. The login suffix is added automatically.</span></div>
 </div>
 <div class="form-grid">
-<div class="input-container full-width">
-<label for="fullName">Full name <span>*</span></label>
-<div class="input-wrapper">
-<i class="icon-left" data-lucide="user"></i>
-<input aria-describedby="fullNameError" autocomplete="name" id="fullName" name="fullName" placeholder="Enter your full name" required="" type="text"/>
+<div class="input-container full-width"><label for="fullName">Full name <span>*</span></label><div class="input-wrapper"><input id="fullName" name="fullName" autocomplete="name" maxlength="200" required placeholder="Your full name"></div></div>
+<div class="input-container"><label for="division">Office division <span>*</span></label><div class="input-wrapper select-wrapper"><select id="division" name="division" required><option value="">Select office division</option><option value="Admin Office">Admin Office</option><option value="Environment Management">Environment Management Division</option><option value="Forestry Division">Forestry Division</option><option value="Mines &amp; Quarry">Mines &amp; Quarry Division</option></select><i class="icon-right" data-lucide="chevron-down"></i></div></div>
+<div class="input-container"><label for="position">Position <small>(optional)</small></label><div class="input-wrapper"><input id="position" name="position" autocomplete="organization-title" maxlength="200" placeholder="Your position"></div></div>
 </div>
-<span class="field-help">Use the name in your personnel records.</span>
-<span aria-live="polite" class="error-msg" id="fullNameError"></span>
-</div>
-<div class="input-container">
-<label for="email">Email address <span>*</span></label>
-<div class="input-wrapper">
-<i class="icon-left" data-lucide="mail"></i>
-<input aria-describedby="emailError" autocomplete="email" id="email" name="email" placeholder="you@example.com" required="" type="email"/>
-</div>
-<span class="field-help">Use an active email you can access.</span>
-<span aria-live="polite" class="error-msg" id="emailError"></span>
-</div>
-<div class="input-container">
-<label for="contact">Mobile number <span>*</span></label>
-<div class="input-wrapper">
-<i class="icon-left" data-lucide="phone"></i>
-<input aria-describedby="contactError" autocomplete="tel" id="contact" inputmode="numeric" maxlength="11" name="contact" pattern="^(09)\d{9}$" placeholder="09123456789" required="" type="tel"/>
-</div>
-<span class="field-help">11 digits, starting with 09.</span>
-<span aria-live="polite" class="error-msg" id="contactError"></span>
-</div>
-<div class="input-container">
-<label for="password">Create password <span>*</span></label>
-<div class="input-wrapper">
-<i class="icon-left" data-lucide="lock"></i>
-<input aria-describedby="passwordError passwordStrengthText" autocomplete="new-password" id="password" minlength="6" name="password" placeholder="At least 6 characters" required="" type="password"/>
-<button aria-controls="password" aria-label="Show password" aria-pressed="false" class="password-toggle" id="togglePasswordBtn" type="button">
-<i data-lucide="eye"></i>
-</button>
-</div>
-<div class="password-meter-wrap">
-<div class="password-meter-segments">
-<span class="segment" id="pwSeg1"></span>
-<span class="segment" id="pwSeg2"></span>
-<span class="segment" id="pwSeg3"></span>
-<span class="segment" id="pwSeg4"></span>
-</div>
-<div class="password-meter-info">
-<i class="meter-icon" data-lucide="shield"></i>
-<span id="passwordStrengthText" role="status">Security strength indicator</span>
-</div>
-</div>
-<span aria-live="polite" class="error-msg" id="passwordError"></span>
-</div>
-<div class="input-container">
-<label for="confirmPassword">Confirm password <span>*</span></label>
-<div class="input-wrapper">
-<i class="icon-left" data-lucide="shield-check"></i>
-<input aria-describedby="confirmPasswordError" autocomplete="new-password" id="confirmPassword" minlength="6" name="confirmPassword" placeholder="Re-enter your password" required="" type="password"/>
-<button aria-controls="confirmPassword" aria-label="Show password" aria-pressed="false" class="password-toggle" id="toggleConfirmPasswordBtn" type="button">
-<i data-lucide="eye"></i>
-</button>
-</div>
-<span class="field-help">Enter the same password again.</span>
-<span aria-live="polite" class="error-msg" id="confirmPasswordError"></span>
-</div>
-</div>
-</section>
-<section aria-label="Division assignment" class="form-page" id="page2" role="tabpanel" style="display:none;">
-<div class="page-header">
-<div class="section-badge">02</div>
-<div>
-<span class="form-kicker">Your assignment</span>
-<h3 tabindex="-1">Where do you work?</h3>
-<p>Choose your position, division, and requested account role.</p>
-</div>
-</div>
+<fieldset class="employee-password-fields" id="passwordFields"><legend>Create your password</legend>
 <div class="form-grid">
-<div class="input-container">
-<label for="position">Position / designation <span>*</span></label>
-<div class="input-wrapper select-wrapper">
-<i class="icon-left" data-lucide="briefcase"></i>
-<select aria-describedby="positionError" id="position" name="position" required="">
-<option disabled="" selected="" value="">Select your position</option>
-<optgroup label="Technical &amp; Natural Resource Personnel">
-<option value="Environmental Management Specialist">Environmental Management Specialist (EMS)</option>
-<option value="Mining Engineer / Geologist">Mining Engineer / Geologist</option>
-<option value="Forestry Technician / Officer">Forestry Technician / Forest Officer</option>
-<option value="GIS Specialist / Cartographer">GIS Specialist / Geomatics Cartographer</option>
-</optgroup>
-<optgroup label="Administrative &amp; Enforcement Personnel">
-<option value="Administrative Officer">Administrative Officer</option>
-<option value="Records / Clearance Officer">Records / Clearance Officer</option>
-<option value="Environmental Inspection Officer">Environmental Inspection / Enforcement Officer</option>
-<option value="Division Chief / Provincial Officer">Division Chief / Provincial Officer</option>
-</optgroup>
-<option value="Other Personnel">Other Accredited Staff</option>
-</select>
-<i class="icon-right" data-lucide="chevron-down"></i>
+<div class="input-container"><label for="password">Password <span>*</span></label><div class="input-wrapper"><input id="password" name="password" autocomplete="new-password" type="password" minlength="8" maxlength="128" required placeholder="At least 8 characters"><button class="password-toggle" type="button" id="togglePasswordBtn" aria-label="Show password" aria-pressed="false">Show</button></div></div>
+<div class="input-container"><label for="confirmPassword">Confirm password <span>*</span></label><div class="input-wrapper"><input id="confirmPassword" name="confirmPassword" autocomplete="new-password" type="password" minlength="8" maxlength="128" required placeholder="Enter your password again"><button class="password-toggle" type="button" id="toggleConfirmPasswordBtn" aria-label="Show confirmation password" aria-pressed="false">Show</button></div></div>
 </div>
-<span aria-live="polite" class="error-msg" id="positionError"></span>
-</div>
-<div class="input-container">
-<label for="division">Assigned division <span>*</span></label>
-<div class="input-wrapper select-wrapper">
-<i class="icon-left" data-lucide="building"></i>
-<select aria-describedby="divisionError" id="division" name="division" required="">
-<option disabled="" selected="" value="">Select your division</option>
-<option value="Admin Office">Admin Office (Executive &amp; General Services)</option>
-<option value="Environment Management">Environment Management Division (Pollution, Waste, Compliance)</option>
-<option value="Forestry Division">Forestry Division (Watershed, Reforestation, Agroforestry)</option>
-<option value="Mines &amp; Quarry">Mines &amp; Geosciences / Quarry Permitting Division</option>
-</select>
-<i class="icon-right" data-lucide="chevron-down"></i>
-</div>
-<span aria-live="polite" class="error-msg" id="divisionError"></span>
-</div>
-<fieldset class="input-container role-field full-width">
-<legend>Requested account role <span>*</span></legend>
-<select aria-describedby="roleError" aria-label="Requested IMS access role" class="sr-only" id="role" name="role" required="" tabindex="-1">
-<option disabled="" selected="" value="">Choose Admin or User</option>
-<option value="User">User access</option>
-<option value="Admin">Admin access</option>
-</select>
-<div aria-label="Account role options" class="role-choice-grid" role="group">
-<button aria-pressed="false" class="role-choice" data-role="User" type="button">
-<span class="role-choice-head">
-<span class="role-choice-icon user-icon">
-<i data-lucide="user-check"></i>
-</span>
-<span class="role-title-block">
-<strong>User access</strong>
-<span>For everyday work</span>
-</span>
-<span aria-hidden="true" class="role-choice-check">
-<i data-lucide="check"></i>
-</span>
-</span>
-<span class="role-desc">
-                                        View your division’s documents and approved workspace modules.
-                                    </span>
-</button>
-<button aria-pressed="false" class="role-choice role-choice--admin" data-role="Admin" type="button">
-<span class="role-choice-head">
-<span class="role-choice-icon admin-icon">
-<i data-lucide="shield-check"></i>
-</span>
-<span class="role-title-block">
-<strong>Admin access</strong>
-<span>For authorized management</span>
-</span>
-<span aria-hidden="true" class="role-choice-check">
-<i data-lucide="check"></i>
-</span>
-</span>
-<span class="role-desc">
-                                        Request tools for records management and account approvals.
-                                    </span>
-</button>
-</div>
-<span class="field-help">The administrator reviews your request and assigns your final access.</span>
-<span aria-live="polite" class="error-msg" id="roleError"></span>
+<label class="employee-account-consent"><input type="checkbox" id="agree" name="agree" required><span>I confirm that this is my employee ID and that my details are correct.</span></label>
 </fieldset>
-<div class="input-container full-width">
-<label for="endorser">Division head / endorser <span>*</span></label>
-<div class="input-wrapper">
-<i class="icon-left" data-lucide="user-check"></i>
-<input aria-describedby="endorserError" autocomplete="off" id="endorser" name="endorser" placeholder="Enter your division head’s name" required="" type="text"/>
-</div>
-<span class="field-help">Name of the person endorsing your request.</span>
-<span aria-live="polite" class="error-msg" id="endorserError"></span>
-</div>
-</div>
-</section>
-<section aria-label="Endorsement validation" class="form-page" id="page3" role="tabpanel" style="display:none;">
-<div class="page-header">
-<div class="section-badge">03</div>
-<div>
-<span class="form-kicker">Review your request</span>
-<h3 tabindex="-1">One final check.</h3>
-<p>Review your details and tell us what you’ll use the account for.</p>
-</div>
-</div>
-<div class="validation-layout">
-<div class="dossier-card" id="dossierPreview">
-<div class="dossier-header">
-<div class="dossier-title">
-<i data-lucide="file-check"></i>
-<span>Your application</span>
-</div>
-<span class="dossier-badge" id="summaryRoleBadge">Role: --</span>
-</div>
-<div class="dossier-grid">
-<div class="dossier-item">
-<small>Full name</small>
-<strong id="sumName">--</strong>
-</div>
-<div class="dossier-item">
-<small>Email address</small>
-<strong id="sumId">--</strong>
-</div>
-<div class="dossier-item">
-<small>Division</small>
-<strong id="sumDivision">--</strong>
-</div>
-<div class="dossier-item">
-<small>Position</small>
-<strong id="sumPosition">--</strong>
-</div>
-</div>
-</div>
-<div class="input-container full-width">
-<div class="label-row">
-<label for="reason">Reason for requesting access <span>*</span></label>
-<span class="char-counter" id="charCount">0 / 250</span>
-</div>
-<div class="input-wrapper textarea-wrapper">
-<i class="icon-left text-icon" data-lucide="pen-tool"></i>
-<textarea aria-describedby="reasonError" id="reason" maxlength="250" name="reason" placeholder="Briefly describe your duties and the access you need." required=""></textarea>
-</div>
-<span class="field-help">Keep it brief and specific. Maximum 250 characters.</span>
-<span aria-live="polite" class="error-msg" id="reasonError"></span>
-</div>
-<div class="compliance-group">
-<div class="compliance-wrapper">
-<label class="compliance-box" for="endorsementCheck">
-<input aria-describedby="endorsementCheckError" id="endorsementCheck" name="endorsementCheck" required="" type="checkbox"/>
-<span class="checkbox-visual"><i data-lucide="check"></i></span>
-<span class="compliance-copy">
-<strong>Division endorsement</strong>
-<span>I have a signed endorsement from my division head and can present it when requested.</span>
-</span>
-</label>
-<span aria-live="polite" class="error-msg" id="endorsementCheckError"></span>
-</div>
-<div class="compliance-wrapper">
-<label class="compliance-box" for="agree">
-<input aria-describedby="agreeError" id="agree" name="agree" required="" type="checkbox"/>
-<span class="checkbox-visual"><i data-lucide="check"></i></span>
-<span class="compliance-copy">
-<strong>Accurate details &amp; account use</strong>
-<span>I confirm that my details are accurate and agree to the <button class="btn-link" id="openPrivacyBtn" type="button">privacy and account-use notice</button>.</span>
-</span>
-</label>
-<span aria-live="polite" class="error-msg" id="agreeError"></span>
-</div>
-</div>
-<div class="secure-submit-note">
-<i data-lucide="lock"></i>
-<span>Your request will be sent for administrator review.</span>
-</div>
-</div>
-</section>
-<div class="form-controls">
-<button class="btn-outline" id="backBtn" style="visibility:hidden;" type="button">
-<i data-lucide="arrow-left"></i>
-<span>Back</span>
-</button>
-<div class="action-group">
-<button class="btn-solid" id="nextBtn" type="button">
-<span>Continue</span>
-<i data-lucide="arrow-right"></i>
-</button>
-<button class="btn-solid btn-success" id="submitBtn" style="display:none;" type="submit">
-<span>Submit request</span>
-<i data-lucide="send"></i>
-</button>
-</div>
-</div>
-</form><section aria-labelledby="successTitle" class="request-success" hidden="" id="requestSuccess" role="status"><span class="success-mark"><i data-lucide="check"></i></span><span class="form-kicker">Request received</span><h2 id="successTitle" tabindex="-1">You’re on your way.</h2><p>Your request has been sent for administrator review.</p><div class="success-reference"><span>Request reference</span><strong id="successRef"></strong></div><p class="success-next">Check your inbox for any confirmation email. Once your account is approved, you can sign in.</p><a class="btn-solid" href="login.html">Back to sign in <i data-lucide="arrow-right"></i></a></section><noscript><p class="noscript-notice">Enable JavaScript to complete and submit your request.</p></noscript></div></section></main><footer class="portal-footer">© 2026 PGENRO <span aria-hidden="true">·</span> Province of Quezon</footer></div><dialog aria-labelledby="privacyTitle" class="modal-dialog" id="privacyModal"><div class="modal-wrapper"><header class="modal-header"><span class="modal-icon-bg"><i data-lucide="shield-check"></i></span><div><span class="form-kicker">PGENRO IMS</span><h2 id="privacyTitle">Privacy &amp; account use</h2></div><button aria-label="Close privacy notice" class="modal-close-btn" id="closePrivacyBtn" type="button"><i data-lucide="x"></i></button></header><div class="modal-body"><p>Your application details are sent to PGENRO for account review. A draft is saved on this device so you can continue later.</p><div class="notice-point"><i data-lucide="lock"></i><div><h3>Keep your account personal</h3><p>Use your own details and keep your password private. Passwords are not saved in the application draft.</p></div></div><div class="notice-point"><i data-lucide="shield"></i><div><h3>Use your assigned access</h3><p>Your administrator reviews the request and sets your final permissions. Handle office records according to PGENRO’s policies.</p></div></div><div class="notice-point"><i data-lucide="trash-2"></i><div><h3>Manage your draft</h3><p>You can discard a saved draft from this page. On a shared device, clear your draft when you are finished.</p></div></div></div><footer class="modal-footer"><button class="btn-solid" id="acceptPrivacyBtn" type="button">I agree <i data-lucide="check"></i></button></footer></div></dialog><div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="requestacc.js?v=20261101-user-ui" type="module"></script></body></html>
+<p class="employee-account-note">One employee ID can have one account or pending request. Your administrator will review the request before access is enabled.</p>
+<button class="btn-solid" id="submitBtn" type="submit">Request account</button>
+<p class="employee-signin-link">Already have an account? <a href="login.html">Sign in</a></p>
+</form>
+<section class="request-success" id="requestSuccess" hidden role="status"><h3 id="successTitle" tabindex="-1">Account request received.</h3><p>Employee ID: <strong id="successEmployeeNumber"></strong></p><p>Your login address is created automatically. Sign in with your employee ID and password once your administrator approves your account.</p><a class="btn-solid" href="login.html">Back to sign in</a></section>
+</div></section></main><footer class="portal-footer">© 2026 PGENRO <span aria-hidden="true">·</span> Province of Quezon</footer></div><div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script defer src="../shared/supabase.js?v=20261105-employee-id"></script><script defer src="../shared/employee-identity.js?v=20261105-employee-id"></script><script defer src="requestacc.js?v=20261106-free-accounts-v1"></script></body></html>

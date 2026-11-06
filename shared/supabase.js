@@ -2538,6 +2538,12 @@
     table,
     select = "*"
   ) {
+    if (table === 'employees' && /\/user\//i.test(location.pathname) && !/\/admin\//i.test(location.pathname)) {
+      const result = await requireClient().rpc('pgenro_employee_directory');
+      if (result.error) throw result.error;
+      if (!Array.isArray(result.data)) throw new Error('The employee directory is not configured.');
+      return result.data;
+    }
     const {
       data,
       error

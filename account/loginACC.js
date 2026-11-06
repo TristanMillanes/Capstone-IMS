@@ -8,7 +8,7 @@ const loginForm = document.getElementById("loginForm");
 loginForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  const email = document.getElementById("email")?.value.trim().toLowerCase() || "";
+  const employeeNumber = (document.getElementById("employeeNumber") || document.getElementById("email"))?.value.trim().replace(/@pgenro\.ims$/i, "") || "";
   const password = document.getElementById("password")?.value || "";
 
   try {
@@ -16,9 +16,14 @@ loginForm?.addEventListener("submit", async (event) => {
       throw new Error("Supabase is not configured.");
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (!/^[A-Za-z0-9_-][A-Za-z0-9._-]{0,63}$/.test(employeeNumber) || employeeNumber.endsWith('.') || employeeNumber.includes('..')) throw new Error('Enter a valid employee ID.');
+    const result = await supabase.functions.invoke('employee-login', { body: { employee_number: employeeNumber, password } });
+    if (result.error) throw new Error('Unable to sign in. Check your employee ID/password and the employee-login service.');
+    if (!result.data?.access_token || !result.data?.refresh_token) throw new Error('The login service did not return a valid session.');
+    const { data, error } = await supabase.auth.setSession(result.data);
     if (error) throw error;
     if (!data.user) throw new Error("No authenticated user returned.");
+    const email = data.user.email || employeeNumber.toLowerCase() + '@pgenro.ims';
 
     const profile = await PGENRO_API.getCurrentProfile();
     if (!profile || !profile.is_active || !["active", "approved"].includes(String(profile.status || "").toLowerCase())) {

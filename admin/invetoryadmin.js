@@ -398,13 +398,13 @@ function rowHTML(item) {
   const updated = item.updated_at ? new Date(item.updated_at).toLocaleDateString() : "—";
 
   return `<tr>
-    <td><span class="control">${escapeHTML(item.control_no || "—")}</span></td>
+    <td class="inventory-reference"><span class="control">${escapeHTML(item.control_no || "—")}</span></td>
     <td>
       <span class="item-name">${escapeHTML(item.item_name || "—")}</span>
       <span class="item-desc">${escapeHTML(item.description || item.remarks || "No specifications")}</span>
     </td>
     <td>${escapeHTML(item.category || "General")}</td>
-    <td><b>${escapeHTML(item.unit || "PCS")}</b></td>
+    <td class="inventory-unit"><b>${escapeHTML(item.unit || "PCS")}</b></td>
     <td><span class="stock-number">${Number(item.quantity || 0).toLocaleString()}</span></td>
     <td>${Number(item.threshold || 0).toLocaleString()}</td>
     <td><span class="badge ${status}">${label}</span></td>

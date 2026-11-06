@@ -1,9 +1,17 @@
-/* Page-owned layout helpers; do not change record permissions or data writes. */
+/* User workspace layout and navigation. Database policies enforce record access. */
 (() => {
   'use strict';
   function init() {
     if (document.body.dataset.unifiedLayoutReady) return;
     document.body.dataset.unifiedLayoutReady = 'true';
+    function hideAdminVisitorLinks() {
+      if (!document.body.classList.contains('pgenro-user')) return;
+      document.querySelectorAll('a[href*="visitorsView"],a[href*="visitors-admin"]').forEach(link => {
+        const row = link.closest('.modules-list li, .sidebar li');
+        (row || link).remove();
+      });
+    }
+    hideAdminVisitorLinks();
     // A wide registry scrolls within its own region, including dynamically mounted tables.
     function containTables() {
       document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
@@ -15,8 +23,9 @@
     containTables();
     let tableFrame;
     const insertedTables = new MutationObserver(records => {
-      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.tagName === 'TABLE' || node.querySelector?.('table'))))) return;
-      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(containTables);
+      const selector = 'table,a[href*="visitorsView"],a[href*="visitors-admin"]';
+      if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.matches?.(selector) || node.querySelector?.(selector))))) return;
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(() => {containTables(); hideAdminVisitorLinks();});
     });
     insertedTables.observe(document.body, {childList:true,subtree:true});
     document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());

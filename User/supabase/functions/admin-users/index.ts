@@ -5,7 +5,7 @@ const TABLE = 'profiles';
 const allowedRoles = new Set(['Admin', 'User']);
 const allowedStatuses = new Set(['Active', 'Inactive', 'Suspended']);
 type ProfileInput = {
-  fullName: string; username: string; email: string; division: string;
+  fullName: string; employeeNumber: string; email: string; division: string;
   role: string; status: string; position: string; contact: string; password?: string;
 };
 class HttpError extends Error {
@@ -25,13 +25,12 @@ function validateUser(raw: unknown, creating: boolean): ProfileInput {
   const u = raw as Record<string, unknown>;
   const result: ProfileInput = {
     fullName: text(u.fullName, 'Full name', 200, true),
-    username: text(u.username, 'Username', 60, true),
+    employeeNumber: text(u.employeeNumber, 'Employee Number', 80, true),
     email: text(u.email, 'Email', 254, true).toLowerCase(),
     division: text(u.division, 'Division', 200, true),
     role: text(u.role, 'Role', 30, true), status: text(u.status, 'Status', 20, true),
     position: text(u.position, 'Position'), contact: text(u.contact, 'Contact', 40),
   };
-  if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(result.username)) throw new HttpError(400, 'Username must contain letters, numbers, dots, underscores or hyphens.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result.email)) throw new HttpError(400, 'Enter a valid email address.');
   // Accept only the two canonical access roles from the Admin review form.
   if (!allowedRoles.has(result.role) || !allowedStatuses.has(result.status)) throw new HttpError(400, 'Invalid role or status.');
@@ -43,14 +42,19 @@ function validateUser(raw: unknown, creating: boolean): ProfileInput {
   if (password) result.password = password;
   return result;
 }
-function directoryFields(u: ProfileInput) {
-  return { full_name: u.fullName, username: u.username, email: u.email, division: u.division,
+function directoryFields(u: ProfileInput, employee: Record<string, any>) {
+  const employeeNumber = String(employee.employee_id || u.employeeNumber).trim();
+  return { full_name: u.fullName, username: employeeNumber, employee_number: employeeNumber,
+    employee_record_id: String(employee.id), email: u.email, division: u.division,
     role: u.role, status: u.status, is_active: u.status === 'Active',
     account_type: u.role === 'Admin' ? 'Administrator' : 'Standard User', position: u.position, contact: u.contact,
     updated_at: new Date().toISOString() };
 }
-function displayMetadata(u: ProfileInput) {
-  return { full_name: u.fullName, fullName: u.fullName, name: u.fullName, username: u.username,
+function displayMetadata(u: ProfileInput, employee: Record<string, any>) {
+  const employeeNumber = String(employee.employee_id || u.employeeNumber).trim();
+  return { full_name: u.fullName, fullName: u.fullName, name: u.fullName,
+    username: employeeNumber, employee_number: employeeNumber,
+    employee_record_id: String(employee.id),
     division: u.division, position: u.position, contact: u.contact };
 }
 function accessMetadata(role: string, status: string) {
@@ -69,11 +73,34 @@ function serverKey(): string {
   return Deno.env.get('SUPABASE_SECRET_KEY') || Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 }
 function databaseError(error: { code?: string; message?: string }): HttpError {
-  if (error.code === '23505') return new HttpError(409, 'Email or username already exists. Refresh the directory before retrying.');
+  if (error.code === '23505') return new HttpError(409, 'Email or Employee Number already belongs to another account. Refresh the directory before retrying.');
   if (error.code === '23514') return new HttpError(409, error.message || 'Keep at least one active Admin.');
+  if (error.code === '42703' && /employee_number|employee_record_id/i.test(error.message || '')) {
+    return new HttpError(503, 'Run EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql in this Supabase project first.');
+  }
   if (['42P01', '42703', 'PGRST205'].includes(error.code || '')) return new HttpError(503, 'Run ADMIN_USER_ACCESS_PATCH.sql in this Supabase project first.');
   console.error('User directory database error:', error.code || 'unknown');
   return new HttpError(500, 'The account profile could not be saved. Refresh and retry.');
+}
+async function resolveEmployee(db: any, input: ProfileInput, excludeUserId: string | null = null): Promise<Record<string, any>> {
+  const response = await db.rpc('pgenro_registration_employee', {
+    p_employee_number: input.employeeNumber,
+    p_email: input.email,
+    p_lock: true,
+    p_exclude_user: excludeUserId,
+  });
+  if (response.error) {
+    if (['42883','PGRST202','PGRST204'].includes(response.error.code || '')
+      || /function.*does not exist|schema cache/i.test(response.error.message || '')) {
+      throw new HttpError(503, 'Run EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql in this Supabase project first.');
+    }
+    if (response.error.code === '23505') throw new HttpError(409, response.error.message || 'This Employee Number is already linked to an account.');
+    throw new HttpError(400, response.error.message || 'The Employee Number and email could not be verified.');
+  }
+  if (!response.data || typeof response.data !== 'object' || !response.data.id || !response.data.employee_id) {
+    throw new HttpError(400, 'The Employee Number could not be verified against the Employee Directory.');
+  }
+  return response.data;
 }
 function authError(error: { code?: string; status?: number; message?: string }): HttpError {
   if (['email_exists', 'user_already_exists', 'email_address_not_authorized'].includes(error.code || '')) {
@@ -84,19 +111,21 @@ function authError(error: { code?: string; status?: number; message?: string }):
     error.message || 'Supabase Auth could not complete this account change.');
 }
 Deno.serve(async (req: Request) => {
-  const origin = req.headers.get('origin') || '';
-  const configuredOrigins = (Deno.env.get('PGENRO_ALLOWED_ORIGINS') || '').split(',').map(s => s.trim()).filter(Boolean);
-  const allowedOrigin = configuredOrigins.length ? configuredOrigins.includes(origin) : true;
+  // CORS is not an authentication boundary. Authorization is enforced by the
+  // private setup key (bootstrap), the employee password (login), or the
+  // verified Admin bearer token (admin-users). Allow the browser app to call
+  // this endpoint from localhost and the deployed site without a stale
+  // PGENRO_ALLOWED_ORIGINS secret causing opaque browser 'Failed to fetch'.
   const cors: Record<string, string> = {
-    'Access-Control-Allow-Origin': configuredOrigins.length ? (allowedOrigin ? origin : configuredOrigins[0]) : '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS', 'Vary': 'Origin',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-api-version',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Max-Age': '86400',
     'Cache-Control': 'no-store',
   };
   const respond = (body: unknown, status = 200) => new Response(JSON.stringify({ ok: (body as Record<string, unknown>)?.success === true, ...(body as Record<string, unknown>) }), {
     status, headers: { ...cors, 'Content-Type': 'application/json' },
   });
-  if (origin && !allowedOrigin) return respond({ success: false, error: 'This website origin is not allowed.' }, 403);
   if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
   if (req.method !== 'POST') return respond({ success: false, error: 'Use POST.' }, 405);
   try {
@@ -141,8 +170,9 @@ Deno.serve(async (req: Request) => {
     };
     const syncProfile = async (profile: Record<string, any>) => {
       const uid = String(profile.user_id);
-      const data = {fullName: profile.full_name, username: profile.username, email: profile.email,
-        contact: profile.contact, position: profile.position, division: profile.division,
+      const data = {fullName: profile.full_name, username: profile.username,
+        employeeNumber: profile.employee_number, employeeRecordId: profile.employee_record_id,
+        email: profile.email, contact: profile.contact, position: profile.position, division: profile.division,
         role: profile.role, accountType: profile.account_type, status: profile.status,
         lastLogin: profile.last_login, updatedAt: new Date().toISOString()};
       await auxiliary('Account registry', () => db.from('users').upsert({id:uid,data,updated_at:new Date().toISOString()}, {onConflict:'id'}));
@@ -183,19 +213,18 @@ Deno.serve(async (req: Request) => {
     }
     if (action === 'create') {
       const input = validateUser(body.user, true);
-      const exactUsername = input.username.replace(/([\\%_])/g, '\\$1');
-      const duplicate = await db.from(TABLE).select('user_id').ilike('username', exactUsername).limit(1);
-      if (duplicate.error) throw databaseError(duplicate.error);
-      if (duplicate.data?.length) throw new HttpError(409, 'This username already exists.');
+      const employee = await resolveEmployee(db, input);
+      input.employeeNumber = String(employee.employee_id).trim();
       const created = await db.auth.admin.createUser({
         email: input.email, password: input.password, email_confirm: true,
-        user_metadata: {...displayMetadata(input), requested_role:input.role, created_by_admin: true}, app_metadata: accessMetadata(input.role, input.status),
+        user_metadata: {...displayMetadata(input, employee), requested_role:input.role, created_by_admin: true},
+        app_metadata: {...accessMetadata(input.role, input.status),created_by_admin:true},
         ban_duration: input.status === 'Active' ? 'none' : '876000h',
       });
       if (created.error) throw authError(created.error);
       if (!created.data.user) throw new HttpError(502, 'Auth did not confirm the new account. Refresh before retrying.');
       const userId = created.data.user.id;
-      const saved = await db.from(TABLE).upsert({ user_id: userId, ...directoryFields(input) }, { onConflict: 'user_id' }).select('*').single();
+      const saved = await db.from(TABLE).upsert({ user_id: userId, ...directoryFields(input, employee) }, { onConflict: 'user_id' }).select('*').single();
       if (saved.error) {
         // Roll back only the Auth user created by this request.
         const rollback = await db.auth.admin.deleteUser(userId);
@@ -248,9 +277,11 @@ Deno.serve(async (req: Request) => {
       if (userId === actor.id && (input.role !== before.role || input.status !== before.status)) {
         throw new HttpError(409, 'Use another Admin to change your own role or status.');
       }
-      fields = directoryFields(input);
+      const employee = await resolveEmployee(db, input, userId);
+      input.employeeNumber = String(employee.employee_id).trim();
+      fields = directoryFields(input, employee);
       authChanges = { email: input.email, email_confirm: true,
-        user_metadata: { ...existingAuth.data.user.user_metadata, ...displayMetadata(input) },
+        user_metadata: { ...existingAuth.data.user.user_metadata, ...displayMetadata(input, employee) },
         app_metadata: { ...existingAuth.data.user.app_metadata, ...accessMetadata(input.role, input.status) },
         ban_duration: input.status === 'Active' ? 'none' : '876000h' };
       if (input.password) authChanges.password = input.password;
@@ -263,7 +294,8 @@ Deno.serve(async (req: Request) => {
     const authUpdate = await db.auth.admin.updateUserById(userId, authChanges);
     if (authUpdate.error) {
       const rollback = await db.from(TABLE).update({ full_name: before.full_name,
-        username: before.username, email: before.email, division: before.division,
+        username: before.username, employee_number: before.employee_number,
+        employee_record_id: before.employee_record_id, email: before.email, division: before.division,
         role: before.role, status: before.status, is_active: before.is_active, account_type: before.account_type, position: before.position,
         contact: before.contact, updated_at: new Date().toISOString() }).eq('user_id', userId)
         .eq('updated_at', changed.data.updated_at).select('user_id');

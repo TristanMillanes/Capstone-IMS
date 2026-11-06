@@ -1,3 +1,6 @@
+-- Employee-ID registration update: after initial Admin setup, run the entire
+-- EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql file LAST to enable employee linking and private attendance.
+
 -- ============================================================================
 -- PGENRO IMS - SUPABASE DATABASE SCHEMA
 -- Run this once in Supabase Dashboard > SQL Editor.
@@ -1066,7 +1069,7 @@ grant execute on function public.pgenro_healthcheck() to anon, authenticated, se
 
 -- ============================================================================
 -- PGENRO IMS — SAFE ACCOUNT & SYSTEM SETTINGS PATCH
--- Idempotent: safe to run more than once after PGENRO_FULL_SETUP.sql.
+-- Idempotent: safe to run more than once after COMPLETE_SETUP.sql.
 -- Does not replace or drop operational tables.
 -- ============================================================================
 

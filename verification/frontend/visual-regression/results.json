@@ -1,0 +1,3053 @@
+{
+  "passed": true,
+  "method": "Actual Chromium; production frontend; local fixture Auth/database; computed solid and gradient-stop contrast, control geometry and legacy navigation",
+  "pages": 29,
+  "appearances": [
+    "light",
+    "dark"
+  ],
+  "widths": [
+    1440,
+    1024,
+    768,
+    390,
+    320
+  ],
+  "scenarios": 290,
+  "redirects": [
+    {
+      "file": "User/admin/Usermanagement.html",
+      "target": "/admin/Usermanagement.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/admin.html",
+      "target": "/admin/admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/admincommunication.html",
+      "target": "/admin/admincommunication.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/audittrail-admin.html",
+      "target": "/admin/audittrail-admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/backup-admin.html",
+      "target": "/admin/backup-admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/employee-admin.html",
+      "target": "/admin/employee-admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/ics-admin.html",
+      "target": "/admin/ics-admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/invetoryadmin.html",
+      "target": "/admin/invetoryadmin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/officememo-admin.html",
+      "target": "/admin/officememo-admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/requestacc.html",
+      "target": "/admin/requestacc.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/serviceAdmin.html",
+      "target": "/admin/serviceAdmin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/travelOR-admin.html",
+      "target": "/admin/travelOR-admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/admin/visitors-admin.html",
+      "target": "/admin/visitors-admin.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/communication.html",
+      "target": "/User/communication.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/employee.html",
+      "target": "/User/employee.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/homepage.html",
+      "target": "/User/homepage.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/ics-form.html",
+      "target": "/User/ics-form.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/ics.html",
+      "target": "/User/ics.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/inventory.html",
+      "target": "/User/inventory.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/login.html",
+      "target": "/User/login.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/officememo.html",
+      "target": "/User/officememo.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/requestacc.html",
+      "target": "/User/requestacc.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/service-request-form.html",
+      "target": "/User/service-request-form.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/service.html",
+      "target": "/User/service.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/travelOR.html",
+      "target": "/User/travelOR.html",
+      "result": "PASS"
+    },
+    {
+      "file": "User/User/visitorsView.html",
+      "target": "/User/visitorsView.html",
+      "result": "PASS"
+    }
+  ],
+  "errors": [],
+  "missing": [],
+  "results": [
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/Usermanagement.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/requestacc.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/communication.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/employee.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/homepage.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics-form.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/ics.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/inventory.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/login.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/my-attendance.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/officememo.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/requestacc.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service-request-form.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/service.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/travelOR.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "User/visitorsView.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "light",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "light",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "light",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "light",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "light",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "dark",
+      "width": 1440,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "dark",
+      "width": 1024,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "dark",
+      "width": 768,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "dark",
+      "width": 390,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "theme": "dark",
+      "width": 320,
+      "contrast": [],
+      "icons": [],
+      "clipped": [],
+      "oversized": [],
+      "geometry": []
+    }
+  ]
+}

@@ -43,5 +43,5 @@
 - All three Visitors pages load the shared Supabase client.
 - Admin Visitors page now loads its controller.
 
-## Still required in your Supabase account
-Run `supabase/PGENRO_FULL_SETUP.sql` in SQL Editor and deploy the `admin-users` Edge Function. These account-side operations cannot be applied only by editing frontend files.
+## Current Employee Number / First Admin deployment requirements
+The current account-flow repair is documented in `README_EMPLOYEE_NUMBER_FIX.md`. For an existing production database, do not rerun `PGENRO_FULL_SETUP.sql`; apply only `EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql` and `FIRST_ADMIN_SYSTEM_SETUP_PATCH.sql` when their objects are not already installed, then deploy `admin-users`, `employee-login`, and `bootstrap-first-admin`. These account-side operations cannot be applied only by editing frontend files.

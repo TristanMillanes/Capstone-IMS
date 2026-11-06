@@ -213,16 +213,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       let records;
 
       if (db) {
-        let response = await db
-          .from(CONFIG.employeeTable)
-          .select("*")
-          .order("last_name", { ascending: true });
-
-        if (response.error) {
-          response = await db.from(CONFIG.employeeTable).select("*");
-        }
+        // Directory projection excludes private monitoring arrays.
+        const response = await db.rpc('pgenro_employee_directory');
         if (response.error) throw response.error;
-        records = response.data || [];
+        if (!Array.isArray(response.data)) throw new Error('The employee directory is not configured. Contact the administrator.');
+        records = response.data;
         cacheEmployees(records);
         setConnectionStatus("online", "Personnel records connected");
       } else {
@@ -333,7 +328,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
   function cacheEmployees(rows) {
     try {
-      localStorage.setItem("employees", JSON.stringify(rows));
+      localStorage.setItem("pgenro_user_employee_directory_v3", JSON.stringify(rows));
     } catch (error) {
       console.warn("Employee records could not be cached:", error);
     }
@@ -341,7 +336,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
   function readCachedEmployees() {
     try {
-      const rows = JSON.parse(localStorage.getItem("employees") || "[]");
+      const rows = JSON.parse(localStorage.getItem("pgenro_user_employee_directory_v3") || "[]");
       return Array.isArray(rows) ? rows : [];
     } catch {
       return [];

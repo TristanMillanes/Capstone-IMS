@@ -1,3 +1,7 @@
+Latest account update (4 November 2026): read [EMPLOYEE_ACCOUNT_SETUP.md](EMPLOYEE_ACCOUNT_SETUP.md). Public registration now verifies an encoded employee ID, and User accounts have personal attendance. **Run the included `supabase/EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql` last in your existing database before using this update.**
+
+Latest frontend repair (4 November 2026): read [FRONTEND_FIXES_2026-11-04.md](FRONTEND_FIXES_2026-11-04.md) for the current light/dark visibility, alignment, mobile and legacy-entry fixes.
+
 # PGENRO IMS — corrected system, 3 November 2026
 
 ## Run this copy

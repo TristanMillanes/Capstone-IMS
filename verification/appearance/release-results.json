@@ -1,0 +1,24 @@
+{
+  "passed": true,
+  "sourceArchive": "Capstone-IMS (4)(1).zip",
+  "pages": 28,
+  "appearances": [
+    "light",
+    "dark"
+  ],
+  "screenAndDialogCases": 390,
+  "actualToggleReloadCases": 28,
+  "missingLocalAssets": 0,
+  "uncaughtJavascriptErrors": 0,
+  "detectedClippingOrOverflow": 0,
+  "detectedSolidBackgroundContrastFailures": 0,
+  "localAssetReferences": 230,
+  "syntax": {
+    "passed": true,
+    "javascriptFiles": 43,
+    "stylesheets": 41,
+    "productionPythonFiles": 3,
+    "errors": []
+  },
+  "validation": "Local Chromium and simulated backend; no hosted data or deployments changed. Gradient/image contrast requires visual review."
+}

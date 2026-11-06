@@ -5,6 +5,11 @@ const scope=vm.createContext({});
 for(const [start,end] of [['/* Sender detection reads','/* End sender detection. */'],['/* Memo document parser:','/* End memo document parser. */'],['/* Printed heading and letter-purpose','/* End letter-purpose extraction. */']]){
  const block=source.slice(source.indexOf(start),source.indexOf(end)+end.length);vm.runInContext(block,scope);
 }
+// The current correspondence parser delegates to these shared header helpers.
+// Load their production definitions as well as the older marked sections.
+const headerStart=source.indexOf('function parseMemoDate('),headerEnd=source.indexOf('/* End letter-purpose extraction. */');
+assert(headerStart>=0&&headerEnd>headerStart,'Production header helpers are present');
+vm.runInContext(source.slice(headerStart,headerEnd),scope);
 const cases=[
  ['Inline closing','REQUEST LETTER\nTO: ENRO\nFROM: OFFICE A\nSUBJECT: Work\n\nPlease assist.\n\nRespectfully yours, MARIA L. SANTOS\nMunicipal Mayor','MARIA L. SANTOS'],
  ['Inline designation','REQUEST LETTER\nTO: ENRO\nSUBJECT: Work\n\nPlease assist.\n\nRespectfully yours,\nMARIA L. SANTOS, Municipal Mayor','MARIA L. SANTOS'],

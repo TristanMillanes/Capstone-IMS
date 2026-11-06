@@ -1,57 +1,34 @@
-# PGENRO IMS — latest corrected build
-
-**Start with [START_HERE.md](START_HERE.md)** for the 3 November 2026 frontend repairs, Windows startup and current verification results. Extract the complete project into a clean folder. The earlier setup notes below remain available for existing backend features.
-
-# Administrator Service Request update
-
-See [ADMIN_SERVICE_REQUEST_UPDATE.md](ADMIN_SERVICE_REQUEST_UPDATE.md) for the public-form review queue, filters, status updates, document downloads, and Print Form. Existing public Service Request setup instructions remain in [PUBLIC_SERVICE_REQUEST_SETUP.md](PUBLIC_SERVICE_REQUEST_SETUP.md).
-
-Current navigation, dark-mode, chart and PDF update: see [UI_NAVIGATION_PDF_UPDATE.md](UI_NAVIGATION_PDF_UPDATE.md).
-
-Public Service Request form update, 26 October 2026: **Service Request · Fill Up Form** opens `/User/service-request-form.html` directly without signing in. Follow [PUBLIC_SERVICE_REQUEST_SETUP.md](PUBLIC_SERVICE_REQUEST_SETUP.md) and run `supabase/PUBLIC_SERVICE_REQUEST_PATCH.sql` to enable public submissions. Requests appear in the existing admin Service Requests registry as **Pending Review**. ICS retains its authenticated workflow.
-
 # PGENRO Information Management System
 
-Updated 11 October 2026: consistent Admin/User UI, responsive controls and dialogs, separate Audit Trail and Backup modules, and repaired chart containers and updates. See [UI_FULL_SYSTEM_UPDATE.md](UI_FULL_SYSTEM_UPDATE.md) for applying this full source update and its verification.
+This folder contains the application, OCR server, required assets, Supabase setup files and current installation guides.
 
-Updated 10 October 2026: the system uses **Admin** and **User** access. Active Admins open User Management directly through the normal Admin workspace. Registration saves the requested Admin/User role, and approval lets an Admin choose either final role. Persistent per-module notifications, unread sidebar badges and modern Admin/User dashboards are included, with a new period selector on the User charts. Run the entire latest `supabase/ADMIN_USER_ACCESS_PATCH.sql`, deploy the updated `admin-users` Edge Function and redeploy the full application, including when the earlier Admin/User update is already installed. The patch includes the account-list return-type repair. See [ADMIN_USER_SETUP.md](ADMIN_USER_SETUP.md) for installation and optional first-Admin setup.
+## Start locally
 
-Modern interface, slide navigation and logout confirmation update, 10 October 2026. See `UI_MODERN_3D_UPDATE.md` for the refreshed design, faster paginated registries and verification, and `UI_NAVIGATION_LOGOUT_UPDATE.md` for transitions and the system confirmation dialog. Supabase integration, OCR and ordinary-user read-only workflows are retained.
+Install Python 3 and Tesseract OCR, then double-click **START_SYSTEM.bat** on Windows. Open **http://127.0.0.1:5000/User/login.html** after the server starts.
 
-Before saving new shared attachments, run `supabase/DOCUMENT_STORAGE_PATCH.sql` in your existing Supabase project. Follow `FIXES_AND_SETUP.md` for local startup and deployment.
+For manual startup, see [FIXES_AND_SETUP.md](FIXES_AND_SETUP.md). For Docker/Render hosting, see [docs/DEPLOYMENT_RENDER.md](docs/DEPLOYMENT_RENDER.md).
+
+## Set up accounts
+
+Follow [EMPLOYEE_ID_LOGIN_SETUP.md](EMPLOYEE_ID_LOGIN_SETUP.md) to install the employee ID SQL patches and deploy the Supabase functions. Registration and login use the employee ID and password, with `@pgenro.ims` added automatically.
+
+Run **SETUP_FIRST_ADMIN.bat** to create **Admin001** with your chosen password after applying the SQL setup. For a new database or Admin/User access configuration, see [ADMIN_USER_SETUP.md](ADMIN_USER_SETUP.md).
 
 ## Main folders
 
-- `admin/` — administrator workspace and write-enabled operational modules.
-- `User/` — public sign-in and service request submission pages, plus the authenticated user/viewer workspace. Operational registries remain read-only for ordinary users.
-- `shared/` — shared Supabase client, runtime settings and OCR field helpers.
-- `supabase/` — database setup/patch SQL and Edge Functions.
-- `SettingIMS/` — account/workspace settings UI.
-- `VisitorsLog/` — visitor kiosk/forwarding pages retained for compatibility.
-- `logo/` — application logos.
-- `verification/` — source verification fixtures/results; excluded from the Docker image.
-- `docs/` — maintenance and deployment notes.
+| Folder | Purpose |
+| --- | --- |
+| admin | Administrator pages and operational modules |
+| User | Employee pages, login, public Service Request form and OCR engine |
+| shared | Shared account, database, document and settings code |
+| supabase | Canonical SQL setup, patches and Edge Functions |
+| vendor | Libraries and assets required by the application |
+| logo | Application logos |
+| SettingIMS | Settings pages |
+| VisitorsLog | Visitor kiosk and compatibility pages |
+| account | Compatibility login controller |
+| docs | Deployment guide |
 
-## Deployment files
+Required PDF/Word templates, fonts, icons and library licenses are included. Nested ZIP archives, duplicate SQL/docs trees, developer test fixtures, generated screenshots, temporary OCR files and historical update reports have been removed.
 
-- `Dockerfile` — installs Python 3.11, Tesseract and the OCR dependencies.
-- `requirements.txt` — Python dependencies for the deployment service.
-- `ocr_server.py` — serves the frontend and OCR API from one Flask application.
-- `render.yaml` — optional Render Blueprint configuration.
-- `.dockerignore` — keeps tests, caches and runtime uploads out of the Docker image.
-- `.gitignore` — keeps local environments, temporary OCR files and secrets out of source control.
-
-## Production entry points
-
-- `/` → `/User/login.html`
-- `/User/service-request-form.html` → public Service Request form
-- `/ocr` → full-document OCR API
-- `/ocr/status/<request_id>` → live page progress
-- `/cancel` → cancel an OCR request
-- `/health` → deployment/OCR health check
-
-## Access boundary
-
-Administrator modules retain encoding/edit/delete workflows. Ordinary user modules are designed for authenticated viewing, filtering, printing and export only. The user Employee Directory now displays additional safe read-only employment and education fields that are available in the administrator record, while admin-only HR identifiers and sensitive fields are intentionally not exposed.
-
-See `docs/DEPLOYMENT_RENDER.md` for deployment steps and `FIXES_AND_SETUP.md` for application notes.
+The source package does not apply SQL, deploy Supabase functions or create hosted accounts automatically. Follow the setup guide before using the employee ID login in your live system.

@@ -50,7 +50,7 @@
     insight($('#viewer-distribution-insight'),[
       [leaders.length>1?'SHARED LEAD':'LARGEST SHARE',top?(leaders.length>1?leaders.length+' modules tied':leaders[0].label):'No dated activity',top?(leaders.length>1?number.format(top)+' record'+(top===1?'':'s')+' each':number.format(top)+' record'+(top===1?'':'s')+' · '+percentage(top,model.total)):(model.availableCount?'Try another chart period':'Activity sources are unavailable')]
     ]);
-    chartTable('trend',['Week starting','Documents & ICS','Travel orders','Visitors','Service requests','Total'],model.buckets.map(bucket=>[bucket.label,bucket.documents,bucket.travel,bucket.visitors,bucket.services,bucket.total]));
+    chartTable('trend',['Week starting','Documents & ICS','Travel orders','Service requests','Total'],model.buckets.map(bucket=>[bucket.label,bucket.documents,bucket.travel,bucket.services,bucket.total]));
     chartTable('distribution',['Module','Records','Share'],model.breakdown.map(module=>[module.label,module.available?module.current:'Unavailable',module.available?percentage(module.current,model.total):'—']));
     for(const kind of ['trend','distribution'])$('#viewer-'+kind+'-data caption').textContent=(kind==='trend'?'Weekly record activity':'Activity by module')+' · '+dayLabel(model.start)+' – '+dayLabel(model.end);
     const legend=$('#viewerDistributionLegend');legend.replaceChildren();
@@ -68,7 +68,7 @@
     if(!chartState)return;
     const model=chartState.model;
     const rows=kind==='trend'?
-      [['Week starting','Documents & ICS','Travel orders','Visitors','Service requests','Total'],...model.buckets.map((bucket,index)=>[isoDay(model.start+index*7),bucket.documents,bucket.travel,bucket.visitors,bucket.services,bucket.total])]:
+      [['Week starting','Documents & ICS','Travel orders','Service requests','Total'],...model.buckets.map((bucket,index)=>[isoDay(model.start+index*7),bucket.documents,bucket.travel,bucket.services,bucket.total])]:
       [['Module','Records','Share'],...model.breakdown.map(module=>[module.label,module.available?module.current:'Unavailable',module.available?percentage(module.current,model.total):''])];
     const content='\uFEFF'+rows.map(row=>row.map(value=>'"'+String(value).replaceAll('"','""')+'"').join(',')).join('\r\n');
     const url=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8;'}));

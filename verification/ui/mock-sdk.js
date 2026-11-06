@@ -66,7 +66,19 @@
   const client = {
     from,
     auth:{getSession:async()=>({data:{session:session()}}),getUser:async()=>({data:{user:session()?.user||null}}),signOut,onAuthStateChange(callback){queueMicrotask(()=>callback('INITIAL_SESSION',session()));return {data:{subscription:{unsubscribe(){}}}};},updateUser:async()=>({data:{user},error:null}),resetPasswordForEmail:async()=>({data:{},error:null})},
-    rpc:async(name,args)=>({data:name==='pgenro_um_context'?{authorized:admin,reason:admin?null:'USER',profile}:name==='pgenro_um_directory'?{items:[profile],total:1,pending:1,offset:args?.p_offset||0,hasMore:false}:(name==='pgenro_is_admin'||name==='is_pgenro_admin')?admin:name==='pgenro_admin_list_users'?[profile]:name==='pgenro_admin_pending_count'?1:name==='get_system_settings'?{}:{success:true},error:null}),
+    rpc:async(name,args)=>{
+      if(name==='pgenro_employee_directory')return {data:window.__db.employees.map(row=>{const safe={...row};delete safe.ceremony_records;delete safe.uniform_records;delete safe.data;return safe;}),error:null};
+      if(name==='pgenro_employee_registration_check'){
+        const employee=window.__db.employees.find(e=>String(e.employee_id||'').trim().toUpperCase()===String(args?.p_employee_number||'').trim().toUpperCase());
+        if(!employee||(employee.email&&employee.email.toLowerCase()!==String(args?.p_email||'').trim().toLowerCase()))return {data:null,error:{code:'22023',message:'Employee ID and email could not be verified.'}};
+        return {data:{eligible:true,employee_number:employee.employee_id},error:null};
+      }
+      if(name==='pgenro_my_attendance'){
+        if(window.__attendanceRPCResult)return {data:window.__attendanceRPCResult,error:null};
+        const e=window.__db.employees[0];return {data:e?{linked:true,employee:{employee_number:e.employee_id,full_name:[e.first_name,e.last_name].filter(Boolean).join(' '),department:e.department,designation:e.designation},ceremony_records:e.ceremony_records||[],uniform_records:e.uniform_records||[]}:{linked:false,employee:null,ceremony_records:[],uniform_records:[]},error:null};
+      }
+      return ({data:name==='pgenro_um_context'?{authorized:admin,reason:admin?null:'USER',profile}:name==='pgenro_um_directory'?{items:[profile],total:1,pending:1,offset:args?.p_offset||0,hasMore:false}:(name==='pgenro_is_admin'||name==='is_pgenro_admin')?admin:name==='pgenro_admin_list_users'?[profile]:name==='pgenro_admin_pending_count'?1:name==='get_system_settings'?{}:{success:true},error:null})
+    },
     channel(name){const channel={name,on(event,filter,callback){channel.table=filter.table;channel.callback=callback;return channel;},subscribe(callback){window.__channels.push(channel);callback?.('SUBSCRIBED');return channel;},unsubscribe(){}};return channel;},
     removeChannel(){},functions:{invoke:async(name,{body})=>{window.__mutations.push({function:name,body});return {data:{success:true},error:null};}},
     storage:{from(){return {upload:async(path)=>({data:{path},error:null}),getPublicUrl:path=>({data:{publicUrl:'https://example.com/'+path}}),remove:async()=>({error:null}),createSignedUrl:async()=>({data:{signedUrl:'https://example.com/fixture.pdf'},error:null})};}}

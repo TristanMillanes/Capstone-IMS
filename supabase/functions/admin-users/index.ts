@@ -26,12 +26,14 @@ function validateUser(raw: unknown, creating: boolean): ProfileInput {
   const result: ProfileInput = {
     fullName: text(u.fullName, 'Full name', 200, true),
     username: text(u.username, 'Username', 60, true),
-    email: text(u.email, 'Email', 254, true).toLowerCase(),
+    email: creating ? text(u.username, 'Employee ID', 60, true).toLowerCase() + '@pgenro.ims'
+      : text(u.email, 'Login address', 254, true).toLowerCase(),
     division: text(u.division, 'Division', 200, true),
     role: text(u.role, 'Role', 30, true), status: text(u.status, 'Status', 20, true),
     position: text(u.position, 'Position'), contact: text(u.contact, 'Contact', 40),
   };
-  if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(result.username)) throw new HttpError(400, 'Username must contain letters, numbers, dots, underscores or hyphens.');
+  if (!/^[a-zA-Z0-9_-][a-zA-Z0-9_.-]{0,59}$/.test(result.username) || result.username.endsWith('.') || result.username.includes('..'))
+    throw new HttpError(400, 'Employee ID must contain 1–60 letters, numbers, dots, underscores or hyphens.');
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(result.email)) throw new HttpError(400, 'Enter a valid email address.');
   // Accept only the two canonical access roles from the Admin review form.
   if (!allowedRoles.has(result.role) || !allowedStatuses.has(result.status)) throw new HttpError(400, 'Invalid role or status.');
@@ -189,7 +191,7 @@ Deno.serve(async (req: Request) => {
       if (duplicate.data?.length) throw new HttpError(409, 'This username already exists.');
       const created = await db.auth.admin.createUser({
         email: input.email, password: input.password, email_confirm: true,
-        user_metadata: {...displayMetadata(input), requested_role:input.role, created_by_admin: true}, app_metadata: accessMetadata(input.role, input.status),
+        user_metadata: {...displayMetadata(input), requested_role:input.role, created_by_admin: true}, app_metadata: {...accessMetadata(input.role, input.status),created_by_admin:true},
         ban_duration: input.status === 'Active' ? 'none' : '876000h',
       });
       if (created.error) throw authError(created.error);
@@ -272,7 +274,7 @@ Deno.serve(async (req: Request) => {
     }
     const saved = { ...changed.data, email: authUpdate.data.user?.email || changed.data.email };
     await syncProfile(saved);
-    let reviewedRequest = null;
+    let reviewedRequest: Record<string, unknown> | null = null;
     if (requestRow) {
       reviewedRequest = {...requestRow.data,requestedRole:requestedAccessRole(requestRow.data),
         assignedRole:action==='approve_request'?saved.role:null,role:saved.role,accountType:saved.account_type,

@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" data-css-scope="auth-request" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#053d31" />
+  <meta name="description" content="One-time initial administrator setup for PGENRO IMS." />
+  <title>PGENRO IMS | First Admin Setup</title>
+  <script src="user-theme.js?v=20261106-theme-ui-1"></script>
+  <link rel="stylesheet" href="requestacc.css?v=20261105-first-admin-setup" />
+  <link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui" />
+  <link rel="stylesheet" href="user-polish.css?v=20261101-user-ui" />
+  <style>
+    .first-admin-note{margin:0 0 16px;padding:12px 14px;border:1px solid #d8e5cb;border-radius:12px;background:#f3f8ed;color:#486246;font-size:13px;line-height:1.55}
+    .first-admin-note strong{display:block;margin-bottom:3px;color:#34543b}
+    .first-admin-status{margin:0 0 16px;padding:12px 14px;border:1px solid #d7e4dc;border-radius:12px;background:#f5f9f5;color:#355541;font-size:13px;line-height:1.55}
+    .first-admin-status[data-kind="error"]{border-color:#e1c9c2;background:#fff5f0;color:#8e4137}
+    .first-admin-status[data-kind="success"]{border-color:#c9dfc5;background:#eff8ec;color:#356b45}
+    .first-admin-status[data-kind="warning"]{border-color:#ead9b2;background:#fff9e9;color:#795a1f}
+    .first-admin-form .input-wrapper input{padding-left:14px}
+    .first-admin-form .form-grid{gap:13px 16px}
+    .first-admin-form .btn-solid{width:100%;margin-top:17px}
+    .first-admin-success{display:flex;flex-direction:column;align-items:flex-start;gap:12px;padding:26px 0 20px}
+    .first-admin-success h3{margin:0;color:#214a34;font-size:25px}
+    .first-admin-success p{margin:0;color:#5e7266;line-height:1.65}
+    .first-admin-success .btn-solid{margin-top:8px}
+    .first-admin-disabled{opacity:.58;pointer-events:none}
+    @media(max-width:600px){.first-admin-form .form-grid{grid-template-columns:minmax(0,1fr)}}
+  </style>
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="../shared/supabase.js?v=20261105-login-repair-1"></script>
+  <script defer src="first-admin-setup.js?v=20261105-login-repair-1"></script>
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+</head>
+<body class="pgenro-auth pgenro-request ui-unified user-refresh" data-motion="paused">
+  <div class="portal-viewport">
+    <header class="portal-topbar">
+      <a class="brand-lockup" href="login.html" aria-label="PGENRO IMS sign in">
+        <span class="brand-logo-wrap"><img class="brand-logo" src="../logo/enro.png" alt="PGENRO seal" width="48" height="48" /></span>
+        <span class="brand-copy"><span class="brand-title">PGENRO <span class="brand-subbadge">IMS</span></span><span class="brand-office">Information Management System</span></span>
+      </a>
+      <a class="topbar-sign-in" href="login.html">Back to <strong>Sign in</strong></a>
+    </header>
+
+    <main class="app-shell" id="appShell">
+      <aside class="hero-panel" aria-labelledby="setupIntro">
+        <div class="hero-texture"></div>
+        <div class="hero-main">
+          <span class="eyebrow"><span class="status-dot" aria-hidden="true"></span>Province of Quezon</span>
+          <h1 id="setupIntro">Initialize your<br /><span>IMS workspace.</span></h1>
+          <p class="hero-lede">Create the first administrator directly through the PGENRO system. No manual Auth user creation is required.</p>
+        </div>
+        <div class="hero-points" aria-label="First Admin setup steps">
+          <div class="hero-point"><span class="hero-point-icon">1</span><div><strong>Verify the employee record</strong><span>The Employee Number and email must match the Employee Directory.</span></div></div>
+          <div class="hero-point"><span class="hero-point-icon">2</span><div><strong>Create the account securely</strong><span>The server creates the Auth account and links the employee profile.</span></div></div>
+          <div class="hero-point"><span class="hero-point-icon">3</span><div><strong>Activate the first Admin</strong><span>This one-time setup closes after an active Admin is created.</span></div></div>
+        </div>
+        <div class="hero-bottom"><span>Provincial Government of Quezon</span></div>
+      </aside>
+
+      <section class="form-panel" aria-labelledby="setupHeading">
+        <div class="form-panel-header">
+          <span class="section-kicker">ONE-TIME SYSTEM INITIALIZATION</span>
+          <h2 id="setupHeading">First Admin Setup<span>.</span></h2>
+          <p>Use the official employee record of the person who will manage the system.</p>
+        </div>
+        <div class="request-form-body">
+          <div id="setupStatus" class="first-admin-status" role="status" aria-live="polite">Checking whether the system still needs its first Admin…</div>
+          <div id="setupError" class="request-error" role="alert" hidden></div>
+
+          <form id="firstAdminForm" class="form-content first-admin-form" autocomplete="off">
+            <div class="first-admin-note"><strong>Restricted one-time setup</strong>This page works only while no active Admin exists and requires a private setup key configured by the system maintainer. Do not share that key.</div>
+            <div class="form-grid">
+              <div class="input-container full-width">
+                <label for="employeeNumber">Employee Number <span>*</span></label>
+                <div class="input-wrapper"><input id="employeeNumber" name="employeeNumber" maxlength="80" required autocomplete="off" placeholder="Enter the exact Employee Number" /></div>
+              </div>
+              <div class="input-container full-width">
+                <label for="email">Employee Directory Email <span>*</span></label>
+                <div class="input-wrapper"><input id="email" name="email" type="email" maxlength="254" required autocomplete="email" placeholder="Enter the email recorded in the Employee Directory" /></div>
+              </div>
+              <div class="input-container full-width">
+                <label for="setupKey">Private Setup Key <span>*</span></label>
+                <div class="input-wrapper"><input id="setupKey" name="setupKey" type="password" minlength="32" maxlength="200" required autocomplete="new-password" placeholder="Enter the one-time setup key" /></div>
+                <span class="field-help">This is a separate deployment key, not your Employee Number or Supabase API key.</span>
+              </div>
+              <div class="input-container">
+                <label for="password">Create Password <span>*</span></label>
+                <div class="input-wrapper"><input id="password" name="password" type="password" minlength="8" maxlength="128" required autocomplete="new-password" placeholder="At least 8 characters" /></div>
+              </div>
+              <div class="input-container">
+                <label for="confirmPassword">Confirm Password <span>*</span></label>
+                <div class="input-wrapper"><input id="confirmPassword" name="confirmPassword" type="password" minlength="8" maxlength="128" required autocomplete="new-password" placeholder="Re-enter the password" /></div>
+              </div>
+            </div>
+            <button id="submitBtn" class="btn-solid" type="submit" disabled>Create First Admin Account</button>
+            <p class="field-help">After setup, sign in with the Employee Number and password you created. The system will not ask for the email during login.</p>
+          </form>
+
+          <section id="setupSuccess" class="first-admin-success" hidden role="status">
+            <h3>First Admin account created.</h3>
+            <p id="successMessage">The account is linked to the Employee Directory and is now active.</p>
+            <p>Employee Number: <strong id="successEmployeeNumber"></strong></p>
+            <a class="btn-solid" href="login.html">Continue to Sign in</a>
+          </section>
+        </div>
+      </section>
+    </main>
+    <footer class="portal-footer">© 2026 PGENRO <span aria-hidden="true">·</span> Province of Quezon</footer>
+  </div>
+</body>
+</html>

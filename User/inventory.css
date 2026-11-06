@@ -967,8 +967,8 @@ td small {
 }
 
 .stock-cell {
-  display: grid;
-  gap: 6px;
+  /* Keep the td in the table formatting context so all row borders align. */
+  vertical-align: middle;
 }
 
 .stock-summary {
@@ -1010,6 +1010,7 @@ td small {
 
 .stock-bar {
   width: 100%;
+  margin-top: 6px;
   height: 5px;
   overflow: hidden;
   border-radius: 999px;

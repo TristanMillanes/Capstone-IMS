@@ -1,0 +1,236 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "schema": "normalized employees",
+      "check": "Migration installs on the production employee storage format",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Only an approved account with a unique verified-email match is auto-linked",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Public verification preserves leading zeroes and returns no personnel data",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Anonymous callers cannot enumerate employee rows or call the private resolver",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Direct signup without an encoded employee ID is rejected, including a forged admin flag",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "The database derives identity from the employee row, links the account and keeps approval pending",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "A pending request reserves the employee ID against duplicate signup",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Pending accounts cannot read attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "An approved User receives only their linked ceremony/uniform records and allowed record fields",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Legacy permissive table policies cannot expose other employees attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "The existing user directory retains personnel rows without monitoring arrays",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "A User cannot request a different employee ID or change the authoritative link",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Editing Auth user metadata cannot redirect attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Unlinked existing accounts receive an empty link state with no fallback to another employee",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Administrator employee encoding access remains available, with no personal attendance endpoint",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Trusted existing Admin account creation works without public-registration employee fields",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "An employee without a recorded email can submit a pending request for administrator review",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Deleting a linked employee cannot silently orphan or redirect the account",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Employee-number corrections preserve the stable account/attendance link",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "An active Admin can explicitly link a verified existing User to the encoded employee",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Anonymous row access remains blocked even with a legacy PUBLIC grant and read policy",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Ambiguous employee numbers are rejected instead of selecting a different person",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "The migration is repeatable without deleting or relinking records",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Migration installs on the production employee storage format",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Only an approved account with a unique verified-email match is auto-linked",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Public verification preserves leading zeroes and returns no personnel data",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Anonymous callers cannot enumerate employee rows or call the private resolver",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Direct signup without an encoded employee ID is rejected, including a forged admin flag",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "The database derives identity from the employee row, links the account and keeps approval pending",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "A pending request reserves the employee ID against duplicate signup",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Pending accounts cannot read attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "An approved User receives only their linked ceremony/uniform records and allowed record fields",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Legacy permissive table policies cannot expose other employees attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "The existing user directory retains personnel rows without monitoring arrays",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "A User cannot request a different employee ID or change the authoritative link",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Editing Auth user metadata cannot redirect attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Unlinked existing accounts receive an empty link state with no fallback to another employee",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Administrator employee encoding access remains available, with no personal attendance endpoint",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Trusted existing Admin account creation works without public-registration employee fields",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "An employee without a recorded email can submit a pending request for administrator review",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Deleting a linked employee cannot silently orphan or redirect the account",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Employee-number corrections preserve the stable account/attendance link",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "An active Admin can explicitly link a verified existing User to the encoded employee",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Anonymous row access remains blocked even with a legacy PUBLIC grant and read policy",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "Ambiguous employee numbers are rejected instead of selecting a different person",
+      "result": "PASS"
+    },
+    {
+      "schema": "legacy JSON employees",
+      "check": "The migration is repeatable without deleting or relinking records",
+      "result": "PASS"
+    }
+  ],
+  "method": "Production SQL executed in PostgreSQL/PGlite with role/RLS and Auth fixtures; no hosted data changed"
+}

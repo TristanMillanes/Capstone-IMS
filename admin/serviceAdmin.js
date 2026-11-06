@@ -789,13 +789,18 @@
           }
         );
 
+        data.hasAttachments = data.hasAttachments === 'true' ? true : data.hasAttachments === 'false' ? false : null;
+        data.serviceNo ||= generateNewServiceNo();
+        data.dateRequest ||= M.today();
+        data.serviceStatus ||= 'Pending Review';
+
         data.primaryCategory =
           data.technicalAssistance ||
           data.certifications ||
           data.plantingMaterials ||
           data.environmentalConcerns ||
           data.iecService ||
-          'TECHNICAL ASSISTANCE';
+          (data.otherServices ? 'Other Services' : 'General Service');
 
         data.secondaryCategory =
           data.iecService ||
@@ -887,6 +892,10 @@
             }
           }
         );
+
+        const attachmentFlag = typeof data?.hasAttachments === 'boolean' ? data.hasAttachments
+          : Array.isArray(data?.attachments) ? data.attachments.length > 0 : null;
+        $('#hasAttachments').value = attachmentFlag === null ? '' : String(attachmentFlag);
 
         if (displayActiveId) {
           displayActiveId.textContent =

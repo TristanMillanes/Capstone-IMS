@@ -7,7 +7,7 @@
 <meta content="#063d32" name="theme-color">
 <meta content="20261103-frontend-fix" name="pgenro-user-management-build">
 <script>window.PGENRO_ADMIN_FUNCTION=window.PGENRO_ADMIN_FUNCTION||'admin-users';window.PGENRO_USER_MANAGEMENT_BUILD='20261103-frontend-fix';</script>
-<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+<script src="../User/user-theme.js?v=20261106-theme-ui-1"></script>
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
@@ -15,6 +15,7 @@
 <!-- Lucide Icons -->
 <!-- CSS -->
 <link href="Usermanagement.css?v=20261103-frontend-fix" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="Usermanagement.html" data-css-scope="admin-users" data-user-management-access="admin" data-unified-ui="20261013" data-module-title="User Management" data-design="emerald-v6">
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
@@ -371,14 +372,15 @@
 <input class="form-control" id="fullNameInput" maxlength="200" placeholder="e.g. Gabriel Mendoza" required="" type="text">
 </div>
 <div class="form-group">
-<label for="usernameInput">Username <span class="required">*</span></label>
-<input class="form-control" id="usernameInput" maxlength="60" pattern="[a-zA-Z0-9_.\-]+" placeholder="e.g. gmendoza" required="" type="text">
+<label for="usernameInput">Employee ID <span class="required">*</span></label>
+<input class="form-control" id="usernameInput" maxlength="60" pattern="[a-zA-Z0-9_.\-]+" placeholder="e.g. EMP-001 or Admin002" required="" type="text">
 </div>
 </div>
 <div class="form-row">
 <div class="form-group">
-<label for="emailInput">Email Address <span class="required">*</span></label>
-<input class="form-control" id="emailInput" maxlength="254" placeholder="gmendoza@pgenro.gov.ph" required="" type="email">
+<label for="emailInput">Automatic login address</label>
+<p class="form-hint" id="employeeLoginHelp">Enter the employee ID. @pgenro.ims is added automatically.</p>
+<input class="form-control" id="emailInput" maxlength="254" placeholder="employee-id@pgenro.ims" readonly type="text" aria-describedby="employeeLoginHelp">
 </div>
 <div class="form-group">
 <label for="passwordInput">Password <span class="required" id="passRequiredStar">*</span></label>
@@ -437,7 +439,8 @@
 <!-- JS -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- This module owns its Supabase session/access controller in the versioned script below. -->
-<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management script is missing. Upload Usermanagement.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.js?v=20261103-frontend-fix"></script>
+<script defer src="../shared/employee-identity.js?v=20261105-employee-id"></script>
+<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management script is missing. Upload Usermanagement.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.js?v=20261105-employee-id-20261103-frontend-fix"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 

@@ -863,6 +863,10 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (els.fullNameInput) els.fullNameInput.value = user?.fullName || '';
     if (els.usernameInput) els.usernameInput.value = user?.username || '';
     if (els.emailInput) els.emailInput.value = user?.email || '';
+    if (els.usernameInput) els.usernameInput.oninput = () => {
+      const number=els.usernameInput.value.trim();
+      els.emailInput.value = user && number === user.username ? user.email : number.toLowerCase() + '@pgenro.ims';
+    };
     if (els.passwordInput) {
       els.passwordInput.value = '';
       els.passwordInput.required = !user;
@@ -919,8 +923,8 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
       position: els.positionInput?.value.trim() || '',
       contact: els.contactInput?.value.trim() || ''
     };
-    if (!/^[a-zA-Z0-9_.-]{1,60}$/.test(userInput.username)) { showToast('Username must be 1–60 letters, numbers, dots, underscores or hyphens.', 'warning'); return; }
-    if(state.users.some(u=>u.id!==state.editingId&&(u.email.toLowerCase()===userInput.email||u.username.toLowerCase()===userInput.username.toLowerCase()))){showToast('Email or username already exists.','warning');return;}
+    if (!/^[a-zA-Z0-9_-][a-zA-Z0-9_.-]{0,59}$/.test(userInput.username) || userInput.username.endsWith('.') || userInput.username.includes('..')) { showToast('Employee ID must be 1–60 letters, numbers, dots, underscores or hyphens.', 'warning'); return; }
+    if(state.users.some(u=>u.id!==state.editingId&&(u.email.toLowerCase()===userInput.email||u.username.toLowerCase()===userInput.username.toLowerCase()))){showToast('Employee ID or login address already exists.','warning');return;}
     if (!['Admin','User'].includes(userInput.role)) { showToast('Choose Admin or User.', 'warning'); return; }
     setSaving(true); feedback();
     const generation = authVersion;

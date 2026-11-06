@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+
+<html data-css-scope="user-attendance" data-theme="light" lang="en">
+<head>
+<meta charset="utf-8"/><script src="user-theme.js?v=20261106-theme-ui-1"></script>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<meta content="light dark" name="color-scheme"/>
+<title>PGENRO IMS | My Attendance</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="vendor/lucide/lucide.min.js"></script>
+<link href="employee.css?v=20261102-viewer" rel="stylesheet"/>
+<link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
+<script defer src="user-refresh.js?v=20261102-viewer"></script>
+<script defer src="user-workspace.js?v=20261106-free-accounts-v1"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="my-attendance.css?v=20261104-employee-account-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+</head>
+<body class="pgenro-user depth-workspace ui-unified user-refresh my-attendance" data-css-scope="user-attendance" data-page-data-owner="module" data-requires-auth="user">
+
+<div aria-hidden="true" class="overlay" id="overlay"></div>
+<a class="user-skip-link" href="#mainContent">Skip to main content</a>
+<div class="app-container">
+<aside class="sidebar" id="sidebar">
+<div class="sidebar-brand"><button aria-label="Close module menu" class="user-sidebar-close" type="button">×</button>
+<div class="sidebar-logo">
+<img alt="PGENRO Logo" class="logo-image" src="../logo/enro.png"/>
+</div>
+<div class="sidebar-brand-copy">
+<strong>PGENRO IMS</strong>
+<span>Quezon Province</span>
+</div>
+</div>
+<div class="sidebar-header">
+<h2>Office Modules</h2>
+<p>Information Management System</p>
+</div>
+<nav aria-label="Office modules" class="sidebar-nav">
+<ul class="modules-list">
+<li><a href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
+<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
+<li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
+<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+<li><a aria-current="page" class="active" href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
+
+<li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
+<li><a href="ics.html"><i data-lucide="layers"></i><span>ICS Property Slips</span></a></li>
+</ul>
+</nav>
+<div class="sidebar-footer">
+
+<div class="profile-menu" id="profileMenu">
+<button aria-expanded="false" aria-haspopup="true" class="profile-btn" id="profileBtn" type="button">
+<span class="profile-avatar"><i data-lucide="user"></i></span>
+<span class="profile-text">
+<strong>PGENRO User</strong>
+<small>Authorized account</small>
+</span>
+<i class="profile-chevron" data-lucide="chevron-up"></i>
+</button>
+<div aria-hidden="true" class="profile-dropdown" id="profileDropdown" role="menu">
+<div class="profile-dropdown-header">
+<span class="profile-avatar big"><i data-lucide="user"></i></span>
+<div>
+<h3>PGENRO User</h3>
+<p>Office account</p>
+</div>
+</div>
+<a href="homepage.html" role="menuitem"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+<a href="../SettingIMS/Settings.html?from=user" role="menuitem"><i data-lucide="settings"></i><span>Settings</span></a>
+<button class="logout-btn" id="logoutBtn" role="menuitem" type="button">
+<i data-lucide="log-out"></i><span>Logout</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+<main class="main-content" id="mainContent" tabindex="-1">
+<header aria-label="Workspace toolbar" class="depth-user-topbar">
+<button aria-controls="sidebar" aria-expanded="false" aria-label="Open module menu" class="hamburger-menu" id="hamburgerMenu" type="button">
+<span></span><span></span><span></span>
+</button>
+<nav aria-label="Breadcrumb" class="depth-topbar-breadcrumb"><a href="homepage.html">Workspace</a><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m9 5 7 7-7 7"></path></svg><span>My Attendance</span></nav>
+<div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
+</header>
+<div class="content-shell">
+<section class="page-header depth-hero"><div class="header-copy"><div class="eyebrow">MY EMPLOYEE RECORD</div><h1>My Attendance</h1><p>View the attendance and uniform monitoring encoded for your registered employee ID.</p></div><div class="header-actions"><span class="last-updated" id="attendanceUpdated"></span><button class="secondary-action" id="attendanceRefresh" type="button">Refresh</button></div></section>
+<p class="attendance-message" id="attendanceMessage" role="status" aria-live="polite">Loading your employee attendance…</p>
+<section class="attendance-identity" id="attendanceIdentity" hidden aria-label="Your employee number"><div><span class="section-kicker">YOUR ACCOUNT</span><h2 id="attendanceName"></h2><p id="attendanceDepartment"></p></div><strong>Employee ID <span id="attendanceNumber"></span></strong></section>
+<div class="attendance-workspace" id="attendanceWorkspace" hidden>
+<div class="attendance-tabs" role="tablist" aria-label="Monitoring records"><button class="tab-btn active" id="ceremonyTab" role="tab" aria-selected="true" aria-controls="attendanceRecords" data-attendance-kind="ceremony" type="button">Flag ceremony attendance</button><button class="tab-btn" id="uniformTab" role="tab" aria-selected="false" aria-controls="attendanceRecords" data-attendance-kind="uniform" type="button">Uniform monitoring</button></div>
+<div class="attendance-metrics" aria-label="Filtered record totals"><article class="attendance-metric"><span>Total records</span><strong id="attendanceTotal">0</strong></article><article class="attendance-metric"><span id="positiveLabel">Present</span><strong id="attendancePositive">0</strong></article><article class="attendance-metric"><span id="negativeLabel">Absent</span><strong id="attendanceNegative">0</strong></article><article class="attendance-metric"><span id="otherLabel">Late</span><strong id="attendanceOther">0</strong></article></div>
+<section class="records-card" id="attendanceRecords" role="tabpanel" aria-labelledby="ceremonyTab"><div class="records-header"><div><span class="section-kicker">YOUR RECORDS</span><h2 id="attendanceTableTitle">Flag ceremony attendance</h2><p>Records are maintained by your office administrator.</p></div></div>
+<div class="attendance-filters"><label for="attendanceSearch">Search your records<input id="attendanceSearch" type="search" maxlength="200" placeholder="Search control number, activity or remarks"></label><label for="attendanceMonth">Month<input id="attendanceMonth" type="month"></label><label for="attendanceStatus">Status<select id="attendanceStatus"></select></label></div>
+<div class="table-wrapper" tabindex="0" role="region" aria-label="Your attendance records"><table><thead><tr id="attendanceColumns"></tr></thead><tbody id="attendanceBody"></tbody></table></div>
+<div class="attendance-pagination"><span id="attendanceRange"></span><div class="attendance-page-controls"><button class="secondary-action" id="attendancePrevious" type="button">Previous</button><span id="attendancePage"></span><button class="secondary-action" id="attendanceNext" type="button">Next</button></div></div>
+</section></div>
+<footer class="footer"><div><strong>PGENRO IMS</strong><p>Personal employee attendance</p></div></footer>
+</div></main></div><div class="toast-container" id="toastContainer" aria-live="polite"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="../shared/supabase.js?v=20261104-employee-account-1"></script>
+<script defer src="my-attendance.js?v=20261106-free-accounts-v1-20261104-employee-account-1"></script>
+</body></html>

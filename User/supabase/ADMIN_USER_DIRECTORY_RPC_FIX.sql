@@ -1,12 +1,12 @@
 -- PGENRO IMS: repair "structure of query does not match function result type".
--- Run this whole file in Supabase SQL Editor after the Admin/User migration.
+-- Run this whole file in Supabase SQL Editor after the Admin/User and Employee Number migrations.
 -- Existing varchar and timestamp columns are cast to the declared RPC output.
 -- No email edits, role promotion or data deletion is performed.
 begin;
 drop function if exists public.pgenro_admin_list_users(integer,integer);
 create function public.pgenro_admin_list_users(p_offset integer default 0, p_limit integer default 500)
 returns table (
-  user_id uuid, full_name text, username text, email text, division text,
+  user_id uuid, full_name text, username text, employee_number text, email text, division text,
   role text, status text, is_active boolean, "position" text, contact text,
   last_login timestamptz, created_at timestamptz, updated_at timestamptz, account_type text
 ) language plpgsql stable security definer set search_path = '' as $$
@@ -16,7 +16,7 @@ begin
   end if;
   return query
     select p.user_id::uuid, p.full_name::text, p.username::text,
-      coalesce(u.email::text,p.email::text), p.division::text,
+      to_jsonb(p)->>'employee_number', coalesce(u.email::text,p.email::text), p.division::text,
       p.role::text, (case when p.status='Active' and u.banned_until > now() then 'Suspended' else p.status end)::text,
       (p.is_active and (u.banned_until is null or u.banned_until <= now()))::boolean,
       p.position::text, p.contact::text,

@@ -1,0 +1,25 @@
+{
+  "passed": true,
+  "date": "2026-11-04",
+  "databaseChecks": 46,
+  "databaseSchemas": [
+    "normalized employees",
+    "legacy JSON employees"
+  ],
+  "browserWorkflowChecks": 20,
+  "canonicalPages": 29,
+  "pageThemeWidthCases": 290,
+  "panelCases": 400,
+  "legacyRedirects": 26,
+  "themeToggleReloadPages": 29,
+  "syntax": {
+    "passed": true,
+    "javascriptFiles": 44,
+    "stylesheets": 42,
+    "productionPythonFiles": 3,
+    "errors": []
+  },
+  "adminFunctionTypeScriptSyntax": true,
+  "liveDatabaseChanged": false,
+  "requiredInstallation": "Run supabase/EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql LAST in the existing project, then use the updated frontend."
+}

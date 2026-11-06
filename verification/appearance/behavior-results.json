@@ -1,0 +1,287 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "file": "admin/Usermanagement.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/admincommunication.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/audittrail-admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/backup-admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/employee-admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/ics-admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/invetoryadmin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/officememo-admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/requestacc.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/serviceAdmin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/travelOR-admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "admin/visitors-admin.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/communication.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/employee.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/homepage.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/ics-form.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/ics.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/inventory.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/login.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/officememo.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/requestacc.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/service-request-form.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/service.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/travelOR.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "User/visitorsView.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "SettingIMS/Settings.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    },
+    {
+      "file": "VisitorsLog/visitorslog.html",
+      "result": "PASS",
+      "checks": [
+        "Actual light/dark toggle",
+        "Reload persistence",
+        "Native control appearance",
+        "Return to light"
+      ]
+    }
+  ],
+  "errors": [],
+  "missing": []
+}

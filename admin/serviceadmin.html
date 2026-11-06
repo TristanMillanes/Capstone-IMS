@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport">
 <title>PGENRO IMS | Service Request &amp; Course of Action</title>
 <meta content="#063d32" name="theme-color">
-<script>try{document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')==='dark'?'dark':'light';}catch(e){document.documentElement.dataset.theme='light';}</script>
+<script src="../User/user-theme.js?v=20261106-theme-ui-1"></script>
 <!-- Google Font -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
@@ -14,6 +14,7 @@
 <!-- Supabase JavaScript SDK -->
 <!-- Stylesheet -->
 <link href="serviceAdmin.css?v=20261027-emerald-v6" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="serviceAdmin.html" data-css-scope="admin-services" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Service Requests" data-design="emerald-v6">
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
@@ -380,12 +381,12 @@
 <div class="toast-container" id="toastContainer"></div>
 <!-- SCRIPT -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
+<script defer src="../shared/supabase.js?v=20261104-employee-account-1"></script>
 <script defer src="vendor/jszip.min.js"></script>
 <script defer src="vendor/pdf-lib.min.js"></script>
 <script defer src="vendor/fontkit.umd.min.js"></script>
-<script defer src="serviceRequestFile.js?v=20261027-emerald-v6"></script>
-<script defer src="serviceAdmin.js?v=20261103-frontend-fix"></script>
+<script defer src="serviceRequestFile.js?v=20261103-service-letter"></script>
+<script defer src="serviceAdmin.js?v=20261103-service-letter"></script>
 <div aria-hidden="true" class="modal-backdrop" id="serviceFormModal"><div aria-labelledby="serviceFormTitle" aria-modal="true" class="modal-card service-form-card" role="dialog"><div class="modal-header"><div><h2 id="serviceFormTitle">Service Request Details</h2><p>Complete the details to automatically fill the official service request form.</p></div><button aria-label="Close service form" data-close="serviceFormModal" type="button">×</button></div>
 <!-- CARD HEADER & TAB CONTROLLERS -->
 <div class="service-card-header">
@@ -418,29 +419,29 @@
 <i data-lucide="user-check"></i>
 <div>
 <h3>Step 1: Client &amp; Requesting Entity Details</h3>
-<p>Provide the applicant name, organization/LGU, and contact information. Click <strong>Next</strong> when finished.</p>
+<p>Add any applicant and contact information available. All fields are optional. Click <strong>Next</strong> to continue.</p>
 </div>
 </div>
 <div class="form-grid-3">
 <div class="form-group">
-<label for="serviceNo">Service No. <span class="required">*</span></label>
+<label for="serviceNo">Service No.</label>
 <div class="input-with-icon ui-affixed-control">
 <i data-lucide="hash" class="ui-field-icon"></i>
-<input id="serviceNo" name="serviceNo" placeholder="SR-2026-____" required="" type="text" class="ui-affixed-field">
+<input id="serviceNo" name="serviceNo" placeholder="SR-2026-____" type="text" class="ui-affixed-field">
 </div>
 </div>
 <div class="form-group">
-<label for="clientName">Full Name of Client / Requestor <span class="required">*</span></label>
+<label for="clientName">Full Name of Client / Requestor</label>
 <div class="input-with-icon ui-affixed-control">
 <i data-lucide="user" class="ui-field-icon"></i>
-<input id="clientName" name="clientName" placeholder="e.g., Juan Dela Cruz" required="" type="text" class="ui-affixed-field">
+<input id="clientName" name="clientName" placeholder="e.g., Juan Dela Cruz" type="text" class="ui-affixed-field">
 </div>
 </div>
 <div class="form-group">
-<label for="organization">Organization / LGU / Barangay <span class="required">*</span></label>
+<label for="organization">Organization / LGU / Barangay</label>
 <div class="input-with-icon ui-affixed-control">
 <i data-lucide="building-2" class="ui-field-icon"></i>
-<input id="organization" name="organization" placeholder="e.g., LGU Lucena / DepEd Quezon" required="" type="text" class="ui-affixed-field">
+<input id="organization" name="organization" placeholder="e.g., LGU Lucena / DepEd Quezon" type="text" class="ui-affixed-field">
 </div>
 </div>
 <div class="form-group">
@@ -458,10 +459,10 @@
 </div>
 </div>
 <div class="form-group">
-<label for="dateRequest">Date of Request <span class="required">*</span></label>
+<label for="dateRequest">Date of Request</label>
 <div class="input-with-icon ui-affixed-control">
 <i data-lucide="calendar" class="ui-field-icon"></i>
-<input id="dateRequest" name="dateRequest" required="" type="date" class="ui-affixed-field">
+<input id="dateRequest" name="dateRequest" type="date" class="ui-affixed-field">
 </div>
 </div>
 </div>
@@ -470,7 +471,7 @@
 <i data-lucide="clipboard-list"></i>
 <div>
 <h3>Step 2: Service Request Classification &amp; Scope</h3>
-<p>Specify the required technical interventions, project site location, and status.</p>
+<p>All request fields are optional. Add the service, letter status, and details that apply.</p>
 </div>
 </div>
 <div class="form-grid-2">
@@ -547,17 +548,26 @@
 </div>
 </div>
 <!-- Request Details & Logistics -->
+<div class="form-group" style="margin-top:16px;">
+<label for="hasAttachments">Attached letter or supporting documents (optional)</label>
+<select class="custom-select" id="hasAttachments" name="hasAttachments" aria-describedby="serviceLetterHelp">
+<option value="">Not specified</option>
+<option value="true">WITH letter / documents</option>
+<option value="false">WITHOUT letter / documents</option>
+</select>
+<p id="serviceLetterHelp">No letter? Type your request below. Letter status, notes, and supporting details are optional.</p>
+</div>
 <div class="form-grid-2" style="margin-top: 16px;">
 <div class="form-group">
-<label for="requestDetails">Detailed Request Notes &amp; Quantities <span class="required">*</span></label>
-<textarea id="requestDetails" name="requestDetails" placeholder="Enter specific instructions, quantity of seedlings requested, issue coordinates, or scope..." required="" rows="4"></textarea>
+<label for="requestDetails">Detailed Request Notes &amp; Quantities</label>
+<textarea id="requestDetails" name="requestDetails" placeholder="No letter? Type your request here, including any instructions, quantities, or scope (optional)." maxlength="4000" rows="4"></textarea>
 </div>
 <div class="sub-form-stack">
 <div class="form-group">
-<label for="location">Location / Project Site <span class="required">*</span></label>
+<label for="location">Location / Project Site</label>
 <div class="input-with-icon ui-affixed-control">
 <i data-lucide="map-pin" class="ui-field-icon"></i>
-<input id="location" name="location" placeholder="Barangay, Municipality, Specific Landmark" required="" type="text" class="ui-affixed-field">
+<input id="location" name="location" placeholder="Barangay, Municipality, Specific Landmark" type="text" class="ui-affixed-field">
 </div>
 </div>
 <div class="form-grid-2">
@@ -566,8 +576,8 @@
 <input id="dateNeeded" name="dateNeeded" type="date">
 </div>
 <div class="form-group">
-<label for="serviceStatus">Service Status <span class="required">*</span></label>
-<select class="custom-select status-select" id="serviceStatus" name="serviceStatus" required="">
+<label for="serviceStatus">Service Status</label>
+<select class="custom-select status-select" id="serviceStatus" name="serviceStatus">
 <option value="Pending Review">Pending Review</option>
 <option value="Assessed / Evaluated">Assessed / Evaluated</option>
 <option value="In Progress">In Progress</option>

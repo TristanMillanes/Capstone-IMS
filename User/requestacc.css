@@ -471,3 +471,32 @@ html[data-theme="dark"] body.pgenro-auth.ui-unified :is(.step.active,.input-box:
 html[data-theme="dark"] body.pgenro-auth.ui-unified .form-panel :is(a,.login-link) {color:var(--green-700);}
 
 }
+/* Employee-bound account registration. Uses the existing appearance tokens. */
+@media screen {
+ .employee-registration-panel .employee-registration-form {padding:0;display:grid;gap:18px;}
+ .employee-registration-panel .employee-registration-form .input-wrapper input {padding-left:14px;}
+ .employee-registration-panel .employee-registration-form input[type="password"],
+ .employee-registration-panel .employee-registration-form input[autocomplete="new-password"] {padding-right:62px;}
+ .employee-registration-panel .employee-verify-button {justify-self:start;min-height:44px;}
+ .employee-registration-panel .employee-password-fields {min-width:0;margin:0;padding:18px 0 0;border:0;border-top:1px solid var(--ui-border,#cbdcd2);}
+ .employee-registration-panel .employee-password-fields legend {padding:0 0 12px;font-size:15px;font-weight:700;color:var(--ui-ink,#193b2d);}
+ .employee-registration-panel .employee-password-fields:disabled {opacity:.6;}
+ .employee-registration-panel .employee-account-consent {display:flex;align-items:flex-start;gap:10px;margin-top:18px;font-size:12px;line-height:1.6;}
+ .employee-registration-panel .employee-account-consent input {flex:0 0 18px;width:18px;height:18px;margin-top:2px;accent-color:#0a6c4e;}
+ .employee-registration-panel :is(.employee-check-status,.employee-account-note,.employee-signin-link) {margin:0;font-size:12px;line-height:1.7;color:var(--ui-muted,#52695e);}
+ .employee-registration-panel .employee-check-status {padding:12px 14px;background:var(--ui-soft,#f0f6f3);border:1px solid var(--ui-border,#cbdcd2);border-radius:10px;}
+ .employee-registration-panel .employee-check-status[data-kind="success"] {color:var(--ui-accent,#066c4f);background:var(--ui-tint,#e5f3eb);}
+ .employee-registration-panel .employee-check-status[data-kind="error"] {color:var(--app-danger,#b42335);}
+ .employee-registration-panel #submitBtn {width:100%;min-height:46px;justify-content:center;}
+ .employee-registration-panel .employee-signin-link a {font-weight:700;color:var(--ui-accent,#066c4f);text-decoration:underline;}
+ .employee-registration-panel .password-toggle {font:600 11px system-ui;width:auto;padding:4px 9px;}
+ .employee-registration-panel .request-success {padding:20px 0;color:var(--ui-ink,#193b2d);}
+ .employee-registration-panel .request-success p {line-height:1.7;}
+ @media(max-width:600px){.employee-registration-panel .employee-password-fields .form-grid {grid-template-columns:minmax(0,1fr);}}
+}
+
+/* Fixed employee login suffix, including narrow phone screens. */
+.employee-login-identity { display:flex; align-items:center; gap:8px; }
+.employee-login-identity input { min-width:0; width:100%; flex:1 1 0; }
+.account-domain-suffix { flex:0 0 auto; padding-right:14px; font-size:13px; font-weight:600; color:var(--text-muted, #547165); white-space:nowrap; }
+@media(max-width:360px) { .account-domain-suffix { font-size:11px; padding-right:8px; } }

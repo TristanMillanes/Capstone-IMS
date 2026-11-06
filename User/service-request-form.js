@@ -32,11 +32,6 @@
     const date = Object.fromEntries(parts.map(part=>[part.type,part.value]));
     field('dateNeeded').min = `${date.year}-${date.month}-${date.day}`;
   }
-  function syncCategories() {
-    const selected = categories.some(name=>field(name).value.trim());
-    field('technicalAssistance').setCustomValidity(selected?'':'Please select at least one service or describe another service.');
-    return selected;
-  }
   function showError(message,focus=true) {
     feedback.textContent=message;feedback.hidden=false;
     if(focus) feedback.focus();
@@ -64,7 +59,6 @@
       input.setCustomValidity(input.required&&!input.value.trim()?'Please complete this field.':'');
       clearFieldError(input);
     });
-    if(index===1) syncCategories();
     let invalid=null;
     fields.forEach(input=>{if(!input.validity.valid){markFieldError(input);invalid??=input;}});
     return invalid;
@@ -80,7 +74,7 @@
     const groups=[
       {title:'Your details',step:0,rows:[['Client / requestor',val('clientName')],['Organization / LGU / Barangay',val('organization')],['Contact number',val('contactNo')],['Email address',val('emailAddress')]]},
       {title:'Services requested',step:1,rows:categories.filter(name=>val(name)).map(name=>[field(name).labels[0].textContent.trim(),val(name),true])},
-      {title:'Request details',step:2,rows:[['Detailed request notes & quantities',val('requestDetails'),true],['Location / project site',val('location'),true],['Date needed',formattedDate(val('dateNeeded'))],['Requested by',val('requestedBy')||val('clientName')],['Noted / endorsed by',val('notedBy')]]}
+      {title:'Request details',step:2,rows:[['Attached letter / supporting documents',val('hasAttachments')==='true'?'WITH attached letter or supporting documents':val('hasAttachments')==='false'?'WITHOUT attached letter or supporting documents':'Not specified'],['Detailed request notes & quantities',val('requestDetails'),true],['Location / project site',val('location'),true],['Date needed',formattedDate(val('dateNeeded'))],['Requested by',val('requestedBy')||val('clientName')],['Noted / endorsed by',val('notedBy')]]}
     ];
     groups.forEach(group=>{
       const section=document.createElement('section');section.className='request-review-group';
@@ -131,7 +125,6 @@
   function onEdit(event) {
     if(!event.target.matches('input,textarea,select'))return;
     event.target.setCustomValidity('');clearFieldError(event.target);feedback.hidden=true;
-    if(categories.includes(event.target.name)&&syncCategories())clearFieldError(field('technicalAssistance'));
   }
   form.addEventListener('input',onEdit);form.addEventListener('change',onEdit);
   form.addEventListener('reset',event=>{
@@ -152,6 +145,7 @@
     if(!navigator.onLine){showError('You are offline. Connect to the internet and submit again. Your entries are still here.');return;}
     const payload=Object.fromEntries(new FormData(form));
     Object.keys(payload).forEach(key=>{payload[key]=String(payload[key]).trim();});
+    payload.hasAttachments = payload.hasAttachments === 'true' ? true : payload.hasAttachments === 'false' ? false : null;
     const serialized=JSON.stringify(payload);
     // The existing RPC uses this ID to deduplicate unchanged retries.
     if(!requestId||requestPayload!==serialized){requestId=submissionId();requestPayload=serialized;}

@@ -2,7 +2,7 @@
 
 <html data-theme="light" lang="en">
 <head>
-<meta charset="utf-8"/><script src="user-theme.js?v=20261103-frontend-fix"></script>
+<meta charset="utf-8"/><script src="user-theme.js?v=20261106-theme-ui-1"></script>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <meta content="PGENRO Information Management System dashboard." name="description"/>
 <meta content="light dark" name="color-scheme"/>
@@ -15,12 +15,13 @@
 <link rel="stylesheet" href="homepage-details.css?v=20261102-viewer">
 <link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
 <script defer src="user-refresh.js?v=20261102-viewer"></script>
-<script defer src="user-workspace.js?v=20261102-viewer"></script>
+<script defer src="user-workspace.js?v=20261106-free-accounts-v1"></script>
 <link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
 <script src="vendor/lucide/lucide.min.js"></script>
-<link rel="stylesheet" href="user-viewer.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
 <script defer src="user-viewer.js?v=20261102-viewer"></script>
 <script defer src="user-documents.js?v=20261102-viewer"></script>
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
 </head>
 <body class="pgenro-user workspace-dashboard depth-workspace ui-unified user-refresh" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
 
@@ -48,8 +49,9 @@
 <li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
 <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
 <li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
+<li><a href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
 <li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
-<li><a href="visitorsView.html"><i data-lucide="clipboard-signature"></i><span>Visitors Log</span></a></li>
+
 <li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
 <li><a href="ics.html"><i data-lucide="layers"></i><span>ICS Property Slips</span></a></li>
 </ul>
@@ -111,7 +113,7 @@
 
               A consolidated view of office records, requests, personnel,
 
-              assets, communications, and daily visitor activity.
+              assets, communications, and office activity.
 
             </p>
 <div class="header-actions">
@@ -210,7 +212,7 @@
 <div>
 <span class="section-kicker">Record activity</span>
 <h2>Record Activity Trend</h2>
-<p id="dashboardTrendDescription">Documents, travel orders, visitors, and services in the last 90 days.</p>
+<p id="dashboardTrendDescription">Documents, travel orders, and services in the last 90 days.</p>
 </div>
 <select aria-label="Dashboard chart period" class="chart-range-select" id="dashboardChartRange"><option value="30">Last 30 days</option><option selected="" value="90">Last 90 days</option><option value="180">Last 180 days</option><option value="365">Last year</option></select>
 </div>
@@ -221,26 +223,8 @@
 </div>
 </article>
 <article class="panel activity-panel">
-<div class="panel-header">
-<div>
-<span class="section-kicker">Visitor activity</span>
-<h2>Recent Visitor Logs</h2>
-<p>Latest registered visitors and current visit status.</p>
-</div>
-<a class="panel-link" href="visitorsView.html">
-
-                View all
-
-                <i data-lucide="arrow-right"></i>
-</a>
-</div>
-<div aria-live="polite" class="activity-list" id="visitorRecentList">
-<div class="empty-state-box">
-<span class="empty-icon"><i data-lucide="clipboard-list"></i></span>
-<h3>No Visitor Records</h3>
-<p>Visitor entries will appear here once available.</p>
-</div>
-</div>
+<div class="panel-header"><div><span class="section-kicker">Personal monitoring</span><h2>My Attendance</h2><p>View flag ceremony attendance and uniform records for your employee number.</p></div></div>
+<div class="empty-state-box"><span class="empty-icon"><i data-lucide="calendar-check"></i></span><h3>Your records, in one place</h3><p>Only records for the employee number on your account are shown.</p><a class="panel-link" href="my-attendance.html">Open My Attendance <i data-lucide="arrow-right"></i></a></div>
 </article>
 </section>
 <section class="dashboard-grid reveal">
@@ -328,7 +312,7 @@
 
 <script defer="" src="../vendor/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261011-navigation-pdf-v2"></script>
-<script defer="" src="homepage.js?v=20261102-viewer"></script>
+<script defer="" src="../shared/supabase.js?v=20261104-employee-account-1"></script>
+<script defer="" src="homepage.js?v=20261106-free-accounts-v1-20261104-employee-account-1"></script>
 </body>
 </html>
