@@ -23,22 +23,52 @@
   if(typeof document==='undefined')return;
   window.PGENRO_AttendanceData=api;
   const $=id=>document.getElementById(id);
-  let source=null,kind='ceremony',pageNumber=1,generation=0,currentUser=null,pollTimer,subscription;
+  let attendanceRecords = null;
+  let manualTabSelection = false;
+  let kind='ceremony',pageNumber=1,generation=0,currentUser=null,pollTimer,subscription;
+  let liveChannel=null,liveUser='',liveRefresh;
   const size=20;
-  function clear() {
-    source=null;currentUser=null;$('attendanceIdentity').hidden=true;$('attendanceWorkspace').hidden=true;
+  function stopLiveUpdates() {
+    clearTimeout(liveRefresh);liveRefresh=null;liveUser='';
+    const channel=liveChannel;liveChannel=null;
+    if(channel)Promise.resolve(window.pgenroSupabase?.removeChannel?.(channel)).catch(()=>{});
+  }
+  function watchAttendance(userId) {
+    if(liveUser===userId&&liveChannel)return;
+    stopLiveUpdates();
+    const db=window.pgenroSupabase;if(!db?.channel)return;
+    liveUser=userId;
+    try {
+      liveChannel=db.channel('my-attendance-'+userId)
+        .on('postgres_changes',{event:'*',schema:'public',table:'pgenro_attendance_updates',filter:'user_id=eq.'+userId},payload=>{
+          // Only a revision signal is received. Attendance is always fetched
+          // again through the authenticated caller-only RPC, never from events.
+          if(liveUser!==userId||currentUser!==userId||payload?.new?.user_id!==userId||document.hidden)return;
+          clearTimeout(liveRefresh);liveRefresh=setTimeout(load,180);
+        }).subscribe();
+    } catch {stopLiveUpdates();} // Polling/Refresh remain available offline.
+  }
+  function clear(resetUser=true) {
+    attendanceRecords = null;
+    if (resetUser) {
+      currentUser = null;
+      manualTabSelection = false;
+      stopLiveUpdates();
+      selectKind('ceremony');
+    }
+    $('attendanceIdentity').hidden=true;$('attendanceWorkspace').hidden=true;
     $('attendanceBody').replaceChildren();$('attendanceName').textContent='';$('attendanceNumber').textContent='';
     $('attendanceDepartment').textContent='';$('attendanceRange').textContent='';
     $('attendanceUpdated').textContent='';
-    for(const id of ['attendanceTotal','attendancePositive','attendanceNegative','attendanceOther'])$(id).textContent='0';
+    for(const id of ['attendanceTotal','attendancePositive','attendanceNegative','attendanceOther','ceremonyTabCount','uniformTabCount'])$(id).textContent='0';
   }
   function notice(message,error=false) {
     $('attendanceMessage').textContent=message;$('attendanceMessage').dataset.kind=error?'error':'info';
     $('attendanceMessage').hidden=!message;
   }
   function render() {
-    if(!source?.linked)return;
-    const all=records(source[kind==='ceremony'?'ceremony_records':'uniform_records'],kind);
+    if (!attendanceRecords) return;
+    const all = attendanceRecords[kind];
     const filtered=filter(all,{month:$('attendanceMonth').value,status:$('attendanceStatus').value,search:$('attendanceSearch').value});
     const totals=summary(filtered),ceremony=kind==='ceremony';
     $('attendanceTotal').textContent=totals.total;
@@ -63,7 +93,21 @@
         tr.append(td);
       });body.append(tr);
     }
-    if(!rows.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=labels.length;td.className='attendance-empty';td.textContent=all.length?'No records match your filters.':'No records have been encoded for your employee account yet.';tr.append(td);body.append(tr);}
+    if (!rows.length) {
+      const tr = document.createElement('tr');
+      const td = document.createElement('td');
+      td.colSpan = labels.length;
+      td.className = 'attendance-empty';
+      const recordType = ceremony ? 'flag ceremony attendance' : 'uniform monitoring';
+      td.textContent = all.length ? 'No records match your filters.' : `No ${recordType} records for this employee account yet.`;
+      const otherCount = attendanceRecords[ceremony ? 'uniform' : 'ceremony'].length;
+      if (!all.length && otherCount) {
+        const otherTab = ceremony ? 'Uniform monitoring' : 'Flag ceremony attendance';
+        td.textContent += ` Open ${otherTab} to view ${otherCount} ${otherCount === 1 ? 'record' : 'records'}.`;
+      }
+      tr.append(td);
+      body.append(tr);
+    }
     $('attendanceRange').textContent=`${filtered.length?((pageNumber-1)*size+1):0}–${Math.min(pageNumber*size,filtered.length)} of ${filtered.length} records`;
     $('attendancePage').textContent=`Page ${pageNumber} of ${pages}`;$('attendancePrevious').disabled=pageNumber<=1;$('attendanceNext').disabled=pageNumber>=pages;
   }
@@ -85,21 +129,34 @@
       if(authError)throw authError;
       if(!identity?.user){clear();notice('Sign in to view your attendance.');window.location.replace('login.html');return;}
       if(currentUser!==identity.user.id){clear();notice('Loading your employee attendance…');currentUser=identity.user.id;}
+      watchAttendance(identity.user.id);
       // No ID or query-string value is supplied. The database uses auth.uid().
       const {data,error}=await db.rpc('pgenro_my_attendance');if(token!==generation)return;
       if(error)throw error;
       if(!data||typeof data.linked!=='boolean')throw new Error('Attendance is not configured. Please contact the administrator.');
-      if(!data.linked){clear();notice('Your account needs an employee number. Ask the administrator to update your account.');return;}
-      source=data;$('attendanceName').textContent=text(data.employee?.full_name)||'Employee';
+      if(!data.linked){clear(false);notice('Your account is not linked to an employee record yet. Ask the administrator to link your employee number.');return;}
+      attendanceRecords = {
+        ceremony: records(data.ceremony_records, 'ceremony'),
+        uniform: records(data.uniform_records, 'uniform')
+      };
+      $('ceremonyTabCount').textContent = attendanceRecords.ceremony.length;
+      $('uniformTabCount').textContent = attendanceRecords.uniform.length;
+      $('attendanceName').textContent=text(data.employee?.full_name)||'Employee';
       $('attendanceNumber').textContent=text(data.employee?.employee_number);$('attendanceDepartment').textContent=[data.employee?.designation,data.employee?.department].filter(Boolean).join(' · ');
       for(const el of document.querySelectorAll('.profile-text strong,.profile-dropdown-header h3'))el.textContent=text(data.employee?.full_name)||'Employee';
       $('attendanceIdentity').hidden=false;$('attendanceWorkspace').hidden=false;
       notice(data.reason==='ambiguous_employee_number'?'Your employee number needs an administrator review before attendance can be shown.':
-        data.matched===false?'No attendance or uniform records have been encoded for your employee number yet.':'');render();
+        data.matched===false?'No attendance or uniform records have been encoded for your employee number yet.':'');
+      const otherKind = kind === 'ceremony' ? 'uniform' : 'ceremony';
+      if (!manualTabSelection && !attendanceRecords[kind].length && attendanceRecords[otherKind].length) {
+        selectKind(otherKind);
+      } else {
+        render();
+      }
       $('attendanceUpdated').textContent='Updated '+new Intl.DateTimeFormat('en-PH',{hour:'numeric',minute:'2-digit',timeZone:'Asia/Manila'}).format(new Date());
     } catch(error) {
       if(token!==generation)return;
-      clear();notice(error?.code==='PGRST202'?'Attendance is not configured. Please contact the administrator.':error?.message||'Your attendance could not be loaded. Try Refresh.',true);
+      clear(false);notice(error?.code==='PGRST202'?'Attendance is not configured. Please contact the administrator.':error?.message||'Your attendance could not be loaded. Try Refresh.',true);
     } finally {if(token===generation)$('attendanceRefresh').disabled=false;}
   }
   function navigation() {
@@ -116,7 +173,12 @@
     if(!$('attendanceBody'))return;navigation();selectKind('ceremony');
     $('attendanceRefresh').addEventListener('click',load);
     for(const id of ['attendanceMonth','attendanceStatus','attendanceSearch'])$(id).addEventListener(id==='attendanceSearch'?'input':'change',()=>{pageNumber=1;render();});
-    for(const tab of document.querySelectorAll('[data-attendance-kind]'))tab.addEventListener('click',()=>selectKind(tab.dataset.attendanceKind));
+    for (const tab of document.querySelectorAll('[data-attendance-kind]')) {
+      tab.addEventListener('click', () => {
+        manualTabSelection = true;
+        selectKind(tab.dataset.attendanceKind);
+      });
+    }
     $('attendancePrevious').addEventListener('click',()=>{pageNumber--;render();});$('attendanceNext').addEventListener('click',()=>{pageNumber++;render();});
     const db=window.pgenroSupabase;
     if(db?.auth.onAuthStateChange)subscription=db.auth.onAuthStateChange((event,session)=>{
@@ -125,6 +187,7 @@
       if(event==='SIGNED_IN')queueMicrotask(load);
     }).data?.subscription;
     document.addEventListener('visibilitychange',()=>{if(!document.hidden)load();});
+    window.addEventListener('focus',()=>{if(!document.hidden)load();});
     pollTimer=setInterval(()=>{if(!document.hidden&&currentUser)load();},45000);
     window.addEventListener('pagehide',()=>{generation++;clearInterval(pollTimer);subscription?.unsubscribe();clear();});
     load();

@@ -51,7 +51,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     tables: {
       communications: "communications",
       serviceRequests: "service_requests",
-      employees: "employees",
       travelOrders: "travel_orders",
       inventory: "inventory",
       ics: "ics_records",
@@ -181,9 +180,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         pendingServices:
           $("#kpiPendingServices"),
 
-        totalEmployees:
-          $("#kpiTotalEmployees"),
-
         totalTravel:
           $("#kpiTotalTravel"),
 
@@ -210,7 +206,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       records: {
         communications: [],
         serviceRequests: [],
-        employees: [],
         travelOrders: [],
         inventory: [],
         ics: [],
@@ -1335,10 +1330,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         state.records
           .serviceRequests;
 
-      const employees =
-        state.records
-          .employees;
-
       const travel =
         state.records
           .travelOrders;
@@ -1477,9 +1468,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
         pendingServices,
 
-        totalEmployees:
-          employees.length,
-
         totalTravel:
           travel.length,
 
@@ -1521,7 +1509,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         const total =
           communications.length +
           services.length +
-          employees.length +
           travel.length +
           inventory.length +
           ics.length +
@@ -2332,7 +2319,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       const description=document.getElementById("dashboardTrendDescription");
       if(description)description.textContent=`Documents, travel orders, and services in the last ${chartRangeDays} days.`;
       const missingNote = model.missingDates ? ` ${model.missingDates} records without valid dates are excluded.` : "";
-      const availabilityNote = `${model.availableCount} of 6 activity modules available.`;
+      const availabilityNote = `${model.availableCount} of ${chartActivityModules.length} activity modules available.`;
       const trendSummary = $("#dashboardTrendSummary");
       const distributionSummary = $("#dashboardDistributionSummary");
       if (trendSummary) trendSummary.textContent = `${model.total} dated records over the last ${chartRangeDays} days. ${availabilityNote}${missingNote}`;
@@ -2376,12 +2363,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     async function queryTable(
       table
     ) {
-      if (table === 'employees') {
-        const result = await client.rpc('pgenro_employee_directory');
-        if (result.error) throw result.error;
-        if (!Array.isArray(result.data)) throw new Error('The employee directory is not configured.');
-        return result.data.map(normalizeRow);
-      }
       const {
         data,
         error
@@ -3122,7 +3103,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     communications:['Communications','admincommunication.html','communication.html'],
     travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
     office_memos:['Office Memos','officememo-admin.html','officememo.html'],
-    employees:['Employees','employee-admin.html','employee.html'],
+    employees:['Employees','employee-admin.html',null],
     inventory:['Inventory','invetoryadmin.html','inventory.html'],
     visitors:['Visitors','visitors-admin.html',null],
     service_requests:['Service Requests','serviceAdmin.html','service.html'],

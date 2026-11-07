@@ -1,8 +1,5 @@
--- Run this file LAST, after COMPLETE_SETUP.sql or ADMIN_USER_ACCESS_PATCH.sql.
--- Installs Employee Number linking, private employee-number login lookup,
--- synchronized account-request details, personal attendance access, and the
--- one-time first Admin bootstrap.
--- Employee Numbers are text: leading zeroes and internal punctuation are preserved.
+-- Run this file LAST, after ADMIN_USER_ACCESS_PATCH.sql / existing setup.
+-- Employee IDs are text: leading zeroes and internal punctuation are preserved.
 begin;
 
 alter table public.profiles
@@ -10,21 +7,6 @@ alter table public.profiles
   add column if not exists employee_number text;
 create unique index if not exists profiles_one_account_per_employee
   on public.profiles(employee_record_id) where employee_record_id is not null;
-
--- One employee number can identify only one account, regardless of letter case.
-do $$
-begin
-  if exists (
-    select 1 from public.profiles
-    where nullif(btrim(employee_number),'') is not null
-    group by upper(btrim(employee_number)) having count(*) > 1
-  ) then
-    raise exception 'Duplicate Employee Numbers already exist in profiles. Resolve those account links before installing this patch.';
-  end if;
-end $$;
-create unique index if not exists profiles_employee_number_unique
-  on public.profiles (upper(btrim(employee_number)))
-  where nullif(btrim(employee_number),'') is not null;
 
 -- Normalized installations store monitoring arrays as employee columns.
 -- Legacy JSON-backed installations keep the arrays inside employees.data.
@@ -63,12 +45,12 @@ declare employee jsonb; matches integer; number text:=btrim(p_employee_number); 
 begin
   if number is null or number='' or length(number)>80 or email is null or email=''
     or length(email)>254 or email !~ '^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$' then
-    raise exception using errcode='22023',message='Enter an Employee Number and a valid email address.';
+    raise exception using errcode='22023',message='Enter an employee ID and a valid email address.';
   end if;
   select count(*) into matches from public.employees e
     where upper(btrim(public.pgenro_employee_payload(to_jsonb(e))->>'employee_id'))=upper(number);
   if matches<>1 then
-    raise exception using errcode='22023',message='Employee Number and email could not be verified. Ask the administrator to check your Employee record.';
+    raise exception using errcode='22023',message='Employee ID and email could not be verified. Ask the administrator to check your Employee record.';
   end if;
   if p_lock then
     select public.pgenro_employee_payload(to_jsonb(e)) into employee from public.employees e
@@ -79,21 +61,11 @@ begin
   end if;
   if employee is null or (nullif(btrim(employee->>'email'),'') is not null
     and lower(btrim(employee->>'email'))<>email) then
-    raise exception using errcode='22023',message='Employee Number and email could not be verified. Ask the administrator to check your Employee record.';
+    raise exception using errcode='22023',message='Employee ID and email could not be verified. Ask the administrator to check your Employee record.';
   end if;
-  -- Detect both newly linked profiles and legacy profiles that still have the
-  -- Employee Number stored only in username/employee_number. This prevents a
-  -- second Auth account from colliding with the legacy unique-username trigger.
-  if exists(
-    select 1 from public.profiles p
-    where (
-      p.employee_record_id=employee->>'id'
-      or upper(btrim(coalesce(p.employee_number,'')))=upper(number)
-      or upper(btrim(coalesce(p.username,'')))=upper(number)
-    )
-    and (p_exclude_user is null or p.user_id<>p_exclude_user)
-  ) then
-    raise exception using errcode='23505',message='This Employee Number already has an account or pending request. Use Sign in or ask the system administrator to link the existing account.';
+  if exists(select 1 from public.profiles p where p.employee_record_id=employee->>'id'
+    and (p_exclude_user is null or p.user_id<>p_exclude_user)) then
+    raise exception using errcode='23505',message='This employee ID already has an account or pending request. Use Sign in or contact the administrator.';
   end if;
   return employee;
 end $$;
@@ -106,23 +78,6 @@ begin
   employee:=public.pgenro_registration_employee(p_employee_number,p_email);
   return jsonb_build_object('eligible',true,'employee_number',btrim(employee->>'employee_id'));
 end $$;
-
--- Private identity lookup used only by the employee-login Edge Function.
--- The browser never receives the email-to-employee-number directory lookup.
--- PostgreSQL cannot change a RETURNS TABLE shape using CREATE OR REPLACE, so
--- drop this exact signature first. No SQL function depends on this RPC; it is
--- called by the Edge Function through PostgREST only.
-drop function if exists public.pgenro_employee_login_lookup(text);
-create function public.pgenro_employee_login_lookup(p_employee_number text)
-returns table(user_id uuid,email text,role text,status text,is_active boolean)
-language sql stable security definer set search_path='' as $$
-  select p.user_id,u.email,p.role,p.status,p.is_active
-  from public.profiles p
-  join auth.users u on u.id=p.user_id
-  where nullif(btrim(p_employee_number),'') is not null
-    and upper(btrim(p.employee_number))=upper(btrim(p_employee_number))
-  limit 2;
-$$;
 
 create or replace function public.pgenro_require_employee_registration()
 returns trigger language plpgsql security definer set search_path='' as $$
@@ -237,7 +192,7 @@ begin
   return result;
 end $$;
 
--- No Employee Number argument: the caller cannot request another person's records.
+-- No employee ID argument: the caller cannot request another person's records.
 create or replace function public.pgenro_my_attendance()
 returns jsonb language plpgsql stable security definer set search_path='' as $$
 declare profile public.profiles; employee jsonb; ceremony jsonb; uniforms jsonb;
@@ -280,80 +235,6 @@ begin
   update public.profiles set employee_record_id=employee->>'id' where user_id=p_user_id;
 end $$;
 
--- One-time first Admin bootstrap. The account must already have completed the
--- normal employee-number registration and verified its email. It cannot be
--- used to create additional Admins after the first active Admin exists.
-create or replace function public.promote_pgenro_first_admin_by_employee_number(p_employee_number text)
-returns text language plpgsql security definer set search_path='' as $$
-declare target public.profiles; account auth.users; target_number text:=btrim(p_employee_number);
-begin
-  if target_number is null or target_number='' or length(target_number)>80 then
-    raise exception 'Enter the first Admin employee number.';
-  end if;
-
-  if exists (
-    select 1 from public.profiles p join auth.users u on u.id=p.user_id
-    where p.role='Admin' and p.status='Active' and p.is_active
-      and (u.banned_until is null or u.banned_until<=now())
-  ) then
-    raise exception 'An active Admin already exists. Use User Management to manage other accounts.';
-  end if;
-
-  select p.* into target
-  from public.profiles p
-  join auth.users u on u.id=p.user_id
-  where upper(btrim(p.employee_number))=upper(target_number)
-    and p.employee_record_id is not null
-    and u.email_confirmed_at is not null
-    and lower(coalesce(p.status,'')) not in ('rejected','suspended')
-  for update of p;
-
-  if target.user_id is null then
-    raise exception 'No verified employee account was found for Employee Number %. Register through Request Account, verify the email, and try again.',target_number;
-  end if;
-
-  select * into account from auth.users where id=target.user_id;
-  update public.profiles
-    set role='Admin',account_type='Administrator',status='Active',is_active=true,updated_at=now()
-    where user_id=target.user_id;
-
-  update auth.users
-    set banned_until=null,
-        raw_app_meta_data=coalesce(raw_app_meta_data,'{}'::jsonb)
-          || jsonb_build_object('role','admin','pgenro_role','Admin','pgenro_status','Active')
-    where id=target.user_id;
-
-  if to_regclass('public.access_requests') is not null then
-    update public.access_requests
-      set data=(data-'password'-'confirmPassword')
-        || jsonb_build_object('employeeNumber',target.employee_number,
-          'employeeRecordId',target.employee_record_id,'role','Admin',
-          'accountType','Administrator','assignedRole','Admin','status','Approved',
-          'approvedBy','First Admin Bootstrap','approvedAt',now())
-      where data->>'uid'=target.user_id::text;
-  end if;
-
-  if to_regclass('public.users') is not null then
-    update public.users
-      set data=(coalesce(data,'{}'::jsonb)-'password'-'confirmPassword')
-        || jsonb_build_object('employeeNumber',target.employee_number,'fullName',target.full_name,
-          'email',coalesce(account.email,target.email),'role','Admin',
-          'accountType','Administrator','status','Active')
-      where id=target.user_id::text;
-  end if;
-
-  if to_regclass('public.admins') is not null then
-    insert into public.admins(id,data)
-    values(target.user_id::text,jsonb_build_object('uid',target.user_id::text,
-      'employeeNumber',target.employee_number,'fullName',target.full_name,
-      'email',coalesce(account.email,target.email),'role','Admin',
-      'accountType','Administrator','status','Active'))
-    on conflict(id) do update set data=excluded.data,updated_at=now();
-  end if;
-
-  return 'First Admin activated for Employee Number '||target.employee_number||'.';
-end $$;
-
 -- Restrictive policies compose with legacy permissive policies. Users
 -- get directory projections / their own attendance only through the RPCs above.
 alter table public.employees enable row level security;
@@ -369,13 +250,9 @@ revoke all on function public.pgenro_employee_payload(jsonb),public.pgenro_emplo
   public.pgenro_registration_employee(text,text,boolean,uuid),public.pgenro_require_employee_registration(),
   public.pgenro_bind_employee_profile(),public.pgenro_employee_request_details(),public.pgenro_keep_linked_employee()
   from public,anon,authenticated;
-revoke all on function public.pgenro_employee_registration_check(text,text),public.pgenro_employee_login_lookup(text),
-  public.pgenro_employee_directory(),public.pgenro_my_attendance(),
-  public.pgenro_link_employee_account(uuid,text),public.promote_pgenro_first_admin_by_employee_number(text)
-  from public,anon,authenticated;
+revoke all on function public.pgenro_employee_registration_check(text,text),public.pgenro_employee_directory(),
+  public.pgenro_my_attendance(),public.pgenro_link_employee_account(uuid,text) from public,anon,authenticated;
 grant execute on function public.pgenro_employee_registration_check(text,text) to anon,authenticated;
-grant execute on function public.pgenro_registration_employee(text,text,boolean,uuid),
-  public.pgenro_employee_login_lookup(text),public.promote_pgenro_first_admin_by_employee_number(text) to service_role;
 grant execute on function public.pgenro_employee_directory(),public.pgenro_my_attendance(),
   public.pgenro_link_employee_account(uuid,text) to authenticated,service_role;
 notify pgrst,'reload schema';

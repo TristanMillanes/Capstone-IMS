@@ -8,7 +8,7 @@ try {
     supabase link --project-ref $ProjectRef
     if ($LASTEXITCODE -ne 0) { throw 'Supabase project linking failed.' }
 
-    foreach ($FunctionName in @('admin-users', 'employee-login', 'bootstrap-first-admin')) {
+    foreach ($FunctionName in @('admin-users', 'employee-login', 'employee-register')) {
         Write-Host "Deploying $FunctionName..." -ForegroundColor Cyan
         supabase functions deploy $FunctionName --no-verify-jwt
         if ($LASTEXITCODE -ne 0) { throw "Deployment failed for $FunctionName." }

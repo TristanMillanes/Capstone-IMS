@@ -1,0 +1,235 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "schema": "normalized employees",
+      "check": "Migration backfills existing employee-ID accounts without guessing legacy identities",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Migration is re-runnable without duplicate records/history and publishes the private attendance revision table",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Registration preflight accepts new numbers and cannot create or expose employee records",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "One signup atomically creates the employee, pending User profile and linked access request",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "An existing employee number reuses the exact HR row and preserves names, email and monitoring histories",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "The database also rejects duplicate employee numbers introduced by manual Admin encoding",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Duplicate requests are blocked while distinct leading-zero employee numbers remain distinct",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "An Admin employee update signals only the linked account for attendance refresh",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Approved users receive only their own attendance/uniform records and cannot open the personnel directory",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Attendance signals are read-only and caller-owned; personnel and visitor notifications stay Admin-only",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "URL-style ID arguments, profile edits and forged Auth metadata cannot redirect attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Admin can link an older User account by employee number while retaining exclusive personnel-directory access",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Administrator HR corrections keep the permanent attendance link and employee-number login resolver",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Trusted administrator setup remains supported; administrator-created Users also receive linked employees",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "A failed request rolls back Auth, profile and employee creation without orphan records",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees",
+      "check": "Production registration endpoint creates linked employees, forces Pending User metadata, validates details and handles racing duplicates",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Migration backfills existing employee-ID accounts without guessing legacy identities",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Migration is re-runnable without duplicate records/history and publishes the private attendance revision table",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Registration preflight accepts new numbers and cannot create or expose employee records",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "One signup atomically creates the employee, pending User profile and linked access request",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "An existing employee number reuses the exact HR row and preserves names, email and monitoring histories",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "The database also rejects duplicate employee numbers introduced by manual Admin encoding",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Duplicate requests are blocked while distinct leading-zero employee numbers remain distinct",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "An Admin employee update signals only the linked account for attendance refresh",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Approved users receive only their own attendance/uniform records and cannot open the personnel directory",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Attendance signals are read-only and caller-owned; personnel and visitor notifications stay Admin-only",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "URL-style ID arguments, profile edits and forged Auth metadata cannot redirect attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Admin can link an older User account by employee number while retaining exclusive personnel-directory access",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Administrator HR corrections keep the permanent attendance link and employee-number login resolver",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "Trusted administrator setup remains supported; administrator-created Users also receive linked employees",
+      "result": "PASS"
+    },
+    {
+      "schema": "JSON employees",
+      "check": "A failed request rolls back Auth, profile and employee creation without orphan records",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Migration backfills existing employee-ID accounts without guessing legacy identities",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Migration is re-runnable without duplicate records/history and publishes the private attendance revision table",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Registration preflight accepts new numbers and cannot create or expose employee records",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "One signup atomically creates the employee, pending User profile and linked access request",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "An existing employee number reuses the exact HR row and preserves names, email and monitoring histories",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "The database also rejects duplicate employee numbers introduced by manual Admin encoding",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Duplicate requests are blocked while distinct leading-zero employee numbers remain distinct",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "An Admin employee update signals only the linked account for attendance refresh",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Approved users receive only their own attendance/uniform records and cannot open the personnel directory",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Attendance signals are read-only and caller-owned; personnel and visitor notifications stay Admin-only",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "URL-style ID arguments, profile edits and forged Auth metadata cannot redirect attendance",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Admin can link an older User account by employee number while retaining exclusive personnel-directory access",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Administrator HR corrections keep the permanent attendance link and employee-number login resolver",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "Trusted administrator setup remains supported; administrator-created Users also receive linked employees",
+      "result": "PASS"
+    },
+    {
+      "schema": "normalized employees (upgrade)",
+      "check": "A failed request rolls back Auth, profile and employee creation without orphan records",
+      "result": "PASS"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "check": "homepage.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "communication.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "travelOR.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "officememo.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "inventory.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "service.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "ics.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "my-attendance.html shows My Attendance without personnel profiles or directory requests",
+      "result": "PASS"
+    },
+    {
+      "check": "An old Employee Profiles bookmark redirects to the signed-in user attendance",
+      "result": "PASS"
+    },
+    {
+      "check": "Registration submits names and employee number without directory verification, reports duplicate errors and confirms the employee link",
+      "result": "PASS"
+    },
+    {
+      "check": "Personal attendance ignores another number in the URL, uses caller-only RPC and clears private data when access is refused",
+      "result": "PASS"
+    },
+    {
+      "check": "A delayed response from the previous account cannot overwrite the new account attendance",
+      "result": "PASS"
+    },
+    {
+      "check": "My Attendance opens the populated Uniform tab when Flag Ceremony is empty",
+      "result": "PASS"
+    },
+    {
+      "check": "Live updates refresh the tab counts while preserving the user-selected tab",
+      "result": "PASS"
+    },
+    {
+      "check": "An Admin change refreshes the matching user attendance/uniform history automatically; other account signals are ignored",
+      "result": "PASS"
+    },
+    {
+      "check": "An already-open unlinked User page displays attendance automatically when Admin links the employee number",
+      "result": "PASS"
+    },
+    {
+      "check": "The pencil opens item details and stock movement; editing details preserves a newer stock balance",
+      "result": "PASS"
+    },
+    {
+      "check": "Stock In through the pencil calls the existing movement transaction and refreshes the audit history",
+      "result": "PASS"
+    },
+    {
+      "check": "Stock Out targets the selected item and rejects quantities above its available stock",
+      "result": "PASS"
+    },
+    {
+      "check": "Zero-stock adjustments, retry after failure and duplicate-submit protection still work inside the pencil editor",
+      "result": "PASS"
+    },
+    {
+      "check": "Adding a new inventory item retains its separate initial-quantity form",
+      "result": "PASS"
+    },
+    {
+      "check": "User/requestacc.html fits desktop and phone widths in light and dark mode",
+      "result": "PASS"
+    },
+    {
+      "check": "User/homepage.html fits desktop and phone widths in light and dark mode",
+      "result": "PASS"
+    },
+    {
+      "check": "User/my-attendance.html fits desktop and phone widths in light and dark mode",
+      "result": "PASS"
+    },
+    {
+      "check": "admin/invetoryadmin.html fits desktop and phone widths in light and dark mode",
+      "result": "PASS"
+    }
+  ],
+  "errors": [],
+  "missing": []
+}

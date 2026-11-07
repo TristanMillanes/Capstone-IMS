@@ -1,3 +1,6 @@
+# Current registration update
+Use `../UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md` and run `EMPLOYEE_REGISTRATION_AUTO_SYNC_PATCH.sql` last. Registration now creates or links the Employee record automatically. The directory-verification instructions below describe an earlier release.
+
 # PGENRO IMS — Employee Number Account Flow
 
 This guide is aligned with the end-to-end repair package. For the complete deployment checklist, read `README_EMPLOYEE_NUMBER_FIX.md` or `FIRST_ADMIN_SYSTEM_SETUP.md`.

@@ -15,7 +15,7 @@
 <link rel="stylesheet" href="homepage-details.css?v=20261102-viewer">
 <link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
 <script defer src="user-refresh.js?v=20261102-viewer"></script>
-<script defer src="user-workspace.js?v=20261106-free-accounts-v1"></script>
+<script defer src="user-workspace.js?v=20261107-attendance-only"></script>
 <link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
 <script src="vendor/lucide/lucide.min.js"></script>
 <link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
@@ -48,7 +48,6 @@
 <li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
 <li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
 <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
-<li><a href="employee.html"><i data-lucide="users-round"></i><span>Employee Profiles</span></a></li>
 <li><a href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
 <li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
 
@@ -173,14 +172,6 @@
 </div>
 </article>
 <article class="kpi-card">
-<div class="kpi-icon blue"><i data-lucide="users-round"></i></div>
-<div class="kpi-copy">
-<span>Personnel</span>
-<strong class="font-mono" id="kpiTotalEmployees">0</strong>
-<small>Staff records</small>
-</div>
-</article>
-<article class="kpi-card">
 <div class="kpi-icon violet"><i data-lucide="navigation"></i></div>
 <div class="kpi-copy">
 <span>Travel Orders</span>
@@ -235,7 +226,7 @@
 <h2>Activity Distribution</h2>
 <p>Share of dated activity across office modules in the selected period.</p>
 </div>
-<span class="panel-badge">6 activity modules</span>
+<span class="panel-badge">5 activity modules</span>
 </div>
 <div class="chart-wrapper">
 <div class="chart-canvas-host"><canvas aria-describedby="dashboardDistributionSummary" aria-label="Record distribution by module" id="operationsDistChart" role="img"></canvas></div>
@@ -312,7 +303,7 @@
 
 <script defer="" src="../vendor/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261104-employee-account-1"></script>
-<script defer="" src="homepage.js?v=20261106-free-accounts-v1-20261104-employee-account-1"></script>
+<script defer="" src="../shared/supabase.js?v=20261107-attendance-only"></script>
+<script defer="" src="homepage.js?v=20261107-attendance-only"></script>
 </body>
 </html>

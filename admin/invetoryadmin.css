@@ -2498,3 +2498,11 @@ html body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[dat
 html body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui="20261013"][data-design="emerald-v6"] .modern-dashboard-hero :is(h1,p){color:#111}
 }
 
+/* One pencil entry point for item details and audited stock movements. */
+#itemModal [hidden]{display:none!important}
+.inventory-editor-tabs{display:flex;gap:8px;padding:12px 24px;border-bottom:1px solid var(--border-color);flex-shrink:0;flex-wrap:wrap}
+.inventory-editor-tabs button{flex:1;min-height:42px;padding:10px 14px;border:1px solid var(--border-color);border-radius:8px;background:var(--bg-surface,#fff);color:var(--text-main,#163b30);font:inherit;font-weight:700;cursor:pointer}
+.inventory-editor-tabs button[aria-selected="true"]{background:#047857;color:#fff;border-color:#047857}
+.inventory-editor-tabs button:focus-visible{outline:3px solid var(--emerald-400,#34d399);outline-offset:2px}
+.inventory-quantity-help{display:block;margin-top:6px;font-size:11px;font-weight:400;color:var(--text-muted,#64748b);line-height:1.5}
+#itemQuantity[readonly]{background:var(--bg-main,#f0f5f2);cursor:default}

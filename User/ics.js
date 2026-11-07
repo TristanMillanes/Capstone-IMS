@@ -1575,7 +1575,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     communications:['Communications','admincommunication.html','communication.html'],
     travel_orders:['Travel Orders','travelOR-admin.html','travelOR.html'],
     office_memos:['Office Memos','officememo-admin.html','officememo.html'],
-    employees:['Employees','employee-admin.html','employee.html'],
+    employees:['Employees','employee-admin.html',null],
     inventory:['Inventory','invetoryadmin.html','inventory.html'],
     visitors:['Visitors','visitors-admin.html','visitorsView.html'],
     service_requests:['Service Requests','serviceAdmin.html','service.html'],

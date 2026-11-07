@@ -1,4 +1,4 @@
-/* Manual employee-number requests. The administrator reviews all new accounts. */
+/* Registration creates or reuses one linked employee; Admin reviews access. */
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
@@ -34,7 +34,14 @@
       }
       $('confirmPassword').setCustomValidity($('password').value === $('confirmPassword').value ? '' : 'Passwords do not match.');
       if (!form.reportValidity()) return;
-      const body = {employee_number: number, full_name: $('fullName').value.trim(),
+      const names = {first_name: $('firstName').value.trim(), middle_name: $('middleName').value.trim(),
+        last_name: $('lastName').value.trim(), name_extension: $('nameExtension').value.trim()};
+      const fullName = Object.values(names).filter(Boolean).join(' ');
+      if (fullName.length > 200) {
+        $('requestError').textContent = 'Your full name must contain at most 200 characters.';
+        $('requestError').hidden = false; return;
+      }
+      const body = {employee_number: number, ...names, full_name: fullName,
         division: $('division').value, position: $('position').value.trim(), password: $('password').value};
       busy(true);
       try {

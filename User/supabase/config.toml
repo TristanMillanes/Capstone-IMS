@@ -3,12 +3,10 @@
 [functions.admin-users]
 verify_jwt = false
 
-# Employee-number login resolves the private Auth email server-side and then
-# verifies the password through Supabase Auth. The function performs its own
-# request validation, so JWT verification is disabled for this public endpoint.
+# Public employee sign-in and registration validate the employee identity and
+# password inside the function. Registration always creates a Pending User.
 [functions.employee-login]
 verify_jwt = false
 
-# Public one-time bootstrap endpoint; it validates a private setup key and closes after first Admin.
-[functions.bootstrap-first-admin]
+[functions.employee-register]
 verify_jwt = false

@@ -9,7 +9,7 @@
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link href="invetoryadmin.css?v=20261027-emerald-v6" rel="stylesheet">
+<link href="invetoryadmin.css?v=20261107-employee-stock-sync" rel="stylesheet">
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="invetoryadmin.html" data-css-scope="admin-inventory" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Inventory" data-design="emerald-v6">
@@ -286,9 +286,6 @@
 <button class="btn btn-secondary" id="exportBtn" type="button">
 <i data-lucide="download"></i>Export CSV
             </button>
-<button class="btn btn-primary" id="movementBtn" type="button">
-<i data-lucide="arrow-left-right"></i>Record Movement
-            </button>
 </div>
 </div>
 <div class="tabs">
@@ -374,6 +371,10 @@
 </div>
 <button aria-label="Close dialog" class="icon-btn close" data-close="itemModal" type="button"><i data-lucide="x"></i></button>
 </div>
+<div class="inventory-editor-tabs" id="inventoryEditorTabs" role="tablist" aria-label="Edit inventory" hidden>
+<button id="itemDetailsTab" type="button" role="tab" aria-selected="true" aria-controls="itemForm" data-inventory-editor="details">Item details</button>
+<button id="itemMovementTab" type="button" role="tab" aria-selected="false" aria-controls="movementForm" tabindex="-1" data-inventory-editor="movement">Stock movement</button>
+</div>
 <form id="itemForm"><div class="modal-body">
 <input id="itemDbId" type="hidden">
 <div class="form-grid">
@@ -402,8 +403,9 @@
           <input id="itemUnit" placeholder="e.g. REAM, BOX, ROLL, PCS" required="">
 </label>
 <label>
-          Initial / Current Quantity
+          <span id="itemQuantityLabel">Initial quantity</span>
           <input id="itemQuantity" min="0" required="" type="number" value="0">
+          <small class="inventory-quantity-help" id="itemQuantityHelp" hidden>Use the Stock movement tab to add, issue or adjust stock.</small>
 </label>
 <label>
           Low Stock Alert Level
@@ -424,22 +426,11 @@
 <i data-lucide="save"></i>Save Item
         </button>
 </div></form>
-</div>
-</div>
-<!-- STOCK MOVEMENT MODAL -->
-<div aria-hidden="true" class="modal-backdrop" id="movementModal">
-<div aria-labelledby="movementModalTitle" aria-modal="true" class="modal small-modal modal-card" role="dialog">
-<div class="modal-head modal-header">
-<div>
-<span class="modal-kicker">STOCK DISBURSEMENT / REPLENISHMENT</span>
-<h2 id="movementModalTitle">Record Stock Movement</h2>
-</div>
-<button aria-label="Close dialog" class="icon-btn close" data-close="movementModal" type="button"><i data-lucide="x"></i></button>
-</div>
-<form id="movementForm"><div class="modal-body">
+<!-- The pencil opens both editors for this item; stock changes keep their audit trail. -->
+<form id="movementForm" role="tabpanel" aria-labelledby="itemMovementTab" hidden><div class="modal-body">
 <label>
-        Select Inventory Item
-        <select id="movementItem" required=""></select>
+        Inventory item
+        <select id="movementItem" required="" disabled></select>
 </label>
 <div class="form-grid two">
 <label>
@@ -467,7 +458,7 @@
         Select an item to preview balance updates.
       </div>
 </div><div class="modal-actions">
-<button class="btn btn-secondary" data-close="movementModal" type="button">Cancel</button>
+<button class="btn btn-secondary" data-close="itemModal" type="button">Cancel</button>
 <button class="btn btn-primary" type="submit">
 <i data-lucide="check"></i>Record Transaction
         </button>
@@ -518,7 +509,7 @@
 <!-- SCRIPT -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/supabase.js?v=20261104-employee-account-1"></script>
-<script defer src="invetoryadmin.js?v=20261104-ui-repair-2"></script>
+<script defer src="invetoryadmin.js?v=20261107-employee-stock-sync"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

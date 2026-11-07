@@ -1,11 +1,13 @@
-# Employee ID login and first administrator — 5 November 2026
+# Employee ID login and first administrator
 
-Registration asks for the employee ID and password only. A fixed `@pgenro.ims` suffix is displayed beside the ID. The system generates the Auth login address: `0007` becomes `0007@pgenro.ims`. Leading zeroes are preserved and ID matching ignores case. The first administrator signs in as `Admin001`, using the same automatic suffix.
+**Current registration update:** Follow [UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md](UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md). Apply `supabase/EMPLOYEE_REGISTRATION_AUTO_SYNC_PATCH.sql` last and redeploy `employee-register`. Staff enter their number and basic details; the Employee record is created or linked automatically. The older verification steps below are superseded by this update.
+
+Registration asks for the employee number, name, office division, optional position and password. A fixed `@pgenro.ims` suffix is displayed beside the ID. The system generates the Auth login address: `0007` becomes `0007@pgenro.ims`. Leading zeroes are preserved and ID matching ignores case. The first administrator signs in as `Admin001`, using the same automatic suffix.
 
 ## Install in your existing Supabase project
 
 1. Run the existing `supabase/ADMIN_USER_ACCESS_PATCH.sql` if Admin/User access is not installed yet. For a new empty database, follow `ADMIN_USER_SETUP.md` first.
-2. Run the entire `supabase/EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql`, then the entire **`supabase/EMPLOYEE_ID_LOGIN_PATCH.sql` last**. The second patch can be repeated safely. Do not apply an older account patch afterward without reapplying this last patch.
+2. Run the entire **`supabase/EMPLOYEE_REGISTRATION_AUTO_SYNC_PATCH.sql` last**. It includes the employee link, registration and private attendance setup for existing databases. Do not reapply an older account patch afterward without reapplying this latest patch.
 3. Deploy all three Edge Functions from this project. The two public employee functions are new; `admin-users` is updated:
 
    ```bash
@@ -32,9 +34,8 @@ Then open `/User/login.html`, enter **`Admin001`** and the password you chose. T
 
 ## Employee registration and account management
 
-- Encode the employee's ID in the Employee module first. Employee IDs for login support 1–64 letters, digits, underscores, hyphens and dots; dots cannot be consecutive or last. Admin-created IDs use the existing 60-character username limit.
-- Employees enter their ID, click **Verify employee ID**, and choose a password. Their name/division/position come from the encoded record. Any contact email in HR is retained as contact information and is not required for registration.
-- `employee-register` generates the alias on the server, confirms it without sending mail, and creates an inactive **Pending User**. An administrator must approve the request before access is granted. A client cannot choose Admin access or bypass the database employee check.
+- Employees enter their ID, name, division, optional position and password. The Employee record is added or linked automatically; Admin completes other personnel information. IDs support letters, digits, underscores, hyphens and dots; dots cannot be consecutive or last. The registration form uses the existing 60-character limit.
+- `employee-register` generates the alias on the server, confirms it without sending mail, and creates an inactive **Pending User** linked to an Employee record. An administrator must approve access. A client cannot choose Admin access or another employee's attendance link.
 - One employee record can have only one account or pending request. `Admin001` is reserved for the first administrator.
 - In Admin User Management, enter the Employee ID. The login address is filled automatically and cannot be edited separately. Password changes remain available to administrators; email recovery is not used for synthetic login addresses.
 - Existing linked email-based accounts retain their password and Auth identity. The private login resolver finds them by the linked Employee ID. Older unlinked accounts can use their existing username, or an administrator can link a confirmed employee using `pgenro_link_employee_account` as documented in `EMPLOYEE_ACCOUNT_SETUP.md`. An employee ID correction continues to use the stable employee record link.

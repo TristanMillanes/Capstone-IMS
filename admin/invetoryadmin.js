@@ -239,7 +239,6 @@ function bindUIEvents() {
 
   // Buttons & Forms
   $("addItemBtn").onclick = () => openItemModal();
-  $("movementBtn").onclick = () => openMovementModal();
   $("openReportBtn").onclick = openReportModal;
   $("confirmPrintBtn").onclick = printReport;
   $("exportBtn").onclick = exportCSV;
@@ -268,6 +267,16 @@ function bindUIEvents() {
   $("movementItem").onchange = updateMovementPreview;
   $("movementType").onchange = updateMovementPreview;
   $("movementQty").oninput = updateMovementPreview;
+  document.querySelectorAll('[data-inventory-editor]').forEach(button => {
+    button.onclick = () => selectInventoryEditor(button.dataset.inventoryEditor);
+    button.onkeydown = event => {
+      if (!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)) return;
+      event.preventDefault();
+      const next = event.key === 'Home' ? 'details' : event.key === 'End' ? 'movement' :
+        button.dataset.inventoryEditor === 'details' ? 'movement' : 'details';
+      selectInventoryEditor(next, true);
+    };
+  });
 
   // Filter tabs
   document.querySelectorAll(".tab").forEach((tab) => {
@@ -312,10 +321,10 @@ async function loadMovements(){
  try{const rows=await M.read('inventory_movements');movements=rows.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,30).map(row=>({...row,inventory:row.inventory||inventory.find(i=>String(i.id)===String(row.item_id))}));saveToLocalStorage();renderMovements();}
  catch(error){if(!movements.length)movements=cachedRows(MOVEMENTS_CACHE);renderMovements();}
 }
-function setStatus(online){$('addItemBtn').disabled=!online;$('movementBtn').disabled=!online;renderActionState();}
+function setStatus(online){$('addItemBtn').disabled=!online;renderActionState();}
 
 function renderActionState() {
-  document.querySelectorAll("#inventoryBody [data-edit], #inventoryBody [data-delete], #inventoryBody [data-move]")
+  document.querySelectorAll("#inventoryBody [data-edit], #inventoryBody [data-delete]")
     .forEach((button) => { button.disabled = !dbOnline; });
 }
 
@@ -361,7 +370,6 @@ function render() {
   // Attach dynamic button events
   tbody.querySelectorAll("[data-edit]").forEach((b) => (b.onclick = () => openItemModal(b.dataset.edit)));
   tbody.querySelectorAll("[data-delete]").forEach((b) => (b.onclick = () => deleteItem(b.dataset.delete)));
-  tbody.querySelectorAll("[data-move]").forEach((b) => (b.onclick = () => openMovementModal(b.dataset.move)));
   renderActionState();
 
   // Recalculate KPIs
@@ -411,10 +419,7 @@ function rowHTML(item) {
     <td><small style="color: var(--slate-500); font-weight: 600;">${updated}</small></td>
     <td>
       <div class="actions">
-        <button class="action move" title="Record Movement" data-move="${escapeAttr(item.id)}">
-          <i data-lucide="arrow-left-right"></i>
-        </button>
-        <button class="action" title="Edit Item" data-edit="${escapeAttr(item.id)}">
+        <button class="action" type="button" title="Edit item / record stock movement" aria-label="Edit ${escapeAttr(item.item_name || 'item')} or record stock movement" data-edit="${escapeAttr(item.id)}">
           <i data-lucide="pencil"></i>
         </button>
         <button class="action delete" title="Delete Item" data-delete="${escapeAttr(item.id)}">
@@ -428,15 +433,23 @@ function rowHTML(item) {
 // Add or Edit Item
 function openItemModal(id = null) {
       if (!M.canStartAction()) return;
+  if (itemSaving || movementSaving) return;
   editingId = id;
   $("itemForm").reset();
   $("itemQuantity").value = 0;
   $("itemThreshold").value = 5;
+  $('inventoryEditorTabs').hidden = !id;
+  $('itemQuantity').readOnly = !!id;
+  $('itemQuantityLabel').textContent = id ? 'Current quantity' : 'Initial quantity';
+  $('itemQuantityHelp').hidden = !id;
+  $('itemForm').setAttribute('role', id ? 'tabpanel' : 'form');
+  if (id) $('itemForm').setAttribute('aria-labelledby','itemDetailsTab');
+  else $('itemForm').removeAttribute('aria-labelledby');
 
   if (id) {
     const item = inventory.find((x) => String(x.id) === String(id));
     if (!item) return;
-    $("itemModalTitle").textContent = "Edit Inventory Masterfile";
+    $("itemModalTitle").textContent = "Edit Inventory Item";
     $("controlNo").value = item.control_no || "";
     $("itemName").value = item.item_name || "";
     $("itemCategory").value = item.category || "";
@@ -445,6 +458,7 @@ function openItemModal(id = null) {
     $("itemThreshold").value = item.threshold ?? 5;
     $("itemDescription").value = item.description || "";
     $("itemRemarks").value = item.remarks || "";
+    prepareItemMovement(item);
   } else {
     $("itemModalTitle").textContent = "Add Inventory Item";
     const year = new Date().getFullYear();
@@ -456,7 +470,23 @@ function openItemModal(id = null) {
     }, 0);
     $("controlNo").value = `${prefix}${String(highest + 1).padStart(3, "0")}`;
   }
+  selectInventoryEditor('details');
   openModal("itemModal");
+}
+
+function selectInventoryEditor(kind, focus = false) {
+  if (itemSaving || movementSaving || (kind === 'movement' && !editingId)) return;
+  const movement = kind === 'movement';
+  $('itemForm').hidden = movement;
+  $('movementForm').hidden = !movement;
+  for (const button of document.querySelectorAll('[data-inventory-editor]')) {
+    const active = button.dataset.inventoryEditor === kind;
+    button.setAttribute('aria-selected',String(active));button.tabIndex = active ? 0 : -1;
+    if (active && focus) button.focus();
+  }
+  $('itemModalTitle').textContent = !editingId ? 'Add Inventory Item' :
+    movement ? 'Record Stock Movement' : 'Edit Inventory Item';
+  if (movement) updateMovementPreview();
 }
 
 async function saveItem(e) {
@@ -480,6 +510,9 @@ async function saveItem(e) {
 
   if (![payload.quantity,payload.threshold].every(n=>Number.isInteger(n)&&n>=0)){toast('Quantity and threshold must be non-negative whole numbers.','error');return;}
   if(inventory.some(i=>String(i.id)!==String(editingId||'')&&String(i.control_no||'').trim().toLowerCase()===payload.control_no.toLowerCase())){toast('Control number already exists.','warning');return;}
+  // Editing specifications must never overwrite a newer stock balance or bypass
+  // the transactional movement RPC and its audit ledger.
+  if (editingId) delete payload.quantity;
   if (!requireLiveDatabase()) return;
   itemSaving=true;$('itemModal').dataset.busy='true';
   $("saveItemBtn").disabled = true;
@@ -507,23 +540,13 @@ async function deleteItem(id) {
   }
 }
 
-// Stock Movements
-function openMovementModal(id = null) {
-      if (!M.canStartAction()) return;
+// Stock movements are scoped to the item selected through its pencil button.
+function prepareItemMovement(item) {
   const select = $("movementItem");
-  select.innerHTML = inventory.length
-    ? inventory
-        .map(
-          (i) =>
-            `<option value="${escapeAttr(i.id)}">${escapeHTML(i.control_no)} — ${escapeHTML(i.item_name)} (${Number(i.quantity)} ${escapeHTML(i.unit)} on hand)</option>`
-        )
-        .join("")
-    : `<option value="">No registered items available</option>`;
-
   $("movementForm").reset();
-  if (id) select.value = id;
+  select.innerHTML = `<option value="${escapeAttr(item.id)}">${escapeHTML(item.control_no)} — ${escapeHTML(item.item_name)} (${Number(item.quantity)} ${escapeHTML(item.unit)} on hand)</option>`;
+  select.value = item.id;
   $("movementQty").value = 1;
-  openModal("movementModal");
   updateMovementPreview();
 }
 
@@ -556,8 +579,9 @@ function updateMovementPreview() {
 
 async function saveMovement(e) {
   e.preventDefault();
-  if(movementSaving)return;
+  if(movementSaving||itemSaving||!$('movementForm').reportValidity())return;
   const itemId = $("movementItem").value;
+  if (!editingId || String(itemId) !== String(editingId)) return toast('Reopen the item using its pencil button.','error');
   const type = $("movementType").value;
   const qty = Number($("movementQty").value);
   const ref = $("movementReference").value.trim();
@@ -580,7 +604,7 @@ async function saveMovement(e) {
   }
   if (!requireLiveDatabase()) return;
 
-  movementSaving=true;$('movementModal').dataset.busy='true';const submit=$('movementForm').querySelector('button[type=submit]');submit.disabled=true;
+  movementSaving=true;$('itemModal').dataset.busy='true';const submit=$('movementForm').querySelector('button[type=submit]');submit.disabled=true;
   try {
     const { error } = await supabase.rpc("record_inventory_movement", {
       p_item_id: item.id,
@@ -595,11 +619,11 @@ async function saveMovement(e) {
 
     const refreshed = await loadInventory();
     await loadMovements();
-    $("movementModal").dataset.busy="false";closeModal("movementModal");M.audit("STOCK_MOVEMENT",`${type} ${qty} ${item.unit} — ${item.item_name}`);
+    $("itemModal").dataset.busy="false";closeModal("itemModal");M.audit("STOCK_MOVEMENT",`${type} ${qty} ${item.unit} — ${item.item_name}`);
     toast(refreshed ? "Stock movement successfully recorded." : "Movement submitted; reconnect to verify the updated balance.", refreshed ? "success" : "warning");
   } catch (error) {
     toast(error?.message || "Unable to record stock movement.", "error");
-  }finally{movementSaving=false;$("movementModal").dataset.busy="false";submit.disabled=false;}
+  }finally{movementSaving=false;$("itemModal").dataset.busy="false";submit.disabled=false;}
 }
 
 function renderMovements() {

@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test:employee-account": "node employee-account-database.cjs && node employee-account-browser.cjs",
+    "test:employee-account": "node ../employee-sync/database.cjs && node ../employee-sync/browser.cjs",
     "test:visual": "node visual-regression.cjs"
   },
   "devDependencies": {

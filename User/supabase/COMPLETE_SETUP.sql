@@ -1,6 +1,5 @@
--- Employee Number login update: run EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql LAST
--- after this base schema. Use BOOTSTRAP_FIRST_ADMIN.sql after the first employee
--- account has registered and confirmed its email.
+-- Employee-ID registration update: after initial Admin setup, run the entire
+-- EMPLOYEE_ACCOUNT_ATTENDANCE_PATCH.sql file LAST to enable employee linking and private attendance.
 
 -- ============================================================================
 -- PGENRO IMS - SUPABASE DATABASE SCHEMA
@@ -1070,7 +1069,7 @@ grant execute on function public.pgenro_healthcheck() to anon, authenticated, se
 
 -- ============================================================================
 -- PGENRO IMS — SAFE ACCOUNT & SYSTEM SETTINGS PATCH
--- Idempotent: safe to run more than once after PGENRO_FULL_SETUP.sql.
+-- Idempotent: safe to run more than once after COMPLETE_SETUP.sql.
 -- Does not replace or drop operational tables.
 -- ============================================================================
 
@@ -1354,7 +1353,7 @@ end $$;
 
 create function public.pgenro_admin_list_users(p_offset integer default 0, p_limit integer default 500)
 returns table (
-  user_id uuid, full_name text, username text, employee_number text, email text, division text,
+  user_id uuid, full_name text, username text, email text, division text,
   role text, status text, is_active boolean, "position" text, contact text,
   last_login timestamptz, created_at timestamptz, updated_at timestamptz, account_type text
 ) language plpgsql stable security definer set search_path = '' as $$
@@ -1364,7 +1363,7 @@ begin
   end if;
   return query
     select p.user_id::uuid, p.full_name::text, p.username::text,
-      to_jsonb(p)->>'employee_number', coalesce(u.email::text,p.email::text), p.division::text,
+      coalesce(u.email::text,p.email::text), p.division::text,
       p.role::text, (case when p.status='Active' and u.banned_until > now() then 'Suspended' else p.status end)::text,
       (p.is_active and (u.banned_until is null or u.banned_until <= now()))::boolean,
       p.position::text, p.contact::text,

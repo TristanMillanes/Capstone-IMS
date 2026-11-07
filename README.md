@@ -1,5 +1,7 @@
 # PGENRO Information Management System
 
+On the User side, use **My Attendance** for the signed-in employee's ceremony and uniform records. Employee Profiles/Directory is Admin-only. Apply the latest auto-sync SQL patch again and redeploy the website for the current attendance-only User update.
+
 This folder contains the application, OCR server, required assets, Supabase setup files and current installation guides.
 
 ## Start locally
@@ -10,7 +12,7 @@ For manual startup, see [FIXES_AND_SETUP.md](FIXES_AND_SETUP.md). For Docker/Ren
 
 ## Set up accounts
 
-Follow [EMPLOYEE_ID_LOGIN_SETUP.md](EMPLOYEE_ID_LOGIN_SETUP.md) to install the employee ID SQL patches and deploy the Supabase functions. Registration and login use the employee ID and password, with `@pgenro.ims` added automatically.
+Follow [UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md](UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md) for automatic Employee creation/linking during registration, private personal attendance and inventory stock movements through the pencil button. Apply the auto-sync SQL patch last and redeploy `employee-register` as described there. Login uses the employee ID and password, with `@pgenro.ims` added automatically.
 
 Run **SETUP_FIRST_ADMIN.bat** to create **Admin001** with your chosen password after applying the SQL setup. For a new database or Admin/User access configuration, see [ADMIN_USER_SETUP.md](ADMIN_USER_SETUP.md).
 

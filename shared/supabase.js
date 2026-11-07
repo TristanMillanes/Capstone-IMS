@@ -2539,10 +2539,7 @@
     select = "*"
   ) {
     if (table === 'employees' && /\/user\//i.test(location.pathname) && !/\/admin\//i.test(location.pathname)) {
-      const result = await requireClient().rpc('pgenro_employee_directory');
-      if (result.error) throw result.error;
-      if (!Array.isArray(result.data)) throw new Error('The employee directory is not configured.');
-      return result.data;
+      throw accessError('PGENRO_ADMIN_REQUIRED', 'Personnel records are available to administrators. Open My Attendance for your own monitoring records.');
     }
     const {
       data,
@@ -2625,33 +2622,6 @@
         await load();
         watchTable(
           "communications",
-          load
-        );
-      }
-
-      if (
-        path.endsWith(
-          "/user/employee.html"
-        )
-      ) {
-        const load = async () => {
-          const rows =
-            (
-              await selectRows(
-                "employees"
-              )
-            ).map(
-              mapEmployeeForUser
-            );
-
-          window.loadDatabaseEmployees?.(
-            rows
-          );
-        };
-
-        await load();
-        watchTable(
-          "employees",
           load
         );
       }

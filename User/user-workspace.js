@@ -4,14 +4,14 @@
   function init() {
     if (document.body.dataset.unifiedLayoutReady) return;
     document.body.dataset.unifiedLayoutReady = 'true';
-    function hideAdminVisitorLinks() {
+    function hideAdminRecordLinks() {
       if (!document.body.classList.contains('pgenro-user')) return;
-      document.querySelectorAll('a[href*="visitorsView"],a[href*="visitors-admin"]').forEach(link => {
+      document.querySelectorAll('a[href*="visitorsView"],a[href*="visitors-admin"],a[href="employee.html"],a[href$="/employee.html"],a[href*="employee-admin.html"]').forEach(link => {
         const row = link.closest('.modules-list li, .sidebar li');
         (row || link).remove();
       });
     }
-    hideAdminVisitorLinks();
+    hideAdminRecordLinks();
     // A wide registry scrolls within its own region, including dynamically mounted tables.
     function containTables() {
       document.querySelectorAll('main table,.modal-body table,.modal-content table').forEach(table => {
@@ -23,9 +23,9 @@
     containTables();
     let tableFrame;
     const insertedTables = new MutationObserver(records => {
-      const selector = 'table,a[href*="visitorsView"],a[href*="visitors-admin"]';
+      const selector = 'table,a[href*="visitorsView"],a[href*="visitors-admin"],a[href="employee.html"],a[href$="/employee.html"],a[href*="employee-admin.html"]';
       if (!records.some(record => [...record.addedNodes].some(node => node.nodeType === 1 && (node.matches?.(selector) || node.querySelector?.(selector))))) return;
-      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(() => {containTables(); hideAdminVisitorLinks();});
+      cancelAnimationFrame(tableFrame); tableFrame = requestAnimationFrame(() => {containTables(); hideAdminRecordLinks();});
     });
     insertedTables.observe(document.body, {childList:true,subtree:true});
     document.querySelector('.admin-sidebar-close')?.addEventListener('click',()=>document.getElementById('sidebarBackdrop')?.click());

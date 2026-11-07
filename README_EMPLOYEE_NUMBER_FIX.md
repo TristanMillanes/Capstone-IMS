@@ -1,5 +1,7 @@
 # PGENRO IMS — Employee Number + Supabase End-to-End Repair
 
+**Superseded registration instructions:** Use [UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md](UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md) for the current automatic Employee record and personal-attendance update. Pre-encoding and employee/email verification below describe an earlier release.
+
 This package repairs the Employee Number account flow and the one-time First Admin setup. It does **not** deploy to the live Supabase project automatically; run the deployment commands below from the project root.
 
 ## What is repaired
