@@ -1,42 +1,3 @@
-/* PGENRO modern charts, 10 October 2026. */
-/* Dashboard-owned chart style; data stays with the existing analytics model. */
-(() => {
-  'use strict';
-  const colors=['#278560','#4b9da7','#8b7ac7','#c79b46','#ce7d78','#7caa9f'];
-  const family='Inter, system-ui, sans-serif';
-  function theme(){const style=getComputedStyle(document.body);return {label:style.getPropertyValue('--chart-label-color').trim()||'#718379',grid:style.getPropertyValue('--chart-grid-color').trim()||'#e0e9e3'};}
-  function options(){
-    return {responsive:true,maintainAspectRatio:false,resizeDelay:0,
-      animation:matchMedia('(prefers-reduced-motion: reduce)').matches?false:{duration:220,easing:'easeOutQuart'},
-      interaction:{mode:'index',intersect:false},
-      plugins:{legend:{position:'bottom',labels:{usePointStyle:true,pointStyle:'circle',boxWidth:7,boxHeight:7,padding:12,color:theme().label,font:{size:10,weight:550,family}}},
-        tooltip:{backgroundColor:'#183e30',titleColor:'#fff',bodyColor:'#e2eee6',padding:13,cornerRadius:11,
-          boxPadding:5,usePointStyle:true,titleFont:{size:12,weight:650,family},bodyFont:{size:12,family}}}};
-  }
-  function scales(){return {
-    x:{border:{display:false},grid:{display:false},ticks:{maxRotation:0,maxTicksLimit:8,font:{size:11,family},color:theme().label}},
-    y:{beginAtZero:true,border:{display:false},grid:{color:theme().grid,drawTicks:false},ticks:{precision:0,padding:9,font:{size:11,family},color:theme().label}}
-  };}
-  function area(context){
-    const {chart}=context,box=chart.chartArea;if(!box)return '#27856012';
-    const gradient=chart.ctx.createLinearGradient(0,box.top,0,box.bottom);gradient.addColorStop(0,'#2785602d');gradient.addColorStop(1,'#27856000');return gradient;
-  }
-  window.PGENRO_ChartStyle={colors,options,scales,area};
-  if(!window.Chart)return;
-  window.Chart.defaults.font.family=family;window.Chart.defaults.font.size=11;window.Chart.defaults.color='#758b7d';
-  Object.assign(window.Chart.defaults.plugins.tooltip,options().plugins.tooltip);
-  window.Chart.register({id:'pgenroDoughnutTotal',afterDraw(chart){
-    if(chart.config.type!=='doughnut'||!chart.chartArea)return;
-    const sum=(chart.data.datasets[0]?.data||[]).reduce((total,value,index)=>total+(chart.getDataVisibility(index)?Number(value)||0:0),0);
-    const {left,right,top,bottom}=chart.chartArea,x=(left+right)/2,y=(top+bottom)/2,ctx=chart.ctx;
-    const radius=chart.getDatasetMeta(0).data[0]?.innerRadius||45;
-    ctx.save();ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=getComputedStyle(chart.canvas).getPropertyValue('--chart-total-color').trim()||'#244d39';
-    ctx.font=`750 ${Math.min(32,Math.max(19,radius*.6))}px ${family}`;
-    ctx.fillText(new Intl.NumberFormat(undefined,{notation:sum>=10000?'compact':'standard',maximumFractionDigits:1}).format(sum),x,y-6);
-    ctx.fillStyle='#84988b';ctx.font=`550 10px ${family}`;ctx.fillText('TOTAL RECORDS',x,y+18);ctx.restore();
-  }});
-})();
-
 /* Page-owned UI helpers: render new placeholders without rebuilding existing SVGs. */
 const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
@@ -52,7 +13,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       communications: "communications",
       serviceRequests: "service_requests",
       travelOrders: "travel_orders",
-      inventory: "inventory",
+      supplyRequests: "pgenro_supply_requests",
       ics: "ics_records",
       memos: "office_memos"
     }
@@ -140,9 +101,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       refreshDashboardBtn:
         $("#refreshDashboardBtn"),
 
-      visitorRecentList:
-        $("#visitorRecentList"),
-
       serviceRecentList:
         $("#serviceRecentList"),
 
@@ -186,17 +144,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         activeTravel:
           $("#kpiActiveTravel"),
 
-        totalAssets:
-          $("#kpiTotalAssets"),
+        totalSupplyRequests:
+          $("#kpiTotalSupplyRequests"),
 
         totalIcs:
-          $("#kpiTotalIcs"),
-
-        visitorsToday:
-          $("#kpiVisitorsToday"),
-
-        visitorsInside:
-          $("#kpiVisitorsInside")
+          $("#kpiTotalIcs")
       }
     };
 
@@ -207,9 +159,8 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         communications: [],
         serviceRequests: [],
         travelOrders: [],
-        inventory: [],
+        supplyRequests: [],
         ics: [],
-        visitors: [],
         memos: []
       },
 
@@ -224,6 +175,8 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       refreshTimer: 0,
       loading: false
     };
+
+    const refreshButtons = [ui.refreshDashboardBtn, $("#refreshUserAnalyticsBtn")].filter(Boolean);
 
     const mobileQuery =
       window.matchMedia(
@@ -527,32 +480,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       );
     }
 
-    function formatTime(
-      record
-    ) {
-      const date =
-        getRecordDate(
-          record
-        );
-
-      if (!date) {
-        return "—";
-      }
-
-      return new Intl
-        .DateTimeFormat(
-          "en-PH",
-          {
-            hour:
-              "numeric",
-
-            minute:
-              "2-digit"
-          }
-        )
-        .format(date);
-    }
-
     function formatDate(
       value
     ) {
@@ -581,65 +508,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           }
         )
         .format(date);
-    }
-
-    function isToday(
-      record
-    ) {
-      const date =
-        getRecordDate(
-          record
-        );
-
-      if (!date) {
-        return false;
-      }
-
-      const now =
-        new Date();
-
-      return (
-        date.getFullYear() ===
-          now.getFullYear() &&
-        date.getMonth() ===
-          now.getMonth() &&
-        date.getDate() ===
-          now.getDate()
-      );
-    }
-
-    function getInitials(
-      name
-    ) {
-      const words =
-        text(
-          name ||
-          "Visitor"
-        )
-          .split(/\s+/)
-          .filter(Boolean);
-
-      if (
-        !words.length
-      ) {
-        return "V";
-      }
-
-      if (
-        words.length === 1
-      ) {
-        return words[0]
-          .slice(0, 2)
-          .toUpperCase();
-      }
-
-      return (
-        `${words[0][0]}${
-          words[
-            words.length - 1
-          ][0]
-        }`
-      ).toUpperCase();
     }
 
     /* =========================================================
@@ -1280,409 +1148,52 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
        DATE / TIME
        ========================================================= */
 
+    const officeCalendarDate = new Intl.DateTimeFormat("en-PH", {
+      timeZone: "Asia/Manila", weekday: "short", month: "short", day: "numeric", year: "numeric"
+    });
     function updateClock() {
-      if (
-        !ui.currentDateText
-      ) {
-        return;
-      }
-
-      ui.currentDateText
-        .textContent =
-        new Intl
-          .DateTimeFormat(
-            "en-PH",
-            {
-              weekday:
-                "short",
-
-              year:
-                "numeric",
-
-              month:
-                "short",
-
-              day:
-                "numeric",
-
-              hour:
-                "2-digit",
-
-              minute:
-                "2-digit"
-            }
-          )
-          .format(
-            new Date()
-          );
+      if (!ui.currentDateText) return;
+      const now = new Date();
+      ui.currentDateText.textContent = officeCalendarDate.format(now);
+      ui.currentDateText.dateTime = now.toISOString();
     }
 
-    /* =========================================================
-       KPI CALCULATION
-       ========================================================= */
+    function serviceInQueue(record) {
+      const status = lower(getFirstValue(record, [
+        "serviceStatus", "service_status", "status", "request_status"
+      ], "pending"));
+      return /pending|open|queue|review|evaluation|assess|in progress/.test(status);
+    }
 
     function renderKPIs() {
-      const communications =
-        state.records
-          .communications;
-
-      const services =
-        state.records
-          .serviceRequests;
-
-      const travel =
-        state.records
-          .travelOrders;
-
-      const inventory =
-        state.records
-          .inventory;
-
-      const ics =
-        state.records
-          .ics;
-
-      const visitors =
-        state.records
-          .visitors;
-
-      let incoming = 0;
-      let outgoing = 0;
-
-      communications
-        .forEach(
-          (record) => {
-            const type =
-              lower(
-                getFirstValue(
-                  record,
-                  [
-                    "type",
-                    "direction",
-                    "document_type",
-                    "category"
-                  ],
-                  "incoming"
-                )
-              );
-
-            if (
-              type.includes(
-                "out"
-              )
-            ) {
-              outgoing += 1;
-            } else {
-              incoming += 1;
-            }
-          }
-        );
-
-      const pendingServices =
-        services.filter(
-          (record) => {
-            const status =
-              lower(
-                getFirstValue(
-                  record,
-                  [
-                    "serviceStatus",
-                    "service_status",
-                    "status",
-                    "request_status"
-                  ],
-                  "pending"
-                )
-              );
-
-            return /pending|open|queue|review|evaluation|assess|in progress/
-              .test(
-                status
-              );
-          }
-        ).length;
-
-      const activeTravel =
-        travel.filter(
-          (record) => {
-            const status =
-              lower(
-                getFirstValue(
-                  record,
-                  [
-                    "status",
-                    "travel_status",
-                    "travelStatus"
-                  ],
-                  "active"
-                )
-              );
-
-            return /active|ongoing|approved|field/
-              .test(
-                status
-              );
-          }
-        ).length;
-
-      const visitorsToday =
-        visitors.filter(
-          isToday
-        ).length;
-
-      const visitorsInside =
-        visitors.filter(
-          (record) => {
-            const status =
-              lower(
-                getFirstValue(
-                  record,
-                  [
-                    "status",
-                    "visit_status",
-                    "visitStatus"
-                  ],
-                  "inside"
-                )
-              );
-
-            return /checked.?in|active|inside/
-              .test(
-                status
-              );
-          }
-        ).length;
-
+      const {communications, serviceRequests, travelOrders, supplyRequests, ics} = state.records;
+      const outgoing = communications.filter(record =>
+        lower(getFirstValue(record, ["type", "direction", "document_type", "category"], "incoming")).includes("out")
+      ).length;
+      const activeTravel = travelOrders.filter(record =>
+        /active|ongoing|approved|field/.test(lower(getFirstValue(record, ["status", "travel_status", "travelStatus"], "active")))
+      ).length;
       const values = {
-        totalComms:
-          communications.length,
-
-        incomingComms:
-          incoming,
-
-        outgoingComms:
-          outgoing,
-
-        totalServices:
-          services.length,
-
-        pendingServices,
-
-        totalTravel:
-          travel.length,
-
-        activeTravel,
-
-        totalAssets:
-          inventory.length,
-
-        totalIcs:
-          ics.length,
-
-        visitorsToday,
-
-        visitorsInside
+        totalComms: ["communications", communications.length],
+        incomingComms: ["communications", communications.length - outgoing],
+        outgoingComms: ["communications", outgoing],
+        totalServices: ["serviceRequests", serviceRequests.length],
+        pendingServices: ["serviceRequests", serviceRequests.filter(serviceInQueue).length],
+        totalTravel: ["travelOrders", travelOrders.length],
+        activeTravel: ["travelOrders", activeTravel],
+        totalSupplyRequests: ["supplyRequests", supplyRequests.length],
+        totalIcs: ["ics", ics.length]
       };
-
-      Object.entries(
-        values
-      ).forEach(
-        ([
-          key,
-          value
-        ]) => {
-          if (
-            ui.kpis[key]
-          ) {
-            ui.kpis[key]
-              .textContent =
-              Number(
-                value
-              ).toLocaleString();
-          }
+      for (const [key, [source, value]] of Object.entries(values)) {
+        if (ui.kpis[key]) {
+          ui.kpis[key].textContent = state.chartSources[source] === "live" ? value.toLocaleString() : "—";
         }
-      );
-
-      if (
-        ui.heroTotalRecords
-      ) {
-        const total =
-          communications.length +
-          services.length +
-          travel.length +
-          inventory.length +
-          ics.length +
-          visitors.length +
-          state.records
-            .memos
-            .length;
-
-        ui.heroTotalRecords
-          .textContent =
-          total.toLocaleString();
       }
-    }
-
-    /* =========================================================
-       VISITOR ACTIVITY
-       ========================================================= */
-
-    function renderVisitors() {
-      if (
-        !ui.visitorRecentList
-      ) {
-        return;
+      const sources = Object.keys(state.records).filter(key => state.chartSources[key] === "live");
+      if (ui.heroTotalRecords) {
+        const total = sources.reduce((sum, key) => sum + state.records[key].length, 0);
+        ui.heroTotalRecords.textContent = sources.length ? total.toLocaleString() : "—";
       }
-
-      const visitors =
-        sortNewest(
-          state.records
-            .visitors
-        ).slice(
-          0,
-          5
-        );
-
-      if (
-        !visitors.length
-      ) {
-        ui.visitorRecentList
-          .innerHTML = `
-            <div class="empty-state-box">
-              <span class="empty-icon">
-                <i data-lucide="clipboard-list"></i>
-              </span>
-
-              <h3>
-                No Visitor Records
-              </h3>
-
-              <p>
-                Visitor entries will appear here once available.
-              </p>
-            </div>
-          `;
-
-        refreshIcons();
-
-        return;
-      }
-
-      ui.visitorRecentList
-        .innerHTML =
-        visitors
-          .map(
-            (visitor) => {
-              const name =
-                getFirstValue(
-                  visitor,
-                  [
-                    "full_name",
-                    "name",
-                    "fullName",
-                    "visitorName"
-                  ],
-                  "Visitor"
-                );
-
-              const destination =
-                getFirstValue(
-                  visitor,
-                  [
-                    "person_to_visit",
-                    "personToVisit",
-                    "office",
-                    "organization",
-                    "agency"
-                  ],
-                  "PGENRO Office"
-                );
-
-              const purpose =
-                getFirstValue(
-                  visitor,
-                  [
-                    "purpose_category",
-                    "purposeCategory",
-                    "purpose",
-                    "reason"
-                  ],
-                  "General Transaction"
-                );
-
-              const status =
-                text(
-                  getFirstValue(
-                    visitor,
-                    [
-                      "status",
-                      "visit_status",
-                      "visitStatus"
-                    ],
-                    "Inside"
-                  )
-                );
-
-              const inside =
-                /checked.?in|active|inside/i
-                  .test(
-                    status
-                  );
-
-              return `
-                <div class="activity-item">
-                  <span class="activity-avatar">
-                    ${escapeHtml(
-                      getInitials(
-                        name
-                      )
-                    )}
-                  </span>
-
-                  <div class="activity-copy">
-                    <strong>
-                      ${escapeHtml(
-                        name
-                      )}
-                    </strong>
-
-                    <span>
-                      ${escapeHtml(
-                        destination
-                      )}
-                      ·
-                      ${escapeHtml(
-                        purpose
-                      )}
-                    </span>
-                  </div>
-
-                  <div class="activity-meta">
-                    <span class="activity-time">
-                      ${escapeHtml(
-                        formatTime(
-                          visitor
-                        )
-                      )}
-                    </span>
-
-                    <span class="status-badge ${
-                      inside
-                        ? "status-active"
-                        : "status-completed"
-                    }">
-                      ${escapeHtml(
-                        status
-                      )}
-                    </span>
-                  </div>
-                </div>
-              `;
-            }
-          )
-          .join("");
-
-      refreshIcons();
     }
 
     /* =========================================================
@@ -1705,38 +1216,10 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           5
         );
 
-      const pending =
-        state.records
-          .serviceRequests
-          .filter(
-            (record) => {
-              const status =
-                lower(
-                  getFirstValue(
-                    record,
-                    [
-                      "serviceStatus",
-                      "service_status",
-                      "status",
-                      "request_status"
-                    ],
-                    "pending"
-                  )
-                );
-
-              return /pending|open|queue|review|evaluation|assess|in progress/
-                .test(
-                  status
-                );
-            }
-          ).length;
-
-      if (
-        ui.servicePendingSummary
-      ) {
-        ui.servicePendingSummary
-          .textContent =
-          `${pending} pending`;
+      const available = state.chartSources.serviceRequests === "live";
+      if (ui.servicePendingSummary) {
+        const pending = state.records.serviceRequests.filter(serviceInQueue).length;
+        ui.servicePendingSummary.textContent = available ? `${pending.toLocaleString()} in queue` : "Unavailable";
       }
 
       if (
@@ -1750,11 +1233,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
               </span>
 
               <h3>
-                No Active Service Requests
+                ${available ? "No service requests yet" : "Service requests unavailable"}
               </h3>
 
               <p>
-                Requests will appear here once registered.
+                ${available ? "New requests will appear here." : "Refresh the dashboard to try again."}
               </p>
             </div>
           `;
@@ -1875,6 +1358,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         return;
       }
 
+      const available = state.chartSources.memos === "live";
       const memos =
         state.records
           .memos
@@ -1916,11 +1400,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
                 </span>
 
                 <h3>
-                  No Pinned Memorandums
+                  ${available ? "No pinned memos yet" : "Office memos unavailable"}
                 </h3>
 
                 <p>
-                  Pinned office notices will appear here once available.
+                  ${available ? "Pinned notices will appear here." : "Refresh the dashboard to try again."}
                 </p>
               </div>
             </div>
@@ -2110,19 +1594,22 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     }
 
     /* =========================================================
-       ADMIN-MATCHED CHARTS — existing user panels only
-       Same six activity modules, date precedence, 90-day range,
-       weekly buckets, datasets, palette, and options as admin.
+       DASHBOARD CHARTS
        ========================================================= */
 
-    let chartRangeDays = 90;
+    let chartPeriod = "90";
     const chartDayMs = 86400000;
+    const chartFailures = new Set();
+    const {
+      chartTheme, chartOptions, chartPointerCoordinates, doughnutTotal, lineArea,
+      hideChartTooltip, renderChartLegend, assertDistributionColors, distributionShare
+    } = window.PGENRO_DashboardCharts;
     const chartActivityModules = [
-      { key: "communications", sourceKey: "communications", label: "Communications", color: "#4b9da7" },
-      { key: "memos", sourceKey: "memos", label: "Office Memos", color: "#278560" },
-      { key: "travel", sourceKey: "travelOrders", label: "Travel Orders", color: "#8b7ac7" },
-      { key: "services", sourceKey: "serviceRequests", label: "Service Requests", color: "#ce7d78" },
-      { key: "ics", sourceKey: "ics", label: "ICS Property Slips", color: "#7caa9f" }
+      { key: "communications", sourceKey: "communications", group: "documents", label: "Communications", color: "#059669" },
+      { key: "memos", sourceKey: "memos", group: "documents", label: "Office Memos", color: "#35a7a0" },
+      { key: "travel", sourceKey: "travelOrders", group: "travel", label: "Travel Orders", color: "#8b7fc6" },
+      { key: "services", sourceKey: "serviceRequests", group: "services", label: "Service Requests", color: "#d77988" },
+      { key: "ics", sourceKey: "ics", group: "documents", label: "ICS Property Slips", color: "#709fa8" }
     ];
 
     const officeDateFormat=new Intl.DateTimeFormat('en-US',{timeZone:'Asia/Manila',year:'numeric',month:'2-digit',day:'2-digit'});
@@ -2130,7 +1617,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     communications: ['receivedDate', 'received_date', 'date_received', 'dateReceived', 'sentDate', 'sent_date', 'date_sent', 'letterDate', 'docDate', 'document_date'],
     memos: ['memoDate', 'memo_date', 'dateIssued', 'date_issued', 'issuedDate', 'issued_date'],
     travel: ['departureDate', 'departure_date', 'travelDate', 'travel_date', 'date_from', 'dateFrom', 'start_date', 'startDate'],
-    visitors: ['visitDate', 'visit_date', 'dateVisited', 'date_visited', 'time_in', 'timeIn', 'check_in', 'checkIn'],
     services: ['requestDate', 'request_date', 'date_requested', 'dateRequested'],
     ics: ['dateIssued', 'date_issued', 'issuedDate', 'issued_date', 'icsDate', 'ics_date']
   };
@@ -2164,45 +1650,56 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     return null;
   }
 
-    function buildDashboardChartModel(now = new Date()) {
-      const end = chartRecordDay({date:now});
-      const start = end - (chartRangeDays - 1);
-      const buckets = [];
-      for (let day = start; day <= end; day += 7) {
-        buckets.push({
-          label: new Date(day * chartDayMs).toLocaleDateString("en-US", {
-            month: "short", day: "numeric", timeZone: "UTC"
-          }),
-          documents: 0, travel: 0, visitors: 0, services: 0, total: 0
-        });
-      }
+    const shortBucketDate = new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric", timeZone: "UTC" });
+    const longBucketDate = new Intl.DateTimeFormat("en-PH", { month: "short", year: "numeric", timeZone: "UTC" });
+    const reportDate = new Intl.DateTimeFormat("en-PH", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+    const formatCount = value => value.toLocaleString("en-PH");
 
-      const breakdown = chartActivityModules.map((module) => {
-        let current = 0;
-        let missing = 0;
-        for (const row of state.records[module.sourceKey] || []) {
-          const day = chartRecordDay(row,module.key);
-          if (day === null) { missing++; continue; }
-          if (day < start || day > end) continue;
-          current++;
-          const bucket = buckets[Math.floor((day - start) / 7)];
-          const key = ["communications", "memos", "ics"].includes(module.key) ? "documents" : module.key;
-          bucket[key]++;
-          bucket.total++;
-        }
-        return { ...module, current, missing, available: state.chartSources[module.sourceKey] === "live" };
+    function buildDashboardChartModel() {
+      const end = chartRecordDay({ date: new Date() });
+      let earliest = end;
+      const breakdown = chartActivityModules.filter(module => canReadTable(CONFIG.tables[module.sourceKey])).map(module => {
+        const dates = (state.records[module.sourceKey] || []).map(row => chartRecordDay(row, module.key));
+        for (const date of dates) if (date !== null) earliest = Math.min(earliest, date);
+        return {
+          ...module, dates, available: state.chartSources[module.sourceKey] === "live",
+          current: 0, previous: 0, missing: dates.filter(date => date === null).length
+        };
       });
-
+      const yearStart = Date.UTC(new Date(end * chartDayMs).getUTCFullYear(), 0, 1) / chartDayMs;
+      const start = chartPeriod === "all" ? earliest : chartPeriod === "year" ? yearStart : end - Number(chartPeriod) + 1;
+      const days = end - start + 1;
+      const interval = days <= 45 ? "day" : days <= 120 ? "week" : "month";
+      const bucketKey = day => interval === "month"
+        ? new Date(day * chartDayMs).toISOString().slice(0, 7)
+        : Math.floor((day - start) / (interval === "week" ? 7 : 1));
+      const buckets = new Map();
+      for (let day = start; day <= end;) {
+        const date = new Date(day * chartDayMs);
+        const label = (interval === "month" ? longBucketDate : shortBucketDate).format(date);
+        buckets.set(bucketKey(day), { label, documents: 0, travel: 0, services: 0 });
+        day = interval === "month"
+          ? Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1) / chartDayMs
+          : day + (interval === "week" ? 7 : 1);
+      }
+      for (const module of breakdown) {
+        for (const date of module.dates) {
+          if (date === null) continue;
+          if (date >= start && date <= end) {
+            module.current++;
+            buckets.get(bucketKey(date))[module.group]++;
+          } else if (date >= start - days && date < start) {
+            module.previous++;
+          }
+        }
+      }
       return {
-        start, end, buckets, breakdown,
+        start, end, interval, buckets: [...buckets.values()], breakdown,
         total: breakdown.reduce((sum, module) => sum + module.current, 0),
-        availableCount: breakdown.filter((module) => module.available).length,
+        previous: breakdown.reduce((sum, module) => sum + module.previous, 0),
+        availableCount: breakdown.filter(module => module.available).length,
         missingDates: breakdown.reduce((sum, module) => sum + module.missing, 0)
       };
-    }
-
-    function userChartBaseOptions() {
-      return window.PGENRO_ChartStyle.options();
     }
 
     // Native charts occupy the same fixed-size wrappers if Chart.js is unavailable.
@@ -2229,7 +1726,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           ? `<text x="${x(index)}" y="207" text-anchor="middle">${escapeHtml(label)}</text>` : "").join("");
         const lines = datasets.map((dataset) => {
           const points = dataset.data.map((value, index) => `${x(index)},${y(value)}`).join(" ");
-          const area = dataset.fill ? `<polygon points="35,180 ${points} 585,180" fill="${typeof dataset.backgroundColor === 'string' ? dataset.backgroundColor : '#27856018'}"/>` : "";
+          const area = dataset.fill ? `<polygon points="35,180 ${points} 585,180" fill="${dataset.borderColor}18"/>` : "";
           const dots = dataset.data.map((value, index) => `<circle cx="${x(index)}" cy="${y(value)}" r="2.5" fill="${dataset.borderColor}"><title>${escapeHtml(`${labels[index]} · ${dataset.label}: ${value}`)}</title></circle>`).join("");
           return `${area}<polyline points="${points}" fill="none" stroke="${dataset.borderColor}" stroke-width="2"/>${dots}`;
         }).join("");
@@ -2248,14 +1745,14 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           return segment;
         }).join("");
         svg = `<svg viewBox="0 0 240 200" aria-hidden="true">${segments}</svg>`;
-        legend = labels.map((label, index) => `<span><i style="background:${dataset.backgroundColor[index]}"></i>${escapeHtml(label)} (${dataset.data[index]})</span>`).join("");
+        legend = "";
       }
-      fallback.innerHTML = `${svg}<div class="homepage-chart-legend">${legend}</div>`;
+      fallback.innerHTML = legend ? `${svg}<div class="homepage-chart-legend">${legend}</div>` : svg;
     }
 
     function updateUserChart(key, canvas, config) {
       if (!canvas) return;
-      if (typeof window.Chart === "function") {
+      if (typeof window.Chart === "function" && !chartFailures.has(key)) {
         try {
           canvas.hidden = false;
           if (state.charts[key]) {
@@ -2265,11 +1762,13 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           } else {
             state.charts[key] = new window.Chart(canvas, config);
           }
+          if (config.type === "doughnut") assertDistributionColors(state.charts[key]);
           canvas.parentElement.querySelector(".homepage-chart-fallback")?.remove();
           return;
         } catch (error) {
-          state.charts[key]?.destroy();
+          window.Chart.getChart(canvas)?.destroy();
           state.charts[key] = null;
+          chartFailures.add(key);
           console.warn("Dashboard chart is using its native fallback:", error);
         }
       }
@@ -2277,66 +1776,120 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     }
 
     function renderCommunicationChart(model) {
+      const datasets = [
+        { group: "documents", label: "Documents & ICS", borderColor: "#059669", backgroundColor: lineArea, fill: true },
+        { group: "travel", label: "Travel orders", borderColor: "#8b7fc6" },
+        { group: "services", label: "Service requests", borderColor: "#d77988" }
+      ].filter(({ group }) => model.breakdown.some(module => module.group === group && module.available))
+        .map(({ group, ...series }) => ({
+          ...series, data: model.buckets.map(bucket => bucket[group]),
+          tension: .25, borderWidth: 2.3, pointRadius: 2, pointHoverRadius: 5, pointHitRadius: 12
+        }));
       updateUserChart("comm", ui.commCompareChart, {
-        type: "line",
-        data: {
-          labels: model.buckets.map((bucket) => bucket.label),
-          datasets: [
-            { label: "Documents & ICS", borderColor: "#278560", backgroundColor: window.PGENRO_ChartStyle.area, data: model.buckets.map((bucket) => bucket.documents), fill: true },
-            { label: "Travel Orders", borderColor: "#8b7ac7", data: model.buckets.map((bucket) => bucket.travel) },
-            { label: "Service Requests", borderColor: "#ce7d78", data: model.buckets.map((bucket) => bucket.services) }
-          ].map((dataset) => ({ ...dataset, tension: 0.38, borderWidth: 2.5, pointRadius: 0, pointHoverRadius: 5, pointHitRadius: 12 }))
-        },
-        options: {
-          ...userChartBaseOptions(),
-          scales: window.PGENRO_ChartStyle.scales()
-        }
+        type: "line", data: { labels: model.buckets.map(bucket => bucket.label), datasets },
+        options: chartOptions({ legend: true }),
+        plugins: [chartPointerCoordinates]
       });
     }
 
-    function renderOperationsChart(model) {
+    function renderOperationsChart(categories) {
       updateUserChart("operations", ui.operationsDistChart, {
         type: "doughnut",
         data: {
-          labels: chartActivityModules.map((module) => module.label),
+          labels: categories.map(category => category.label),
           datasets: [{
-            data: model.breakdown.map((module) => module.current),
-            backgroundColor: chartActivityModules.map((module) => module.color),
-            borderWidth: 3, borderColor: getComputedStyle(document.body).getPropertyValue("--bg-surface").trim()||"#ffffff", borderRadius: 6, spacing: 3
+            label: "Records",
+            data: categories.map(category => category.value ?? 0),
+            backgroundColor: categories.map(category => category.color),
+            borderWidth: 3, borderColor: chartTheme().surface, borderRadius: 5, spacing: 2
           }]
         },
-        options: { ...userChartBaseOptions(), cutout: "76%" }
+        options: chartOptions({ doughnut: true }),
+        plugins: [chartPointerCoordinates, doughnutTotal]
       });
     }
 
-    document.getElementById('dashboardChartRange')?.addEventListener('change', event => {
-      const days=Number(event.target.value);if(![30,90,180,365].includes(days))return;
-      chartRangeDays=days;renderDashboardCharts();
+    const rangeSelect = $("#dashboardChartRange");
+    rangeSelect?.addEventListener("change", event => {
+      chartPeriod = event.target.value;
+      renderDashboardCharts();
     });
 
+    function setAnalyticsText(id, value) {
+      const node = document.getElementById(id);
+      if (node) node.textContent = value;
+    }
+
+    function renderAnalyticsMetrics(model) {
+      const servicesAvailable = state.chartSources.serviceRequests === "live";
+      const supplyAvailable = state.chartSources.supplyRequests === "live";
+      const services = state.records.serviceRequests;
+      let serviceTotal = 0, completed = 0, open = 0, aged = 0;
+      for (const record of services) {
+        const date = chartRecordDay(record, "services");
+        if (date !== null && date >= model.start && date <= model.end) {
+          const status = lower(getFirstValue(record, ["serviceStatus", "service_status", "status", "request_status"]));
+          serviceTotal++;
+          if (/^(complete|completed|closed|resolved|done)$/.test(status)) completed++;
+        }
+        if (serviceInQueue(record)) {
+          open++;
+          if (date !== null && model.end - date >= 7) aged++;
+        }
+      }
+      setAnalyticsText("userAnalyticsVolume", model.availableCount ? formatCount(model.total) : "—");
+      const change = model.previous ? (model.total - model.previous) / model.previous : null;
+      setAnalyticsText("userAnalyticsVolumeChange", !model.availableCount ? "Activity data unavailable"
+        : chartPeriod === "all" ? "All recorded dates"
+        : change !== null ? `${change > 0 ? "+" : ""}${distributionShare.format(change)} vs preceding period`
+        : model.total ? "New activity vs preceding period" : "No dated activity in this period");
+      setAnalyticsText("userAnalyticsCompletion", servicesAvailable && serviceTotal ? distributionShare.format(completed / serviceTotal) : "—");
+      setAnalyticsText("userAnalyticsCompletionDetail", !servicesAvailable ? "Service data unavailable"
+        : serviceTotal ? `${formatCount(completed)} of ${formatCount(serviceTotal)} completed` : "No dated requests in this period");
+      setAnalyticsText("userAnalyticsBacklog", servicesAvailable ? formatCount(open) : "—");
+      setAnalyticsText("userAnalyticsBacklogDetail", servicesAvailable ? `${formatCount(aged)} open 7+ days` : "Service data unavailable");
+      setAnalyticsText("userAnalyticsSupply", supplyAvailable ? formatCount(state.records.supplyRequests.length) : "—");
+      setAnalyticsText("userAnalyticsSupplyDetail", supplyAvailable ? "Current request history" : "Supply data unavailable");
+    }
+
     function renderDashboardCharts() {
+      hideChartTooltip();
       const model = buildDashboardChartModel();
-      const description=document.getElementById("dashboardTrendDescription");
-      if(description)description.textContent=`Documents, travel orders, and services in the last ${chartRangeDays} days.`;
-      const missingNote = model.missingDates ? ` ${model.missingDates} records without valid dates are excluded.` : "";
-      const availabilityNote = `${model.availableCount} of ${chartActivityModules.length} activity modules available.`;
-      const trendSummary = $("#dashboardTrendSummary");
-      const distributionSummary = $("#dashboardDistributionSummary");
-      if (trendSummary) trendSummary.textContent = `${model.total} dated records over the last ${chartRangeDays} days. ${availabilityNote}${missingNote}`;
-      if (distributionSummary) distributionSummary.textContent = `${availabilityNote} ${model.breakdown.map((module) => `${module.label}: ${module.current}`).join("; ")}.${missingNote}`;
+      renderAnalyticsMetrics(model);
+      const categories = model.breakdown.map(({ label, color, available, current }) => ({
+        label, color, value: available ? current : null
+      }));
+      const availability = `${model.availableCount} of ${model.breakdown.length} approved activity modules loaded.`;
+      const missing = model.missingDates ? ` ${formatCount(model.missingDates)} undated records excluded.` : "";
+      setAnalyticsText("userAnalyticsPeriodLabel", `${reportDate.format(model.start * chartDayMs)} – ${reportDate.format(model.end * chartDayMs)}`);
+      setAnalyticsText("userAnalyticsSourceStatus", availability);
+      setAnalyticsText("userAnalyticsBucketLabel", { day: "Daily", week: "Weekly", month: "Monthly" }[model.interval]);
+      setAnalyticsText("dashboardTrendSummary", `${formatCount(model.total)} dated records · ${model.buckets.length} ${model.interval} intervals.${missing}`);
+      setAnalyticsText("dashboardDistributionSummary", `${formatCount(model.total)} dated records · ${availability}`);
+      for (const canvas of [ui.commCompareChart, ui.operationsDistChart]) {
+        if (canvas) canvas.parentElement.hidden = model.total === 0;
+      }
       for (const id of ["dashboardTrendEmpty", "dashboardDistributionEmpty"]) {
-        const empty = $(`#${id}`);
+        const empty = document.getElementById(id);
         if (!empty) continue;
         empty.hidden = model.total > 0;
         empty.textContent = model.availableCount ? "No dated activity recorded in this period." : "Chart data is unavailable.";
       }
-      renderCommunicationChart(model);
-      renderOperationsChart(model);
+      if (model.total) {
+        renderCommunicationChart(model);
+        renderOperationsChart(categories);
+      }
+      renderChartLegend($("#operationsDistChartLegend"), state.charts.operations, categories);
     }
 
-    const chartThemeObserver = new MutationObserver(() => renderDashboardCharts());
-    chartThemeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
-    window.addEventListener('pagehide',event=>{if(event.persisted)return;chartThemeObserver.disconnect();Object.values(state.charts).forEach(chart=>chart?.destroy());});
+    const chartThemeObserver = new MutationObserver(renderDashboardCharts);
+    chartThemeObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    window.addEventListener("pagehide", event => {
+      hideChartTooltip();
+      if (event.persisted) return;
+      chartThemeObserver.disconnect();
+      Object.values(state.charts).forEach(chart => chart?.destroy());
+    });
 
     /* =========================================================
        RENDER EVERYTHING
@@ -2344,8 +1897,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
     function renderAll() {
       renderKPIs();
-
-      renderVisitors();
 
       renderServices();
 
@@ -2359,6 +1910,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     /* =========================================================
        SUPABASE QUERY
        ========================================================= */
+
+    function canReadTable(table) {
+      const permission = table === 'pgenro_supply_requests' ? 'supply_requests' : table;
+      return state.profile?.user_modules?.includes(permission) === true;
+    }
 
     async function queryTable(
       table
@@ -2401,11 +1957,8 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           "Dashboard database unavailable"
         );
 
-        showToast(
-          "Supabase client is unavailable.",
-          "error"
-        );
-
+        renderAll();
+        showToast("Dashboard data is unavailable.", "error");
         return;
       }
 
@@ -2417,18 +1970,12 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         "Loading office records…"
       );
 
-      if (
-        ui.refreshDashboardBtn
-      ) {
-        ui.refreshDashboardBtn
-          .disabled =
-          true;
-      }
+      refreshButtons.forEach(button => { button.disabled = true; });
 
       const requests =
         Object.entries(
           CONFIG.tables
-        );
+        ).filter(([, table]) => canReadTable(table));
 
       const results =
         await Promise
@@ -2493,17 +2040,10 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       renderAll();
 
       setDatabaseStatus(
-        failed
-          ? "standby"
-          : "online",
-
-        failed
-          ? `Dashboard loaded with ${failed} unavailable module${
-              failed === 1
-                ? ""
-                : "s"
-            }`
-          : "Office records connected"
+        failed && failed === requests.length ? "offline" : failed || !requests.length ? "standby" : "online",
+        !requests.length ? "No dashboard data modules assigned" : failed === requests.length ? "Records unavailable" : failed
+          ? `${failed} of ${requests.length} sources unavailable`
+          : "Office records synced"
       );
 
       if (notify) {
@@ -2525,13 +2065,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       state.loading =
         false;
 
-      if (
-        ui.refreshDashboardBtn
-      ) {
-        ui.refreshDashboardBtn
-          .disabled =
-          false;
-      }
+      refreshButtons.forEach(button => { button.disabled = false; });
     }
 
     /* =========================================================
@@ -2566,7 +2100,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
       Object.values(
         CONFIG.tables
-      ).forEach(
+      ).filter(canReadTable).forEach(
         (table) => {
           state.realtimeChannel
             .on(
@@ -2585,30 +2119,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         }
       );
 
-      state.realtimeChannel
-        .subscribe(
-          (status) => {
-            if (
-              status ===
-              "SUBSCRIBED"
-            ) {
-              setDatabaseStatus(
-                "online",
-                "Office records connected"
-              );
-            }
-
-            if (
-              status ===
-              "CHANNEL_ERROR"
-            ) {
-              setDatabaseStatus(
-                "standby",
-                "Realtime connection interrupted"
-              );
-            }
-          }
-        );
+      state.realtimeChannel.subscribe();
     }
 
     /* =========================================================
@@ -2715,15 +2226,9 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           }
         );
 
-      ui.refreshDashboardBtn
-        ?.addEventListener(
-          "click",
-          () => {
-            loadDashboardData({
-              notify: true
-            });
-          }
-        );
+      refreshButtons.forEach(button => {
+        button.addEventListener("click", () => loadDashboardData({ notify: true }));
+      });
 
       ui.scrollToTopBtn
         ?.addEventListener(
@@ -3105,7 +2610,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     office_memos:['Office Memos','officememo-admin.html','officememo.html'],
     employees:['Employees','employee-admin.html',null],
     inventory:['Inventory','invetoryadmin.html','inventory.html'],
-    visitors:['Visitors','visitors-admin.html',null],
     service_requests:['Service Requests','serviceAdmin.html','service.html'],
     ics_records:['Property Slips','ics-admin.html','ics.html'],
     user_accounts:['User Management','Usermanagement.html',null],
@@ -3170,8 +2674,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       if(token!==generation||disposed)return;
       if(result.error)throw result.error;
       const data=result.data;
-      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
-      feed=data;status='ready';render();
+      if(!data||!Array.isArray(data.items)||!data.counts||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      const counts = Object.fromEntries(Object.entries(data.counts).filter(([module]) => modules[module]?.[2]));
+      const items = data.items.filter(item => modules[item.module]?.[2]);
+      const total = Object.values(counts).reduce((sum, count) => sum + (Number(count) || 0), 0);
+      feed = { counts, items, total, workspace:'user' }; status='ready'; render();
     }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
     finally{loading=false;if(again){again=false;scheduleRefresh();}}
   }

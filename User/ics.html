@@ -11,18 +11,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="vendor/lucide/lucide.min.js"></script>
 <link href="ics.css?v=20261102-viewer" rel="stylesheet"/>
-<link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-workspace.css?v=20261107-module-access">
 <link rel="stylesheet" href="ics-details.css?v=20261101-ics-refresh">
 <link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
 <script defer src="user-refresh.js?v=20261102-viewer"></script>
-<script defer src="user-workspace.js?v=20261107-attendance-only"></script>
-<link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
-<link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="user-workspace.js?v=20261108-inventory-roles"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261107-color-motion">
+<link rel="stylesheet" href="user-viewer.css?v=20261107-color-motion">
 <script defer src="user-viewer.js?v=20261102-viewer"></script>
 <script defer src="user-documents.js?v=20261102-viewer"></script>
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 </head>
 <body class="pgenro-user depth-workspace ui-unified user-refresh" data-css-scope="user-ics" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
+<p class="user-module-loading" role="status">Checking your access…</p>
 
 <div aria-hidden="true" class="overlay" id="overlay"></div>
 <a class="user-skip-link" href="#mainContent">Skip to main content</a>
@@ -68,6 +70,7 @@
 </a>
 </li>
 <li><a href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
+<li><a href="stock.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
 <li>
 <a href="inventory.html">
 <i data-lucide="package"></i>
@@ -222,14 +225,14 @@
 <div class="toolbar">
 <label class="search-field" for="tableSearchInput">
 <i data-lucide="search"></i>
-<input autocomplete="off" id="tableSearchInput" placeholder="Search control no., account code, description, serial no., or custodian…" type="search"/>
+<input autocomplete="off" id="tableSearchInput" aria-label="Search property slips" placeholder="Search control no., account code, description, serial no., or custodian…" type="search"/>
 </label>
 <select aria-label="Filter by article or category" class="filter-select" id="filterArticleSelect">
 <option value="ALL">All Articles / Categories</option>
 </select>
 <select aria-label="Filter ICS records by review status" class="filter-select" id="filterIcsStatus"><option value="ALL">All statuses</option><option value="Pending">Pending review</option><option value="Active">Active</option><option value="Archived">Archived</option></select>
 </div>
-<div class="table-wrapper">
+<div class="table-wrapper" tabindex="0" role="region" aria-label="Property slip records">
 <table class="data-table">
 <thead>
 <tr>
@@ -482,8 +485,8 @@
 
 <div aria-atomic="true" aria-live="polite" class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261107-attendance-only"></script>
+<script defer="" src="../shared/supabase.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/ics-records.js?v=20261026-private-ics"></script>
-<script defer="" src="ics.js?v=20261107-attendance-only"></script>
+<script defer="" src="ics.js?v=20261108-user-notifications"></script>
 </body>
 </html>

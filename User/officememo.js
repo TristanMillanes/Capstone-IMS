@@ -1202,7 +1202,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     office_memos:['Office Memos','officememo-admin.html','officememo.html'],
     employees:['Employees','employee-admin.html',null],
     inventory:['Inventory','invetoryadmin.html','inventory.html'],
-    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
     service_requests:['Service Requests','serviceAdmin.html','service.html'],
     ics_records:['Property Slips','ics-admin.html','ics.html'],
     user_accounts:['User Management','Usermanagement.html',null],
@@ -1267,8 +1266,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       if(token!==generation||disposed)return;
       if(result.error)throw result.error;
       const data=result.data;
-      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
-      feed=data;status='ready';render();
+      if(!data||!Array.isArray(data.items)||!data.counts||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      const counts = Object.fromEntries(Object.entries(data.counts).filter(([module]) => modules[module]?.[2]));
+      const items = data.items.filter(item => modules[item.module]?.[2]);
+      const total = Object.values(counts).reduce((sum, count) => sum + (Number(count) || 0), 0);
+      feed = { counts, items, total, workspace:'user' }; status='ready'; render();
     }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
     finally{loading=false;if(again){again=false;scheduleRefresh();}}
   }

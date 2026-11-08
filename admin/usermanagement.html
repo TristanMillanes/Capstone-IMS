@@ -15,9 +15,12 @@
 <!-- Lucide Icons -->
 <!-- CSS -->
 <link href="Usermanagement.css?v=20261103-frontend-fix" rel="stylesheet">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="Usermanagement.html" data-css-scope="admin-users" data-user-management-access="admin" data-unified-ui="20261013" data-module-title="User Management" data-design="emerald-v6">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="Usermanagement.html" data-requires-auth="admin" data-css-scope="admin-users" data-user-management-access="admin" data-unified-ui="20261013" data-module-title="User Management" data-design="emerald-v6">
+<p class="admin-module-loading" role="status">Checking your access…</p>
+
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR -->
@@ -280,6 +283,11 @@
 <section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Total Accounts</span></div><div class="kpi-body"><h3 class="counter" id="statTotalUsers">0</h3><span class="kpi-trend">Personnel accounts</span></div><div class="kpi-footer"><span>Registered account profiles</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Active Administrators</span></div><div class="kpi-body"><h3 class="counter" id="statTotalAdmins">0</h3><span class="kpi-trend">Administrator accounts</span></div><div class="kpi-footer"><span>Active access to admin modules</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Pending Requests</span></div><div class="kpi-body"><h3 class="counter" id="statPendingRequests">0</h3><span class="kpi-trend">Awaiting account review</span></div><div class="kpi-footer"><span>Review Account Requests</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Suspended / Inactive</span></div><div class="kpi-body"><h3 class="counter" id="statSuspendedUsers">0</h3><span class="kpi-trend">Restricted access</span></div><div class="kpi-footer"><span>Inactive or suspended accounts</span></div></div></section>
 <!-- USER TABLE & FILTERS SECTION -->
 <section class="dashboard-section">
+<section class="inventory-access-note" aria-labelledby="inventoryAccessTitle">
+<h2 id="inventoryAccessTitle">Inventory Access</h2>
+<p>Every active Admin can manage stock. To let a User see stock availability, edit their account and check <strong>Inventory (View Only)</strong>.</p>
+<div><a class="btn btn-secondary" href="invetoryadmin.html">Open Inventory</a></div>
+</section>
 <div aria-live="polite" class="user-management-feedback" hidden="" id="userManagementFeedback" role="status"></div>
 <!-- Filter Controls Bar -->
 <div class="table-controls-card account-directory-filters">
@@ -411,12 +419,14 @@
 <div class="form-group">
 <label for="roleSelect">User Role <span class="required">*</span></label>
 <select class="form-control" id="roleSelect" required="">
-<option value="User">User (Read-only workspace)</option>
+<option value="User">User (Selected modules)</option>
 <option value="Admin">Admin (Manage system and accounts)</option>
 </select>
 <p class="user-role-help" id="roleChangeHelp">Select the account’s final Admin or User access role.</p>
 </div>
 </div>
+<fieldset class="module-access" id="accountModuleAccess" hidden><legend>Allowed user modules</legend><p>Check the modules this user may open. Dashboard and Settings are always available.</p></fieldset>
+<p id="moduleAccessStatus" class="user-role-help" role="status" hidden></p>
 <div class="form-group">
 <label for="statusSelect">Account Status</label>
 <select class="form-control" id="statusSelect">
@@ -440,7 +450,10 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- This module owns its Supabase session/access controller in the versioned script below. -->
 <script defer src="../shared/employee-identity.js?v=20261105-employee-id"></script>
-<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management script is missing. Upload Usermanagement.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.js?v=20261105-employee-id-20261103-frontend-fix"></script>
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
+<script defer src="module-access.js?v=20261108-inventory-roles"></script>
+<script defer onerror="var p=document.getElementById('userManagementFeedback');if(p){p.hidden=false;p.textContent='User Management script is missing. Upload Usermanagement.js beside Usermanagement.html.';}document.body.dataset.directoryState='unavailable';['openAddUserModalBtn','saveUserBtn','bulkDeleteBtn'].forEach(function(id){var b=document.getElementById(id);if(b)b.disabled=true;});" src="Usermanagement.js?v=20261108-inventory-roles"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 

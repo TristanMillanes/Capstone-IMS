@@ -11,16 +11,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="vendor/lucide/lucide.min.js"></script>
 <link href="employee.css?v=20261102-viewer" rel="stylesheet"/>
-<link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-workspace.css?v=20261107-module-access">
 <link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
 <script defer src="user-refresh.js?v=20261102-viewer"></script>
-<script defer src="user-workspace.js?v=20261107-attendance-only"></script>
-<link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
-<link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
-<link rel="stylesheet" href="my-attendance.css?v=20261107-attendance-tab-counts">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="user-workspace.js?v=20261108-inventory-roles"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261107-color-motion">
+<link rel="stylesheet" href="user-viewer.css?v=20261107-color-motion">
+<link rel="stylesheet" href="my-attendance.css?v=20261107-color-motion">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 </head>
 <body class="pgenro-user depth-workspace ui-unified user-refresh my-attendance" data-css-scope="user-attendance" data-page-data-owner="module" data-requires-auth="user">
+<p class="user-module-loading" role="status">Checking your access…</p>
 
 <div aria-hidden="true" class="overlay" id="overlay"></div>
 <a class="user-skip-link" href="#mainContent">Skip to main content</a>
@@ -46,6 +48,7 @@
 <li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
 <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
 <li><a aria-current="page" class="active" href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
+<li><a href="stock.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
 <li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
 
 <li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
@@ -89,23 +92,48 @@
 <div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
 </header>
 <div class="content-shell">
-<section class="page-header depth-hero"><div class="header-copy"><div class="eyebrow">PERSONAL ATTENDANCE</div><h1>My Attendance</h1><p>View the attendance and uniform monitoring encoded for your registered employee ID.</p></div><div class="header-actions"><span class="last-updated" id="attendanceUpdated"></span><button class="secondary-action" id="attendanceRefresh" type="button">Refresh</button></div></section>
+<section class="page-header depth-hero"><div class="header-copy"><div class="eyebrow"><i data-lucide="calendar-check"></i>PERSONAL ATTENDANCE</div><h1>My Attendance</h1><p>Check activity attendance and uniform records linked to your employee number.</p></div><div class="header-actions"><span class="last-updated" id="attendanceUpdated"></span><button class="secondary-action" id="attendanceRefresh" type="button"><i data-lucide="refresh-cw"></i><span>Refresh</span></button></div></section>
 <p class="attendance-message" id="attendanceMessage" role="status" aria-live="polite">Loading your employee attendance…</p>
-<section class="attendance-identity" id="attendanceIdentity" hidden aria-label="Your employee number"><div><span class="section-kicker">YOUR ACCOUNT</span><h2 id="attendanceName"></h2><p id="attendanceDepartment"></p></div><strong>Employee ID <span id="attendanceNumber"></span></strong></section>
+<section class="attendance-identity" id="attendanceIdentity" hidden aria-label="Your employee number"><span class="attendance-identity-icon" aria-hidden="true"><i data-lucide="badge-check"></i></span><div class="attendance-identity-copy"><span class="section-kicker">LINKED EMPLOYEE</span><h2 id="attendanceName"></h2><p id="attendanceDepartment"></p></div><strong>Employee ID <span id="attendanceNumber"></span></strong></section>
 <div class="attendance-workspace" id="attendanceWorkspace" hidden>
 <div class="attendance-tabs" role="tablist" aria-label="Monitoring records">
-<button class="tab-btn active" id="ceremonyTab" role="tab" aria-selected="true" aria-controls="attendanceRecords" data-attendance-kind="ceremony" type="button">Flag ceremony attendance <span class="attendance-tab-count" id="ceremonyTabCount">0</span></button>
-<button class="tab-btn" id="uniformTab" role="tab" aria-selected="false" aria-controls="attendanceRecords" data-attendance-kind="uniform" type="button">Uniform monitoring <span class="attendance-tab-count" id="uniformTabCount">0</span></button>
+<button class="tab-btn active" id="ceremonyTab" role="tab" aria-selected="true" aria-controls="attendanceRecords" data-attendance-kind="ceremony" type="button">Activity attendance <small class="attendance-tab-count" id="ceremonyTabCount">0</small></button>
+<button class="tab-btn" id="uniformTab" role="tab" aria-selected="false" aria-controls="attendanceRecords" data-attendance-kind="uniform" type="button">Uniform monitoring <small class="attendance-tab-count" id="uniformTabCount">0</small></button>
 </div>
-<div class="attendance-metrics" aria-label="Filtered record totals"><article class="attendance-metric"><span>Total records</span><strong id="attendanceTotal">0</strong></article><article class="attendance-metric"><span id="positiveLabel">Present</span><strong id="attendancePositive">0</strong></article><article class="attendance-metric"><span id="negativeLabel">Absent</span><strong id="attendanceNegative">0</strong></article><article class="attendance-metric"><span id="otherLabel">Late</span><strong id="attendanceOther">0</strong></article></div>
-<section class="records-card" id="attendanceRecords" role="tabpanel" aria-labelledby="ceremonyTab"><div class="records-header"><div><span class="section-kicker">YOUR RECORDS</span><h2 id="attendanceTableTitle">Flag ceremony attendance</h2><p>Records are maintained by your office administrator.</p></div></div>
-<div class="attendance-filters"><label for="attendanceSearch">Search your records<input id="attendanceSearch" type="search" maxlength="200" placeholder="Search control number, activity or remarks"></label><label for="attendanceMonth">Month<input id="attendanceMonth" type="month"></label><label for="attendanceStatus">Status<select id="attendanceStatus"></select></label></div>
+<dl class="attendance-metrics" id="attendanceMetrics" aria-label="Filtered record totals"></dl>
+<template id="attendanceMetric"><div class="attendance-metric"><dt></dt><dd></dd></div></template>
+<section class="records-card" id="attendanceRecords" role="tabpanel" aria-labelledby="ceremonyTab">
+<div class="records-header attendance-records-header">
+<div><span class="section-kicker">YOUR RECORDS</span><h2 id="attendanceTableTitle">Activity attendance</h2><p>Records are maintained by your office administrator.</p></div>
+<button class="secondary-action attendance-visualize-button" id="attendanceVisualize" type="button" aria-expanded="false" aria-controls="attendanceVisualization"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18M8 16v-4m5 4V7m5 9v-6"></path></svg><span id="attendanceVisualizeLabel">Visualize</span></button>
+</div>
+<div class="attendance-filters">
+<label for="attendanceSearch">Search your records<input id="attendanceSearch" type="search" maxlength="200" placeholder="Control number or remarks"></label>
+<label for="attendanceActivity" id="attendanceActivityField">Activity<select id="attendanceActivity"><option value="">All activities</option></select></label>
+<label for="attendanceMonth">Month<input id="attendanceMonth" type="month"></label>
+<label for="attendanceStatus">Status<select id="attendanceStatus"></select></label>
+<div class="attendance-filter-actions"><button class="secondary-action" id="attendanceClearFilters" type="button" disabled><i data-lucide="filter-x"></i><span>Clear filters</span></button></div>
+</div>
+<section class="attendance-visualization" id="attendanceVisualization" aria-labelledby="activityChartTitle" hidden>
+<h3 id="activityChartTitle">Attendance by activity</h3>
+<p class="activity-chart-description">Bars show record counts by status for the current filters.</p>
+<ul class="activity-chart-legend" id="activityChartLegend" aria-label="Attendance status colors"></ul>
+<ul class="activity-chart-rows" id="activityChartRows" aria-label="Attendance records by activity"></ul>
+<p class="activity-chart-empty" id="activityChartEmpty" role="status" hidden>No activity records match your filters.</p>
+<template id="activityChartRow">
+<li>
+<div class="activity-chart-summary"><strong class="activity-chart-label"></strong><span class="activity-chart-count"></span></div>
+<div class="activity-chart-track" aria-hidden="true"><span class="activity-chart-bar"></span></div>
+<ul class="activity-chart-statuses" aria-label="Status counts"></ul>
+</li>
+</template>
+</section>
 <div class="table-wrapper" tabindex="0" role="region" aria-label="Your attendance records"><table><thead><tr id="attendanceColumns"></tr></thead><tbody id="attendanceBody"></tbody></table></div>
-<div class="attendance-pagination"><span id="attendanceRange"></span><div class="attendance-page-controls"><button class="secondary-action" id="attendancePrevious" type="button">Previous</button><span id="attendancePage"></span><button class="secondary-action" id="attendanceNext" type="button">Next</button></div></div>
+<div class="attendance-pagination"><span id="attendanceRange" role="status"></span><div class="attendance-page-controls"><button class="secondary-action" id="attendancePrevious" type="button">Previous</button><span id="attendancePage"></span><button class="secondary-action" id="attendanceNext" type="button">Next</button></div></div>
 </section></div>
 <footer class="footer"><div><strong>PGENRO IMS</strong><p>Personal employee attendance</p></div></footer>
 </div></main></div><div class="toast-container" id="toastContainer" aria-live="polite"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../shared/supabase.js?v=20261107-attendance-only"></script>
-<script defer src="my-attendance.js?v=20261107-attendance-tab-counts"></script>
+<script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
+<script defer src="my-attendance.js?v=20261107-color-motion"></script>
 </body></html>

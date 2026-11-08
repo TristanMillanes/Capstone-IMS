@@ -46,8 +46,12 @@
     window.lucide?.createIcons?.();
     // The supplied folder relies on seals in its parent project. Keep a generic
     // leaf mark if a seal is unavailable, while retaining the original image URL.
-    document.querySelectorAll('.public-seal img,.sidebar-logo img').forEach(img=>{
+    document.querySelectorAll('.public-seal img,.sidebar-logo img,.brand-logo-wrap img[data-seal]').forEach(img=>{
       const fallback=()=>{
+        if (img.parentElement.querySelector('.logo-fallback-mark')) {
+          img.parentElement.classList.add('logo-fallback');
+          return;
+        }
         if(img.parentElement.querySelector('.brand-image-fallback'))return;
         img.hidden=true;
         const mark=document.createElement('span');mark.className='brand-image-fallback';mark.setAttribute('role','img');mark.setAttribute('aria-label','PGENRO IMS');

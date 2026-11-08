@@ -16,10 +16,10 @@
 <script defer="" src="login-modern.js?v=20261105-employee-id"></script>
 <link rel="stylesheet" href="user-refresh.css?v=20261101-user-ui">
 <script defer src="user-refresh.js?v=20261101-user-ui"></script>
-<script defer src="user-workspace.js?v=20261107-attendance-only"></script>
-<link rel="stylesheet" href="user-polish.css?v=20261101-user-ui">
-<link href="login-modern.css?v=20261106-theme-ui-1" rel="stylesheet"/>
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<script defer src="user-workspace.js?v=20261107-workspace-redesign"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261107-workspace-redesign">
+<link href="login-modern.css?v=20261108-dark-mode" rel="stylesheet"/>
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 </head>
 <body class="pgenro-auth pgenro-login ui-unified user-refresh" data-css-scope="auth-login" data-motion="paused">
 <svg aria-hidden="true" class="icon-definitions" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -101,7 +101,7 @@
 <div class="story-heading">
 <span class="story-eyebrow"><span aria-hidden="true"></span>Province of Quezon</span>
 <h2 id="workspaceIntro">Your work,<br/><span>connected.</span></h2>
-<p>Documents, personnel, and inventory.<br/>Together in one PGENRO workspace.</p>
+<p>Access office records, requests, and your attendance.</p>
 </div>
 <div class="eco-scene" aria-hidden="true">
   <svg class="eco-illustration" viewBox="0 0 440 320" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -243,7 +243,7 @@
 </div>
 <div aria-label="Workspace areas" class="story-details">
 <span><svg aria-hidden="true" class="icon"><use href="#icon-folder"></use></svg>Documents</span>
-<span><svg aria-hidden="true" class="icon"><use href="#icon-user-plus"></use></svg>Personnel</span>
+<span><svg aria-hidden="true" class="icon"><use href="#icon-user-plus"></use></svg>Attendance</span>
 <span><svg aria-hidden="true" class="icon"><use href="#icon-grid"></use></svg>Inventory</span>
 </div>
 </aside>
@@ -270,7 +270,7 @@
 <label class="input-label" for="employeeNumber">Employee Number</label>
 <div class="input-box employee-number-box" id="employeeNumberFieldBox">
 <span class="input-icon"><svg aria-hidden="true" class="icon box-icon"><use href="#icon-id-card"></use></svg></span>
-<input aria-describedby="employeeNumberError employeeDomain" autocapitalize="characters" autocomplete="username" id="employeeNumber" inputmode="text" maxlength="75" name="employeeNumber" placeholder="e.g. Admin001" required="" spellcheck="false" type="text"/>
+<input aria-describedby="employeeNumberError employeeDomain" autocapitalize="characters" autocomplete="username" id="employeeNumber" inputmode="text" maxlength="75" name="employeeNumber" placeholder="e.g. 0007" required="" spellcheck="false" type="text"/>
 <span class="employee-domain-suffix" id="employeeDomain">@pgenro.ims</span>
 <button aria-label="Clear employee number" class="field-action-btn" hidden="" id="clearEmployeeNumberBtn" type="button"><svg aria-hidden="true" class="icon"><use href="#icon-close"></use></svg></button>
 </div>
@@ -292,7 +292,7 @@
 </form>
 <div class="card-divider"><span>Other access</span></div>
 <nav aria-label="Account, visitor, and service request access" class="secondary-access">
-<div class="access-card-entry ics-access-entry"><a class="ics-access-btn" id="serviceRequestAccessBtn" data-access-link="" href="service-request-form.html"><span class="secondary-icon"><svg aria-hidden="true" class="icon"><use href="#icon-folder"></use></svg></span><span class="access-copy"><strong>Service Request · Fill Up Form</strong><small>Fill out and submit a service request directly</small></span><svg aria-hidden="true" class="icon access-arrow"><use href="#icon-arrow-up"></use></svg></a></div>
+<div class="access-card-entry ics-access-entry"><a class="ics-access-btn" id="serviceRequestAccessBtn" data-access-link="" href="service-request-form.html"><span class="secondary-icon"><svg aria-hidden="true" class="icon"><use href="#icon-folder"></use></svg></span><span class="access-copy"><strong>Submit a service request</strong><small>Fill out and submit a service request directly</small></span><svg aria-hidden="true" class="icon access-arrow"><use href="#icon-arrow-up"></use></svg></a></div>
 <div class="access-card-entry"><a class="access-request" data-access-link="" href="requestacc.html"><span class="secondary-icon"><svg aria-hidden="true" class="icon"><use href="#icon-user-plus"></use></svg></span><span class="access-copy"><strong>Request account</strong><small>For new staff</small></span><svg aria-hidden="true" class="icon access-arrow"><use href="#icon-arrow-up"></use></svg></a></div>
 <div class="access-card-entry"><a class="visitor-access-btn" data-access-link="" href="../VisitorsLog/visitorslog.html"><span class="secondary-icon"><svg aria-hidden="true" class="icon"><use href="#icon-visitor"></use></svg></span><span class="access-copy"><strong>Visitors log</strong><small>Visitor access</small></span><svg aria-hidden="true" class="icon access-arrow"><use href="#icon-arrow-up"></use></svg></a></div>
 </nav>

@@ -1873,3 +1873,134 @@ html[data-pgenro-auth-state="warning"] :is(.app-layout,.app-container,.settings-
 .pgenro-user :is(button,a) > svg { flex-shrink:0; vertical-align:middle; }
 .pgenro-user :is(.attachment-card,.viewer-panel,.modal-panel) { min-width:0; }
 .pgenro-user :is(.attachment-card,.modal-subtitle,.file-name) { overflow-wrap:anywhere; }
+
+.supply-request-form { padding: 20px 24px; }
+
+body[data-css-scope="user-inventory"] .user-skip-link:not(:focus) {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.supply-request-form fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-inline-size: 0;
+}
+
+.supply-request-form .field label {
+  color: var(--viewer-text);
+  font-size: 12px;
+}
+
+.supply-request-form .field :is(input, textarea) {
+  background: var(--viewer-bg);
+  color: var(--viewer-text);
+  border-color: var(--viewer-line);
+  font-size: 14px;
+}
+
+.supply-request-form .field :is(input, textarea):focus-visible {
+  outline: 2px solid var(--viewer-green);
+  outline-offset: 2px;
+}
+
+.supply-form-actions,
+.inventory-pages {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.supply-form-actions p,
+.supply-history-status,
+.inventory-pages span {
+  color: var(--viewer-muted);
+  font-size: 13px;
+}
+
+.supply-form-actions p { margin-right: auto; }
+.supply-history-status { padding: 12px 24px; }
+.supply-history-status:empty { display: none; }
+.inventory-pages { padding: 0 24px 16px; }
+.inventory-pages[hidden] { display: none; }
+
+.supply-history-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.supply-history-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 16px;
+  align-items: start;
+  padding: 15px 24px;
+  border-top: 1px solid var(--viewer-line);
+}
+
+.supply-history-row p {
+  margin-top: 4px;
+  color: var(--viewer-muted);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+.supply-history-row strong { overflow-wrap: anywhere; }
+.supply-history-state {
+  background: var(--viewer-tint);
+  color: var(--viewer-green);
+  border-radius: 8px;
+  padding: 6px 9px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.supply-form-actions .supply-error { color: var(--red-700); }
+html[data-theme="dark"] .supply-form-actions .supply-error { color: #fca5a5; }
+
+@media (max-width: 520px) {
+  .supply-history-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .supply-history-item { grid-column: 1 / -1; }
+  .supply-request-form .form-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+.stock-catalog table {
+  min-width: 650px;
+  table-layout: auto;
+}
+
+.stock-catalog .table-wrapper[hidden] { display: none; }
+
+.stock-catalog-status {
+  padding: 0 22px 12px;
+  color: var(--viewer-muted);
+  font-size: 13px;
+}
+
+.stock-availability {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  border-radius: 999px;
+  padding: .25rem .6rem;
+  background: var(--ui-tint);
+  color: var(--ui-accent);
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.stock-availability[data-stock-state="low"] {
+  background: var(--ui-amber-bg);
+  color: var(--ui-amber);
+}
+
+.stock-availability[data-stock-state="out"] {
+  background: var(--ui-red-bg);
+  color: var(--ui-red);
+}

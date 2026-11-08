@@ -835,6 +835,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       };
 
       return {
+        raw: item,
         attachmentUrl: serviceField(item, "attachmentUrl", "attachment_url", "fileUrl", "file_url", "pdfUrl", "pdf_url", "documentUrl") || "",
         attachmentName: serviceField(item, "attachmentName", "fileName", "file_name", "pdfFileName") || "",
         id:
@@ -1177,6 +1178,58 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       };
     }
 
+    function openServiceFile(record) {
+      const file = window.PGENRO_ServiceFile;
+      const fields = Object.create(null);
+      const withoutPlaceholder = value => {
+        const cleaned = text(value);
+        return /^(?:--+|—|–)$/.test(cleaned) ? "" : cleaned;
+      };
+      for (const [key, value] of Object.entries(record.raw || {})) {
+        const camel = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+        const entry = typeof value === "string" ? withoutPlaceholder(value) : value;
+        if (entry === "" || entry == null) continue;
+        if (camel === key || !Object.hasOwn(fields, camel)) fields[camel] = entry;
+      }
+      for (const key of [
+        "id", "serviceNo", "clientName", "organization", "contactNo", "emailAddress",
+        "dateRequest", "dateNeeded", "location", "requestedBy", "requestDetails"
+      ]) {
+        fields[key] ||= withoutPlaceholder(record[key]);
+      }
+      fields.clientName ||= fields.requesterName || fields.requestorName || fields.submittedBy || "";
+      fields.requestedBy ||= fields.clientName;
+      fields.notedBy ||= fields.endorsedBy || withoutPlaceholder(record.endorsedBy);
+      fields.recommendedRemarks ||= fields.recRemarks || "";
+      fields.clientRemarks ||= fields.finalRemarks || "";
+      // Older requests stored some workflow dates and times as one display value.
+      for (const [dateKey, timeKey, oldDate, oldTime] of [
+        ["recommendedDate", "recommendedTime", "recDate", "recTime"],
+        ["pgdhDateActed", "pgdhTimeActed"],
+        ["dateProcessed", "timeProcessed"],
+        ["clientDateReceived", "clientTimeReceived", "finalDateRec", "finalTimeRec"]
+      ]) {
+        const [date, time] = text(fields[dateKey] || fields[oldDate]).split(/\s*•\s*/, 2);
+        fields[dateKey] = date;
+        fields[timeKey] ||= time || fields[oldTime] || "";
+      }
+      const attachmentFlag = lower(fields.hasAttachments);
+      if (attachmentFlag === "true" || attachmentFlag === "false") {
+        fields.hasAttachments = attachmentFlag === "true";
+      } else if (PGENRO_PageUI.file(record)) {
+        fields.hasAttachments = true;
+      }
+
+      void window.PGENRO_Documents.open({
+        reference: record.serviceNo,
+        name: file?.filename?.(fields, "pdf") || "Service Request.pdf",
+        async loadBlob() {
+          if (!file) throw new Error("The form generator could not load. Refresh the page and try again.");
+          return (await file.generate(fields, { pdfOnly: true })).pdf;
+        }
+      });
+    }
+
     function getStatusType(
       status
     ) {
@@ -1475,6 +1528,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           </td>
 
           <td class="action-column">
+            <button type="button" class="btn-inspect viewer-legacy-details service-file-action"
+              data-service-file data-record-id="${escapeHtml(record.id)}" aria-label="View file for ${escapeHtml(record.serviceNo)}">
+              <i data-lucide="file-text"></i>
+              <span>View File</span>
+            </button>
             <button
               class="btn-inspect"
               type="button"
@@ -2216,11 +2274,9 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
                   )
               );
 
-            if (record) {
-              openInspectModal(
-                record
-              );
-            }
+            if (!record) return;
+            if (button.hasAttribute("data-service-file")) openServiceFile(record);
+            else openInspectModal(record);
           }
         );
 
@@ -2638,7 +2694,6 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
     office_memos:['Office Memos','officememo-admin.html','officememo.html'],
     employees:['Employees','employee-admin.html',null],
     inventory:['Inventory','invetoryadmin.html','inventory.html'],
-    visitors:['Visitors','visitors-admin.html','visitorsView.html'],
     service_requests:['Service Requests','serviceAdmin.html','service.html'],
     ics_records:['Property Slips','ics-admin.html','ics.html'],
     user_accounts:['User Management','Usermanagement.html',null],
@@ -2703,8 +2758,11 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       if(token!==generation||disposed)return;
       if(result.error)throw result.error;
       const data=result.data;
-      if(!data||!Array.isArray(data.items)||typeof data.counts!=='object')throw new Error('Invalid notification response');
-      feed=data;status='ready';render();
+      if(!data||!Array.isArray(data.items)||!data.counts||typeof data.counts!=='object')throw new Error('Invalid notification response');
+      const counts = Object.fromEntries(Object.entries(data.counts).filter(([module]) => modules[module]?.[2]));
+      const items = data.items.filter(item => modules[item.module]?.[2]);
+      const total = Object.values(counts).reduce((sum, count) => sum + (Number(count) || 0), 0);
+      feed = { counts, items, total, workspace:'user' }; status='ready'; render();
     }catch{if(token===generation&&!disposed){feed=empty();status='unavailable';render();}}
     finally{loading=false;if(again){again=false;scheduleRefresh();}}
   }

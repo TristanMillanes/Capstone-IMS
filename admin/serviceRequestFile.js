@@ -11,6 +11,7 @@
   const clean = value => String(value ?? '').replace(/\r\n?/g, '\n').replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, '').trim();
   const equal = (a,b) => clean(a).toLocaleLowerCase() === clean(b).toLocaleLowerCase();
   let assetsPromise = null;
+  let wordTemplatePromise = null;
   let pdfjsPromise = null;
   let sequence = 0;
   let current = null;
@@ -35,11 +36,18 @@
   function loadAssets() {
     if (!assetsPromise) assetsPromise = Promise.all([
       fetchAsset('PGENRO_Service_Request_Template.pdf'),
-      fetchAsset('PGENRO_Service_Request_Template.docx'),
       fetchAsset('DejaVuSans.ttf'),
       fetchAsset('layout.json', true)
-    ]).then(([pdf,docx,font,layout]) => ({pdf,docx,font,layout})).catch(error => {assetsPromise=null;throw error;});
+    ]).then(([pdf,font,layout]) => ({pdf,font,layout})).catch(error => {assetsPromise=null;throw error;});
     return assetsPromise;
+  }
+
+  function loadWordTemplate() {
+    if (!wordTemplatePromise) {
+      wordTemplatePromise = fetchAsset('PGENRO_Service_Request_Template.docx')
+        .catch(error => { wordTemplatePromise=null; throw error; });
+    }
+    return wordTemplatePromise;
   }
 
   function date(value) {
@@ -58,8 +66,13 @@
     const d=record || {}, v={};
     for (const key of ['clientName','organization','contactNo','emailAddress','serviceNo','location','requestedBy','notedBy','otherServices','receivedBy','receivedRemarks','assessedBy','assessedRemarks','recommendedBy','recommendedRemarks','processedBy','processedRemarks','serviceReceivedBy','clientRemarks']) v[key]=clean(d[key]);
     v.dateRequest=date(d.dateRequest); v.dateNeeded=date(d.dateNeeded);
+    const hasCategory = ['technicalAssistance','iecService','plantingMaterials','environmentalConcerns','certifications','otherServices']
+      .some(field => clean(d[field]));
+    const legacyCategories = hasCategory ? [] : [d.primaryCategory || d.category,d.secondaryCategory,d.concernsCategory].map(clean);
     const select=(field,main,choices,other,text) => {
-      const value=clean(d[field]);v[main]=Boolean(value);
+      const legacyChoice = choices.find(([,label]) => legacyCategories.some(category => equal(category,label)));
+      const value=clean(d[field]) || legacyChoice?.[1] || '';
+      v[main]=Boolean(value);
       for(const [key,label] of choices) v[key]=Boolean(value)&&equal(value,label);
       v[other]=Boolean(value)&&!choices.some(([,label])=>equal(value,label));
       v[text]=v[other]?value:'';
@@ -74,12 +87,16 @@
       ['envWaste','Solid Waste'],['envAir','Air Quality'],['envWater','Water Quality'],['envWildlife','Wildlife'],['envResources','Natural Resources']
     ],'envOthers','envOtherText');
     select('certifications','certMain',[['certSwm','SWM Compliance']],'certOthers','certOtherText');
-    v.plantingMain=Boolean(clean(d.plantingMaterials));v.otherMain=Boolean(v.otherServices);
+    const planting = clean(d.plantingMaterials) || legacyCategories.find(category => equal(category,'Native Tree Seedlings'));
+    v.plantingMain=Boolean(planting);v.otherMain=Boolean(v.otherServices);
     const attachmentFlag=typeof d.hasAttachments==='boolean'?d.hasAttachments:(Array.isArray(d.attachments)?d.attachments.length>0:null);
     v.withDocuments=attachmentFlag===true;v.withoutDocuments=attachmentFlag===false;
     v.approved=equal(d.pgdhAction,'Approved');v.disapproved=equal(d.pgdhAction,'Disapproved');
     v.pgdhInstructions=[clean(d.pgdhAction)&&!v.approved&&!v.disapproved?`Action: ${clean(d.pgdhAction)}`:'',clean(d.pgdhInstructions)].filter(Boolean).join('\n');
-    v.requestDetails=[v.plantingMain?`Planting materials: ${clean(d.plantingMaterials)}`:'',clean(d.requestDetails)].filter(Boolean).join('\n');
+    const category = ![v.taMain,v.iecMain,v.envMain,v.certMain,v.plantingMain,v.otherMain].some(Boolean)
+      ? legacyCategories.find(value => value && !/^(--|—|general service)$/i.test(value))
+      : '';
+    v.requestDetails=[planting?`Planting materials: ${planting}`:'',category?`Service category: ${category}`:'',clean(d.requestDetails)].filter(Boolean).join('\n');
     for(const [prefix,receivedDate,receivedTime,actedDate,actedTime] of [
       ['received','dateReceived','timeReceived','receivedDateActed','receivedTimeActed'],
       ['assessed','dateAssessed','timeAssessed','assessedDateActed','assessedTimeActed'],
@@ -122,9 +139,11 @@
     return {text:'See continuation',lines:['See continuation'],size,overflow:true};
   }
 
-  async function generate(record) {
-    if(!window.PDFLib||!window.fontkit||!window.JSZip) throw new Error('The document tools could not load. Copy the vendor folder beside serviceAdmin.html, then refresh.');
-    const assets=await loadAssets();
+  async function generate(record, {pdfOnly=false}={}) {
+    if(!window.PDFLib||!window.fontkit||(!pdfOnly&&!window.JSZip)) {
+      throw new Error('The document tools could not load. Refresh the page and try again.');
+    }
+    const [assets,docx]=await Promise.all([loadAssets(),pdfOnly?null:loadWordTemplate()]);
     const pdf=await PDFLib.PDFDocument.load(assets.pdf.slice(0));
     pdf.registerFontkit(window.fontkit);
     const font=await pdf.embedFont(assets.font.slice(0),{subset:true});
@@ -167,7 +186,7 @@
     pdf.setTitle(`PGENRO Service Request ${clean(record.serviceNo)}`);
     pdf.setSubject('Environment and Natural Resources Services Request Form');
     pdf.setProducer('PGENRO IMS');
-    return {pdf:new Blob([await pdf.save()],{type:'application/pdf'}),record:{...record},values,display,overflow,assets};
+    return {pdf:new Blob([await pdf.save()],{type:'application/pdf'}),record:{...record},values,display,overflow,assets:{...assets,docx}};
   }
 
   function element(doc,name,attrs={}) {
@@ -342,6 +361,7 @@
   }
 
   document.addEventListener('DOMContentLoaded',()=>{
+    if (!$('serviceFileModal')) return;
     $('printServiceFormBtn').addEventListener('click',printForm);
     $('downloadServicePdfBtn').addEventListener('click',()=>{
       if(!current)return;download(current.pdf,filename(current.record,'pdf'));
@@ -371,5 +391,5 @@
       });
     });
   },{once:true});
-  window.PGENRO_ServiceFile={view,generate,wordDocument,documentValues};
+  window.PGENRO_ServiceFile={view,generate,wordDocument,documentValues,filename};
 })();

@@ -326,8 +326,7 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
   const $ = id => document.getElementById(id);
   let authSubscription = null, connecting = false, realtimeTimer = null, authVersion = 0, reconnectRequested = false, accessTimer = null;
   let accountServiceReadyUntil = 0;
-  let directoryAPI = 'current';
-  const missingRPC = error => ['PGRST202','42883'].includes(error?.code);
+  let modulePicker;
   const els = {};
   const state = {
     users: [],
@@ -349,6 +348,7 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
   else queueMicrotask(init);
   function init() {
     cacheElements();
+    modulePicker = window.PGENRO_MODULE_ACCESS_PICKER.mount(els.accountModuleAccess, els.roleSelect);
     bindShell();
     bindFilters();
     bindActions();
@@ -376,7 +376,8 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
       'closeUserModalBtn','userForm','userIdInput','fullNameInput','usernameInput',
       'emailInput','passRequiredStar','passwordInput','positionInput','contactInput','divisionSelect','roleSelect',
       'statusSelect','cancelModalBtn','saveUserBtn','toast','toastMessage','statPendingRequests',
-      'sidebarPendingAccBadge','sidebarOpenServicesBadge','roleChangeHelp','userManagementFeedback'
+      'sidebarPendingAccBadge','sidebarOpenServicesBadge','roleChangeHelp','userManagementFeedback',
+      'accountModuleAccess','moduleAccessStatus'
     ].forEach(id => els[id] = $(id));
   }
   function bindShell() {
@@ -432,26 +433,9 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     );
     return window.pgenroSupabase;
   }
-  // This page owns its session bridge so an older shared Super Admin gate
-  // cannot override the live database Admin/User check for this module.
-  window.PGENRO_API = {
-    async signOut(options = {}) {
-      if (options.confirm !== false && options.ask !== false && typeof window.PGENRO_ConfirmLogout === 'function') {
-        const confirmed = await window.PGENRO_ConfirmLogout(); if (!confirmed) return false;
-      }
-      try {
-        const result = await getClient().auth.signOut(); if (result?.error) throw result.error;
-        try { for (const storage of [localStorage, sessionStorage]) storage.removeItem('pgenro_current_user'); } catch {}
-        location.replace('../User/login.html'); return true;
-      } catch {
-        window.dispatchEvent(new Event('pgenro:logout-error'));
-        return false;
-      }
-    }
-  };
   function directoryError(error) {
     if (['PGRST202','PGRST204','42883','42P01','42703','42804'].includes(error?.code)) {
-      return 'Install the included supabase/ADMIN_USER_ACCESS_PATCH.sql and ADMIN_USER_DIRECTORY_RPC_FIX.sql, then refresh User Management.';
+      return 'Apply the included supabase/USER_MODULE_ACCESS_PATCH.sql, then refresh User Management.';
     }
     if (error?.code === '40001') return 'This account changed while you were editing it. Reopen it and review the current values.';
     if (error?.code === '23505') return 'Email or username already belongs to another account.';
@@ -483,37 +467,15 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (identity.error || !identity.data?.user) {
       throw Object.assign(Error('Your session expired. Sign in again.'), { code: 'UM_SIGN_IN' });
     }
-    const response = await state.db.rpc('pgenro_um_context');
-    let context = response.data;
-    if (response.error) {
-      if (!missingRPC(response.error)) throw response.error;
-      directoryAPI = 'legacy';
-      const [access, own] = await Promise.all([
-        state.db.rpc('pgenro_is_admin'),
-        state.db.from('profiles').select('*').eq('user_id',identity.data.user.id).maybeSingle()
-      ]);
-      if (access.error) throw access.error;
-      if (own.error) throw own.error;
-      const profile = own.data;
-      const role = String(profile?.role || '').trim().toLowerCase();
-      const active = profile?.is_active === true && ['active','approved'].includes(String(profile?.status || '').toLowerCase());
-      context = {authorized:access.data === true && role === 'admin' && active, profile,
-        reason:!profile ? 'PROFILE_MISSING' : role === 'user' && active ? 'USER' : 'INACTIVE'};
-    }
-    if (!context || typeof context.authorized !== 'boolean') throw Error('The access service returned an invalid response. Run the updated SQL patch.');
-    if (!context.authorized) {
-      const reason = context.reason || 'INACTIVE';
-      const message = reason === 'PROFILE_MISSING' ? 'Your Auth account has no PGENRO profile. Run the updated SQL patch, then have an Admin review your account.'
-        : reason === 'USER' ? 'Your account uses the User workspace.' : 'Your account is inactive or suspended.';
-      throw Object.assign(Error(message), { code: `UM_${reason}` });
-    }
-    if (String(context.profile?.user_id) !== String(identity.data.user.id)) throw Error('The access response does not match your current account.');
-    return { user: identity.data.user, profile: context.profile };
+    const profile = await window.PGENRO_API.requireAdmin('user_management');
+    if (String(profile.user_id) !== String(identity.data.user.id)) throw Error('The access response does not match your current account.');
+    return { user: identity.data.user, profile };
   }
   function handleAccessFailure(error) {
     clearDirectory(directoryError(error));
     if (error?.code === 'UM_SIGN_IN') location.replace('../User/login.html');
-    else if (error?.code === 'UM_USER') location.replace('../User/homepage.html');
+    else if (error?.code === 'PGENRO_ADMIN_REQUIRED') location.replace('../User/homepage.html');
+    else if (error?.code === 'PGENRO_ADMIN_MODULE_REQUIRED') location.replace('admin.html?access=user_management');
   }
   async function verifyCurrentAccess() {
     if (!state.db || !adminId || connecting) return;
@@ -525,11 +487,6 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     } catch (error) { if (generation === authVersion) handleAccessFailure(error); }
   }
   async function directoryPage(offset, limit) {
-    if (directoryAPI !== 'legacy') {
-      const response = await state.db.rpc('pgenro_um_directory', {p_offset:offset,p_limit:limit});
-      if (!missingRPC(response.error)) return response;
-      directoryAPI = 'legacy';
-    }
     const response = await state.db.rpc('pgenro_admin_list_users', {p_offset:offset,p_limit:limit});
     if (response.error) return response;
     if (!Array.isArray(response.data)) throw Error('The account directory did not return records. Refresh or check the included SQL setup.');
@@ -855,10 +812,10 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (btn.dataset.action === 'toggle') toggleStatus(user);
     if (btn.dataset.action === 'delete') deleteUser(user);
   }
-  function openModal(user = null) {
+  async function openModal(user = null) {
     if(saving || acting || !state.online)return;state.editingId = user?.id || null;
     state.editingSnapshot = user ? { ...user } : null;
-    if (els.roleChangeHelp) els.roleChangeHelp.textContent = user?.id === adminId ? 'Use another Admin to change your own access role.' : 'Choose the final Admin or User role. Save Changes applies it to the account.';
+    if (els.roleChangeHelp) els.roleChangeHelp.textContent = user?.id === adminId ? 'Use another Admin with User Management access to change your own role or grants.' : 'Choose the final Admin or User role. Save Changes applies it to the account.';
     if (els.userIdInput) els.userIdInput.value = user?.id || '';
     if (els.fullNameInput) els.fullNameInput.value = user?.fullName || '';
     if (els.usernameInput) els.usernameInput.value = user?.username || '';
@@ -877,6 +834,9 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (els.contactInput) els.contactInput.value = user?.contact || '';
     if (els.divisionSelect) els.divisionSelect.value = user?.division || '';
     if (els.roleSelect) els.roleSelect.value = user?.role || 'User';
+    modulePicker.set({}, { enabled: !user });
+    els.moduleAccessStatus.hidden = !user;
+    els.moduleAccessStatus.textContent = user ? 'Loading saved module access…' : '';
     if (els.statusSelect) els.statusSelect.value = ['Active','Inactive','Suspended','Pending','Rejected'].includes(user?.status) ? user.status : 'Active';
     // Pending/Rejected are existing review states. Keeping that state does not
     // invoke the account service or silently approve the registration.
@@ -892,12 +852,36 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (awaitingReview && els.roleChangeHelp) els.roleChangeHelp.textContent = `This account is ${user.status}. Role/profile edits preserve that status. Choose Active to approve access before changing credentials.`;
     if (els.roleSelect) els.roleSelect.disabled = user?.id === adminId;
     if (els.statusSelect) els.statusSelect.disabled = user?.id === adminId;
+    if (els.divisionSelect) els.divisionSelect.disabled = user?.id === adminId;
     if (els.modalTitle) els.modalTitle.textContent = user ? 'Edit User Account' : 'Add New User Account';
     if (els.modalSub) els.modalSub.textContent = user ? 'Update personnel profile, division, role, and account status.' : 'Configure personnel credentials and access permissions.';
-    if (els.saveUserBtn) els.saveUserBtn.innerHTML = `<i data-lucide="save"></i>${user ? 'Save Changes' : 'Create Account'}`;
+    if (els.saveUserBtn) {
+      els.saveUserBtn.disabled = Boolean(user);
+      els.saveUserBtn.innerHTML = `<i data-lucide="save"></i>${user ? 'Save Changes' : 'Create Account'}`;
+    }
     M.openModal('userModal');
     els.fullNameInput?.focus({preventScroll:true});
     renderIcons();
+
+    if (!user) return;
+    const snapshot = state.editingSnapshot;
+    try {
+      const { data, error } = await state.db.from('profiles').select('user_modules,admin_modules,updated_at')
+        .eq('user_id', user.id).maybeSingle();
+      if (state.editingSnapshot !== snapshot || !els.userModal.classList.contains('open')) return;
+      if (['42703', 'PGRST204'].includes(error?.code)) throw Error('Apply USER_MODULE_ACCESS_PATCH.sql before editing module access.');
+      if (error) throw error;
+      if (!Array.isArray(data?.user_modules) || !Array.isArray(data.admin_modules)) throw Error('Saved module access could not be verified. Refresh the directory.');
+      if (user.updatedAt && user.updatedAt !== data.updated_at) throw Error('This account changed. Close the form and refresh the directory.');
+      snapshot.userModules = data.user_modules;
+      snapshot.adminModules = data.admin_modules;
+      snapshot.updatedAt = data.updated_at;
+      modulePicker.set({ User: snapshot.userModules, Admin: snapshot.adminModules }, { enabled: user.id !== adminId });
+      els.moduleAccessStatus.hidden = true;
+      els.saveUserBtn.disabled = false;
+    } catch (error) {
+      if (state.editingSnapshot === snapshot) els.moduleAccessStatus.textContent = error.message;
+    }
   }
   function closeModal(){if(saving)return;M.closeModal('userModal');state.editingId=null;state.editingSnapshot=null;els.userForm?.reset();}
   async function saveUser(e) {
@@ -906,6 +890,7 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (!els.userForm?.reportValidity()) return;
     const editingId = state.editingId, original = state.editingSnapshot;
     const isEdit = Boolean(editingId);
+    if (isEdit && (!Array.isArray(original?.userModules) || !Array.isArray(original.adminModules))) return;
     const password = els.passwordInput?.value || '';
     if ((!isEdit || password) && password.length < 8) {
       showToast('Password must contain at least 8 characters.', 'warning');
@@ -921,7 +906,8 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
       role: els.roleSelect.value,
       status: els.statusSelect.value,
       position: els.positionInput?.value.trim() || '',
-      contact: els.contactInput?.value.trim() || ''
+      contact: els.contactInput?.value.trim() || '',
+      ...modulePicker.selected()
     };
     if (!/^[a-zA-Z0-9_-][a-zA-Z0-9_.-]{0,59}$/.test(userInput.username) || userInput.username.endsWith('.') || userInput.username.includes('..')) { showToast('Employee ID must be 1–60 letters, numbers, dots, underscores or hyphens.', 'warning'); return; }
     if(state.users.some(u=>u.id!==state.editingId&&(u.email.toLowerCase()===userInput.email||u.username.toLowerCase()===userInput.username.toLowerCase()))){showToast('Employee ID or login address already exists.','warning');return;}
@@ -930,33 +916,19 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     const generation = authVersion;
     let committed = false;
     try {
-      let result;
-      if (isEdit && directoryAPI === 'legacy') {
-        result = await invoke('update', {userId:editingId,user:userInput});
-      } else if (isEdit) {
-        if (!original) throw Error('Reopen this account before saving.');
-        let expectedVersion = original.updatedAt || null;
-        const credentialOrStatusChange = userInput.email !== original.email.toLowerCase() || Boolean(password) || userInput.status !== original.status;
-        if (credentialOrStatusChange) {
-          const changed = await invoke('update', { userId: editingId, user: userInput });
-          expectedVersion = changed.user?.updated_at || changed.user?.updatedAt || null;
-        }
-        if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
-        const response = await state.db.rpc('pgenro_um_save_profile', {
-          p_user_id: editingId,
-          p_changes: { full_name: userInput.fullName, username: userInput.username, division: userInput.division,
-            role: userInput.role, position: userInput.position, contact: userInput.contact },
-          p_expected_updated_at: expectedVersion
-        });
-        if (response.error) throw response.error;
-        result = response.data;
-      } else result = await invoke('create', { user: userInput });
+      const result = isEdit
+        ? await invoke('update', { userId: editingId, user: userInput, expectedUpdatedAt: original.updatedAt })
+        : await invoke('create', { user: userInput });
       if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
       if (!result || (result.success !== true && result.ok !== true)) throw Error(result?.error || 'The server did not confirm the saved account.');
       const returned = result.user;
       if (!returned || !(returned.user_id || returned.id) || returned.role !== userInput.role ||
           (isEdit && String(returned.user_id || returned.id) !== editingId)) {
         throw Error('The server did not confirm the selected role. Refresh and verify this account before retrying.');
+      }
+      const { sameGrants } = window.PGENRO_USER_MODULES;
+      if (!sameGrants(returned.user_modules, userInput.userModules) || !sameGrants(returned.admin_modules, userInput.adminModules)) {
+        throw Error('The server did not confirm the selected modules. Refresh and verify this account before retrying.');
       }
       const saved = normalizeUser(returned.user_id || returned.id, returned);
       committed = true; upsertLocal(saved);

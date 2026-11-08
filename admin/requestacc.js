@@ -170,7 +170,9 @@
  'use strict';
  const M=window.PGENRO_Module,$=id=>document.getElementById(id),api=window.PGENRO_API;
  let rows=[],selected=null,bulkSelection=[],authorized=false,online=false,busy=false,version=0,channel=null;
+ let reviewAccess,bulkAccess;
  const roles=['User','Admin'];
+ let canGrantAdminModules=false;
  const canonicalRole=value=>String(value||'').trim().toLowerCase()==='admin'?'Admin':'User';
  const requestedRole=r=>canonicalRole(r.requestedRole||r.requested_role||r.requested_system||r.role);
  const assignedRole=r=>r.assignedRole||(['approved','active','suspended','inactive'].includes(status(r))?canonicalRole(r.role):'');
@@ -215,7 +217,8 @@
   const r=selected;
   const values={reviewReqId:r.refCode||r.id,reviewDate:r.date||r.created_at||r.createdAt||'Recent',reviewFullName:name(r),reviewEmail:r.email,reviewContact:r.contact||r.contact_number,reviewGovId:'Account Authentication',reviewPosition:r.position,reviewDivision:r.division,reviewRole:requestedRole(r),reviewEndorser:r.endorser,reviewReason:r.reason};
   Object.entries(values).forEach(([id,v])=>{$(id).textContent=v||'None provided';});
-  $('assignRoleSelect').value=pending(r)?requestedRole(r):canonicalRole(assignedRole(r)||r.role);approvalLabel();
+  $('assignRoleSelect').value=pending(r)?(canGrantAdminModules?requestedRole(r):'User'):canonicalRole(assignedRole(r)||r.role);approvalLabel();
+  reviewAccess.set({}, { visible: pending(r), enabled: pending(r) && online && !busy });
   for(const id of ['assignRoleSelect','approveModalActionBtn','declineModalActionBtn'])$(id).disabled=!pending(r)||!online||busy;
   M.openModal('reviewModal');
  }
@@ -231,8 +234,8 @@
  async function operation(action,items,opts={}){
   if(busy||!authorized||!online){M.toast('Refresh successfully before changing account requests.','warning');return;}
   items=items.filter(r=>action==='delete'||pending(r));if(!items.length)return;
-  busy=true;document.querySelectorAll('.modal-backdrop.open').forEach(m=>{m.dataset.busy='true';m.querySelectorAll('button,select,textarea').forEach(b=>b.disabled=true);});render();
-  let succeeded=0;const errors=[];
+  busy=true;document.querySelectorAll('.modal-backdrop.open').forEach(m=>{m.dataset.busy='true';m.querySelectorAll('button,select,textarea,input[type="checkbox"]').forEach(b=>b.disabled=true);});render();
+  let succeeded=0,refreshNeeded=false;const errors=[];
   try{
    for(const r of items){
     try{
@@ -240,20 +243,32 @@
      else {
       const role=opts.role;
       if(action==='approve'&&!roles.includes(role))throw new Error('Choose Admin or User as the final account role.');
+      if(action==='approve'&&role==='Admin'&&!canGrantAdminModules)throw new Error('User Management access is required to approve an Admin account.');
       if(!api?.invokeAdmin)throw new Error('Administrator service is unavailable.');
-      const response=await api.invokeAdmin(action==='approve'?'approve_request':'reject_request',action==='approve'?{requestId:key(r),userId:r.uid||r.user_id||'',role}:{requestId:key(r),userId:r.uid||r.user_id||'',reason:opts.reason||'Declined via Bulk Review',remarks:opts.remarks||''});
+      const identity={requestId:key(r),userId:r.uid||r.user_id||''};
+      const response=await api.invokeAdmin(action==='approve'?'approve_request':'reject_request',action==='approve'
+       ? {...identity,role,userModules:opts.userModules,adminModules:opts.adminModules}
+       : {...identity,reason:opts.reason||'Declined via Bulk Review',remarks:opts.remarks||''});
       if(response?.error||response?.success===false)throw new Error(response.error?.message||response.message||'The administrator service rejected this action.');
+      refreshNeeded=true;
+      const {sameGrants}=window.PGENRO_USER_MODULES;
+      if(action==='approve'&&(!sameGrants(response?.user?.user_modules,opts.userModules)||!sameGrants(response?.user?.admin_modules,opts.adminModules))){
+       throw new Error('Approval did not confirm the selected modules. Refresh and verify this account in User Management.');
+      }
      }
      succeeded++;
     }catch(error){errors.push(`${name(r)}: ${error.message}`);}
    }
-   if(succeeded){M.toast(`${succeeded} request${succeeded===1?'':'s'} ${action==='approve'?'approved':action==='delete'?'deleted':'declined'}.`);await load();}
+   if(succeeded)M.toast(`${succeeded} request${succeeded===1?'':'s'} ${action==='approve'?'approved':action==='delete'?'deleted':'declined'}.`);
+   if(succeeded||refreshNeeded)await load();
    if(errors.length)M.toast(`${succeeded} succeeded; ${errors.length} failed. ${errors[0]}`,'error');
   }finally{
-   busy=false;document.querySelectorAll('.modal-backdrop').forEach(m=>{m.dataset.busy='false';m.querySelectorAll('button,select,textarea').forEach(b=>b.disabled=false);});if(succeeded&&!errors.length){M.closeModal('reviewModal');M.closeModal('declineModal');M.closeModal('bulkApprovalModal');}render();
+   busy=false;document.querySelectorAll('.modal-backdrop').forEach(m=>{m.dataset.busy='false';m.querySelectorAll('button,select,textarea,input[type="checkbox"]').forEach(b=>b.disabled=false);});if(succeeded&&!errors.length){M.closeModal('reviewModal');M.closeModal('declineModal');M.closeModal('bulkApprovalModal');}render();
   }
  }
  document.addEventListener('DOMContentLoaded',async()=>{
+  reviewAccess=window.PGENRO_MODULE_ACCESS_PICKER.mount($('reviewModuleAccess'),$('assignRoleSelect'));
+  bulkAccess=window.PGENRO_MODULE_ACCESS_PICKER.mount($('bulkModuleAccess'),$('bulkAssignRoleSelect'));
   $('requestSearchInput').addEventListener('input',()=>{$('globalSearchInput').value=$('requestSearchInput').value;render();});$('globalSearchInput').addEventListener('input',()=>{$('requestSearchInput').value=$('globalSearchInput').value;render();});
   for(const id of ['divisionFilterSelect','statusFilterSelect'])$(id).addEventListener('change',render);
   $('selectAllCheckbox').addEventListener('change',e=>{document.querySelectorAll('.row-checkbox:not(:disabled)').forEach(c=>c.checked=e.target.checked);controls();});
@@ -268,24 +283,26 @@
   $('assignRoleSelect').addEventListener('change',approvalLabel);
   for(const [id,modal] of [['closeReviewModalBtn','reviewModal'],['closeDeclineModalBtn','declineModal'],['cancelDeclineModalBtn','declineModal'],['closeBulkApprovalBtn','bulkApprovalModal'],['cancelBulkApprovalBtn','bulkApprovalModal']])$(id).addEventListener('click',()=>M.closeModal(modal));
   $('declineModalActionBtn').addEventListener('click',()=>decline(key(selected)));
-  $('approveModalActionBtn').addEventListener('click',()=>selected&&operation('approve',[selected],{role:$('assignRoleSelect').value}));
+  $('approveModalActionBtn').addEventListener('click',()=>selected&&operation('approve',[selected],{role:$('assignRoleSelect').value,...reviewAccess.selected()}));
   $('confirmDeclineBtn').addEventListener('click',()=>{const reason=$('declineReasonSelect').value,remarks=$('declineNotesInput').value.trim();if(reason==='Other'&&!remarks){M.toast('Add notes explaining the reason for declining.','warning');$('declineNotesInput').focus();return;}if(selected)operation('reject',[selected],{reason,remarks});});
   $('confirmModalCancelBtn').onclick=()=>finishConfirm(false);$('confirmModalActionBtn').onclick=()=>finishConfirm(true);confirmWatcher.observe($('systemConfirmModal'),{attributes:true,attributeFilter:['class']});
   $('bulkApproveBtn').addEventListener('click',()=>{
    bulkSelection=checked().map(key);if(!bulkSelection.length)return;
    $('bulkApprovalCount').textContent=`${bulkSelection.length} selected pending request${bulkSelection.length===1?'':'s'}`;
-   $('bulkAssignRoleSelect').value='';M.openModal('bulkApprovalModal');$('bulkAssignRoleSelect').focus();
+   $('bulkAssignRoleSelect').value='';bulkAccess.set();M.openModal('bulkApprovalModal');$('bulkAssignRoleSelect').focus();
   });
   $('confirmBulkApproveBtn').addEventListener('click',()=>{
    const role=$('bulkAssignRoleSelect').value;if(!roles.includes(role)){M.toast('Choose Admin or User for the selected accounts.','warning');$('bulkAssignRoleSelect').focus();return;}
-   const items=rows.filter(r=>bulkSelection.includes(key(r))&&pending(r));operation('approve',items,{role});
+   const items=rows.filter(r=>bulkSelection.includes(key(r))&&pending(r));operation('approve',items,{role,...bulkAccess.selected()});
   });
   $('bulkRejectBtn').addEventListener('click',async()=>{const items=checked();if(items.length&&await confirmAction('Bulk Decline Requests',`Decline ${items.length} selected pending requests?`))await operation('reject',items);});
   $('refreshRequestsBtn').onclick=async()=>{if(!authorized)return;$('refreshRequestsBtn').disabled=true;try{if(await load())M.toast('Account requests refreshed.');}finally{$('refreshRequestsBtn').disabled=false;}};
   render();
   try{
    if(!M.client()||!api?.requireAdmin)throw new Error('Administrator authorization is unavailable.');
-   const profile=await api.requireAdmin();if(!profile)throw new Error('Administrator authorization is required.');authorized=true;
+   const profile=await api.requireAdmin('account_requests');if(!profile)throw new Error('Administrator authorization is required.');authorized=true;
+   canGrantAdminModules=profile.admin_modules?.includes('user_management')===true;
+   for(const id of ['assignRoleSelect','bulkAssignRoleSelect'])$(id).querySelector('option[value="Admin"]').disabled=!canGrantAdminModules;
    $('dropdownUserName').textContent=profile.full_name||profile.username||'PGENRO Admin';$('dropdownUserEmail').textContent=profile.email||profile.authUser?.email||'Administrator Session';$('dropdownUserRole').textContent=profile.role||'Administrator';
    await load();
    channel=M.client().channel('admin-account-requests').on('postgres_changes',{event:'*',schema:'public',table:'access_requests'},load).subscribe();

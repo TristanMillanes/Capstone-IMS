@@ -12,9 +12,12 @@
 <!-- Supabase JavaScript SDK -->
 <!-- Your existing admin theme + ICS module styles -->
 <link href="ics-admin.css?v=20261027-emerald-v6" rel="stylesheet">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="ics-admin.html" data-css-scope="admin-ics" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Property Slips" data-design="emerald-v6">
+<p class="admin-module-loading" role="status">Checking your access…</p>
+
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- ====================== SIDEBAR ====================== -->
@@ -590,7 +593,8 @@
 </div>
 </div>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../shared/supabase.js?v=20261104-employee-account-1"></script>
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/ics-records.js?v=20261026-private-ics"></script>
 <script defer src="ics-admin.js?v=20261103-frontend-fix"></script>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>

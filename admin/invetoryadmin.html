@@ -9,10 +9,13 @@
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-<link href="invetoryadmin.css?v=20261107-employee-stock-sync" rel="stylesheet">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link href="invetoryadmin.css?v=20261108-inventory-roles" rel="stylesheet">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="invetoryadmin.html" data-css-scope="admin-inventory" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Inventory" data-design="emerald-v6">
+<p class="admin-module-loading" role="status">Checking your access…</p>
+
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
 <!-- SIDEBAR -->
@@ -259,7 +262,7 @@
 <div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Inventory</span></div><h1>Inventory</h1>
 <p>Track stock, record movements, and stay ahead of replenishment needs.</p>
 </div>
-<div class="header-actions"><button class="icon-btn" id="refreshBtn" title="Refresh inventory" type="button">
+<div class="header-actions" data-inventory-admin hidden><button class="icon-btn" id="refreshBtn" title="Refresh inventory" type="button">
 <i data-lucide="refresh-cw"></i>
 </button>
 <button class="btn btn-secondary" id="openReportBtn" type="button">
@@ -273,10 +276,38 @@
 </div>
 
 </section>
+<section id="inventoryAccessStatus" class="panel inventory-access-status" role="status">
+<p>Checking Inventory access…</p>
+</section>
+
+<section aria-labelledby="supplyQueueTitle" class="panel" data-inventory-admin hidden>
+<div class="panel-header">
+<div>
+<h2 id="supplyQueueTitle">Supply Requests</h2>
+<p>Record a release after handing over the supplies. The quantity provided is deducted from stock.</p>
+</div>
+<div class="header-actions">
+<select id="supplyQueueFilter" aria-label="Show supply requests">
+<option value="open">Open requests</option>
+<option value="all">All requests</option>
+</select>
+</div>
+</div>
+<div class="table-wrap">
+<table class="data-table unified-records-table" data-ui-columns="7" style="--ui-table-min:930px;">
+<thead><tr>
+<th scope="col">Reference</th><th scope="col">Requested by</th><th scope="col">Supply and purpose</th>
+<th scope="col">Requested</th><th scope="col">Issued</th><th scope="col">Status</th><th scope="col">Action</th>
+</tr></thead>
+<tbody id="supplyQueueBody"><tr><td colspan="7" class="empty">Loading supply requests…</td></tr></tbody>
+</table>
+</div>
+</section>
+
 <!-- STATS KPI GRID -->
-<section class="kpi-grid unified-metric-grid"><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Total Item Types</span></div><div class="kpi-body"><h3 class="counter" id="totalItems">0</h3><span class="kpi-trend">Registered supplies</span></div><div class="kpi-footer"><span>Inventory masterfile</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Total Stock on Hand</span></div><div class="kpi-body"><h3 class="counter" id="totalStock">0</h3><span class="kpi-trend">Physical balance</span></div><div class="kpi-footer"><span>Stock across registered items</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Low Stock Alerts</span></div><div class="kpi-body"><h3 class="counter" id="lowStock">0</h3><span class="kpi-trend">At or below threshold</span></div><div class="kpi-footer"><span>Review replenishment needs</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Out of Stock</span></div><div class="kpi-body"><h3 class="counter" id="outStock">0</h3><span class="kpi-trend">Depleted supplies</span></div><div class="kpi-footer"><span>Items requiring replenishment</span></div></div></section>
+<section class="kpi-grid unified-metric-grid" data-inventory-admin hidden><div class="kpi-card unified-metric unified-metric-featured"><div class="kpi-header"><span class="kpi-label">Total Item Types</span></div><div class="kpi-body"><h3 class="counter" id="totalItems">0</h3><span class="kpi-trend">Registered supplies</span></div><div class="kpi-footer"><span>Inventory masterfile</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Total Stock on Hand</span></div><div class="kpi-body"><h3 class="counter" id="totalStock">0</h3><span class="kpi-trend">Physical balance</span></div><div class="kpi-footer"><span>Stock across registered items</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Low Stock Alerts</span></div><div class="kpi-body"><h3 class="counter" id="lowStock">0</h3><span class="kpi-trend">At or below threshold</span></div><div class="kpi-footer"><span>Review replenishment needs</span></div></div><div class="kpi-card unified-metric"><div class="kpi-header"><span class="kpi-label">Out of Stock</span></div><div class="kpi-body"><h3 class="counter" id="outStock">0</h3><span class="kpi-trend">Depleted supplies</span></div><div class="kpi-footer"><span>Items requiring replenishment</span></div></div></section>
 <!-- INVENTORY DATABASE PANEL -->
-<section class="panel">
+<section class="panel" data-inventory-admin hidden>
 <div class="panel-header">
 <div>
 <h2>Supplies Directory</h2>
@@ -331,7 +362,7 @@
 </div>
 </section>
 <!-- AUDIT LOG / MOVEMENTS -->
-<section class="panel movement-panel">
+<section class="panel movement-panel" data-inventory-admin hidden>
 <div class="panel-header">
 <div>
 <h2>Stock Movement History &amp; Audit Trail</h2>
@@ -362,6 +393,36 @@
 </div>
 </div>
 <!-- ITEM MODAL (ADD / EDIT) -->
+<div aria-hidden="true" class="modal-backdrop" id="supplyReleaseModal">
+<div aria-labelledby="supplyReleaseTitle" aria-modal="true" class="modal modal-card" role="dialog">
+<div class="modal-header">
+<div><span class="modal-kicker">Supply request</span><h2 id="supplyReleaseTitle">Record Supply Release</h2></div>
+<button aria-label="Close release form" class="icon-btn close" data-close="supplyReleaseModal" type="button"><i data-lucide="x"></i></button>
+</div>
+<form id="supplyReleaseForm">
+<div class="modal-body">
+<p class="movement-preview" id="supplyReleaseSummary"></p>
+<label for="supplyReleaseItem">Inventory item provided
+<select id="supplyReleaseItem" required></select>
+</label>
+<p class="movement-preview" id="supplyReleaseStock"></p>
+<label for="supplyReleaseQuantity">Actual quantity provided
+<input id="supplyReleaseQuantity" inputmode="decimal" min="0.01" step="0.01" type="number" required>
+</label>
+<label class="supply-release-confirmation">
+<input id="supplyReleaseConfirmed" type="checkbox" required>
+<span>I have already handed over this quantity to the requesting division.</span>
+</label>
+<p class="supply-release-error" id="supplyReleaseError" role="alert"></p>
+</div>
+<div class="modal-actions">
+<button class="btn btn-secondary" data-close="supplyReleaseModal" type="button">Cancel</button>
+<button class="btn btn-primary" id="submitSupplyRelease" type="submit"><i data-lucide="check"></i>Record Stock Out</button>
+</div>
+</form>
+</div>
+</div>
+
 <div aria-hidden="true" class="modal-backdrop" id="itemModal">
 <div aria-labelledby="itemModalTitle" aria-modal="true" class="modal modal-card" role="dialog">
 <div class="modal-head modal-header">
@@ -508,8 +569,9 @@
 <div class="toast-container" id="toastContainer"></div>
 <!-- SCRIPT -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../shared/supabase.js?v=20261104-employee-account-1"></script>
-<script defer src="invetoryadmin.js?v=20261107-employee-stock-sync"></script>
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
+<script defer src="invetoryadmin.js?v=20261108-inventory-roles"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

@@ -178,59 +178,81 @@ const $ = (id) => document.getElementById(id);
 // Local State
 let inventory = [];
 let movements = [];
+let supplyRequests = [];
+let releaseRequest = null;
+let releaseSaving = false;
 let activeFilter = "all";
 let editingId = null;
-
-// Read-only cache of records previously retrieved from the live database.
-const INVENTORY_CACHE = "pgenro_admin_inventory_live_cache_v2";
-const MOVEMENTS_CACHE = "pgenro_admin_movements_live_cache_v2";
 let dbOnline = false;
-
-function cachedRows(key) {
-  try { const rows = JSON.parse(localStorage.getItem(key) || "[]"); return Array.isArray(rows) ? rows : []; }
-  catch { return []; }
-}
+let inventoryAdminId = null;
+let accessVersion = 0;
+let workspaceRefresh;
 
 function requireLiveDatabase() {
-  if (isSupabaseConfigured && dbOnline) return true;
+  if (inventoryAdminId && dbOnline) return true;
   toast("Database is offline. Reconnect before changing inventory records.", "error");
   return false;
 }
 
 // Document Ready
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
   M.renderIcons();
   bindUIEvents();
-
-  if (isSupabaseConfigured) {
-    await loadInventory();
-    await loadMovements();
-    const channel = supabase.channel("inventory-admin-live")
-      .on("postgres_changes", { event: "*", schema: "public", table: "inventory" }, async () => {
-        await loadInventory();
-        await loadMovements();
-      })
-      .on("postgres_changes", { event: "*", schema: "public", table: "inventory_movements" }, loadMovements)
-      .subscribe();
-    window.addEventListener("pagehide",(event)=>{if(event.persisted)return;loadVersion++;supabase.removeChannel(channel);});
-  } else {
-    setStatus(false, "Database offline • Cached records are read-only");
-    loadFromLocalStorage();
-  }
+  supabase?.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_OUT' || (inventoryAdminId && session?.user?.id !== inventoryAdminId)) {
+      accessVersion++;
+      showInventoryAccess(false, 'The inventory session has changed. Sign in with an active Admin account.');
+    }
+  });
+  window.addEventListener('focus', () => refreshInventoryWorkspace());
+  window.addEventListener('pageshow', event => { if (event.persisted) refreshInventoryWorkspace(); });
+  refreshInventoryWorkspace();
 });
 
-function loadFromLocalStorage() {
-  inventory = cachedRows(INVENTORY_CACHE);
-  movements = cachedRows(MOVEMENTS_CACHE);
+function showInventoryAccess(allowed, message = '') {
+  document.querySelectorAll('[data-inventory-admin]').forEach(node => { node.hidden = !allowed; });
+  $('inventoryAccessStatus').hidden = allowed;
+  $('inventoryAccessStatus').querySelector('p').textContent = message;
+  if (allowed) return;
+
+  inventoryAdminId = null;
+  loadVersion++;
+  inventory = [];
+  movements = [];
+  supplyRequests = [];
+  releaseRequest = null;
+  dbOnline = false;
   render();
   renderMovements();
+  renderSupplyRequests();
+  for (const id of ['itemModal', 'reportModal', 'supplyReleaseModal']) {
+    $(id).dataset.busy = 'false';
+    closeModal(id);
+  }
 }
 
-function saveToLocalStorage() {
-  try {
-    localStorage.setItem(INVENTORY_CACHE, JSON.stringify(inventory));
-    localStorage.setItem(MOVEMENTS_CACHE, JSON.stringify(movements));
-  } catch { /* Private browsing can disable persistent browser storage. */ }
+function refreshInventoryWorkspace(announce = false) {
+  if (workspaceRefresh || itemSaving || movementSaving || releaseSaving) return workspaceRefresh;
+  const version = ++accessVersion;
+  workspaceRefresh = (async () => {
+    try {
+      if (!isSupabaseConfigured) throw new Error('The inventory database is unavailable.');
+      const profile = await window.PGENRO_API.requireAdmin('inventory');
+      if (version !== accessVersion) return;
+      inventoryAdminId = profile.user_id;
+      showInventoryAccess(true);
+      await Promise.all([loadInventory(), loadSupplyRequests()]);
+      await loadMovements();
+      if (announce && dbOnline) toast('Inventory and supply requests refreshed.');
+    } catch (error) {
+      if (version === accessVersion) {
+        showInventoryAccess(false, ['PGRST202', 'PGENRO_ADMIN_MODULE_REQUIRED'].includes(error.code)
+          ? 'Apply the updated module access database patch to enable Inventory.'
+          : error.message || 'Inventory access could not be verified.');
+      }
+    }
+  })().finally(() => { workspaceRefresh = null; });
+  return workspaceRefresh;
 }
 
 // Bind DOM Events
@@ -243,15 +265,14 @@ function bindUIEvents() {
   $("confirmPrintBtn").onclick = printReport;
   $("exportBtn").onclick = exportCSV;
 
-  $("refreshBtn").onclick = async () => {
-    if (isSupabaseConfigured) {
-      await loadInventory();
-      await loadMovements();
-    } else {
-      loadFromLocalStorage();
-    }
-    toast(dbOnline ? "Inventory data refreshed" : "Database unavailable; showing cached records only", dbOnline ? "success" : "warning");
-  };
+  $("refreshBtn").onclick = () => refreshInventoryWorkspace(true);
+  $('supplyQueueFilter').onchange = renderSupplyRequests;
+  $('supplyQueueBody').addEventListener('click', event => {
+    const button = event.target.closest('[data-release-request]');
+    if (button) openSupplyRelease(button.dataset.releaseRequest);
+  });
+  $('supplyReleaseItem').onchange = updateSupplyReleaseStock;
+  $('supplyReleaseForm').onsubmit = saveSupplyRelease;
 
   // Searching & Filtering
   $("searchInput").oninput = ()=>{$("globalSearchInput").value=$("searchInput").value;render();};
@@ -313,19 +334,137 @@ function bindUIEvents() {
 
 // Database Helpers
 async function loadInventory(){
+ if (!inventoryAdminId) return false;
  const version=++loadVersion;
- try{const rows=await M.read('inventory');if(version!==loadVersion)return false;inventory=rows;dbOnline=true;M.observeRecords('inventory',rows);saveToLocalStorage();render();setStatus(true);return true;}
- catch(error){if(version!==loadVersion)return false;dbOnline=false;setStatus(false);if(!inventory.length)inventory=cachedRows(INVENTORY_CACHE);render();toast(error.message||'Inventory could not refresh.','error');return false;}
+ try{const rows=await M.read('inventory');if(version!==loadVersion)return false;inventory=rows;dbOnline=true;M.observeRecords('inventory',rows);render();setStatus(true);return true;}
+ catch(error){if(version!==loadVersion)return false;dbOnline=false;inventory=[];render();setStatus(false);toast(error.message||'Inventory could not refresh.','error');return false;}
 }
 async function loadMovements(){
- try{const rows=await M.read('inventory_movements');movements=rows.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,30).map(row=>({...row,inventory:row.inventory||inventory.find(i=>String(i.id)===String(row.item_id))}));saveToLocalStorage();renderMovements();}
- catch(error){if(!movements.length)movements=cachedRows(MOVEMENTS_CACHE);renderMovements();}
+ if (!inventoryAdminId) return;
+ const version = accessVersion;
+ try{const rows=await M.read('inventory_movements');if(version!==accessVersion)return;movements=rows.sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0)).slice(0,30).map(row=>({...row,inventory:row.inventory||inventory.find(i=>String(i.id)===String(row.item_id))}));renderMovements();}
+ catch(error){if(version!==accessVersion)return;movements=[];renderMovements();toast(error.message||'Movement history could not refresh.','error');}
 }
 function setStatus(online){$('addItemBtn').disabled=!online;renderActionState();}
 
 function renderActionState() {
-  document.querySelectorAll("#inventoryBody [data-edit], #inventoryBody [data-delete]")
+  document.querySelectorAll("#inventoryBody [data-edit], #inventoryBody [data-delete], #supplyQueueBody [data-release-request]")
     .forEach((button) => { button.disabled = !dbOnline; });
+}
+
+function remainingSupply(request) {
+  return Number((Number(request.quantity_requested) - Number(request.quantity_issued)).toFixed(2));
+}
+
+function renderSupplyRequests() {
+  const all = $('supplyQueueFilter').value === 'all';
+  const requests = all ? supplyRequests : supplyRequests.filter(request => remainingSupply(request) > 0);
+  const body = $('supplyQueueBody');
+  body.innerHTML = requests.length ? requests.map(request => {
+    const remaining = remainingSupply(request);
+    const status = remaining === 0 ? 'Issued' : Number(request.quantity_issued) > 0 ? 'Partially issued' : 'Pending';
+    const unit = escapeHTML(request.unit);
+    return `<tr>
+      <td><strong>SRQ-${escapeHTML(request.request_number)}</strong></td>
+      <td>${escapeHTML(request.requester_name)}<span class="item-desc">${escapeHTML(request.division)}</span></td>
+      <td><strong>${escapeHTML(request.supply_name)}</strong><span class="item-desc">${escapeHTML(request.purpose)}</span></td>
+      <td>${Number(request.quantity_requested).toLocaleString()} ${unit}</td>
+      <td>${Number(request.quantity_issued).toLocaleString()} ${unit}</td>
+      <td>${status}</td>
+      <td>${remaining > 0 ? `<button class="btn btn-secondary" data-release-request="${escapeAttr(request.id)}" type="button" ${dbOnline ? '' : 'disabled'}>Record Release</button>` : '—'}</td>
+    </tr>`;
+  }).join('') : '<tr><td class="empty" colspan="7">No matching supply requests.</td></tr>';
+}
+
+async function loadSupplyRequests() {
+  if (!inventoryAdminId) return;
+  const version = accessVersion;
+  try {
+    const rows = await M.read('pgenro_supply_requests');
+    if (version !== accessVersion) return;
+    supplyRequests = rows.sort((a, b) => Number(a.request_number) - Number(b.request_number));
+    renderSupplyRequests();
+  } catch (error) {
+    if (version !== accessVersion) return;
+    supplyRequests = [];
+    $('supplyQueueBody').innerHTML = '<tr><td class="empty" colspan="7">Supply requests could not be loaded. Try Refresh.</td></tr>';
+    toast(error.message || 'Supply requests could not be loaded.', 'error');
+  }
+}
+
+function updateSupplyReleaseStock() {
+  const item = inventory.find(row => String(row.id) === $('supplyReleaseItem').value);
+  const quantity = $('supplyReleaseQuantity');
+  quantity.disabled = !item;
+  $('submitSupplyRelease').disabled = !item || releaseSaving;
+  if (item && releaseRequest) {
+    quantity.max = Math.min(Number(item.quantity), remainingSupply(releaseRequest));
+    $('supplyReleaseStock').textContent = `Available stock: ${Number(item.quantity).toLocaleString()} ${item.unit}`;
+  } else {
+    quantity.removeAttribute('max');
+    $('supplyReleaseStock').textContent = 'Select the inventory item that was handed over.';
+  }
+}
+
+function openSupplyRelease(requestId) {
+  if (!requireLiveDatabase()) return;
+  const request = supplyRequests.find(row => String(row.id) === requestId);
+  if (!request || remainingSupply(request) <= 0) return;
+  const matching = inventory.filter(row =>
+    String(row.unit).trim().toUpperCase() === request.unit && Number(row.quantity) > 0
+  );
+  if (!matching.length) return toast(`No available inventory item uses ${request.unit}.`, 'warning');
+
+  releaseRequest = request;
+  $('supplyReleaseForm').reset();
+  $('supplyReleaseItem').replaceChildren(new Option('Select inventory item', ''));
+  for (const item of matching) {
+    $('supplyReleaseItem').add(new Option(`${item.item_name} (${item.control_no})`, item.id));
+  }
+  $('supplyReleaseSummary').textContent = `SRQ-${request.request_number} · ${request.supply_name} · ${request.division} · ${remainingSupply(request).toLocaleString()} ${request.unit} remaining`;
+  $('supplyReleaseError').textContent = '';
+  updateSupplyReleaseStock();
+  openModal('supplyReleaseModal');
+}
+
+async function saveSupplyRelease(event) {
+  event.preventDefault();
+  if (releaseSaving || !releaseRequest || !event.currentTarget.reportValidity() || !requireLiveDatabase()) return;
+
+  const request = releaseRequest;
+  const version = accessVersion;
+  const modal = $('supplyReleaseModal');
+  const submit = $('submitSupplyRelease');
+  releaseSaving = true;
+  modal.dataset.busy = 'true';
+  submit.disabled = true;
+  $('supplyReleaseError').textContent = '';
+
+  try {
+    const { error } = await supabase.rpc('pgenro_release_supply_request', {
+      p_request_id: request.id,
+      p_item_id: $('supplyReleaseItem').value,
+      p_quantity: Number($('supplyReleaseQuantity').value),
+      p_expected_issued: Number(request.quantity_issued)
+    });
+    if (version !== accessVersion) return;
+    if (error) throw error;
+
+    modal.dataset.busy = 'false';
+    closeModal('supplyReleaseModal');
+    releaseRequest = null;
+    await Promise.all([loadInventory(), loadSupplyRequests()]);
+    await loadMovements();
+    toast('Supply release recorded in the stock movement history.');
+  } catch (error) {
+    if (version === accessVersion) {
+      $('supplyReleaseError').textContent = error.message || 'Could not confirm the release. Refresh before trying again.';
+    }
+  } finally {
+    modal.dataset.busy = 'false';
+    releaseSaving = false;
+    submit.disabled = false;
+  }
 }
 
 function statusOf(item) {
@@ -508,16 +647,16 @@ async function saveItem(e) {
     return toast("Please fill in all mandatory fields.", "error");
   }
 
-  if (![payload.quantity,payload.threshold].every(n=>Number.isInteger(n)&&n>=0)){toast('Quantity and threshold must be non-negative whole numbers.','error');return;}
-  if(inventory.some(i=>String(i.id)!==String(editingId||'')&&String(i.control_no||'').trim().toLowerCase()===payload.control_no.toLowerCase())){toast('Control number already exists.','warning');return;}
   // Editing specifications must never overwrite a newer stock balance or bypass
   // the transactional movement RPC and its audit ledger.
   if (editingId) delete payload.quantity;
+  if (![payload.quantity ?? 0,payload.threshold].every(n=>Number.isInteger(n)&&n>=0)){toast('Quantity and threshold must be non-negative whole numbers.','error');return;}
+  if(inventory.some(i=>String(i.id)!==String(editingId||'')&&String(i.control_no||'').trim().toLowerCase()===payload.control_no.toLowerCase())){toast('Control number already exists.','warning');return;}
   if (!requireLiveDatabase()) return;
   itemSaving=true;$('itemModal').dataset.busy='true';
   $("saveItemBtn").disabled = true;
   try {
-    const id=editingId;const saved=await M.write('inventory',payload,id);inventory=id?inventory.map(i=>String(i.id)===String(id)?saved:i):[saved,...inventory];saveToLocalStorage();M.observeRecords('inventory',inventory);render();$('itemModal').dataset.busy='false';closeModal('itemModal');M.audit(id?'EDIT_RECORD':'ADD_RECORD',`Inventory ${payload.control_no}`);toast(id?'Item updated.':'New item registered.');
+    const id=editingId;const saved=await M.write('inventory',payload,id);inventory=id?inventory.map(i=>String(i.id)===String(id)?saved:i):[saved,...inventory];M.observeRecords('inventory',inventory);render();$('itemModal').dataset.busy='false';closeModal('itemModal');M.audit(id?'EDIT_RECORD':'ADD_RECORD',`Inventory ${payload.control_no}`);toast(id?'Item updated.':'New item registered.');
   } catch (error) {
     toast(error?.message || "Could not save this inventory item.", "error");
   } finally {
@@ -531,7 +670,7 @@ async function deleteItem(id) {
   if (!item || !requireLiveDatabase() || !confirm(`Permanently delete "${item.item_name}"?`)) return;
 
   try {
-    await M.remove("inventory",[id]);inventory=inventory.filter(i=>String(i.id)!==String(id));saveToLocalStorage();render();M.audit("DELETE_RECORD",`Inventory ${item.control_no}`);
+    await M.remove("inventory",[id]);inventory=inventory.filter(i=>String(i.id)!==String(id));render();M.audit("DELETE_RECORD",`Inventory ${item.control_no}`);
     const refreshed = await loadInventory();
     await loadMovements();
     if (refreshed) toast("Inventory record deleted.", "success");
@@ -764,7 +903,7 @@ function printReport() {
       <div class="footer">
         <div>
           <p>Prepared by:</p>
-          <div class="sig">${escapeHTML($("adminName").textContent.trim())}<br><small>Inventory Custodian</small></div>
+          <div class="sig">${escapeHTML($("adminName").textContent.trim())}<br><small>Administrator</small></div>
         </div>
         <div>
           <p>Verified by:</p>

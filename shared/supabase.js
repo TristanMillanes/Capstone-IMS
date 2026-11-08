@@ -231,7 +231,7 @@
     return profile;
   }
 
-  async function requireAdmin() {
+  async function requireAdmin(module = null) {
     const profile = await requireApprovedUser();
 
     if (!isAdminProfile(profile)) {
@@ -239,6 +239,12 @@
         "PGENRO_ADMIN_REQUIRED",
         "Administrator permission is required."
       );
+    }
+
+    if (module) {
+      const { data, error } = await requireClient().rpc('pgenro_has_admin_module', { p_module: module });
+      if (error) throw error;
+      if (data !== true) throw accessError('PGENRO_ADMIN_MODULE_REQUIRED', 'Your account does not have access to this Admin module.');
     }
 
     return profile;
@@ -446,6 +452,9 @@
     getCurrentProfile,
     requireApprovedUser,
     requireAdmin,
+    adminCan,
+    adminCanOpen,
+    refreshWorkspaceAccess: applyRouteGuard,
     redirectToWorkspace,
     invokeAdmin,
     testConnection,
@@ -839,6 +848,115 @@
       ?.remove();
   }
 
+  let authorizationWatch;
+  let verifiedUserModules;
+  let verifiedAdminModules;
+  let guardVersion = 0;
+
+  function adminCan(module) {
+    return verifiedAdminModules?.modules.includes(module) === true;
+  }
+
+  function adminCanOpen(href) {
+    const module = window.PGENRO_USER_MODULES?.fromUrl(href, 'Admin');
+    return !module || adminCan(module);
+  }
+
+  function filterAdminLinks() {
+    const access = window.PGENRO_USER_MODULES;
+    document.querySelectorAll('a[href], [data-admin-module]').forEach(element => {
+      const module = element.dataset.adminModule || access.fromUrl(element.href, 'Admin');
+      (element.closest('.sidebar-nav li') || element)
+        .toggleAttribute('data-admin-module-hidden', Boolean(module) && !adminCan(module));
+    });
+  }
+
+  function applyAdminModuleAccess(profile, modules) {
+    const access = window.PGENRO_USER_MODULES;
+    if (!access || !Array.isArray(modules)) {
+      throw accessError('PGENRO_MODULE_SETUP_REQUIRED', 'Your Admin module access could not be verified. Contact your administrator or retry.');
+    }
+    const module = access.fromUrl(location.href, 'Admin');
+    if (module && !modules.includes(module)) {
+      delete document.documentElement.dataset.pgenroAdminModules;
+      const dashboard = new URL(adminWorkspaceUrl());
+      dashboard.searchParams.set('access', module);
+      location.replace(dashboard.href);
+      return false;
+    }
+    if (verifiedAdminModules && (verifiedAdminModules.userId !== profile.user_id ||
+      !access.sameGrants(verifiedAdminModules.modules, modules))) {
+      delete document.documentElement.dataset.pgenroAdminModules;
+      location.reload();
+      return false;
+    }
+
+    if (!verifiedAdminModules) {
+      verifiedAdminModules = { userId: profile.user_id, modules };
+      filterAdminLinks();
+      const links = 'a[href], [data-admin-module]';
+      const observer = new MutationObserver(records => {
+        if (records.some(record => record.type === 'attributes' || [...record.addedNodes].some(node =>
+          node.nodeType === 1 && (node.matches(links) || node.querySelector(links))))) filterAdminLinks();
+      });
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['href'] });
+      window.addEventListener('pagehide', event => { if (!event.persisted) observer.disconnect(); });
+
+      const notice = document.getElementById('adminModuleAccessNotice');
+      if (notice) {
+        const url = new URL(location.href);
+        const denied = url.searchParams.get('access');
+        if (denied === 'inventory' && !adminCan('inventory')) {
+          notice.textContent = 'Inventory access needs the updated module access database patch.';
+        } else if (Object.hasOwn(access.adminRoutes, denied) && !modules.includes(denied)) {
+          notice.textContent = `Your account does not have access to ${access.adminRoutes[denied].label}. Contact an Admin with User Management access.`;
+        } else if (!modules.length) {
+          notice.textContent = 'Your account is active. An Admin with User Management access can assign the modules you need.';
+        }
+        notice.hidden = !notice.textContent;
+        if (url.searchParams.has('access')) {
+          url.searchParams.delete('access');
+          history.replaceState(history.state, '', url);
+        }
+      }
+      document.documentElement.dataset.pgenroAdminModules = 'ready';
+      document.dispatchEvent(new CustomEvent('pgenro:admin-modules-ready', { detail: modules }));
+    }
+    document.documentElement.dataset.pgenroAdminModules = 'ready';
+    return true;
+  }
+
+  function applyUserModuleAccess(profile) {
+    const access = window.PGENRO_USER_MODULES;
+    const modules = profile.user_modules;
+    if (!access || !Array.isArray(modules)) {
+      throw accessError('PGENRO_MODULE_SETUP_REQUIRED', 'Your module access could not be verified. Contact your administrator or retry.');
+    }
+
+    const pageModule = access.fromUrl(location.href);
+    if (pageModule && !modules.includes(pageModule)) {
+      delete document.documentElement.dataset.pgenroUserModules;
+      const dashboard = new URL(userWorkspaceUrl());
+      dashboard.searchParams.set('access', pageModule);
+      location.replace(dashboard.href);
+      return false;
+    }
+
+    if (verifiedUserModules && (verifiedUserModules.userId !== profile.user_id ||
+      !access.sameGrants(verifiedUserModules.modules, modules))) {
+      delete document.documentElement.dataset.pgenroUserModules;
+      location.reload();
+      return false;
+    }
+
+    if (!verifiedUserModules) {
+      verifiedUserModules = { userId: profile.user_id, modules };
+      document.dispatchEvent(new CustomEvent('pgenro:user-modules-ready', { detail: modules }));
+    }
+    document.documentElement.dataset.pgenroUserModules = 'ready';
+    return true;
+  }
+
   async function applyRouteGuard() {
     const mode =
       document.body?.dataset?.requiresAuth;
@@ -846,6 +964,8 @@
     if (!mode) {
       return;
     }
+
+    const version = ++guardVersion;
 
     if (!client) {
       console.error(
@@ -865,6 +985,8 @@
           ? await requireAdmin()
           : await requireApprovedUser();
 
+      if (version !== guardVersion) return;
+
       const profileIsAdmin =
         isAdminProfile(profile);
 
@@ -880,12 +1002,22 @@
         return;
       }
 
+      if (mode === 'user' && !applyUserModuleAccess(profile)) return;
+      if (mode === 'admin') {
+        const { data, error } = await client.rpc('pgenro_admin_workspace_access');
+        if (version !== guardVersion) return;
+        if (error?.code === '42501') throw accessError('PGENRO_ACCOUNT_INACTIVE', error.message);
+        if (error) throw error;
+        if (!applyAdminModuleAccess(profile, data)) return;
+      }
       clearAuthorizationWarning();
       await syncBrowserProfile(profile);
 
       const userId = profile.user_id;
+      if (version !== guardVersion || authorizationWatch?.userId === userId) return;
+      if (authorizationWatch) client.removeChannel(authorizationWatch.channel);
 
-      client
+      const channel = client
         .channel(
           `authz-watch-${userId}-${crypto.randomUUID()}`
         )
@@ -898,6 +1030,10 @@
             filter: `user_id=eq.${userId}`
           },
           async (payload) => {
+            if (mode === 'user' || mode === 'admin') {
+              await applyRouteGuard();
+              return;
+            }
             const next = payload.new || {};
 
             const nextActive =
@@ -908,32 +1044,22 @@
                   .toLowerCase()
               );
 
-            const nextAdmin =
-              isAdminProfile(next);
-
             if (!nextActive) {
               await endSessionAndRedirect();
               return;
             }
 
-            if (
-              mode === "admin" &&
-              !nextAdmin
-            ) {
-              await syncBrowserProfile(next);
-
-              window.location.replace(
-                userWorkspaceUrl()
-              );
-
-              return;
-            }
-
             await syncBrowserProfile(next);
           }
-        )
-        .subscribe();
+        );
+      authorizationWatch = { userId, channel };
+      channel.subscribe(status => {
+        if ((mode === 'user' || mode === 'admin') && status === 'SUBSCRIBED') applyRouteGuard();
+      });
     } catch (error) {
+      if (version !== guardVersion) return;
+      if (mode === 'user') delete document.documentElement.dataset.pgenroUserModules;
+      if (mode === 'admin') delete document.documentElement.dataset.pgenroAdminModules;
       if (
         error?.code ===
         "PGENRO_ADMIN_REQUIRED"
@@ -970,7 +1096,8 @@
       );
 
       showAuthorizationWarning(
-        "Unable to verify account access. Reconnect and refresh this page."
+        error?.code === 'PGENRO_MODULE_SETUP_REQUIRED' ? error.message
+          : "Unable to verify account access. Reconnect and refresh this page."
       );
     }
   }
@@ -1043,6 +1170,16 @@
     );
   } else {
     queueMicrotask(applyRouteGuard);
+  }
+
+  if (['user','admin'].includes(document.body?.dataset.requiresAuth)) {
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden) applyRouteGuard();
+    });
+    window.addEventListener('focus', applyRouteGuard);
+    window.addEventListener('pageshow', event => {
+      if (event.persisted) applyRouteGuard();
+    });
   }
 
   function isLoginPage() {

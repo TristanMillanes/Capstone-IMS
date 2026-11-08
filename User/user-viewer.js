@@ -81,7 +81,7 @@
     saved.addEventListener('click', () => { state.savedOnly = !state.savedOnly; saved.setAttribute('aria-pressed',String(state.savedOnly)); state.page = 1; state.render(); });
     tools.append(saved);
     if (['communication','officememo','travelOR','service','ics'].includes(module)) {
-      const attached = button('With files'); attached.prepend(icon('paperclip')); attached.setAttribute('aria-pressed','false');
+      const attached = button(module==='service'?'With attachments':'With files'); attached.prepend(icon('paperclip')); attached.setAttribute('aria-pressed','false');
       attached.addEventListener('click', () => { state.attachedOnly = !state.attachedOnly; attached.setAttribute('aria-pressed',String(state.attachedOnly)); state.page=1; state.render(); });
       tools.append(attached); state.attachedButton = attached;
     }
@@ -148,7 +148,7 @@
       let cell=row.querySelector('.action-column');
       if(!cell){cell=el('td','action-column');row.append(cell);}
       const recordId=id(record);row.dataset.viewerRecord=recordId;
-      const old=cell.querySelector('button:not(.viewer-button)');
+      const old=cell.querySelector('button:not(.viewer-button):not([data-service-file])');
       if(old){
         old.classList.add('viewer-legacy-details');
         old.replaceChildren(icon(module==='employee'?'user-round':'eye'),document.createTextNode(module==='employee'?'Profile':'Details'));
@@ -158,8 +158,9 @@
       cell.querySelectorAll('.viewer-button,.readonly-label').forEach(node=>node.remove());
       const attachment=file(record);
       if(attachment){
-        const view=button('View file','viewer-file-button');view.prepend(icon('file-text'));
-        view.setAttribute('aria-label',`View file for ${reference(record)}`);
+        const serviceAttachment=module==='service'&&cell.querySelector('[data-service-file]');
+        const view=button(serviceAttachment?'Attachment':'View file','viewer-file-button');view.prepend(icon(serviceAttachment?'paperclip':'file-text'));
+        view.setAttribute('aria-label',`View ${serviceAttachment?'attachment':'file'} for ${reference(record)}`);
         view.addEventListener('click',event=>{event.stopPropagation();window.PGENRO_Documents.open({...attachment,title:title(record),reference:reference(record)});});cell.prepend(view);
       }else if(['communication','officememo','travelOR'].includes(module))cell.prepend(el('span','viewer-no-file','No file'));
       if(['inventory','travelOR','officememo'].includes(module)){

@@ -11,18 +11,20 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <script src="vendor/lucide/lucide.min.js"></script>
 <link href="communication.css?v=20261102-viewer" rel="stylesheet"/>
-<link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-workspace.css?v=20261107-module-access">
 <link rel="stylesheet" href="communication-details.css?v=20261102-viewer">
 <link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
 <script defer src="user-refresh.js?v=20261102-viewer"></script>
-<script defer src="user-workspace.js?v=20261107-attendance-only"></script>
-<link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
-<link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="user-workspace.js?v=20261108-inventory-roles"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261107-color-motion">
+<link rel="stylesheet" href="user-viewer.css?v=20261107-color-motion">
 <script defer src="user-viewer.js?v=20261102-viewer"></script>
 <script defer src="user-documents.js?v=20261102-viewer"></script>
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 </head>
 <body class="pgenro-user depth-workspace ui-unified user-refresh" data-css-scope="user-communication" data-page-data-owner="module" data-requires-auth="user">
+<p class="user-module-loading" role="status">Checking your access…</p>
 
 <div aria-hidden="true" class="overlay" id="overlay"></div>
 <a class="user-skip-link" href="#mainContent">Skip to main content</a>
@@ -48,6 +50,7 @@
 <li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
 <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
 <li><a href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
+<li><a href="stock.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
 <li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
 
 <li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
@@ -144,7 +147,7 @@
 <div class="tools">
 <label class="search-field" for="searchInput">
 <i data-lucide="search"></i>
-<input autocomplete="off" id="searchInput" placeholder="Search control no., subject, office…" type="search"/>
+<input autocomplete="off" id="searchInput" aria-label="Search communications" placeholder="Search control no., subject, office…" type="search"/>
 </label>
 <select aria-label="Filter by status" id="statusFilter">
 <option value="All">All statuses</option>
@@ -156,7 +159,7 @@
 </select>
 </div>
 </div>
-<div class="table-wrapper">
+<div class="table-wrapper" tabindex="0" role="region" aria-label="Communication records">
 <table>
 <thead>
 <tr>
@@ -266,7 +269,7 @@
 </button>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261107-attendance-only"></script>
-<script defer="" src="communication.js?v=20261107-attendance-only"></script>
+<script defer="" src="../shared/supabase.js?v=20261108-inventory-roles"></script>
+<script defer="" src="communication.js?v=20261108-user-notifications"></script>
 </body>
 </html>

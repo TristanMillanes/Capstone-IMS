@@ -698,3 +698,20 @@ body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .metric-info>h3 
 body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .user-sidebar-close {display:none;}
 @media(max-width:900px){body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .sidebar-brand{position:relative;padding-right:45px;}body.pgenro-user.depth-workspace.ui-unified[data-requires-auth] .user-sidebar-close{position:absolute;right:14px;top:25px;display:grid;place-items:center;width:28px;height:28px;border:1px solid #3f5a47;border-radius:8px;color:#b8cec0;background:#243d2d;font-size:23px;}}
 }
+
+/* Wait for the signed-in user's module permissions before showing the workspace. */
+html:not([data-pgenro-user-modules="ready"]) body[data-requires-auth="user"] > :not(.user-module-loading, #pgenroAuthWarning),
+body[data-requires-auth="user"] [data-module-hidden],
+html[data-pgenro-user-modules="ready"] .user-module-loading,
+html[data-pgenro-auth-state="warning"] .user-module-loading,
+.user-module-notice[hidden] { display: none !important; }
+
+.user-module-loading { margin: 1.5rem; }
+.user-module-notice {
+  margin: 0 0 1rem;
+  padding: .75rem 1rem;
+  border: 1px solid var(--depth-border, #cedbd6);
+  border-radius: .65rem;
+  background: var(--bg-surface, transparent);
+  color: inherit;
+}

@@ -33,10 +33,13 @@
 <!-- External Stylesheets -->
 
 <link href="admincommunication.css?v=20261027-emerald-v6" rel="stylesheet">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 </head>
 
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Communications" data-design="emerald-v6">
+<p class="admin-module-loading" role="status">Checking your access…</p>
+
 
 
 
@@ -766,16 +769,18 @@
 <!-- Scripts -->
 
 <!-- Start the local interface before external database dependencies. -->
-<script defer src="admincommunication.js?v=20261103-frontend-fix"></script>
+<script defer src="admincommunication.js?v=20261108-admin-grants"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
-<script id="communicationSupabaseGateway" type="application/json" data-src="../shared/supabase.js?v=20261104-employee-account-1" data-load-state="pending"></script>
+<script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script id="communicationSupabaseGateway" type="application/json" data-src="../shared/supabase.js?v=20261108-inventory-roles" data-load-state="pending"></script>
 <script>
 (() => {
   const marker = document.getElementById('communicationSupabaseGateway');
   let started = false;
   function finish(state, eventName) {
     marker.dataset.loadState = state;
+    if (state === 'error') document.querySelector('.admin-module-loading').textContent = 'Unable to verify access. Check your connection and reload.';
     marker.dispatchEvent(new Event(eventName));
     window.dispatchEvent(new Event('pgenro:backend-loaded'));
   }

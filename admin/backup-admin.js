@@ -229,20 +229,21 @@
 (() => {
   'use strict';
   const M=window.PGENRO_Module,$=id=>document.getElementById(id);
-  const groups=[
-    {name:'Communications',keys:['communicationRecords','pgenro_communications']},
-    {name:'Travel orders',keys:['pgenro_admin_travel_orders_live_cache_v2','travelOrders']},
-    {name:'Office memos',keys:['pgenro_office_memos','officeMemos']},
-    {name:'Employee directory',keys:['pgenro_admin_employees','employees']},
-    {name:'Supplies inventory',keys:['pgenro_admin_inventory_live_cache_v2','inventoryRecords']},
-    {name:'Visitors',keys:['pgenro_visitors','visitorRecords']},
-    {name:'Service requests',keys:['pgenro_admin_service_requests_live_cache','pgenro_service_requests','serviceRequests']},
-    {name:'ICS property slips',keys:['pgenro_ics_records','icsRecords']},
-    {name:'Accounts and requests',keys:['pgenro_users','users','pgenro_access_requests','accessRequests']},
-    {name:'Audit activity',keys:['pgenro_audit_log_fallback']},
+  const backupGroups=[
+    {name:'Communications',module:'communications',keys:['communicationRecords','pgenro_communications']},
+    {name:'Travel orders',module:'travel_orders',keys:['pgenro_admin_travel_orders_live_cache_v2','travelOrders']},
+    {name:'Office memos',module:'office_memos',keys:['pgenro_office_memos','officeMemos']},
+    {name:'Employee directory',module:'employees',keys:['pgenro_admin_employees','employees']},
+    {name:'Visitors',module:'visitors',keys:['pgenro_visitors','visitorRecords']},
+    {name:'Service requests',module:'service_requests',keys:['pgenro_admin_service_requests_live_cache','pgenro_service_requests','serviceRequests']},
+    {name:'ICS property slips',module:'ics_records',keys:['pgenro_ics_records','icsRecords']},
+    {name:'User accounts',module:'user_management',keys:['pgenro_users','users']},
+    {name:'Account requests',module:'account_requests',keys:['pgenro_access_requests','accessRequests']},
+    {name:'Audit activity',module:'audit_trail',keys:['pgenro_audit_log_fallback']},
     {name:'Workspace preferences',keys:['pgenro_admin_preferences','pgenro_admin_sidebar','pgenro_admin_theme','pgenro_user_sidebar','pgenro_user_theme']}
   ];
-  const keys=new Set(groups.flatMap(group=>group.keys)),statusKey='pgenro_backup_last_export';
+  const statusKey='pgenro_backup_last_export';
+  let groups=[],keys=new Set();
   let pending=null,busy=false;
   const bytes=text=>new Blob([text]).size;
   function size(value){return value<1024?`${value} B`:value<1024*1024?`${(value/1024).toFixed(1)} KB`:`${(value/1024/1024).toFixed(1)} MB`;}
@@ -326,7 +327,9 @@
     for(const id of ['downloadLocalBackupBtn','restoreBackupInput'])$(id).disabled=true;
     try {
       if(!window.PGENRO_API?.requireAdmin)throw new Error('Reload to connect your administrator session.');
-      await window.PGENRO_API.requireAdmin();
+      const profile = await window.PGENRO_API.requireAdmin('backups');
+      groups = backupGroups.filter(group => !group.module || profile.admin_modules.includes(group.module));
+      keys = new Set(groups.flatMap(group => group.keys));
     }catch(err){error('backupError',err.message||'Administrator access is required.');return;}
     $('restoreBackupInput').disabled=false;
     render();$('refreshBackupBtn').addEventListener('click',render);$('downloadLocalBackupBtn').addEventListener('click',exportBackup);$('restoreBackupInput').addEventListener('change',choose);

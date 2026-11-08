@@ -508,6 +508,17 @@
     { key: "ics", label: "ICS Property Slips", table: "ics_records", href: "ics-admin.html", color: "#709fa8" }
   ];
 
+  const communicationCategories = [
+    { key: "incoming", label: "Incoming", color: "#059669" },
+    { key: "outgoing", label: "Outgoing", color: "#35a7a0" },
+    { key: "internal", label: "Internal", color: "#8b7fc6" },
+    { key: "unclassified", label: "Unclassified", color: "#d5a13c" }
+  ];
+  const {
+    chartTheme, chartOptions, chartPointerCoordinates, doughnutTotal, lineArea,
+    hideChartTooltip, renderChartLegend, assertDistributionColors, distributionShare
+  } = window.PGENRO_DashboardCharts;
+
   const moduleTableKeys = {
     communications: "communications",
     office_memos: "memos",
@@ -520,6 +531,11 @@
     users: "users",
     access_requests: "requests"
   };
+
+  const tableScopes = { users: 'user_management', access_requests: 'account_requests' };
+  const canReadTable = table => window.PGENRO_API.adminCan(tableScopes[table] || table);
+  const tableForSource = Object.fromEntries(Object.entries(moduleTableKeys).map(([table, key]) => [key, table]));
+  const allowedActivity = () => activityModules.filter(module => canReadTable(module.table));
 
   const analyticsSources = Object.fromEntries(
     Object.values(moduleTableKeys).map((k) => [k, { rows: null, source: "unavailable" }])
@@ -657,7 +673,7 @@
     let earliest = today;
     const dated = {};
 
-    const breakdown = activityModules.map((m) => {
+    const breakdown = allowedActivity().map((m) => {
       const src = sources[m.key] || { rows: null, source: "unavailable" };
       const list = (src.rows || []).map((row) => ({ row, day: recordDay(row, m.key) }));
       dated[m.key] = list;
@@ -792,164 +808,6 @@
   // Each canvas owns one chart and one dedicated, bounded resize container.
   const chartInstances = new Map();
   const chartFailures = new Set();
-  const chartTheme = () => document.documentElement.dataset.theme === "dark"
-    ? { text: "#a5c1b1", grid: "#25483c", surface: "#102a23", total: "#ecf8f0", tip: "#091c17" }
-    : { text: "#627e70", grid: "#dfeae4", surface: "#ffffff", total: "#163b2e", tip: "#065f46" };
-
-  let chartTooltip = null, chartTooltipOwner = null, chartTooltipContent = "", touchSelectionChart = null;
-  function hideChartTooltip() {
-    if (chartTooltip) chartTooltip.hidden = true;
-    chartTooltipOwner = null; touchSelectionChart = null;
-  }
-
-  // A single viewport-level tooltip avoids clipping inside the personnel scroller.
-  // Use the canvas's displayed size, not its retina bitmap or page scroll offsets.
-  function renderChartTooltip({ chart, tooltip }) {
-    if (!tooltip.opacity || !tooltip.dataPoints?.length) {
-      if (chartTooltipOwner === chart) hideChartTooltip();
-      return;
-    }
-    if (!chartTooltip) {
-      chartTooltip = document.createElement("div");
-      chartTooltip.className = "analytics-pointer-tooltip";
-      chartTooltip.id = "analyticsPointerTooltip";
-      chartTooltip.setAttribute("role", "tooltip");
-      document.body.appendChild(chartTooltip);
-    }
-    const rows = tooltip.dataPoints.map((point, index) => {
-      const parsed = point.parsed;
-      const value = chart.config.type === "doughnut" ? parsed
-        : chart.options.indexAxis === "y" ? parsed.x : parsed.y;
-      const colors = tooltip.labelColors[index];
-      const color = chart.config.type === "line" ? colors?.borderColor : colors?.backgroundColor;
-      return { label: point.dataset.label || point.label, value: Number(value || 0).toLocaleString("en-PH"), color };
-    });
-    const title = (tooltip.title || []).join(" ");
-    const content = JSON.stringify([chart.canvas.id, title, rows]);
-    if (content !== chartTooltipContent) {
-      const heading = document.createElement("strong");
-      heading.className = "analytics-tooltip-title"; heading.textContent = title;
-      const items = rows.map(row => {
-        const item = document.createElement("div"), swatch = document.createElement("i");
-        const label = document.createElement("span"), count = document.createElement("strong");
-        item.className = "analytics-tooltip-row"; swatch.setAttribute("aria-hidden", "true");
-        swatch.style.backgroundColor = typeof row.color === "string" ? row.color : "#278560";
-        label.textContent = row.label; count.textContent = row.value;
-        item.append(swatch, label, count); return item;
-      });
-      chartTooltip.replaceChildren(heading, ...items); chartTooltipContent = content;
-    }
-    chartTooltipOwner = chart; chartTooltip.hidden = false;
-    const viewport = window.visualViewport;
-    const viewportWidth = viewport?.width || innerWidth, viewportHeight = viewport?.height || innerHeight;
-    const currentBox = chartTooltip.getBoundingClientRect(), style = getComputedStyle(chartTooltip);
-    const scaleX = currentBox.width / parseFloat(style.width) || 1;
-    const scaleY = currentBox.height / parseFloat(style.height) || 1;
-    chartTooltip.style.maxWidth = `${Math.max(1, Math.min(320, viewportWidth - 24)) / scaleX}px`;
-    chartTooltip.style.maxHeight = `${Math.max(1, viewportHeight - 16) / scaleY}px`;
-    const rect = chart.canvas.getBoundingClientRect();
-    const anchorX = rect.left + tooltip.caretX * rect.width / chart.width;
-    const anchorY = rect.top + tooltip.caretY * rect.height / chart.height;
-    const leftEdge = (viewport?.offsetLeft || 0) + 8, topEdge = (viewport?.offsetTop || 0) + 8;
-    const rightEdge = leftEdge + viewportWidth - 16;
-    const bottomEdge = topEdge + viewportHeight - 16;
-    const box = chartTooltip.getBoundingClientRect(), width = box.width, height = box.height;
-    const left = anchorX + 12 + width <= rightEdge ? anchorX + 12 : anchorX - width - 12;
-    const top = anchorY + 12 + height <= bottomEdge ? anchorY + 12 : anchorY - height - 12;
-    chartTooltip.style.left = `${Math.max(leftEdge, Math.min(left, rightEdge - width)) / scaleX}px`;
-    chartTooltip.style.top = `${Math.max(topEdge, Math.min(top, bottomEdge - height)) / scaleY}px`;
-  }
-  // A scroll can move a canvas without a mouse event. Hide the old information
-  // immediately; the next pointer/touch event computes fresh coordinates.
-  document.addEventListener("scroll", hideChartTooltip, { capture: true, passive: true });
-  window.addEventListener("resize", hideChartTooltip, { passive: true });
-  window.visualViewport?.addEventListener("resize", hideChartTooltip, { passive: true });
-  window.visualViewport?.addEventListener("scroll", hideChartTooltip, { passive: true });
-  document.addEventListener("pointermove", event => {
-    if (event.pointerType === "mouse") {
-      touchSelectionChart = null;
-      if (chartTooltipOwner && event.target !== chartTooltipOwner.canvas) hideChartTooltip();
-    }
-  }, { passive: true });
-  document.addEventListener("pointerdown", event => {
-    if (chartTooltipOwner && event.target !== chartTooltipOwner.canvas) hideChartTooltip();
-  }, { passive: true });
-  document.addEventListener("keydown", event => { if (event.key === "Escape") hideChartTooltip(); });
-
-  const chartPointerCoordinates = {
-    id: "pgenroPointerCoordinates",
-    beforeEvent(chart, args) {
-      const { event } = args;
-      // Touch taps can emit a synthetic mouseout immediately afterwards. Keep
-      // their selection until another tap, a real mouse move, scroll or Escape.
-      if (event.type === "mouseout") return touchSelectionChart === chart ? false : undefined;
-      const native = event.native, pointer = native?.touches?.[0] || native?.changedTouches?.[0] || native;
-      if (native?.type?.startsWith("touch")) touchSelectionChart = chart;
-      if (!Number.isFinite(pointer?.clientX) || !Number.isFinite(pointer?.clientY)) return;
-      const rect = chart.canvas.getBoundingClientRect();
-      if (!rect.width || !rect.height) return;
-      // offsetX/offsetY can use different units under CSS zoom. Normalize both
-      // hit testing and tooltip anchoring from the same visible canvas rectangle.
-      event.x = (pointer.clientX - rect.left) * chart.width / rect.width;
-      event.y = (pointer.clientY - rect.top) * chart.height / rect.height;
-      args.inChartArea = chart.isPointInArea(event);
-    }
-  };
-
-  const doughnutTotal = {
-    id: "pgenroDoughnutTotal",
-    afterDraw(chart) {
-      if (chart.config.type !== "doughnut" || !chart.chartArea) return;
-      const arc = chart.getDatasetMeta(0).data[0];
-      if (!arc || arc.innerRadius < 28) return;
-      const total = chart.data.datasets[0].data.reduce((sum, n, i) =>
-        sum + (chart.getDataVisibility(i) ? Number(n) || 0 : 0), 0);
-      const ctx = chart.ctx, theme = chartTheme();
-      ctx.save(); ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillStyle = theme.total;
-      ctx.font = `750 ${Math.min(31, arc.innerRadius * .49)}px Inter, system-ui, sans-serif`;
-      ctx.fillText(new Intl.NumberFormat("en-PH", { notation: total >= 10000 ? "compact" : "standard" }).format(total), arc.x, arc.y - 6);
-      ctx.fillStyle = theme.text; ctx.font = "600 9px Inter, system-ui, sans-serif";
-      const filtered = chart.data.labels.some((_, index) => !chart.getDataVisibility(index));
-      ctx.fillText(filtered ? "VISIBLE RECORDS" : "TOTAL RECORDS", arc.x, arc.y + 17); ctx.restore();
-    }
-  };
-
-  function chartOptions({ horizontal = false, doughnut = false, legend = false } = {}) {
-    const theme = chartTheme();
-    // Fresh nested options for every instance prevent Chart.js mutation leaking across charts.
-    const result = {
-      responsive: true, maintainAspectRatio: false, resizeDelay: 0,
-      animation: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? false : { duration: 220 },
-      font: { family: "Inter, system-ui, sans-serif" },
-      interaction: { mode: doughnut ? "nearest" : "index", intersect: doughnut, axis: doughnut ? "xy" : horizontal ? "y" : "x" },
-      layout: { padding: { top: 8, bottom: 2, left: 0, right: 8 } },
-      plugins: {
-        legend: { display: legend, position: "bottom", labels: { color: theme.text, usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7, padding: 13, font: { family: "Inter, system-ui, sans-serif", size: 11 } } },
-        tooltip: { enabled: false, external: renderChartTooltip, position: "pgenroPointer", animation: false, animations: false,
-          backgroundColor: theme.tip, titleColor: "#fff", bodyColor: "#ddefe4", padding: 12, cornerRadius: 10, displayColors: true,
-          callbacks: { label(context) {
-            const value = doughnut ? context.parsed : horizontal ? context.parsed.x : context.parsed.y;
-            return `${context.dataset.label || context.label}: ${Number(value || 0).toLocaleString("en-PH")}`;
-          } }
-        }
-      }
-    };
-    if (doughnut) { result.cutout = "74%"; return result; }
-    result.indexAxis = horizontal ? "y" : "x";
-    const numbers = { beginAtZero: true, suggestedMax: 1, border: { display: false }, grid: { color: theme.grid, drawTicks: false }, ticks: { precision: 0, padding: 8, color: theme.text, font: { size: 11 } } };
-    const labels = { border: { display: false }, grid: { display: false }, ticks: { autoSkip: !horizontal, maxRotation: 0, maxTicksLimit: horizontal ? 24 : 8, padding: 8, color: theme.text, font: { size: 11 } } };
-    result.scales = horizontal ? { x: numbers, y: labels } : { x: labels, y: numbers };
-    return result;
-  }
-
-  function lineArea(context) {
-    const { chart } = context, area = chart.chartArea;
-    if (!area) return "#05966918";
-    const gradient = chart.ctx.createLinearGradient(0, area.top, 0, area.bottom);
-    gradient.addColorStop(0, "#05966936"); gradient.addColorStop(1, "#05966900"); return gradient;
-  }
-
   function chartConfig(id) {
     if (id === "monthlyChart") return {
       type: "line", data: { labels: [], datasets: [
@@ -962,12 +820,8 @@
       plugins: [chartPointerCoordinates]
     };
     const donut = ["categoryChart", "commChart"].includes(id);
-    const labels = id === "categoryChart" ? activityModules.map(m => m.label)
-      : id === "commChart" ? ["Incoming", "Outgoing", "Internal", "Unclassified"]
-      : id === "statusChart" ? ["Completed", "In progress", "Pending", "Archived", "Other"] : [];
-    const colors = id === "categoryChart" ? activityModules.map(m => m.color)
-      : id === "commChart" ? ["#059669", "#35a7a0", "#8b7fc6", "#d5a13c"]
-      : id === "statusChart" ? ["#059669", "#4e88a8", "#d5a13c", "#8fa79c", "#bdcfc5"]
+    const labels = id === "statusChart" ? ["Completed", "In progress", "Pending", "Archived", "Other"] : [];
+    const colors = id === "statusChart" ? ["#059669", "#4e88a8", "#d5a13c", "#8fa79c", "#bdcfc5"]
       : ["#059669", "#35a7a0", "#8b7fc6", "#d5a13c", "#d77988", "#709fa8"];
     return {
       type: donut ? "doughnut" : "bar",
@@ -980,12 +834,6 @@
 
   function initCharts() {
     if (typeof window.Chart !== "function") return;
-    // The default average position lands between line series or at a bar end.
-    // Anchor the information to the actual event, with no animation lag.
-    window.Chart.Tooltip.positioners.pgenroPointer = function(elements, position) {
-      if (!elements.length || !Number.isFinite(position?.x) || !Number.isFinite(position?.y)) return false;
-      return { x: position.x, y: position.y };
-    };
     for (const id of ["monthlyChart", "categoryChart", "statusChart", "personnelChart", "commChart"]) {
       const canvas = $(id);
       if (!canvas || chartInstances.has(id) || chartFailures.has(id)) continue;
@@ -1002,20 +850,26 @@
     }
   }
 
-  function updateDashboardCharts(model) {
+  function updateDashboardCharts(model, distributions) {
     hideChartTooltip();
     initCharts();
     for (const [id, chart] of chartInstances) {
       const horizontal = ["statusChart", "personnelChart"].includes(id);
-      const doughnut = ["categoryChart", "commChart"].includes(id);
+      const categories = distributions[id];
+      const doughnut = Boolean(categories);
       const options = chartOptions({ horizontal, doughnut, legend: id === "monthlyChart" });
       if (id === "monthlyChart") {
         chart.data.labels = model.buckets.map(b => b.label);
         ["documents", "travel", "visitors", "services"].forEach((key, i) => { chart.data.datasets[i].data = model.buckets.map(b => b[key]); });
-      } else if (id === "categoryChart") chart.data.datasets[0].data = model.breakdown.map(m => m.current);
-      else if (id === "statusChart") chart.data.datasets[0].data = Object.values(model.serviceStatuses);
-      else if (id === "commChart") chart.data.datasets[0].data = ["incoming", "outgoing", "internal", "unclassified"].map(key => model.commBreakdown[key]);
-      else {
+      } else if (categories) {
+        const dataset = chart.data.datasets[0];
+        chart.data.labels = categories.map(category => category.label);
+        dataset.data = categories.map(category => category.value ?? 0);
+        dataset.backgroundColor = categories.map(category => category.color);
+        dataset.borderColor = chartTheme().surface;
+      } else if (id === "statusChart") {
+        chart.data.datasets[0].data = Object.values(model.serviceStatuses);
+      } else {
         const divisions = Object.entries(model.divisionCounts).sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
         chart.data.labels = divisions.map(([label]) => label);
         chart.data.datasets[0].data = divisions.map(([, value]) => value);
@@ -1026,41 +880,17 @@
           return text.length > limit ? `${text.slice(0, limit - 1)}…` : text;
         };
       }
-      if (doughnut) chart.data.datasets[0].borderColor = chartTheme().surface;
       chart.options = options;
-      // Realtime bursts and appearance changes must not queue five new animations.
-      chart.update("none");
+      try {
+        chart.update("none");
+        if (categories) assertDistributionColors(chart);
+      } catch (error) {
+        chartInstances.delete(id);
+        chartFailures.add(id);
+        chart.destroy();
+        console.warn(`Chart ${id} uses its accessible fallback:`, error.message);
+      }
     }
-  }
-
-  // HTML legends keep full category names and totals outside the bounded canvas.
-  // Their buttons retain Chart.js's show/hide behavior and work with a keyboard.
-  function renderChartLegend(canvasId) {
-    const legend = $(`${canvasId}Legend`), chart = chartInstances.get(canvasId);
-    if (!legend) return;
-    legend.hidden = !chart || !chart.data.datasets[0].data.some(value => value > 0);
-    if (legend.hidden) { legend.replaceChildren(); return; }
-    const dataset = chart.data.datasets[0];
-    const buttons = chart.data.labels.map((label, index) => {
-      const button = document.createElement("button");
-      const swatch = document.createElement("i"), name = document.createElement("span"), value = document.createElement("strong");
-      const visible = chart.getDataVisibility(index);
-      button.type = "button"; button.className = "analytics-legend-item";
-      button.setAttribute("aria-pressed", String(visible));
-      button.setAttribute("aria-label", `${visible ? 'Hide' : 'Show'} ${label}`);
-      button.title = `${label}: ${Number(dataset.data[index]).toLocaleString("en-PH")} records`;
-      swatch.style.backgroundColor = dataset.backgroundColor[index]; swatch.setAttribute("aria-hidden", "true");
-      name.textContent = label; value.textContent = Number(dataset.data[index]).toLocaleString("en-PH");
-      button.append(swatch, name, value);
-      button.addEventListener("click", () => {
-        chart.toggleDataVisibility(index); chart.update("none");
-        const isVisible = chart.getDataVisibility(index);
-        button.setAttribute("aria-pressed", String(isVisible));
-        button.setAttribute("aria-label", `${isVisible ? 'Hide' : 'Show'} ${label}`);
-      });
-      return button;
-    });
-    legend.replaceChildren(...buttons);
   }
 
   const chartAppearanceObserver = new MutationObserver(scheduleAnalytics);
@@ -1088,7 +918,8 @@
       pill.hidden = false;
       const cachedCount = Object.values(analyticsSources).filter((s) => s.source === "cache").length;
       pill.textContent = liveCount > 0 ? `${liveCount} live · ${cachedCount} cached modules` : cachedCount ? `${cachedCount} cached modules` : "Data unavailable";
-      pill.dataset.state = liveCount === 10 ? "live" : liveCount > 0 ? "partial" : "unavailable";
+      const assignedCount = Object.keys(moduleTableKeys).filter(canReadTable).length;
+      pill.dataset.state = liveCount && liveCount === assignedCount ? "live" : liveCount > 0 ? "partial" : "unavailable";
     }
 
     setText("analyticsVolume", model.availableCount ? model.total : "—");
@@ -1099,34 +930,16 @@
     setText("analyticsCompletionDetail", model.serviceAvailable ? `${model.serviceStatuses.completed} of ${model.serviceTotal} completed` : "Awaiting service data");
     setText("analyticsBacklog", model.serviceAvailable ? model.openRequests : "—");
     setText("analyticsBacklogDetail", model.serviceAvailable ? `${model.agedRequests} open 7+ days` : "Awaiting service data");
-    setText("analyticsStockAlerts", model.stockAvailable ? model.stock.out + model.stock.low : "—");
-    setText("analyticsStockDetail", model.stockAvailable ? `${model.stock.out} out of stock · ${model.stock.low} low stock` : "Awaiting inventory");
-
-    updateDashboardCharts(model);
-
-    // Stock Breakdown Bars
-    const stockContainer = $("analyticsStockBreakdown");
-    if (stockContainer) {
-      const stockMeta = [
-        { label: "Out of Stock", count: model.stock.out, color: "var(--rose-500)" },
-        { label: "Low Stock Alert", count: model.stock.low, color: "var(--amber-500)" },
-        { label: "Normal Stock", count: model.stock.healthy, color: "var(--emerald-500)" },
-        { label: "Unclassified", count: model.stock.unknown, color: "var(--slate-400)" }
-      ];
-      stockContainer.innerHTML = model.stockAvailable
-        ? stockMeta.map((s) => `
-            <div>
-              <div class="analytics-stock-label">
-                <span>${s.label}</span>
-                <strong>${s.count}</strong>
-              </div>
-              <div class="analytics-stock-track">
-                <div class="analytics-stock-fill" style="width:${model.stockTotal ? (s.count / model.stockTotal) * 100 : 0}%; background:${s.color};"></div>
-              </div>
-            </div>
-          `).join("")
-        : `<p style="font-size: 11px; color: var(--text-muted);">Inventory records unavailable.</p>`;
-    }
+    const distributions = {
+      categoryChart: model.breakdown.map(({ label, color, available, current }) => ({
+        label, color, value: available ? current : null
+      })),
+      commChart: communicationCategories.map(({ key, label, color }) => ({
+        label, color, value: model.commBreakdown[key]
+      }))
+    };
+    updateDashboardCharts(model, distributions);
+    renderStockAnalytics(model);
 
     // Automated Insights (Including Personnel & Communications)
     const insightsList = $("analyticsInsights");
@@ -1151,23 +964,69 @@
       breakdownTbody.innerHTML = model.breakdown.map((m) => {
         const change = m.previous ? ((m.current - m.previous) / m.previous) * 100 : null;
         const variance = !m.available ? "—" : change !== null ? `${change > 0 ? "+" : ""}${change.toFixed(1)}%` : m.current ? "New" : "0%";
-        const share = model.total ? ((m.current / model.total) * 100).toFixed(1) : "0.0";
+        const share = m.available ? distributionShare.format(model.total ? m.current / model.total : 0) : "—";
         return `
           <tr>
             <td><span class="analytics-swatch" style="background:${m.color};"></span><strong>${escapeHTML(m.label)}</strong></td>
             <td>${m.available ? m.current.toLocaleString() : "—"}</td>
             <td>${m.available ? m.previous.toLocaleString() : "—"}</td>
             <td>${variance}</td>
-            <td>${share}%</td>
+            <td>${share}</td>
             <td><span class="table-tag">${m.source === "live" ? "Updated" : m.source === "cache" ? "Saved copy" : m.source === "stale" ? "Last loaded / unavailable" : "Unavailable"}</span></td>
           </tr>
         `;
       }).join("");
     }
 
-    updateChartPresentation(model);
+    updateChartPresentation(model, distributions);
     if ($("analyticsDataNote")) $("analyticsDataNote").textContent = `${model.missingDates} records without explicit timestamps were omitted from historical date aggregation.`;
     if ($("exportAnalyticsBtn")) $("exportAnalyticsBtn").disabled = !model.availableCount;
+  }
+
+  function renderStockAnalytics(model) {
+    const source = analyticsSources.inventory.source;
+    const stock = model.stock;
+    const access = canReadTable("inventory");
+    const available = access && model.stockAvailable;
+    const detail = !access ? "Inventory access required"
+      : available ? model.stockTotal ? `${stock.out} out of stock · ${stock.low} low stock` : "No stock items recorded"
+      : source === "loading" ? "Loading inventory records…" : "Inventory data unavailable";
+    setText("analyticsStockAlerts", available ? stock.out + stock.low : "—");
+    setText("analyticsStockDetail", detail);
+
+    const caption = $("analyticsStockCaption");
+    if (caption) {
+      caption.hidden = !available || (!stock.unknown && source !== "stale");
+      caption.textContent = [
+        source === "stale" ? "Showing last loaded stock counts." : "",
+        stock.unknown ? `${stock.unknown.toLocaleString("en-PH")} unclassified · missing or invalid stock quantity or reorder level.` : ""
+      ].filter(Boolean).join(" ");
+    }
+    const container = $("analyticsStockBreakdown");
+    if (!container) return;
+    if (!available || !model.stockTotal) {
+      const message = document.createElement("p");
+      message.className = "analytics-stock-message";
+      message.textContent = !access ? "Inventory access needs the updated module access database patch."
+        : !available && source !== "loading" ? "Inventory data could not be loaded. Use Refresh to try again."
+        : detail + (available ? "." : "");
+      container.replaceChildren(message);
+      return;
+    }
+    const categories = [
+      { label: "Out of stock", count: stock.out, color: "var(--rose-500)" },
+      { label: "Low stock", count: stock.low, color: "var(--amber-500)" },
+      { label: "Normal stock", count: stock.healthy, color: "var(--emerald-500)" },
+      { label: "Unclassified", count: stock.unknown, color: "var(--slate-400)" }
+    ];
+    container.innerHTML = categories.map(({ label, count, color }) => `
+      <div>
+        <div class="analytics-stock-label"><span>${label}</span><strong>${count.toLocaleString("en-PH")}</strong></div>
+        <div class="analytics-stock-track" aria-hidden="true">
+          <div class="analytics-stock-fill" style="width:${count / model.stockTotal * 100}%;background:${color};"></div>
+        </div>
+      </div>
+    `).join("");
   }
 
   // Native, dependency-free charts keep cached dashboards usable if the CDN fails.
@@ -1209,7 +1068,7 @@
     container.innerHTML = entries.map((entry) => `<div class="native-chart-row"><div><span>${escapeHTML(entry.label)}</span><strong>${entry.value.toLocaleString()}</strong></div><div class="native-chart-track"><div class="native-chart-fill" style="width:${entry.value / maximum * 100}%;background:${entry.color || "#278560"}"></div></div></div>`).join("");
   }
 
-  function updateChartPresentation(model) {
+  function updateChartPresentation(model, distributions) {
     const unavailable = "Data unavailable. Connect the module or load its existing cache.";
     const states = [
       ["analyticsTrendEmpty", model.total, model.availableCount, "No dated activity recorded in this period."],
@@ -1224,17 +1083,19 @@
     });
     setText("analyticsBucketLabel", ({ day: "Daily", week: "Weekly", month: "Monthly" })[model.bucketType]);
     setText("analyticsTrendSummary", `${model.total} dated records · ${model.buckets.length} ${model.bucketType} intervals.`);
-    setText("analyticsDistributionSummary", `${model.availableCount} of 6 activity modules available for this period.`);
+    setText("analyticsDistributionSummary", model.breakdown.length
+      ? `${model.total.toLocaleString("en-PH")} dated records · ${model.availableCount} of ${model.breakdown.length} assigned activity modules loaded.`
+      : "Your account has no activity modules assigned.");
     setText("analyticsServiceSummary", `${model.serviceStatuses.completed} completed · ${model.serviceStatuses.progress} in progress · ${model.serviceStatuses.pending} pending.`);
     setText("analyticsPersonnelSummary", `${model.employeeCount} registered personnel across ${Object.keys(model.divisionCounts).length} divisions · Current snapshot.`);
     setText("analyticsCommSummary", `${model.commTotal} communications in this period · ${model.commBreakdown.actionRequired} require action. Direction categories count each record once.`);
     nativeChart("monthlyChart", model.buckets, true);
-    nativeChart("categoryChart", model.breakdown.map((mod) => ({ label: mod.label, value: mod.current, color: mod.color })));
     nativeChart("statusChart", Object.entries(model.serviceStatuses).map(([label, value]) => ({ label: label === "progress" ? "In progress" : label[0].toUpperCase() + label.slice(1), value })));
     nativeChart("personnelChart", Object.entries(model.divisionCounts).map(([label, value]) => ({ label, value })));
-    nativeChart("commChart", ["incoming", "outgoing", "internal", "unclassified"].map((key, i) => ({ label: key[0].toUpperCase() + key.slice(1), value: model.commBreakdown[key], color: ["#059669", "#35a7a0", "#8b7fc6", "#d5a13c"][i] })));
-    renderChartLegend("categoryChart");
-    renderChartLegend("commChart");
+    for (const [canvasId, categories] of Object.entries(distributions)) {
+      nativeChart(canvasId, categories.filter(category => category.value !== null));
+      renderChartLegend($(`${canvasId}Legend`), chartInstances.get(canvasId), categories);
+    }
   }
 
   function csvCell(value) {
@@ -1252,7 +1113,9 @@
       ["Reporting Period", `${new Date(m.start * analyticsDayMs).toISOString().slice(0, 10)} to ${new Date(m.end * analyticsDayMs).toISOString().slice(0, 10)}`],
       [],
       ["Module", "Current Period", "Previous Period", "Share %"],
-      ...m.breakdown.map((mod) => [mod.label, mod.available ? mod.current : "Unavailable", mod.available ? mod.previous : "Unavailable", m.total ? ((mod.current / m.total) * 100).toFixed(1) : 0]),
+      ...m.breakdown.map(mod => mod.available
+        ? [mod.label, mod.current, mod.previous, m.total ? ((mod.current / m.total) * 100).toFixed(1) : 0]
+        : [mod.label, "Unavailable", "Unavailable", "Unavailable"]),
       [],
       ["Personnel by Functional Division", "Headcount"],
       ...Object.entries(m.divisionCounts).map(([div, cnt]) => [div, cnt]),
@@ -1268,7 +1131,9 @@
       ...Object.entries(m.serviceStatuses).map(([st, cnt]) => [st, cnt]),
       [],
       ["Stock Classification", "Count"],
-      ...Object.entries(m.stock).map(([k, v]) => [k, v])
+      ...(m.stockAvailable
+        ? Object.entries(m.stock)
+        : [["Inventory", canReadTable("inventory") ? "Data unavailable" : "Inventory access required"]])
     ];
 
     const csvContent = "\ufeff" + rows.map((r) => r.map(csvCell).join(",")).join("\r\n");
@@ -1360,7 +1225,6 @@
       travel: ["pgenro_admin_travel_orders_live_cache_v2", "travelOrders"],
       memos: ["pgenro_office_memos", "officeMemos"],
       employees: ["pgenro_admin_employees", "employees"],
-      inventory: ["pgenro_admin_inventory_live_cache_v2", "inventoryRecords"],
       visitors: ["pgenro_visitors", "visitorRecords"],
       services: ["pgenro_service_requests", "serviceRequests"],
       ics: ["pgenro_ics_records", "icsRecords"],
@@ -1369,7 +1233,7 @@
     };
 
     for (const [modKey, keys] of Object.entries(cacheMap)) {
-      if (analyticsSources[modKey].source === "live") continue;
+      if (!canReadTable(tableForSource[modKey]) || analyticsSources[modKey].source === "live") continue;
       for (const k of keys) {
         const raw = localStore.getItem(k);
         if (raw) {
@@ -1394,24 +1258,34 @@
   }
 
   function updateConnectionStatus() {
-    const live = Object.values(analyticsSources).filter((source) => source.source === "live").length;
-    const text = !navigator.onLine ? "Offline · cached data" : !sb ? "Local cache mode" : live === 10 ? "Synchronized" : live ? `${live}/10 modules available` : "Data unavailable";
+    const permitted = Object.entries(moduleTableKeys).filter(([table]) => canReadTable(table));
+    const live = permitted.filter(([, key]) => analyticsSources[key].source === "live").length;
+    const ready = permitted.length > 0 && live === permitted.length;
+    const text = !permitted.length ? "No dashboard data modules assigned"
+      : !navigator.onLine ? "Offline · cached data" : !sb ? "Local cache mode"
+      : ready ? "Synchronized" : live ? `${live}/${permitted.length} modules available` : "Data unavailable";
+    const availableRows = permitted.map(([, key]) => analyticsSources[key].rows).filter(Array.isArray);
+    setText("adminHeroRecordTotal", availableRows.length ? availableRows.reduce((total, rows) => total + rows.length, 0) : "—");
+    setText("adminHeroStatus", text);
+    if ($("adminHeroStatusIndicator")) $("adminHeroStatusIndicator").dataset.live = String(ready && navigator.onLine);
     setText("dbStatusText", text);
-    if ($("dbStatusDot")) $("dbStatusDot").className = `status-dot ${navigator.onLine && live === 10 ? "online" : "offline"}`;
+    if ($("dbStatusDot")) $("dbStatusDot").className = `status-dot ${navigator.onLine && ready ? "online" : "offline"}`;
   }
 
   function initDatabaseSync() {
     updateConnectionStatus();
     if (!sb) return;
     setText("dbStatusText", "Connecting…");
-    Object.entries(moduleTableKeys).forEach(([table, modKey]) => {
+    Object.entries(moduleTableKeys).filter(([table]) => canReadTable(table)).forEach(([table, modKey]) => {
       const ref = supabaseStore.realtimeStore().ref(table);
+      if (modKey === "inventory" && !analyticsSources.inventory.rows) analyticsSources.inventory.source = "loading";
       subscriptions.push(ref);
       ref.on("value", (snap) => {
         captureRows(modKey, Object.values(snap.val() || {}), "live");
         updateConnectionStatus();
       }, () => {
         if (analyticsSources[modKey].source === "live") analyticsSources[modKey].source = "stale";
+        else if (analyticsSources[modKey].source === "loading") analyticsSources[modKey].source = "unavailable";
         updateConnectionStatus();
         scheduleAnalytics();
       });
@@ -1448,7 +1322,7 @@
     let activeIndex = -1;
     function filterPalette(q) {
       activeIndex = -1;
-      const matches = searchableItems.filter((i) => i.name.toLowerCase().includes(q));
+      const matches = searchableItems.filter(i => window.PGENRO_API.adminCanOpen(i.href) && i.name.toLowerCase().includes(q));
       if (!matches.length) {
         modContainer.innerHTML = `<div style="padding: 12px 14px; font-size: 11.5px; color: var(--text-muted);">No matching administrative destinations.</div>`;
       } else {
@@ -1555,8 +1429,8 @@
     loadLocalModuleCaches();
 
     // 2. Initialize Charts & Database
-    updateChartsAndAnalytics();
     initDatabaseSync();
+    updateChartsAndAnalytics();
     logAudit("PAGE_VISIT", "Opened the administrator dashboard.", { module: "Admin Dashboard" });
     window.addEventListener("storage", () => {
       applyPreferences(); loadLocalModuleCaches();
@@ -1602,8 +1476,8 @@
     // Lucide Icons Render
     renderIcons();
   }
-  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initializeDashboard, { once: true });
-  else initializeDashboard();
+  if (document.documentElement.dataset.pgenroAdminModules === 'ready') initializeDashboard();
+  else document.addEventListener('pgenro:admin-modules-ready', initializeDashboard, { once: true });
   window.addEventListener("pagehide", (event) => {
     if (!event.persisted) subscriptions.forEach((ref) => ref.off());
   });
@@ -1619,15 +1493,17 @@
     if (!M) return;
     const $ = id => document.getElementById(id);
     const modal = $('workspaceJumpModal'), input = $('workspaceJumpSearch'), results = $('workspaceJumpResults');
-    const links = [...document.querySelectorAll('.sidebar-nav a[href]')].map(a => ({
-      name: a.textContent.trim(), href: a.getAttribute('href'), icon: a.querySelector('svg')?.outerHTML || '',
-      group: a.closest('.nav-group')?.querySelector('.nav-label')?.textContent || 'Workspace'
-    }));
+    const workspaceLinks = () => [...document.querySelectorAll('.sidebar-nav a[href]')]
+      .filter(link => !link.closest('[data-admin-module-hidden]') && window.PGENRO_API.adminCanOpen(link.href))
+      .map(a => ({
+        name: a.textContent.trim(), href: a.getAttribute('href'), icon: a.querySelector('svg')?.outerHTML || '',
+        group: a.closest('.nav-group')?.querySelector('.nav-label')?.textContent || 'Workspace'
+      }));
     const isBusy = () => Boolean(document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]'));
     let active = -1;
     function render() {
       const query = input.value.trim().toLowerCase(), words = query.split(/\s+/).filter(Boolean);
-      const matches = links.filter(a => words.every(word => `${a.name} ${a.group} ${a.href}`.toLowerCase().includes(word)));
+      const matches = workspaceLinks().filter(a => words.every(word => `${a.name} ${a.group} ${a.href}`.toLowerCase().includes(word)));
       active = -1;
       results.innerHTML = matches.length ? matches.map(a => `<a class="workspace-jump-result" href="${M.escape(a.href)}">${a.icon}<span><strong>${M.escape(a.name)}</strong><small>${M.escape(a.group)}</small></span><span class="workspace-jump-arrow" aria-hidden="true">↗</span></a>`).join('') : '<p class="workspace-jump-empty">No matching module. Try “memo”, “inventory”, or “users”.</p>';
       $('workspaceJumpCount').textContent = `${matches.length} destination${matches.length === 1 ? '' : 's'}`;

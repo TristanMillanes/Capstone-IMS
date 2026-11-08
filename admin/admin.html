@@ -16,9 +16,13 @@
 <script defer src="vendor/chart.umd.min.js?v=4.5.1"></script>
 <!-- Stylesheet -->
 <link href="admin.css?v=20261027-emerald-v6" rel="stylesheet">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
+<link rel="stylesheet" href="../shared/dashboard-layout.css?v=20261108-dashboard-parity">
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Dashboard" data-design="emerald-v6">
+<body class="pgenro-admin pgenro-dashboard layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admin.html" data-css-scope="admin-dashboard" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Dashboard" data-design="emerald-v6">
+<p class="admin-module-loading" role="status">Checking your access…</p>
+
 
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
 <div class="app-layout">
@@ -259,78 +263,49 @@
 
 <!-- MAIN CONTENT -->
 <main class="main-content" id="adminMainContent" tabindex="-1">
-<div class="workspace-context"><span class="workspace-context-label">PGENRO · Administrative workspace</span><time id="workspaceToday"></time></div>
-<!-- PAGE HEADER -->
-<section class="page-header modern-dashboard-hero depth-hero unified-page-header" id="dashboard">
-<div class="header-title">
-<div class="breadcrumb"><a href="admin.html">Admin Console</a><svg viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" class="lucide lucide-chevron-right"><path d="m9 18 6-6-6-6"></path></svg><span class="active">Dashboard</span></div><h1>Office overview</h1>
-<p>Manage your records, review requests, and keep daily operations moving.</p>
-</div>
-<div class="header-actions"><a class="btn btn-primary" href="admincommunication.html"><i data-lucide="arrow-left-right"></i>Open communications</a><a class="btn btn-secondary" href="#analytics"><i data-lucide="bar-chart-3"></i>View analytics</a></div>
-</section>
-<!-- KPI METRICS GRID -->
-<section class="kpi-grid unified-metric-grid">
-<div class="kpi-card unified-metric unified-metric-featured">
-<div class="kpi-header">
-<span class="kpi-label">Registered Personnel</span>
-
-</div>
-<div class="kpi-body">
-<h3 class="counter" id="kpiPersonnel">—</h3>
-<span class="kpi-trend positive"> Registered Personnel Records</span>
-</div>
-<div class="kpi-footer">
-<a href="employee-admin.html">View Employee Profiles →</a>
+<p class="admin-module-notice" id="adminModuleAccessNotice" role="status" hidden></p>
+<section class="dashboard-hero" id="dashboard" aria-labelledby="adminDashboardTitle">
+<div class="dashboard-hero-copy">
+<span class="dashboard-kicker"><span aria-hidden="true"></span> QUEZON PROVINCE · ADMIN WORKSPACE</span>
+<h1 id="adminDashboardTitle">Office Dashboard</h1>
+<p>Manage office records, review requests, and monitor daily operations.</p>
+<div class="dashboard-hero-actions">
+<a class="dashboard-hero-primary" href="admincommunication.html"><i data-lucide="arrow-left-right"></i><span>Open communications</span></a>
+<a class="dashboard-hero-secondary" href="#analytics"><i data-lucide="chart-no-axes-combined"></i><span>View office activity</span></a>
 </div>
 </div>
-<div class="kpi-card urgent-border unified-metric">
-<div class="kpi-header">
-<span class="kpi-label">Pending Account Requests</span>
-
-</div>
-<div class="kpi-body">
-<h3 class="counter" id="kpiPendingAcc">—</h3>
-<span class="kpi-trend urgent"> Action Required</span>
-</div>
-<div class="kpi-footer">
-<a href="requestacc.html">Approve Credentials →</a>
-</div>
-</div>
-<div class="kpi-card unified-metric">
-<div class="kpi-header">
-<span class="kpi-label">ICS Slips Recorded</span>
-
-</div>
-<div class="kpi-body">
-<h3 class="counter" id="kpiActiveICS">—</h3>
-<span class="kpi-trend positive"> Registry Property Records</span>
-</div>
-<div class="kpi-footer">
-<a href="ics-admin.html">Manage ICS Property →</a>
-</div>
-</div>
-<div class="kpi-card urgent-border unified-metric">
-<div class="kpi-header">
-<span class="kpi-label">Low Supply Items</span>
-
-</div>
-<div class="kpi-body">
-<h3 class="counter" id="kpiLowStock">—</h3>
-<span class="kpi-trend urgent"> Restock Advised</span>
-</div>
-<div class="kpi-footer">
-<a href="invetoryadmin.html">Check Inventory →</a>
-</div>
+<div class="dashboard-hero-summary">
+<div class="dashboard-hero-date"><i data-lucide="calendar-days"></i><time id="workspaceToday">Loading date…</time></div>
+<span class="dashboard-hero-label">Workspace records</span>
+<strong id="adminHeroRecordTotal">—</strong>
+<div class="dashboard-hero-sync" role="status"><span id="adminHeroStatusIndicator" aria-hidden="true"></span><span id="adminHeroStatus">Loading office records…</span></div>
 </div>
 </section>
-<section aria-label="Frequently used modules" class="workspace-quick-actions"><div><strong>Quick access</strong><p>Your everyday office tools.</p></div><nav aria-label="Quick module access" class="workspace-quick-links"><a href="admincommunication.html"><span class="studio-shortcut-index" aria-hidden="true">01</span><span><strong>Communications</strong><small>Incoming &amp; outgoing</small></span></a><a href="officememo-admin.html"><span class="studio-shortcut-index" aria-hidden="true">02</span><span><strong>Office memos</strong><small>Directives &amp; issuances</small></span></a><a href="serviceAdmin.html"><span class="studio-shortcut-index" aria-hidden="true">03</span><span><strong>Service requests</strong><small>Actions &amp; follow-up</small></span></a><a href="visitors-admin.html"><span class="studio-shortcut-index" aria-hidden="true">04</span><span><strong>Visitor logbook</strong><small>Arrivals &amp; departures</small></span></a></nav></section>
+<section class="dashboard-section dashboard-quick-section" aria-labelledby="adminQuickAccessTitle">
+<header class="dashboard-section-heading"><div><span class="dashboard-section-kicker">OFFICE MODULES</span><h2 id="adminQuickAccessTitle">Quick access</h2><p>Open your frequently used office modules.</p></div><a class="dashboard-section-link" href="#modules">All modules <i data-lucide="chevron-right"></i></a></header>
+<nav class="dashboard-quick-grid" aria-label="Quick module access">
+<a class="dashboard-shortcut" href="admincommunication.html" data-module-accent="blue"><span class="dashboard-card-icon"><i data-lucide="arrow-left-right"></i></span><span class="dashboard-shortcut-copy"><strong>Communications</strong><small>Review correspondence</small></span><i class="dashboard-card-arrow" data-lucide="arrow-up-right"></i></a>
+<a class="dashboard-shortcut" href="officememo-admin.html" data-module-accent="violet"><span class="dashboard-card-icon"><i data-lucide="file-text"></i></span><span class="dashboard-shortcut-copy"><strong>Office Memos</strong><small>Manage office notices</small></span><i class="dashboard-card-arrow" data-lucide="arrow-up-right"></i></a>
+<a class="dashboard-shortcut" href="travelOR-admin.html" data-module-accent="teal"><span class="dashboard-card-icon"><i data-lucide="map-pin"></i></span><span class="dashboard-shortcut-copy"><strong>Travel Orders</strong><small>Review official trips</small></span><i class="dashboard-card-arrow" data-lucide="arrow-up-right"></i></a>
+<a class="dashboard-shortcut" href="serviceAdmin.html" data-module-accent="amber"><span class="dashboard-card-icon"><i data-lucide="wrench"></i></span><span class="dashboard-shortcut-copy"><strong>Service Requests</strong><small>Monitor request progress</small></span><i class="dashboard-card-arrow" data-lucide="arrow-up-right"></i></a>
+</nav>
+</section>
+<section class="dashboard-section dashboard-overview" aria-labelledby="adminOverviewTitle">
+<header class="dashboard-section-heading"><div><span class="dashboard-section-kicker">AT A GLANCE</span><h2 id="adminOverviewTitle">Workspace overview</h2><p>See current counts for the modules you oversee.</p></div></header>
+<div class="dashboard-metric-grid">
+<a class="dashboard-metric-card" href="employee-admin.html" data-admin-module="employees" data-module-accent="blue"><span class="dashboard-card-icon"><i data-lucide="users"></i></span><span class="dashboard-metric-copy"><span>Personnel records</span><strong class="counter" id="kpiPersonnel">—</strong><small>Registered employees</small></span></a>
+<a class="dashboard-metric-card" href="requestacc.html" data-admin-module="account_requests" data-module-accent="amber"><span class="dashboard-card-icon"><i data-lucide="user-check"></i></span><span class="dashboard-metric-copy"><span>Pending accounts</span><strong class="counter" id="kpiPendingAcc">—</strong><small>Requests for review</small></span></a>
+<a class="dashboard-metric-card" href="ics-admin.html" data-admin-module="ics_records" data-module-accent="violet"><span class="dashboard-card-icon"><i data-lucide="clipboard-check"></i></span><span class="dashboard-metric-copy"><span>ICS property slips</span><strong class="counter" id="kpiActiveICS">—</strong><small>Property records</small></span></a>
+<a class="dashboard-metric-card" href="invetoryadmin.html" data-admin-module="inventory" data-module-accent="rose"><span class="dashboard-card-icon"><i data-lucide="package"></i></span><span class="dashboard-metric-copy"><span>Low stock items</span><strong class="counter" id="kpiLowStock">—</strong><small>Supplies to review</small></span></a>
+</div>
+</section>
 <!-- DATA ANALYTICS -->
 <section aria-labelledby="analyticsTitle" class="dashboard-section data-analytics" id="analytics">
-<div class="analytics-heading">
+<div class="analytics-heading dashboard-section-heading">
 <div>
-<span class="analytics-eyebrow"> Performance overview</span>
-<h2 id="analyticsTitle">Operational analytics</h2>
-<p>Activity trends, service fulfillment rates, communications flow, and personnel statistics.</p>
+<span class="dashboard-section-kicker">RECORD ACTIVITY</span>
+<h2 id="analyticsTitle">Activity overview</h2>
+<p>Review activity in your assigned modules for the selected reporting period.</p>
 </div>
 <div class="analytics-controls">
 <label for="analyticsPeriod">Reporting Period
@@ -356,35 +331,35 @@
 <span class="analytics-metric-label"> Record Activity</span>
 <strong id="analyticsVolume">—</strong>
 <span class="analytics-comparison" id="analyticsVolumeChange">Selected period</span>
-<small>Documents, travel, visitors, services &amp; ICS</small>
+<small>Dated records in your assigned modules.</small>
 </article>
 <article class="analytics-metric">
 <span class="analytics-metric-label"> Service Completion</span>
 <strong id="analyticsCompletion">—</strong>
 <span id="analyticsCompletionDetail">Waiting for service records</span>
-<small>Current status of requests in this period</small>
+<small>Share of dated requests marked completed.</small>
 </article>
 <article class="analytics-metric">
 <span class="analytics-metric-label"> Open Service Requests</span>
 <strong id="analyticsBacklog">—</strong>
 <span id="analyticsBacklogDetail">Pending + In progress</span>
-<small>Current snapshot · All recorded dates</small>
+<small>Pending and in-progress requests across all dates.</small>
 </article>
 <article class="analytics-metric">
 <span class="analytics-metric-label"> Stock Alerts</span>
 <strong id="analyticsStockAlerts">—</strong>
 <span id="analyticsStockDetail">Waiting for inventory records</span>
-<small>Current snapshot · Out of stock + Low stock</small>
+<small>Current items out of stock or at their reorder level.</small>
 </article>
 </div>
 <!-- ANALYTICS VISUAL GRID (COMPLETE WITH MISSING CHARTS) -->
 <div class="analytics-visual-grid">
 <!-- 1. Activity Trend Line -->
-<article class="chart-card analytics-trend-card">
+<article class="chart-card dashboard-panel analytics-trend-card">
 <div class="chart-card-header">
 <div>
 <span class="chart-eyebrow">Office performance</span><h3>Activity Over Time</h3>
-<p id="analyticsTrendDescription">Dated activity across office modules.</p>
+<p id="analyticsTrendDescription">See how dated records change over the reporting period.</p>
 </div>
 <span class="analytics-tag" id="analyticsBucketLabel">Trend</span>
 </div>
@@ -395,22 +370,22 @@
 <p class="analytics-chart-caption" id="analyticsTrendSummary">Waiting for dated records.</p>
 </article>
 <!-- 2. Module Distribution Doughnut -->
-<article class="chart-card analytics-distribution-card">
+<article class="chart-card dashboard-panel analytics-distribution-card">
 <div class="chart-card-header">
 <div>
 <span class="chart-eyebrow">Workload distribution</span><h3>Activity by Module</h3>
-<p>Share of records in selected period</p>
+<p>See each module’s record count and share for the selected period.</p>
 </div>
 </div>
 <div class="analytics-chart-wrap">
 <div class="chart-canvas-host"><canvas aria-describedby="analyticsDistributionSummary" aria-label="Record distribution by module" id="categoryChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsDistributionEmpty"></p>
 </div>
-<div aria-label="Activity chart categories" class="analytics-chart-legend" hidden="" id="categoryChartLegend"></div>
+<div aria-label="Activity chart categories" class="analytics-chart-legend" hidden="" id="categoryChartLegend" role="group"></div>
 <p class="analytics-chart-caption" id="analyticsDistributionSummary">Waiting for module records.</p>
 </article>
 <!-- 3. Service Requests Bar Chart -->
-<article class="chart-card analytics-service-card">
+<article class="chart-card dashboard-panel analytics-service-card">
 <div class="chart-card-header">
 <div>
 <h3>Service Request Status</h3>
@@ -425,7 +400,7 @@
 <p class="analytics-chart-caption" id="analyticsServiceSummary">Completion includes completed and closed requests.</p>
 </article>
 <!-- 4. Inventory Health Bar Status -->
-<article class="chart-card analytics-stock-card">
+<article class="chart-card dashboard-panel analytics-stock-card">
 <div class="chart-card-header">
 <div>
 <h3>Inventory Health</h3>
@@ -434,16 +409,17 @@
 <a class="analytics-text-link" href="invetoryadmin.html">Review Stock →</a>
 </div>
 <div class="analytics-stock-bars" id="analyticsStockBreakdown">
-<p style="color: var(--text-muted); font-size: 11px;">Waiting for inventory records.</p>
+<p class="analytics-stock-message">Loading inventory records…</p>
 </div>
-<p class="analytics-chart-caption">Items with missing quantities are marked as unclassified.</p>
+<p class="analytics-chart-caption" id="analyticsStockCaption" hidden></p>
 </article>
 <!-- 5. Automated Intelligence Card -->
-<article class="chart-card analytics-insights-card">
+<article class="chart-card dashboard-panel analytics-insights-card">
 <div class="chart-card-header">
 <div>
 <span class="analytics-eyebrow">AUTOMATED INTELLIGENCE</span>
 <h3>Key Insights</h3>
+<p>Highlights from the records available to your account.</p>
 </div>
 </div>
 <ul class="analytics-insights" id="analyticsInsights">
@@ -451,7 +427,7 @@
 </ul>
 </article>
 <!-- 6. NEW: Personnel by division Chart -->
-<article class="chart-card analytics-personnel-card">
+<article class="chart-card dashboard-panel analytics-personnel-card">
 <div class="chart-card-header">
 <div>
 <h3>Personnel Allocation by Division</h3>
@@ -466,7 +442,7 @@
 <p class="analytics-chart-caption" id="analyticsPersonnelSummary">Current personnel snapshot across all recorded dates.</p>
 </article>
 <!-- 7. NEW: Communications Flow & Classification Chart -->
-<article class="chart-card analytics-comm-card">
+<article class="chart-card dashboard-panel analytics-comm-card">
 <div class="chart-card-header">
 <div>
 <h3>Communications flow</h3>
@@ -478,11 +454,11 @@
 <div class="chart-canvas-host"><canvas aria-describedby="analyticsCommSummary" aria-label="Communications flow by direction and type" id="commChart" role="img"></canvas></div>
 <p class="analytics-chart-empty" hidden="" id="analyticsCommEmpty"></p>
 </div>
-<div aria-label="Communication chart categories" class="analytics-chart-legend" hidden="" id="commChartLegend"></div>
+<div aria-label="Communication chart categories" class="analytics-chart-legend" hidden="" id="commChartLegend" role="group"></div>
 <p class="analytics-chart-caption" id="analyticsCommSummary">Includes incoming communications, endorsements, and official issuances.</p>
 </article>
 </div>
-<div class="card analytics-breakdown-card">
+<div class="card dashboard-panel analytics-breakdown-card">
 <div class="chart-card-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 0;">
 <div>
 <h3>Module Activity Breakdown</h3>
@@ -532,7 +508,7 @@
 </div>
 </section>
 <!-- OFFICE MEMORANDA LIVE FEED -->
-<section aria-label="Recent office memoranda" class="dashboard-section">
+<section data-admin-module="office_memos" aria-label="Recent office memoranda" class="dashboard-section">
 <div class="card system-health-card">
 <div class="chart-card-header">
 <div>
@@ -577,8 +553,10 @@
 </div>
 <!-- SCRIPTS -->
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer src="../shared/supabase.js?v=20261104-employee-account-1"></script>
-<script defer src="admin.js?v=20261027-emerald-v6"></script>
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
+<script defer src="../shared/dashboard-charts.js?v=20261108-dashboard-parity"></script>
+<script defer src="admin.js?v=20261108-inventory-roles"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

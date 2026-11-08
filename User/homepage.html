@@ -11,19 +11,22 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
 <link href="homepage.css?v=20261102-viewer" rel="stylesheet"/>
-<link rel="stylesheet" href="user-workspace.css?v=20261102-viewer">
+<link rel="stylesheet" href="user-workspace.css?v=20261107-module-access">
 <link rel="stylesheet" href="homepage-details.css?v=20261102-viewer">
 <link rel="stylesheet" href="user-refresh.css?v=20261102-viewer">
 <script defer src="user-refresh.js?v=20261102-viewer"></script>
-<script defer src="user-workspace.js?v=20261107-attendance-only"></script>
-<link rel="stylesheet" href="user-polish.css?v=20261102-viewer">
+<script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
+<script defer src="user-workspace.js?v=20261108-inventory-roles"></script>
+<link rel="stylesheet" href="user-polish.css?v=20261107-color-motion">
 <script src="vendor/lucide/lucide.min.js"></script>
-<link rel="stylesheet" href="user-viewer.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="user-viewer.css?v=20261107-color-motion">
 <script defer src="user-viewer.js?v=20261102-viewer"></script>
 <script defer src="user-documents.js?v=20261102-viewer"></script>
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261106-theme-ui-1">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="../shared/dashboard-layout.css?v=20261108-dashboard-parity">
 </head>
-<body class="pgenro-user workspace-dashboard depth-workspace ui-unified user-refresh" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
+<body class="pgenro-user pgenro-dashboard workspace-dashboard depth-workspace ui-unified user-refresh" data-login-url="login.html" data-page-data-owner="module" data-requires-auth="user">
+<p class="user-module-loading" role="status">Checking your access…</p>
 
 <div aria-hidden="true" class="overlay" id="overlay"></div>
 <a class="user-skip-link" href="#mainContent">Skip to main content</a>
@@ -45,11 +48,12 @@
 <nav aria-label="Office modules" class="sidebar-nav">
 <ul class="modules-list">
 <li><a aria-current="page" class="active" href="homepage.html"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a></li>
-<li><a href="communication.html"><i data-lucide="mail"></i><span>Communications</span></a></li>
-<li><a href="travelOR.html"><i data-lucide="navigation"></i><span>Travel Orders</span></a></li>
+<li><a href="communication.html"><i data-lucide="arrow-left-right"></i><span>Communications</span></a></li>
+<li><a href="travelOR.html"><i data-lucide="map-pin"></i><span>Travel Orders</span></a></li>
 <li><a href="officememo.html"><i data-lucide="file-text"></i><span>Office Memos</span></a></li>
 <li><a href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My Attendance</span></a></li>
-<li><a href="inventory.html"><i data-lucide="package"></i><span>Supplies Inventory</span></a></li>
+<li><a href="stock.html"><i data-lucide="boxes"></i><span>Inventory</span></a></li>
+<li><a href="inventory.html"><i data-lucide="package"></i><span>Supply Requests</span></a></li>
 
 <li><a href="service.html"><i data-lucide="wrench"></i><span>Service Requests</span></a></li>
 <li><a href="ics.html"><i data-lucide="layers"></i><span>ICS Property Slips</span></a></li>
@@ -101,140 +105,171 @@
 <div class="depth-topbar-actions"><button aria-label="Switch to dark mode" aria-pressed="false" class="user-appearance-toggle" id="userAppearanceBtn" type="button"></button><span class="depth-access-label"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewbox="0 0 24 24"><path d="m12 3 8 4v5c0 5-8 9-8 9s-8-4-8-9V7Z"></path><path d="m8 12 3 3 5-6"></path></svg>Viewer</span><a aria-label="Account settings" class="depth-settings-link" href="../SettingIMS/Settings.html?from=user" title="Account settings"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" viewbox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 21v-2a8 8 0 0 1 16 0v2"></path></svg></a></div>
 </header>
 <div class="content-shell">
-<section class="page-header reveal depth-hero" id="home">
-<div class="header-copy">
-<div class="eyebrow">
-<i data-lucide="layout-dashboard"></i>
-<span>PGENRO Information Management System</span>
-</div>
-<h1>Office Dashboard</h1>
-<p>
-
-              A consolidated view of office records, requests, personnel,
-
-              assets, communications, and office activity.
-
-            </p>
-<div class="header-actions">
-<a class="primary-action" href="communication.html">
-<i data-lucide="mail"></i>
-<span>Open Communications</span>
-</a>
-<a class="secondary-action" href="service.html">
-<i data-lucide="wrench"></i>
-<span>Service Requests</span>
-</a>
-<button class="secondary-action" id="refreshDashboardBtn" type="button">
-<i data-lucide="refresh-cw"></i>
-<span>Refresh</span>
-</button>
+<p class="user-module-notice" id="moduleAccessNotice" role="status" hidden></p>
+<section class="dashboard-hero" id="home" aria-labelledby="dashboardTitle">
+<div class="dashboard-hero-copy">
+<div class="dashboard-kicker"><span aria-hidden="true"></span><span>QUEZON PROVINCE · STAFF WORKSPACE</span></div>
+<h1 id="dashboardTitle">Office Dashboard</h1>
+<p>Find office records, track requests, and check your attendance from one workspace.</p>
+<div class="dashboard-hero-actions">
+<a class="dashboard-hero-primary" href="my-attendance.html"><i data-lucide="calendar-check"></i><span>My attendance</span><i data-lucide="arrow-right"></i></a>
+<a class="dashboard-hero-secondary" href="#analytics" data-user-modules="communications travel_orders office_memos service_requests ics_records supply_requests"><i data-lucide="chart-no-axes-combined"></i><span>View office activity</span></a>
 </div>
 </div>
-<aside class="dashboard-summary">
-<div class="summary-date">
-<i data-lucide="calendar-days"></i>
-<span id="currentDateText">Loading date…</span>
+<div class="dashboard-hero-summary">
+<div class="dashboard-hero-date"><i data-lucide="calendar-days"></i><time id="currentDateText">Loading date…</time></div>
+<span class="dashboard-hero-label">Workspace records</span>
+<strong id="heroTotalRecords">—</strong>
+<div class="dashboard-hero-sync">
+<span class="workspace-data-state" role="status"><span class="status-indicator standby" id="dbStatusIndicator" aria-hidden="true"></span><span id="dbStatusText">Loading office records…</span></span>
+<button id="refreshDashboardBtn" type="button" aria-label="Refresh dashboard" title="Refresh dashboard"><i data-lucide="refresh-cw"></i></button>
 </div>
-<span class="summary-label">Total monitored records</span>
-<strong class="font-mono" id="heroTotalRecords">0</strong>
-<span class="summary-caption">Across active PGENRO modules</span>
-
-</aside>
-
+</div>
 </section>
-<nav class="user-shortcuts" aria-label="Quick actions"><div class="user-shortcut-heading"><span class="section-kicker">YOUR WORKSPACE</span><h2>What would you like to do?</h2></div>
-
-<a href="communication.html"><span class="shortcut-symbol"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="10" cy="10" r="6"/><path d="m15 15 5 5"/></svg></span><span><strong>Browse communications</strong><small>Find correspondence and files</small></span><span aria-hidden="true">↗</span></a>
-<a href="officememo.html"><span class="shortcut-symbol"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M14 3H6v18h12V7Z"/><path d="M9 11h6m-6 4h6"/></svg></span><span><strong>Read office memos</strong><small>Stay updated with the office</small></span><span aria-hidden="true">↗</span></a><a href="service.html"><span class="shortcut-symbol"><i data-lucide="wrench"></i></span><span><strong>Track service requests</strong><small>Review progress and status</small></span><span aria-hidden="true">↗</span></a></nav>
-<section class="overview-section reveal" id="kpiOverview">
-<div class="section-heading">
-<div>
-<span class="section-kicker">Current totals</span>
-<h2>Office Summary</h2>
-<p>Quick totals from the modules currently monitored by the system.</p>
-</div>
-</div>
-<div class="kpi-grid">
-<article class="kpi-card">
-<div class="kpi-icon green"><i data-lucide="mail"></i></div>
-<div class="kpi-copy">
+<section class="dashboard-section dashboard-quick-section" data-user-modules="communications travel_orders office_memos attendance inventory supply_requests service_requests ics_records" aria-labelledby="userQuickAccessTitle">
+<header class="dashboard-section-heading">
+<div><span class="dashboard-section-kicker">OFFICE MODULES</span><h2 id="userQuickAccessTitle">Quick access</h2><p>Open your frequently used office modules.</p></div>
+<button class="dashboard-section-link" data-find-module hidden type="button" aria-haspopup="dialog">All modules <i data-lucide="chevron-right"></i></button>
+</header>
+<nav class="dashboard-quick-grid" aria-label="Quick module access">
+<a class="dashboard-shortcut" href="communication.html" data-module-accent="blue"><span class="dashboard-card-icon"><i data-lucide="arrow-left-right"></i></span><span class="dashboard-shortcut-copy"><strong>Communications</strong><small>Find correspondence</small></span><i data-lucide="arrow-up-right" class="dashboard-card-arrow"></i></a>
+<a class="dashboard-shortcut" href="officememo.html" data-module-accent="violet"><span class="dashboard-card-icon"><i data-lucide="file-text"></i></span><span class="dashboard-shortcut-copy"><strong>Office Memos</strong><small>Read notices and directives</small></span><i data-lucide="arrow-up-right" class="dashboard-card-arrow"></i></a>
+<a class="dashboard-shortcut" href="travelOR.html" data-module-accent="teal"><span class="dashboard-card-icon"><i data-lucide="map-pin"></i></span><span class="dashboard-shortcut-copy"><strong>Travel Orders</strong><small>Check official trips</small></span><i data-lucide="arrow-up-right" class="dashboard-card-arrow"></i></a>
+<a class="dashboard-shortcut" href="service.html" data-module-accent="amber"><span class="dashboard-card-icon"><i data-lucide="wrench"></i></span><span class="dashboard-shortcut-copy"><strong>Service Requests</strong><small>Track request progress</small></span><i data-lucide="arrow-up-right" class="dashboard-card-arrow"></i></a>
+<a class="dashboard-shortcut" href="stock.html" data-module-accent="mint"><span class="dashboard-card-icon"><i data-lucide="boxes"></i></span><span class="dashboard-shortcut-copy"><strong>Inventory</strong><small>View stock availability</small></span><i data-lucide="arrow-up-right" class="dashboard-card-arrow"></i></a>
+</nav>
+</section>
+<section class="overview-section reveal dashboard-section dashboard-overview" id="kpiOverview" data-user-modules="communications travel_orders supply_requests service_requests ics_records">
+<header class="dashboard-section-heading"><div><span class="dashboard-section-kicker">AT A GLANCE</span><h2>Workspace overview</h2><p>See current totals for the records and requests you can access.</p></div></header>
+<div class="dashboard-metric-grid">
+<a class="dashboard-metric-card" href="communication.html" data-module-accent="blue">
+<div class="dashboard-card-icon"><i data-lucide="arrow-left-right"></i></div>
+<div class="dashboard-metric-copy">
 <span>Communications</span>
-<strong class="font-mono" id="kpiTotalComms">0</strong>
-<small><b id="kpiIncomingCount">0</b> incoming · <b id="kpiOutgoingCount">0</b> outgoing</small>
+<strong id="kpiTotalComms">—</strong>
+<small><b id="kpiIncomingCount">—</b> in · <b id="kpiOutgoingCount">—</b> out</small>
 </div>
-</article>
-<article class="kpi-card">
-<div class="kpi-icon yellow"><i data-lucide="wrench"></i></div>
-<div class="kpi-copy">
+</a>
+<a class="dashboard-metric-card" href="service.html" data-module-accent="amber">
+<div class="dashboard-card-icon"><i data-lucide="wrench"></i></div>
+<div class="dashboard-metric-copy">
 <span>Service Requests</span>
-<strong class="font-mono" id="kpiTotalServices">0</strong>
-<small><b id="kpiPendingServices">0</b> pending / in queue</small>
+<strong id="kpiTotalServices">—</strong>
+<small><b id="kpiPendingServices">—</b> in queue</small>
 </div>
-</article>
-<article class="kpi-card">
-<div class="kpi-icon violet"><i data-lucide="navigation"></i></div>
-<div class="kpi-copy">
+</a>
+<a class="dashboard-metric-card" href="travelOR.html" data-module-accent="teal">
+<div class="dashboard-card-icon"><i data-lucide="map-pin"></i></div>
+<div class="dashboard-metric-copy">
 <span>Travel Orders</span>
-<strong class="font-mono" id="kpiTotalTravel">0</strong>
-<small><b id="kpiActiveTravel">0</b> active</small>
+<strong id="kpiTotalTravel">—</strong>
+<small><b id="kpiActiveTravel">—</b> active</small>
 </div>
+</a>
+<a class="dashboard-metric-card" href="inventory.html" data-module-accent="mint">
+<div class="dashboard-card-icon"><i data-lucide="package"></i></div>
+<div class="dashboard-metric-copy">
+<span>Supply Requests</span>
+<strong id="kpiTotalSupplyRequests">—</strong>
+<small>Your submitted requests</small>
+</div>
+</a>
+<a class="dashboard-metric-card" href="ics.html" data-module-accent="rose">
+<div class="dashboard-card-icon"><i data-lucide="clipboard-check"></i></div>
+<div class="dashboard-metric-copy">
+<span>ICS Property Slips</span>
+<strong id="kpiTotalIcs">—</strong>
+<small>Property records</small>
+</div>
+</a>
+</div>
+</section>
+<section class="dashboard-section reveal" id="analytics" aria-labelledby="userAnalyticsTitle" data-user-modules="communications travel_orders office_memos service_requests ics_records supply_requests">
+<header class="dashboard-section-heading dashboard-analytics-heading">
+<div>
+<span class="dashboard-section-kicker">RECORD ACTIVITY</span>
+<h2 id="userAnalyticsTitle">Activity overview</h2>
+<p>Review activity in your approved modules for the selected reporting period.</p>
+</div>
+<div class="dashboard-analytics-controls">
+<label for="dashboardChartRange">Reporting Period
+<select id="dashboardChartRange">
+<option value="30">Last 30 days</option>
+<option selected value="90">Last 90 days</option>
+<option value="180">Last 180 days</option>
+<option value="365">Last 365 days</option>
+<option value="year">This year to date</option>
+<option value="all">All recorded dates</option>
+</select>
+</label>
+<button class="dashboard-section-link" id="refreshUserAnalyticsBtn" type="button"><i data-lucide="refresh-cw"></i>Refresh</button>
+</div>
+</header>
+<div class="dashboard-analytics-context" data-user-modules="communications travel_orders office_memos service_requests ics_records">
+<p id="userAnalyticsPeriodLabel">Loading reporting period…</p>
+<span class="dashboard-analytics-source" id="userAnalyticsSourceStatus" role="status">Loading module records…</span>
+</div>
+<div class="dashboard-analytics-metrics">
+<article class="dashboard-analytics-metric" data-user-modules="communications travel_orders office_memos service_requests ics_records">
+<span>Record Activity</span>
+<strong id="userAnalyticsVolume">—</strong>
+<span id="userAnalyticsVolumeChange">Selected period</span>
+<small>Dated records in your approved modules.</small>
 </article>
-<article class="kpi-card">
-<div class="kpi-icon emerald"><i data-lucide="package"></i></div>
-<div class="kpi-copy">
-<span>Tracked Assets</span>
-<strong class="font-mono" id="kpiTotalAssets">0</strong>
-<small><b id="kpiTotalIcs">0</b> ICS issued</small>
-</div>
+<article class="dashboard-analytics-metric" data-user-modules="service_requests">
+<span>Service Completion</span>
+<strong id="userAnalyticsCompletion">—</strong>
+<span id="userAnalyticsCompletionDetail">Loading service requests…</span>
+<small>Share of dated requests marked completed.</small>
 </article>
-<article class="kpi-card">
-<div class="kpi-icon cyan"><i data-lucide="clipboard-signature"></i></div>
-<div class="kpi-copy">
-<span>Today's Visitors</span>
-<strong class="font-mono" id="kpiVisitorsToday">0</strong>
-<small><b id="kpiVisitorsInside">0</b> currently inside</small>
+<article class="dashboard-analytics-metric" data-user-modules="service_requests">
+<span>Open Service Requests</span>
+<strong id="userAnalyticsBacklog">—</strong>
+<span id="userAnalyticsBacklogDetail">Loading service requests…</span>
+<small>Pending and in-progress requests across all dates.</small>
+</article>
+<article class="dashboard-analytics-metric" data-user-modules="supply_requests">
+<span>My Supply Requests</span>
+<strong id="userAnalyticsSupply">—</strong>
+<span id="userAnalyticsSupplyDetail">Loading supply requests…</span>
+<small>Your submitted requests across all dates.</small>
+</article>
 </div>
+<div class="dashboard-analytics-grid" data-user-modules="communications travel_orders office_memos service_requests ics_records">
+<article class="panel dashboard-panel dashboard-analytics-chart analytics-trend-card">
+<header class="dashboard-chart-header">
+<div>
+<span class="dashboard-section-kicker">OFFICE PERFORMANCE</span>
+<h3>Activity Over Time</h3>
+<p>See how dated records change over the reporting period.</p>
+</div>
+<span class="dashboard-chart-tag" id="userAnalyticsBucketLabel">Trend</span>
+</header>
+<div class="chart-wrapper">
+<div class="chart-canvas-host" hidden><canvas aria-describedby="dashboardTrendSummary" aria-label="Record activity over time" id="commCompareChart" role="img"></canvas></div>
+<p class="homepage-chart-empty" hidden id="dashboardTrendEmpty" role="status"></p>
+</div>
+<p class="analytics-chart-caption" id="dashboardTrendSummary">Waiting for dated records.</p>
+</article>
+<article class="panel dashboard-panel dashboard-analytics-chart analytics-distribution-card">
+<header class="dashboard-chart-header">
+<div>
+<span class="dashboard-section-kicker">WORKLOAD DISTRIBUTION</span>
+<h3>Activity by Module</h3>
+<p>See each module’s record count and share for the selected period.</p>
+</div>
+</header>
+<div class="chart-wrapper">
+<div class="chart-canvas-host" hidden><canvas aria-describedby="dashboardDistributionSummary" aria-label="Record distribution by module" id="operationsDistChart" role="img"></canvas></div>
+<p class="homepage-chart-empty" hidden id="dashboardDistributionEmpty" role="status"></p>
+</div>
+<div aria-label="Activity chart categories" class="analytics-chart-legend" hidden id="operationsDistChartLegend" role="group"></div>
+<p class="analytics-chart-caption" id="dashboardDistributionSummary">Waiting for module records.</p>
 </article>
 </div>
 </section>
-<section class="dashboard-grid reveal" id="analytics">
-<article class="panel chart-panel">
-<div class="panel-header">
-<div>
-<span class="section-kicker">Record activity</span>
-<h2>Record Activity Trend</h2>
-<p id="dashboardTrendDescription">Documents, travel orders, and services in the last 90 days.</p>
-</div>
-<select aria-label="Dashboard chart period" class="chart-range-select" id="dashboardChartRange"><option value="30">Last 30 days</option><option selected="" value="90">Last 90 days</option><option value="180">Last 180 days</option><option value="365">Last year</option></select>
-</div>
-<div class="chart-wrapper">
-<div class="chart-canvas-host"><canvas aria-describedby="dashboardTrendSummary" aria-label="Record activity over time" id="commCompareChart" role="img"></canvas></div>
-<p class="homepage-chart-empty" hidden="" id="dashboardTrendEmpty" role="status"></p>
-<p class="homepage-chart-summary" id="dashboardTrendSummary">Waiting for dated records.</p>
-</div>
-</article>
-<article class="panel activity-panel">
-<div class="panel-header"><div><span class="section-kicker">Personal monitoring</span><h2>My Attendance</h2><p>View flag ceremony attendance and uniform records for your employee number.</p></div></div>
-<div class="empty-state-box"><span class="empty-icon"><i data-lucide="calendar-check"></i></span><h3>Your records, in one place</h3><p>Only records for the employee number on your account are shown.</p><a class="panel-link" href="my-attendance.html">Open My Attendance <i data-lucide="arrow-right"></i></a></div>
-</article>
-</section>
-<section class="dashboard-grid reveal">
-<article class="panel chart-panel">
-<div class="panel-header">
-<div>
-<span class="section-kicker">System distribution</span>
-<h2>Activity Distribution</h2>
-<p>Share of dated activity across office modules in the selected period.</p>
-</div>
-<span class="panel-badge">5 activity modules</span>
-</div>
-<div class="chart-wrapper">
-<div class="chart-canvas-host"><canvas aria-describedby="dashboardDistributionSummary" aria-label="Record distribution by module" id="operationsDistChart" role="img"></canvas></div>
-<p class="homepage-chart-empty" hidden="" id="dashboardDistributionEmpty" role="status"></p>
-<p class="homepage-chart-summary" id="dashboardDistributionSummary">Waiting for module records.</p>
-</div>
-</article>
-<article class="panel activity-panel">
+<section class="dashboard-grid workspace-desk" data-user-modules="service_requests office_memos" aria-label="Recent office updates">
+<article class="panel activity-panel dashboard-panel" data-user-modules="service_requests">
 <div class="panel-header">
 <div>
 <span class="section-kicker">Service desk</span>
@@ -251,26 +286,24 @@
 <div aria-live="polite" class="activity-list service-list" id="serviceRecentList">
 <div class="empty-state-box">
 <span class="empty-icon"><i data-lucide="wrench"></i></span>
-<h3>No Active Service Requests</h3>
-<p>Requests will appear here once registered.</p>
+<h3>Loading service requests…</h3>
 </div>
 </div>
 <div class="queue-summary">
 <span>Queue Summary</span>
-<strong id="servicePendingSummary">0 pending</strong>
+<strong id="servicePendingSummary">—</strong>
 </div>
 </article>
-</section>
-<section class="memo-section reveal" id="memo">
-<div class="section-heading">
+<article class="panel memo-section dashboard-panel" data-user-modules="office_memos" id="memo">
+<div class="panel-header">
 <div>
 <span class="section-kicker">Office notices</span>
-<h2>Pinned Memorandums</h2>
-<p>Important directives and announcements available for office reference.</p>
+<h2>Pinned Office Memos</h2>
+<p>Important office notices and directives.</p>
 </div>
 <a class="panel-link" href="officememo.html">
 
-              Open Office Memos
+              View memos
 
               <i data-lucide="arrow-right"></i>
 </a>
@@ -279,11 +312,11 @@
 <div class="memo-empty-card">
 <div class="empty-state-box">
 <span class="empty-icon"><i data-lucide="file-text"></i></span>
-<h3>No Pinned Memorandums</h3>
-<p>Pinned office notices will appear here once available.</p>
+<h3>Loading office memos…</h3>
 </div>
 </div>
 </div>
+</article>
 </section>
 
 <footer class="footer">
@@ -301,9 +334,10 @@
 </button>
 <div aria-live="polite" class="toast-container" id="toastContainer"></div>
 
-<script defer="" src="../vendor/chart.umd.min.js"></script>
+<script defer="" src="vendor/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script defer="" src="../shared/supabase.js?v=20261107-attendance-only"></script>
-<script defer="" src="homepage.js?v=20261107-attendance-only"></script>
+<script defer="" src="../shared/supabase.js?v=20261108-inventory-roles"></script>
+<script defer="" src="../shared/dashboard-charts.js?v=20261108-dashboard-parity"></script>
+<script defer="" src="homepage.js?v=20261108-dashboard-parity"></script>
 </body>
 </html>

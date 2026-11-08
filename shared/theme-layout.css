@@ -24,7 +24,7 @@ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui
 html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.workspace-context-label,#workspaceToday,.modern-page-footer,.modern-page-footer a,.table-timezone,.chart-eyebrow,.employee-sub,.traveler-sub,.field-hint,.field-counter,.employee-section-link small) {color:var(--app-muted);}
 html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.badge-status.urgent,.badge-status.pending,.status-badge-dot.pending,.badge.pending,#displayActiveStatusBadge) {background:var(--app-warning-bg);color:var(--app-warning);border-color:var(--app-border);}
 html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] .badge-status.info {background:var(--app-info-bg);color:var(--app-info);}
-html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.required,.required-mark,#passRequiredStar,#employeeForm label>span,#icsForm label>span) {color:var(--app-danger);}
+html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.required,.required-mark,#passRequiredStar,.required-pill>span,#employeeForm label>span,#icsForm label>span) {color:var(--app-danger);}
 /* These panels formerly used white backgrounds with inherited pale dark-mode text. */
 html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.ics-form-progress,.form-progress-panel,.progress-panel,.calculated-field,.financial-summary,.financial-summary .total,.document-destination) {background:var(--app-soft);color:var(--app-ink);border-color:var(--app-border);}
 html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] :is(.progress-eyebrow,#icsProgressText,#totalValuePreview,#summaryTotal) {color:var(--app-ink);}
@@ -315,4 +315,145 @@ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui
  html[data-theme] body.user-refresh.pgenro-login .brand-wordmark p {font-size:10px !important;line-height:1.4 !important;}
  html[data-theme] body.user-refresh.pgenro-login .province-label {display:none;}
 }
+}
+
+/* The active link is styled in the viewer layer, including its dark palette. */
+@layer viewer {
+  @media screen {
+    html[data-theme="dark"] body.pgenro-user #sidebar .modules-list a.active {
+      background: #245244 !important;
+      color: #ecfaf3 !important;
+    }
+  }
+}
+
+/* Surface and text pairs for individual workspace components. */
+@media screen {
+  html[data-theme="dark"] body.pgenro-admin #profileModal :is(.profile-hero, .monitor-editor, .monitor-filters) {
+    background: var(--app-soft);
+    color: var(--app-ink);
+    border-color: var(--app-border);
+  }
+  html[data-theme="dark"] body.pgenro-admin #profileModal #viewAvatar {
+    background: #19684c;
+    color: #fff;
+  }
+  html[data-theme="dark"] body.pgenro-admin #profileModal #viewHeadingName {
+    color: var(--app-ink);
+  }
+  html[data-theme="dark"] body.pgenro-admin #profileModal .id-tag {
+    color: var(--app-muted);
+  }
+  html[data-theme="dark"] body.pgenro-admin :is(#employeeFormModal, #profileModal .monitor-panel) .form-group label {
+    color: var(--app-ink);
+  }
+  html[data-theme="dark"] body.pgenro-admin :is(#employeeFormModal, #profileModal .monitor-panel) .form-group label > span {
+    color: var(--app-danger);
+  }
+  html[data-theme="dark"] body.pgenro-admin #encodingModal #runOcrBtn {
+    background: #19664d;
+    border-color: #518a73;
+    color: #f3fbf6;
+  }
+  html[data-theme="dark"] body.pgenro-admin[data-admin-page="officememo-admin.html"] .badge-pinned {
+    background: var(--app-warning-bg);
+    color: var(--app-warning);
+  }
+
+  html[data-theme] body.pgenro-admin #profileModal :is(#ceremonyControlHelp, #uniformControlHelp) {
+    color: var(--app-muted);
+  }
+  html[data-theme] body.pgenro-admin[data-admin-page="Usermanagement.html"] .status-badge-dot.inactive {
+    background: var(--app-danger-bg);
+    color: var(--app-danger);
+  }
+  html[data-theme] body .module-notification-panel :is(.module-notification-empty, .module-notification-more, .module-notification-heading small, .module-notification-copy small) {
+    color: var(--app-muted);
+  }
+  html[data-theme="dark"] body .module-notification-panel .module-notification-copy strong {
+    color: var(--app-accent);
+  }
+  html[data-theme] body #moduleNotificationButton .module-notification-badge {
+    background: #a7393d;
+    color: #fff;
+  }
+  html[data-theme="dark"] body .module-notification-panel :is(.module-notification-tools, .module-notification-item) {
+    border-color: var(--app-border);
+  }
+  html[data-theme="dark"] body .module-notification-panel .module-notification-close {
+    background: var(--app-soft);
+    color: var(--app-ink);
+  }
+  html[data-theme="dark"] body .module-notification-panel .module-notification-tools button,
+  html[data-theme="dark"] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui] .module-notification-panel .module-notification-tools button {
+    background: var(--app-tint);
+    color: var(--app-ink);
+  }
+  html[data-theme="dark"] body .module-notification-panel .module-notification-tools button:hover:not(:disabled) {
+    color: var(--app-accent);
+  }
+
+  html[data-theme="dark"] body.pgenro-user #viewModal #viewAttachmentLink {
+    background: var(--ui-tint);
+    color: var(--ui-ink);
+    border-color: var(--ui-border);
+  }
+  html[data-theme="dark"] body.pgenro-user #viewModal #viewAttachmentLink:hover {
+    color: var(--ui-accent);
+    border-color: var(--ui-accent);
+  }
+  html[data-theme="dark"] body.pgenro-user[data-css-scope="user-communication"] :is(#mainContent, #viewModal) .badge-status {
+    background: var(--ui-soft);
+    color: var(--ui-muted);
+    border-color: var(--ui-border);
+  }
+  html[data-theme="dark"] body.pgenro-user[data-css-scope="user-communication"] :is(#mainContent, #viewModal) .badge-status.pending {
+    background: var(--ui-amber-bg);
+    color: var(--ui-amber);
+  }
+  html[data-theme="dark"] body.pgenro-user[data-css-scope="user-communication"] :is(#mainContent, #viewModal) .badge-status.received {
+    background: var(--ui-blue-bg);
+    color: var(--ui-blue);
+  }
+  html[data-theme="dark"] body.pgenro-user[data-css-scope="user-communication"] :is(#mainContent, #viewModal) .badge-status.forwarded {
+    background: var(--ui-purple-bg);
+    color: var(--ui-purple);
+  }
+  html[data-theme="dark"] body.pgenro-user[data-css-scope="user-communication"] :is(#mainContent, #viewModal) .badge-status.released {
+    background: var(--ui-tint);
+    color: var(--ui-accent);
+  }
+  html[data-theme="dark"] body.pgenro-user #mainContent .memo-table tbody tr.is-pinned {
+    background: var(--ui-amber-bg);
+  }
+  html[data-theme="dark"] body.pgenro-user #mainContent .memo-table tbody tr.is-pinned:hover {
+    background: var(--ui-tint);
+  }
+
+  html[data-theme="dark"] body.service-request-page .eco-caption {
+    color: var(--ui-muted);
+  }
+  html[data-theme="dark"] body.service-request-page .request-note-icon {
+    background: var(--ui-tint);
+    color: var(--ui-accent);
+    border-color: var(--ui-border);
+  }
+  html[data-theme="dark"] body.service-request-page .pending-label {
+    background: var(--ui-amber-bg);
+    color: var(--ui-amber);
+    border-color: var(--ui-amber);
+  }
+  html[data-theme="dark"] body #pgenroAuthWarning {
+    background: var(--app-warning-bg) !important;
+    color: var(--app-warning) !important;
+    border-color: var(--app-border) !important;
+  }
+  html[data-theme="dark"] body #pgenroAuthWarning button {
+    background: var(--app-surface) !important;
+    color: var(--app-warning) !important;
+    border-color: var(--app-border) !important;
+  }
+  html[data-theme="dark"] body.pgenro-public-visitor #successModal .modal-kicker {
+    color: var(--app-accent);
+  }
 }

@@ -326,7 +326,7 @@
   const fields={};
   const routeJournalKey='pgenro_memo_routes';
   let routeCommitted=false,remoteAttachmentRemoved=false,detectedMemo=false;
-  let memoRegistryRows=M.storage.get('pgenro_office_memos',[]);
+  let memoRegistryRows=[];
   function newMemoControlNo(){const prefix=`MEMO-${new Date().getFullYear()}-`;const highest=Math.max(0,...(Array.isArray(memoRegistryRows)?memoRegistryRows:[]).map(m=>String(m.memoNo||m.controlNo||'').startsWith(prefix)?Number(String(m.memoNo||m.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
   const commOcrValues=new Map(),commManualFields=new Set();
   const ocrFormIds=new Set([...Object.values(fieldInputs),'memoRecipientInput','memoIssuerInput']);
@@ -335,8 +335,9 @@
   const memoInputs={memoNo:'controlNoInput',date:'dateInput',addressedTo:'memoRecipientInput',issuedBy:'memoIssuerInput',subject:'subjectInput'};
   for(const id of ocrFormIds)$(id).addEventListener('input',()=>{delete $(id).dataset.senderSelection;commManualFields.add(id);setFieldState(id,'edited','Your manual edit is kept.');});
   const isMemo=()=>$('docTypeSelect').value==='Memorandum';
+  const canRouteMemo=()=>isMemo()&&window.PGENRO_API?.adminCan('office_memos')===true;
   function updateDestination() {
-   const memo=isMemo();
+   const memo=canRouteMemo();
    $('documentDestination').textContent=memo?'Save destination: Office Memos. Review the memo details below. Attachments: maximum 10 MB.':'Save destination: Communications.';
    $('documentDestination').classList.toggle('is-memo',memo);
    $('memoRecipientGroup').hidden=$('memoIssuerGroup').hidden=!memo;
@@ -880,7 +881,7 @@ function parseLetterDetails(rawText=''){
    else {$('dateInput').value=M.today();$('controlNoInput').value=newControlNo();$('typeSelect').value='Incoming';$('statusSelect').value='Pending';}
    const memo=detectMemo(r?.ocrText||'');if(memo){$('memoRecipientInput').value=memo.addressedTo;$('memoIssuerInput').value=memo.issuedBy;}
    const pending=M.storage.get(routeJournalKey,{})[`communication:${id}`];
-   if(id&&pending&&M.client())try{
+   if(id&&pending&&M.client()&&window.PGENRO_API.adminCan('office_memos'))try{
     const saved=(await M.read('office_memos')).find(m=>String(m.id)===pending.id);
     if(saved&&String(editing)===String(id)){
      routeCommitted=true;$('docTypeSelect').value='Memorandum';$('controlNoInput').value=saved.memoNo||'';$('memoRecipientInput').value=saved.addressedTo||'';$('memoIssuerInput').value=saved.issuedBy||'';$('subjectInput').value=saved.subject||'';
@@ -914,12 +915,12 @@ function parseLetterDetails(rawText=''){
    e.preventDefault();if(busy)return;
    if(ocrActive||pendingRead){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
    if(!$('communicationForm').reportValidity())return;
-   const payload=Object.fromEntries(Object.entries(fieldInputs).map(([k,id])=>[k,$(id).value.trim()]));if(!isMemo()&&records.some(r=>String(r.id)!==String(editing)&&String(r.controlNo||'').trim().toLowerCase()===payload.controlNo.toLowerCase()))return M.toast('This control number already exists. Use a unique number.','warning');
+   const payload=Object.fromEntries(Object.entries(fieldInputs).map(([k,id])=>[k,$(id).value.trim()]));if(!canRouteMemo()&&records.some(r=>String(r.id)!==String(editing)&&String(r.controlNo||'').trim().toLowerCase()===payload.controlNo.toLowerCase()))return M.toast('This control number already exists. Use a unique number.','warning');
    let newAttachment=null,newRemoteUrl='';const priorAttachment=records.find(r=>String(r.id)===String(editing))?.attachmentId;
    try {requireWrite();busy=true;$('encodingModal').dataset.busy='true';$('saveRecordBtn').disabled=true;$('runOcrBtn').disabled=true;
     $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=true;
     for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=true;
-    if(isMemo()){await saveToMemos(payload);return;}
+    if(canRouteMemo()){await saveToMemos(payload);return;}
     if(file){
      if(mode==='live'){const uploaded=await window.PGENRO_API.uploadDocument(file,'communications');newRemoteUrl=uploaded.url;payload.fileUrl=uploaded.url;}
      newAttachment=M.uuid();await attachmentIO('put',newAttachment,file);attachment={id:newAttachment,name:file.name,type:attachmentMime(file.name)||file.type};
@@ -1656,7 +1657,11 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   let channel,timer;
   function connectRecords() {
    if(!M.client()||channel)return;
-   M.read('office_memos').then(rows=>{memoRegistryRows=rows;M.storage.set('pgenro_office_memos',rows);}).catch(()=>{});
+   const readMemoRegistry=()=>{
+    if(window.PGENRO_API.adminCan('office_memos'))M.read('office_memos').then(rows=>{memoRegistryRows=rows;M.storage.set('pgenro_office_memos',rows);}).catch(()=>{});
+   };
+   if(document.documentElement.dataset.pgenroAdminModules==='ready')readMemoRegistry();
+   else document.addEventListener('pgenro:admin-modules-ready',readMemoRegistry,{once:true});
    try{channel=M.client().channel('admin-communications').on('postgres_changes',{event:'*',schema:'public',table},()=>{clearTimeout(timer);timer=setTimeout(()=>load(),250);}).subscribe();}catch{}
   }
   window.addEventListener('pgenro:backend-ready',()=>{connectRecords();if(mode!=='loading')load();});

@@ -1,4 +1,4 @@
-/* One direct attachment viewer for every User registry; no record writes. */
+/* Direct preview for attachments and generated documents in the User workspace. */
 (() => {
   'use strict';
   const base=new URL('vendor/pdfjs/',document.currentScript.src);
@@ -113,25 +113,37 @@
   }
   async function open(file){
     reader?.dialog.close();const state=create(file);reader=state;const version=state.version;
-    message(state,'Opening file…','Preparing your attachment.');
-    const timeout=setTimeout(()=>state.abort.abort(),25000);
+    const isCurrent=()=>reader===state&&version===state.version&&state.dialog.open;
+    const generated=typeof file.loadBlob==='function';
+    message(state,generated?'Generating request form…':'Opening file…',
+      generated?'Filling the official form from the saved request.':'Preparing your attachment.');
+    const timeout=generated?null:setTimeout(()=>state.abort.abort(),25000);
     try{
-      const api=window.PGENRO_API?.getDocumentUrl;
-      const resolved=api?await Promise.race([api.call(window.PGENRO_API,file.url),new Promise((_,reject)=>state.abort.signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))]):file.url;
-      if(reader!==state||version!==state.version)return;
-      const url=safeURL(resolved);state.open.href=url;state.open.hidden=false;
-      const response=await fetch(url,{signal:state.abort.signal});if(!response.ok)throw new Error('The attachment could not be retrieved. It may have moved or your account may not have access.');
-      if(Number(response.headers.get('Content-Length'))>maxBytes)throw new Error('This file is larger than 50 MB. Use Open in tab to view it.');
-      const blob=await response.blob();if(blob.size>maxBytes)throw new Error('This file is larger than 50 MB. Use Open in tab to view it.');
-      if(reader!==state||version!==state.version)return;
-      const bytes=new Uint8Array(await blob.arrayBuffer());if(reader!==state||version!==state.version)return;
-      state.objectURL=URL.createObjectURL(blob);state.open.href=state.objectURL;state.download.href=state.objectURL;state.download.hidden=false;
+      let blob;
+      if(generated){
+        blob=await file.loadBlob();
+      }else{
+        const api=window.PGENRO_API?.getDocumentUrl;
+        const resolved=api?await Promise.race([api.call(window.PGENRO_API,file.url),new Promise((_,reject)=>state.abort.signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')),{once:true}))]):file.url;
+        if(!isCurrent())return;
+        const url=safeURL(resolved);state.open.href=url;state.open.hidden=false;
+        const response=await fetch(url,{signal:state.abort.signal});
+        if(!response.ok)throw new Error('The attachment could not be retrieved. It may have moved or your account may not have access.');
+        if(Number(response.headers.get('Content-Length'))>maxBytes)throw new Error('This file is larger than 50 MB. Use Open in tab to view it.');
+        blob=await response.blob();
+        if(blob.size>maxBytes)throw new Error('This file is larger than 50 MB. Use Open in tab to view it.');
+      }
+      if(!isCurrent())return;
+      if(!(blob instanceof Blob))throw new Error('The request form could not be generated. Please try again.');
+      const bytes=new Uint8Array(await blob.arrayBuffer());if(!isCurrent())return;
+      state.objectURL=URL.createObjectURL(blob);state.open.href=state.objectURL;state.open.hidden=false;
+      state.download.href=state.objectURL;state.download.hidden=false;
       const signature=new TextDecoder('ascii').decode(bytes.subarray(0,1024));const mime=blob.type.split(';')[0].toLowerCase();
       if(signature.includes('%PDF-')||mime==='application/pdf'){
         state.kind='pdf';state.status.textContent='Loading PDF…';
-        const pdf=await pdfLibrary();if(reader!==state||version!==state.version)return;
+        const pdf=await pdfLibrary();if(!isCurrent())return;
         state.pdfTask=pdf.getDocument({data:bytes,isEvalSupported:false,cMapUrl:new URL('cmaps/',base).href,cMapPacked:true,standardFontDataUrl:new URL('standard_fonts/',base).href,wasmUrl:new URL('wasm/',base).href});
-        state.pdf=await state.pdfTask.promise;if(reader!==state||version!==state.version)return;
+        state.pdf=await state.pdfTask.promise;if(!isCurrent())return;
         state.message.hidden=true;state.textDetails.hidden=false;state.pageInput.max=String(state.pdf.numPages);
         [state.previous,state.pageInput.parentElement,state.next,state.zoom,state.rotate].forEach(node=>node.hidden=false);state.print.disabled=false;await renderPage(state);
       }else if(/^image\/(?:png|jpeg|gif|webp|bmp)$/.test(mime)||/\.(?:png|jpe?g|gif|webp|bmp)$/i.test(file.name)){
@@ -146,7 +158,14 @@
         state.download.href=state.objectURL;state.open.removeAttribute('href');state.open.hidden=true;
         message(state,'File ready to download','Download this attachment and open it in its usual application.');state.status.textContent='Preview is unavailable for this file type.';
       }
-    }catch(error){if(reader===state&&version===state.version){message(state,'Unable to preview file',error.name==='AbortError'?'The file took too long to load. Close the viewer and try again.':error.message);state.status.textContent='Preview unavailable';}}
+    }catch(error){
+      if(isCurrent()){
+        const generationFailed=generated&&!state.objectURL;
+        message(state,generationFailed?'Unable to generate the request form':'Unable to preview file',
+          error.name==='AbortError'?'The file took too long to load. Close the viewer and try again.':error.message);
+        state.status.textContent=generationFailed?'Form unavailable':'Preview unavailable';
+      }
+    }
     finally{clearTimeout(timeout);}
   }
   let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(reader?.pdf&&reader.zoom.value==='fit')renderPage(reader);},160);});
