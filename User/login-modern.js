@@ -292,13 +292,13 @@
       el.employeeNumber.value = ""; el.clearEmployeeNumberBtn.hidden = true;
       setFieldError("employeeNumber"); hideMessage(); el.employeeNumber.focus();
     });
-    el.togglePassword.addEventListener("click", () => {
-      const visible = el.password.type === "password";
+    function setPasswordVisibility(visible) {
       el.password.type = visible ? "text" : "password";
       el.togglePassword.setAttribute("aria-label", visible ? "Hide password" : "Show password");
       el.togglePassword.setAttribute("aria-pressed", String(visible));
       el.togglePassword.querySelector("use").setAttribute("href", visible ? "#icon-eye-off" : "#icon-eye");
-    });
+    }
+    el.togglePassword.addEventListener("click", () => setPasswordVisibility(el.password.type === "password"));
     const checkCaps = event => { if (event.getModifierState) el.capsLockWarning.hidden = !event.getModifierState("CapsLock"); };
     el.password.addEventListener("keydown", checkCaps);
     el.password.addEventListener("keyup", checkCaps);
@@ -377,16 +377,22 @@
           } catch { /* Use the generic sign-in error below. */ }
           const status = Number(loginError.context?.status || loginError.status || failure?.status || 0);
           const code = normalize(failure?.code || "");
-          if (status === 401 || code === "invalid_credentials") {
+          if (code === "invalid_credentials") {
             recordFailedAttempt();
-            setFieldError("employeeNumber", "Check your employee number and password.");
-            showMessage("error", "Unable to sign in", "The employee number or password you entered is incorrect.");
+            setPasswordVisibility(false);
+            showMessage("error", "Unable to sign in", "Check your employee number and current password. If both are correct, ask your administrator to check your account.");
+          } else if (code === "approval_pending") {
+            showMessage("warning", "Approval pending", "Your account is waiting for administrator approval.");
+          } else if (code === "account_inactive") {
+            showMessage("error", "Account access is inactive", "Contact the administrator to restore access.");
+          } else if (code === "profile_missing") {
+            showMessage("error", "Account profile missing", "Contact the administrator to link your account profile.");
           } else if (code === "email_not_confirmed") {
             showMessage("warning", "Account confirmation needed", "Your account still needs confirmation. Contact the system administrator for assistance.");
           } else if (status === 429) {
             showMessage("warning", "Please wait", "Too many sign-in attempts. Wait a moment and try again.");
-          } else if (status === 503 || code === "employee_login_not_configured") {
-            showMessage("error", "Sign-in service unavailable", "Employee-number sign-in has not been installed in Supabase yet. Contact the system administrator.");
+          } else if ([401, 404, 503].includes(status) || code === "employee_login_not_configured") {
+            showMessage("error", "Sign-in service unavailable", "Try again shortly or contact the system administrator.");
           } else {
             showMessage("error", "Sign-in unavailable", "Check your connection and try again.");
           }

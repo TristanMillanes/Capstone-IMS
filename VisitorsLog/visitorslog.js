@@ -145,7 +145,6 @@
 
 (() => {
   "use strict";
-  // Existing Supabase project and insert payload are preserved.
   const CONFIG = Object.freeze({
     url: "https://zssrxubajhqryrwijyzm.supabase.co",
     publishableKey: "sb_publishable_5RWFfJ5oN6ike6SSyafajw_yF9DYApP",
@@ -206,6 +205,8 @@
     };
     const state = { submitting: false, saveFailed: false, saveSucceeded: false, alertKind: null, modalFallback: false };
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const signature = setupSignature($, () => state.submitting || ui.fieldset.disabled);
+    let signedSubmission = null;
     let syncMotion = () => {};
     const clean = (value) => String(value ?? "").replace(/\s+/g, " ").trim();
     const allowedPurposes = new Set([...ui.purpose.options].map((option) => option.value).filter(Boolean));
@@ -378,6 +379,11 @@
           : "Registration is still connecting. Please try again shortly.", "sdk");
         return;
       }
+      const signaturePng = signature.image();
+      if (signaturePng && (!signaturePng.startsWith("data:image/png;base64,") || signaturePng.length > 131072)) {
+        signature.showStatus("The signature is too large to save. Clear it and sign again.");
+        return;
+      }
       const visitorData = {
         full_name: clean(ui.fullName.value),
         contact: normalizePhone(ui.contact.value),
@@ -386,19 +392,32 @@
         purpose_category: clean(ui.purpose.value),
         other_purpose_specific: ui.other.disabled ? "" : clean(ui.other.value)
       };
+      if (signaturePng) {
+        const payload = JSON.stringify([visitorData, signaturePng]);
+        if (signedSubmission?.payload !== payload) {
+          const random = crypto.getRandomValues(new Uint8Array(16));
+          const id = Array.from(random, (byte) => byte.toString(16).padStart(2, "0")).join("");
+          signedSubmission = { id, payload };
+        }
+      }
       state.saveFailed = false;
       state.saveSucceeded = false;
       setSubmitting(true);
       try {
-        // INSERT only: the public kiosk does not need SELECT access to visitor records.
-        const { error } = await db.from(CONFIG.table).insert([visitorData]);
+        const { error } = signaturePng
+          ? await db.rpc("pgenro_register_signed_visit", {
+              p_visit: visitorData,
+              p_signature: signaturePng,
+              p_submission_id: signedSubmission.id
+            })
+          : await db.from(CONFIG.table).insert([visitorData]);
         if (error) throw error;
         state.saveSucceeded = true;
       } catch (error) {
         state.saveFailed = true;
         const message = /Abort|Timeout/.test(error?.name || "")
           ? "The connection timed out. Ask the front desk to check whether your visit was recorded before trying again."
-          : error?.code === "42501"
+          : ["42501", "PGRST202", "42883"].includes(error?.code)
           ? "Registration is unavailable. Please ask the front desk for assistance."
           : error?.code === "23502"
             ? "Your entry could not be saved. Please ask the front desk for assistance."
@@ -440,6 +459,8 @@
     });
     form.addEventListener("submit", submitVisitor);
     form.addEventListener("reset", () => {
+      signedSubmission = null;
+      signature.clear();
       // reset fires before the browser updates input values.
       queueMicrotask(() => {
         ui.fields.forEach((input) => setFieldState(input));
@@ -546,6 +567,80 @@
     initAmbient();
     // Attach load/error listeners before starting the SDK request, keeping the UI responsive.
     if (!db && sdkScript?.dataset.src) sdkScript.src = sdkScript.dataset.src;
+  }
+
+  function setupSignature($, locked) {
+    const canvas = $("visitorSignature");
+    const clearButton = $("clearVisitorSignature");
+    const status = $("signatureStatus");
+    const ink = canvas.getContext("2d");
+    let pointerId = null;
+    let lastPoint = null;
+    let hasInk = false;
+
+    function showStatus(message) {
+      status.textContent = message;
+    }
+
+    function finishStroke() {
+      const id = pointerId;
+      pointerId = null;
+      lastPoint = null;
+      if (id !== null && canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
+    }
+
+    function clear() {
+      finishStroke();
+      ink?.clearRect(0, 0, canvas.width, canvas.height);
+      hasInk = false;
+      clearButton.disabled = true;
+      showStatus("Signature box is empty.");
+    }
+
+    if (ink) {
+      ink.strokeStyle = "#19382e";
+      ink.lineWidth = 4;
+      ink.lineCap = "round";
+      ink.lineJoin = "round";
+
+      function point(event) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+          x: (event.clientX - rect.left) * canvas.width / rect.width,
+          y: (event.clientY - rect.top) * canvas.height / rect.height
+        };
+      }
+
+      canvas.addEventListener("pointerdown", (event) => {
+        if (locked() || pointerId !== null || !event.isPrimary || event.button !== 0) return;
+        event.preventDefault();
+        canvas.setPointerCapture(event.pointerId);
+        pointerId = event.pointerId;
+        lastPoint = point(event);
+      });
+      canvas.addEventListener("pointermove", (event) => {
+        if (locked() || event.pointerId !== pointerId) return;
+        const nextPoint = point(event);
+        if (nextPoint.x === lastPoint.x && nextPoint.y === lastPoint.y) return;
+        ink.beginPath();
+        ink.moveTo(lastPoint.x, lastPoint.y);
+        ink.lineTo(nextPoint.x, nextPoint.y);
+        ink.stroke();
+        lastPoint = nextPoint;
+        if (!hasInk) {
+          hasInk = true;
+          clearButton.disabled = false;
+          showStatus("Signature added.");
+        }
+      });
+      for (const eventName of ["pointerup", "pointercancel", "lostpointercapture"]) {
+        canvas.addEventListener(eventName, (event) => {
+          if (event.pointerId === pointerId) finishStroke();
+        });
+      }
+      clearButton.addEventListener("click", clear);
+    }
+    return { clear, showStatus, image: () => hasInk ? canvas.toDataURL("image/png") : null };
   }
 })();
 

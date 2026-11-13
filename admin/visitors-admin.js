@@ -59,13 +59,15 @@
   }
   const wrapped = new Map();
   const client = () => window.pgenroSupabase || window.PGENRO_DB?.client || null;
-  const unwrap = row => row.data && typeof row.data === 'object' && !Array.isArray(row.data) ? {...row.data,id:row.id,created_at:row.created_at ?? row.data.created_at,updated_at:row.updated_at ?? row.data.updated_at} : row;
+  const unwrap = ({ data, ...columns }) =>
+    data && typeof data === 'object' && !Array.isArray(data) ? { ...data, ...columns } : columns;
   async function read(table) {
     const sb = client(); if (!sb) throw new Error('Database client is unavailable. Refresh the page and try again.');
     if (!wrapped.has(table)) {
-      const probe = await sb.from(table).select('data').limit(1);
+      // Normalized visitor tables still retain a legacy data column.
+      const probe = await sb.from(table).select('full_name').limit(1);
       if (probe.error && !['42703','PGRST204'].includes(probe.error.code)) throw probe.error;
-      wrapped.set(table, !probe.error);
+      wrapped.set(table, Boolean(probe.error));
     }
     const rows = []; let offset = 0;
     while (true) {
@@ -209,6 +211,8 @@
       resetFiltersBtn: $("resetFiltersBtn"),
       detailDrawer: $("detailDrawer"),
       closeDrawerBtn: $("closeDrawerBtn"),
+      drawerSignature: $("drawerSignature"),
+      drawerSignatureStatus: $("drawerSignatureStatus"),
       toggleCheckoutBtn: $("toggleCheckoutBtn"),
       printPassBtn: $("printPassBtn"),
       editVisitorBtn: $("editVisitorBtn"),
@@ -248,6 +252,7 @@
 
     let visitors = [];
     let selectedVisitor = null;
+    let signatureRequest = 0;
     let activeDateFilter = "all";
     let currentPage = 1;
     let syncTimer = null;
@@ -294,11 +299,12 @@
     }
 
     function normalizeVisitor(row) {
-      const timeInISO = row.time_in || row.timeIn || row.created_at || null;
-      const timeOutISO = row.time_out || row.timeOut || null;
+      const timeInISO = row.time_in || row.timeInISO || row.timeIn || row.created_at || null;
+      const timeOutISO = row.time_out === undefined ? row.timeOutISO || row.timeOut || null : row.time_out;
       const parsedTimeIn = timeInISO ? new Date(timeInISO) : null;
       const fallbackDateKey = parsedTimeIn && !Number.isNaN(parsedTimeIn.getTime()) ? getLocalDateKey(parsedTimeIn) : "";
-      const dateKey = row.visit_date ? String(row.visit_date).slice(0, 10) : fallbackDateKey;
+      const visitDate = row.visit_date || row.dateISO;
+      const dateKey = visitDate ? String(visitDate).slice(0, 10) : fallbackDateKey;
 
       return {
         _id: row.id ?? row._id ?? "",
@@ -483,7 +489,7 @@
     }
 
     function openDrawer(visitor) {
-      if (!visitor) return;
+      if (!visitor || !M.canStartAction()) return;
       selectedVisitor = visitor;
 
       $("drawerName").textContent = visitor.fullName || "Guest Details";
@@ -495,7 +501,7 @@
       $("drawerPurpose").textContent = [visitor.purposeCategory, visitor.otherPurposeSpecific].filter(Boolean).join(" — ") || "—";
       $("drawerTimeIn").textContent = visitor.time || "—";
       $("drawerDate").textContent = visitor.date || "—";
-      $("drawerTimeOut").textContent = visitor.timeOut || "Still Inside";
+      $("drawerTimeOut").textContent = visitor.timeOut || (isInside(visitor) ? "Still Inside" : "—");
 
       const inside = isInside(visitor);
       const badge = $("drawerStatusBadge");
@@ -504,6 +510,40 @@
 
       els.toggleCheckoutBtn.innerHTML = inside ? '<i data-lucide="log-out"></i> Log Departure' : '<i data-lucide="rotate-ccw"></i> Re-open Visit';
       M.openModal('detailDrawer');M.renderIcons();
+      loadVisitorSignature(visitor._id);
+    }
+
+    function showSignatureStatus(message = "") {
+      els.drawerSignature.hidden = true;
+      els.drawerSignature.removeAttribute("src");
+      els.drawerSignatureStatus.textContent = message;
+      els.drawerSignatureStatus.hidden = !message;
+    }
+
+    async function loadVisitorSignature(id) {
+      const request = ++signatureRequest;
+      showSignatureStatus("Loading signature…");
+      try {
+        const { data, error } = await supabaseClient.rpc("pgenro_get_visitor_signature", { p_visitor_id: String(id) });
+        if (error) throw error;
+        if (request !== signatureRequest) return;
+        if (!data) {
+          showSignatureStatus("No signature recorded.");
+          return;
+        }
+        if (typeof data !== "string" || data.length > 131072 || !data.startsWith("data:image/png;base64,")) {
+          throw new Error("Invalid visitor signature image");
+        }
+        els.drawerSignatureStatus.hidden = true;
+        els.drawerSignature.src = data;
+        els.drawerSignature.hidden = false;
+      } catch (error) {
+        if (request !== signatureRequest) return;
+        const message = ["PGRST202", "42883"].includes(error?.code)
+          ? "Signature storage is not configured."
+          : "Could not load the signature. Reopen this visit to try again.";
+        showSignatureStatus(message);
+      }
     }
     function closeDrawer(){if(changing)return;M.closeModal('detailDrawer');selectedVisitor=null;}
 
@@ -757,6 +797,13 @@
 
     els.addVisitorBtn?.addEventListener("click", () => openVisitorModal("add"));
     els.closeDrawerBtn?.addEventListener("click", closeDrawer);
+    els.detailDrawer.addEventListener("pgenro:modal-close", () => {
+      signatureRequest++;
+      showSignatureStatus();
+    });
+    els.drawerSignature.addEventListener("error", () => {
+      if (els.drawerSignature.hasAttribute("src")) showSignatureStatus("The signature image could not be displayed.");
+    });
     els.closeVisitorModalBtn?.addEventListener("click", closeVisitorModal);
     els.cancelVisitorModalBtn?.addEventListener("click", closeVisitorModal);
     els.visitorAdminForm?.addEventListener("submit", saveVisitor);
