@@ -645,6 +645,9 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
       try { body = await response.error.context?.json(); } catch {}
       const status = response.error.context?.status;
       if (!status && (response.error.name === 'FunctionsFetchError' || /Failed to send|Failed to fetch|NetworkError|Load failed/i.test(response.error.message || ''))) throw accountConnectionError();
+      if (action === 'save_account' && status === 400 && body?.error === 'Unknown account action.') {
+        throw Error(`Deploy the updated ${accountServiceName()} Edge Function from the ZIP before saving module access.`);
+      }
       if (status === 401 || status === 403) {
         try { await readCurrentAccess(); } catch (error) { handleAccessFailure(error); throw error; }
         throw Error(`The ${accountServiceName()} service rejected this request: ${body?.error || body?.message || response.error.message}. Check its Admin/User authorization and JWT configuration; your database Admin access is still valid.`);
@@ -834,7 +837,7 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (els.contactInput) els.contactInput.value = user?.contact || '';
     if (els.divisionSelect) els.divisionSelect.value = user?.division || '';
     if (els.roleSelect) els.roleSelect.value = user?.role || 'User';
-    modulePicker.set({}, { enabled: !user });
+    modulePicker.set({}, { visible: !user });
     els.moduleAccessStatus.hidden = !user;
     els.moduleAccessStatus.textContent = user ? 'Loading saved module access…' : '';
     if (els.statusSelect) els.statusSelect.value = ['Active','Inactive','Suspended','Pending','Rejected'].includes(user?.status) ? user.status : 'Active';
@@ -916,9 +919,10 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     const generation = authVersion;
     let committed = false;
     try {
-      const result = isEdit
-        ? await invoke('update', { userId: editingId, user: userInput, expectedUpdatedAt: original.updatedAt })
-        : await invoke('create', { user: userInput });
+      const result = await invoke('save_account', {
+        user: userInput,
+        ...(isEdit ? { userId: editingId, expectedUpdatedAt: original.updatedAt } : {})
+      });
       if (generation !== authVersion) throw Error('Your session changed. Refresh the user registry.');
       if (!result || (result.success !== true && result.ok !== true)) throw Error(result?.error || 'The server did not confirm the saved account.');
       const returned = result.user;
@@ -926,12 +930,13 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
           (isEdit && String(returned.user_id || returned.id) !== editingId)) {
         throw Error('The server did not confirm the selected role. Refresh and verify this account before retrying.');
       }
+      committed = true;
       const { sameGrants } = window.PGENRO_USER_MODULES;
       if (!sameGrants(returned.user_modules, userInput.userModules) || !sameGrants(returned.admin_modules, userInput.adminModules)) {
         throw Error('The server did not confirm the selected modules. Refresh and verify this account before retrying.');
       }
       const saved = normalizeUser(returned.user_id || returned.id, returned);
-      committed = true; upsertLocal(saved);
+      upsertLocal(saved);
       setSaving(false); closeModal();
       M.audit(isEdit ? 'EDIT_USER' : 'CREATE_USER', `Account ${saved.email || saved.username}; role ${saved.role}`);
       const loaded = await refreshUsers();
@@ -1023,7 +1028,7 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     render();
     if (!els.saveUserBtn) return;
     els.saveUserBtn.disabled = value;
-    els.saveUserBtn.innerHTML = value ? '<span class="spinner"></span> Saving...' : '<i data-lucide="save"></i> Save Account';
+    els.saveUserBtn.innerHTML = value ? '<span class="spinner"></span> Saving...' : `<i data-lucide="save"></i>${state.editingId ? 'Save Changes' : 'Create Account'}`;
     renderIcons();
   }
   const showToast=M.toast;

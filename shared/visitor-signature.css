@@ -26,6 +26,12 @@
   font-weight: 400;
 }
 
+.signature-heading h3 .required-mark,
+#visitorSignature[aria-invalid="true"] + .signature-status {
+  color: var(--app-danger, var(--danger));
+  font-weight: 650;
+}
+
 .visitor-signature .signature-help { margin: 2px 0 8px; }
 .visitor-signature .signature-status { margin: 6px 0 0; }
 
@@ -57,6 +63,10 @@
 }
 
 #visitorFields:disabled #visitorSignature { pointer-events: none; }
+
+#visitorSignature[aria-invalid="true"] {
+  border-color: var(--app-danger, var(--danger));
+}
 
 #drawerSignatureLabel {
   margin: 0 0 8px;

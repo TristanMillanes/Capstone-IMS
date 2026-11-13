@@ -147,8 +147,7 @@
   "use strict";
   const CONFIG = Object.freeze({
     url: "https://zssrxubajhqryrwijyzm.supabase.co",
-    publishableKey: "sb_publishable_5RWFfJ5oN6ike6SSyafajw_yF9DYApP",
-    table: "visitors"
+    publishableKey: "sb_publishable_5RWFfJ5oN6ike6SSyafajw_yF9DYApP"
   });
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", init, { once: true });
@@ -205,7 +204,7 @@
     };
     const state = { submitting: false, saveFailed: false, saveSucceeded: false, alertKind: null, modalFallback: false };
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const signature = setupSignature($, () => state.submitting || ui.fieldset.disabled);
+    const signature = setupSignature($, () => state.submitting || ui.fieldset.disabled, updateProgress);
     let signedSubmission = null;
     let syncMotion = () => {};
     const clean = (value) => String(value ?? "").replace(/\s+/g, " ").trim();
@@ -258,12 +257,13 @@
     }
     function updateProgress() {
       const required = activeFields();
-      const completed = required.filter((input) => !fieldError(input)).length;
-      const percentage = required.length ? Math.round((completed / required.length) * 100) : 0;
+      const total = required.length + 1;
+      const completed = required.filter((input) => !fieldError(input)).length + Number(signature.hasInk());
+      const percentage = Math.round((completed / total) * 100);
       ui.progressBar.style.width = `${percentage}%`;
-      ui.progressCount.textContent = `${completed} of ${required.length} complete`;
+      ui.progressCount.textContent = `${completed} of ${total} complete`;
       ui.progress.setAttribute("aria-valuenow", String(percentage));
-      ui.progress.setAttribute("aria-valuetext", `${completed} of ${required.length} fields complete`);
+      ui.progress.setAttribute("aria-valuetext", `${completed} of ${total} fields complete`);
     }
     function syncOtherPurpose() {
       const needsOther = /\bothers?\b/i.test(ui.purpose.value);
@@ -367,6 +367,15 @@
         focusInvalid();
         return;
       }
+      const signaturePng = signature.image();
+      if (!signaturePng) {
+        signature.showError("Please sign in the box before registering your visit.");
+        return;
+      }
+      if (!signaturePng.startsWith("data:image/png;base64,") || signaturePng.length > 131072) {
+        signature.showError("The signature could not be saved. Clear it and sign again.");
+        return;
+      }
       if (!navigator.onLine) {
         syncConnectionStatus();
         showError("Reconnect to the internet, then register your visit again.");
@@ -379,11 +388,6 @@
           : "Registration is still connecting. Please try again shortly.", "sdk");
         return;
       }
-      const signaturePng = signature.image();
-      if (signaturePng && (!signaturePng.startsWith("data:image/png;base64,") || signaturePng.length > 131072)) {
-        signature.showStatus("The signature is too large to save. Clear it and sign again.");
-        return;
-      }
       const visitorData = {
         full_name: clean(ui.fullName.value),
         contact: normalizePhone(ui.contact.value),
@@ -392,25 +396,21 @@
         purpose_category: clean(ui.purpose.value),
         other_purpose_specific: ui.other.disabled ? "" : clean(ui.other.value)
       };
-      if (signaturePng) {
-        const payload = JSON.stringify([visitorData, signaturePng]);
-        if (signedSubmission?.payload !== payload) {
-          const random = crypto.getRandomValues(new Uint8Array(16));
-          const id = Array.from(random, (byte) => byte.toString(16).padStart(2, "0")).join("");
-          signedSubmission = { id, payload };
-        }
+      const payload = JSON.stringify([visitorData, signaturePng]);
+      if (signedSubmission?.payload !== payload) {
+        const random = crypto.getRandomValues(new Uint8Array(16));
+        const id = Array.from(random, (byte) => byte.toString(16).padStart(2, "0")).join("");
+        signedSubmission = { id, payload };
       }
       state.saveFailed = false;
       state.saveSucceeded = false;
       setSubmitting(true);
       try {
-        const { error } = signaturePng
-          ? await db.rpc("pgenro_register_signed_visit", {
-              p_visit: visitorData,
-              p_signature: signaturePng,
-              p_submission_id: signedSubmission.id
-            })
-          : await db.from(CONFIG.table).insert([visitorData]);
+        const { error } = await db.rpc("pgenro_register_signed_visit", {
+          p_visit: visitorData,
+          p_signature: signaturePng,
+          p_submission_id: signedSubmission.id
+        });
         if (error) throw error;
         state.saveSucceeded = true;
       } catch (error) {
@@ -569,7 +569,7 @@
     if (!db && sdkScript?.dataset.src) sdkScript.src = sdkScript.dataset.src;
   }
 
-  function setupSignature($, locked) {
+  function setupSignature($, locked, onChange) {
     const canvas = $("visitorSignature");
     const clearButton = $("clearVisitorSignature");
     const status = $("signatureStatus");
@@ -579,7 +579,15 @@
     let hasInk = false;
 
     function showStatus(message) {
+      canvas.removeAttribute("aria-invalid");
       status.textContent = message;
+    }
+
+    function showError(message) {
+      canvas.setAttribute("aria-invalid", "true");
+      status.textContent = message;
+      canvas.focus({ preventScroll: true });
+      canvas.scrollIntoView({ block: "center" });
     }
 
     function finishStroke() {
@@ -595,6 +603,7 @@
       hasInk = false;
       clearButton.disabled = true;
       showStatus("Signature box is empty.");
+      onChange();
     }
 
     if (ink) {
@@ -631,6 +640,7 @@
           hasInk = true;
           clearButton.disabled = false;
           showStatus("Signature added.");
+          onChange();
         }
       });
       for (const eventName of ["pointerup", "pointercancel", "lostpointercapture"]) {
@@ -640,7 +650,7 @@
       }
       clearButton.addEventListener("click", clear);
     }
-    return { clear, showStatus, image: () => hasInk ? canvas.toDataURL("image/png") : null };
+    return { clear, showError, hasInk: () => hasInk, image: () => hasInk ? canvas.toDataURL("image/png") : null };
   }
 })();
 

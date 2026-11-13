@@ -10,9 +10,9 @@
 <meta name="description" content="Visitor registration — Provincial Government Environment and Natural Resources Office, Quezon.">
 <link rel="stylesheet" href="visitorslog.css?v=20261102-portal-modern-v4">
 
-<script defer src="visitorslog.js?v=20261113-signature"></script><script async data-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" id="supabaseSdk"></script>
+<script defer src="visitorslog.js?v=20261113-signature-required"></script><script async data-src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" id="supabaseSdk"></script>
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
-<link rel="stylesheet" href="../shared/visitor-signature.css?v=20261113-signature">
+<link rel="stylesheet" href="../shared/visitor-signature.css?v=20261113-signature-required">
 </head>
 <body data-portal-ui="v3" class="pgenro-public-visitor" data-portal-design="v4">
 <svg class="icon-definitions" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><defs>
@@ -97,7 +97,7 @@
 <p>A few details before you head in. <span class="required-note">* Required</span></p>
 <a class="panel-return" href="../User/login.html">Back to sign in</a></header><div class="progress-block">
 <div class="progress-meta">
-<span>Registration progress</span><span id="progressCount">0 of 5 complete</span>
+<span>Registration progress</span><span id="progressCount">0 of 6 complete</span>
 </div>
 <div class="progress-track" id="registrationProgress" role="progressbar" aria-label="Registration completion" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="progress-fill" id="progressBar"></div></div>
 </div>
@@ -187,11 +187,11 @@
 </div>
 <section class="visitor-signature" aria-labelledby="signatureLabel">
 <div class="signature-heading">
-<h3 id="signatureLabel">Signature <span>(optional)</span></h3>
+<h3 id="signatureLabel">Signature <span class="required-mark">(required)</span></h3>
 <button class="signature-clear" id="clearVisitorSignature" type="button" disabled>Clear signature</button>
 </div>
 <p class="signature-help" id="signatureHelp">Sign in the box with your finger or a stylus. On a computer, use your mouse.</p>
-<canvas id="visitorSignature" width="600" height="270" role="img" aria-labelledby="signatureLabel" aria-describedby="signatureHelp"></canvas>
+<canvas id="visitorSignature" width="600" height="270" tabindex="-1" role="img" aria-labelledby="signatureLabel" aria-describedby="signatureHelp signatureStatus"></canvas>
 <p class="signature-status" id="signatureStatus" role="status">Signature box is empty.</p>
 </section>
 </fieldset>
