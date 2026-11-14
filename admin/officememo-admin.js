@@ -584,150 +584,17 @@ function parseCorrespondence(rawText='',signatureRegion=false) {
 }
 /* End sender detection. */
 
-/* Memo document parser: identical page-owned code in Communications and Office Memos. */
-function parseMemoDocument(rawText='') {
- const labels='SUBJECT MATTER|SUBJECT|SUBJ|PAKSA|RE|ADDRESSED TO|MEMORANDUM FOR|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE|REF|CONTROL NO\\.?|REMARKS';
- const normalize=s=>String(s||'').replace(/\u00a0/g,' ').replace(/[\u2013\u2014\u2212]/g,'-').replace(/[\uff1a]/g,':').replace(/[ \t]+/g,' ').trim();
- const text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/[\uff1a]/g,':');
- const lines=text.replace(new RegExp(`[ \\t]{2,}(?=(?:${labels})\\s*:)`,'gi'),'\n').split('\n').map(normalize);
- const labelPattern=new RegExp(`^(${labels})\\s*(?::|[-])\\s*(.*)$`,'i');
- const bodyLine=/^(?:dear\b|sir\b|madam\b|respectfully\b|please\b|kindly\b|you are\b|this (?:is|memo|memorandum)\b|pursuant\b|in (?:connection|view|compliance)\b|for your (?:information|compliance|guidance)\b|\d+\.\s)/i;
- const header=lines.map((line,index)=>({line,index})).filter(x=>x.line).slice(0,60);
- const boundary=header.findIndex(x=>bodyLine.test(x.line)||/^(?:SUBJECT(?: MATTER)?|SUBJ|PAKSA|RE)\s*[:\-]/i.test(x.line));
- const title=/^(?:OFFICE\s+)?(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO)(?:\s+(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*[A-Z0-9 /._,-]*|\s+FOR\s*:?.*|\s*[:#.-]?\s*\d[\d /._,-]*)?\s*$/i;
- const titleText=line=>line.replace(/MEM0RANDUM/gi,'MEMORANDUM');
- const heading=header.find((x,i)=>(boundary<0||i<boundary)&&title.test(titleText(x.line)));
- const warnings=[],evidence={};
- function field(names,maxLines=4) {
-  const pattern=new RegExp(`^(?:${names})\\s*(?::|[-])?\\s*$`,'i');
-  for(let i=0;i<lines.length;i++){
-   const match=lines[i].match(labelPattern);
-   if(!(match&&pattern.test(match[1]))&&!pattern.test(lines[i]))continue;
-   const parts=match?.[2]?[match[2]]:[];
-   for(let j=i+1;j<lines.length&&j<=i+maxLines;j++){
-    const line=lines[j];if(!line||labelPattern.test(line)||bodyLine.test(line)||title.test(titleText(line)))break;
-    parts.push(line);
-   }
-   const value=normalize(parts.join(' '));
-   if(value)return {value,line:i+1};
-  }
-  return {value:'',line:null};
- }
- const fields={memoNo:'',date:'',addressedTo:'',issuedBy:'',subject:'',isMemo:!!heading,warnings,evidence};
- if(heading){
-  const headingText=titleText(heading.line);
-  const numberText=lines.slice(heading.index,Math.min(lines.length,heading.index+5)).map(titleText).join('\n');
-  const number=numberText.match(/(?:^(?:OFFICE\s+)?(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO)\s+(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*|^(?:N[O0]\.?|NUMBER|CONTROL\s+(?:NO\.?|NUMBER))\s*[:#.-]?\s*)([A-Z0-9][A-Z0-9/._-]*)/im)||headingText.match(/^(?:OFFICE\s+)?(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO)\s*[:#.-]?\s*(\d[\d/._-]*)/i);
-  if(number){fields.memoNo=number[1];const series=numberText.match(/(?:[,;]\s*s\.?\s*|\bseries\s+of\s+)(\d{4})\b/i);if(series)fields.memoNo+=`, s. ${series[1]}`;evidence.memoNo=heading.index+1;}
- }
- for(const [key,names] of Object.entries({addressedTo:'TO|T0|FOR|PARA(?: KAY| SA)?|ADDRESSED TO|MEMORANDUM FOR',issuedBy:'FROM|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY',subject:'SUBJECT|SUBJECT MATTER|SUBJ|PAKSA|RE'})){
-  const result=field(names);fields[key]=result.value;evidence[key]=result.line;
- }
- const dateField=field('DATE|DATE ISSUED|DATED',1);
- if(dateField.value){fields.date=parseMemoDate(dateField.value);evidence.date=dateField.line;if(!fields.date)warnings.push('The printed date is invalid or ambiguous. Enter the date manually.');}
- if(!fields.isMemo)warnings.push('A memorandum heading was not detected. Check the document type.');
- for(const [key,label] of [['memoNo','Memo number'],['date','Issue date'],['addressedTo','Recipient'],['subject','Subject'],['issuedBy','Issuing office']])if(!fields[key])warnings.push(`${label} was not detected.`);
- return fields;
-}
-/* End memo document parser. */
-
-function parseMemoDate(value='') {
- const months={jan:1,january:1,feb:2,february:2,mar:3,march:3,apr:4,april:4,may:5,jun:6,june:6,jul:7,july:7,aug:8,august:8,sep:9,sept:9,september:9,oct:10,october:10,nov:11,november:11,dec:12,december:12};
- const text=String(value||'').trim();let year,month,day,match;
- if((match=text.match(/\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b/)))[,year,month,day]=match;
- else if((match=text.match(/\b([A-Za-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b/i))){month=months[match[1].toLowerCase()];day=match[2];year=match[3];}
- else if((match=text.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)\.?,?\s+(\d{4})\b/i))){day=match[1];month=months[match[2].toLowerCase()];year=match[3];}
- else if((match=text.match(/\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b/))){const first=Number(match[1]),second=Number(match[2]);year=match[3];if(first>12&&second<=12){day=first;month=second;}else if(second>12&&first<=12){day=second;month=first;}else if(first===second){day=first;month=second;}else return '';}
- if(!year||!month||!day)return '';
- const date=new Date(Date.UTC(Number(year),Number(month)-1,Number(day)));
- if(date.getUTCFullYear()!==Number(year)||date.getUTCMonth()+1!==Number(month)||date.getUTCDate()!==Number(day))return '';
- return `${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+/* Memo document parser. */
+function parseMemoDate(value) {
+ return window.PGENRO_OcrFields.parseDate(value);
 }
 function parseDocumentHeader(rawText='') {
- const labels='SUBJECT MATTER|SUBJECT|SUBJ|RE|ADDRESSED TO|MEMORANDUM FOR|RECIPIENT OFFICE|RECEIVED FROM|SENDER|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY|DATE RECEIVED|RECEIVED DATE|DATE RELEASED|RELEASED DATE|DATE ISSUED|DATE|DATED|TO|T0|FROM|FOR|THROUGH|THRU|CC|ATTACHMENTS?|REFERENCE(?: NO\\.?| NUMBER)?|REF(?: NO\\.?)?|CONTROL (?:NO\\.?|NUMBER)|REMARKS';
- const labelRe=new RegExp(`^(${labels})\\s*(?::|[–—-])\\s*(.*)$`,'i'),bareRe=new RegExp(`^(?:${labels})\\s*$`,'i');
- const bodyRe=/^(?:dear\b|sir\b|madam\b|respectfully\b|sincerely\b|please\b|kindly\b|you are\b|this (?:is|memo|memorandum|office|letter)\b|pursuant\b|in (?:connection|view|compliance|light)\b|for your (?:information|compliance|guidance)\b|we (?:are|would|request)\b|I (?:am|would|respectfully)\b|attached (?:is|are)\b|relative to\b|\d+\.\s)/i;
- const dateLine=/^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4}|[A-Za-z]+\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}|\d{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\.?,?\s+\d{4})\s*$/i;
- const prefix='(?:(?:PG\\s*ENRO|PGENRO|PROVINCIAL ENRO)\\s+)?';
- const memoRe=new RegExp(`^${prefix}(?:OFFICE\\s+)?(?:MEMORANDUM(?:\\s+(?:ORDER|CIRCULAR))?|MEMO)(?:\\s+(?:N[O0]\\.?|NUMBER)\\s*[:#.-]?\\s*[A-Z0-9 /._,-]*|\\s+FOR\\s*:?.*|\\s*[:#.-]?\\s*\\d[\\d /._,-]*)?\\s*$`,'i');
- const types=['Office Order','Special Order','Travel Order','Request Letter','Endorsement Letter','Transmittal Letter','Response Letter','Notice of Meeting','Invitation','Report'];
- let text=String(rawText||'').replace(/\r/g,'').split('\f')[0].replace(/\u00a0/g,' ').replace(/：/g,':');
- const lines=[];
- text.split('\n').forEach((raw,index)=>{
-  raw=raw.replace(/^(?:SUBJECI|SUB3ECT|SUBIECT)\s*(?=[:\-])/i,'SUBJECT').replace(new RegExp(`^(${labels})[ \\t]{2,}(?=\\S)`,'i'),'$1: ');
-  raw.split(new RegExp(`[ \\t]{2,}(?=(?:${labels})\\s*:)`,'i')).forEach(line=>lines.push({text:line.replace(/[ \t]+/g,' ').trim(),number:index+1}));
- });
- let header=lines.slice(0,Math.min(100,lines.findIndex(x=>bodyRe.test(x.text))<0?lines.length:lines.findIndex(x=>bodyRe.test(x.text))));
- const subjectIndex=header.findIndex(x=>/^(?:SUBJECT(?: MATTER)?|SUBJ|RE)\s*(?::|[–—-]|$)/i.test(x.text));
- if(subjectIndex>=0){
-  let content=!!header[subjectIndex].text.match(labelRe)?.[2];
-  for(let i=subjectIndex+1;i<header.length;i++){
-   const line=header[i].text;
-   if(line){if(!labelRe.test(line)&&!bareRe.test(line))content=true;continue;}
-   const following=header.slice(i+1).find(x=>x.text)?.text||'';
-   if(content&&following&&!labelRe.test(following)&&!bareRe.test(following)&&!dateLine.test(following)&&!/^(?:FOR|OF|ON|AND|OR|WITH|REGARDING|DURING)\b/i.test(following)){header=header.slice(0,i);break;}
-  }
- }
- const result={memoNo:'',controlNo:'',date:'',receivedDate:'',releasedDate:'',addressedTo:'',recipient:'',issuedBy:'',subject:'',sender:'',sourceOffice:'',signatory:'',docType:'',documentType:'',isMemo:false,warnings:[],evidence:{},fieldEvidence:{},needsReview:[]};
- let heading=-1;
- for(let i=0;i<Math.min(subjectIndex<0?header.length:subjectIndex,60);i++){
-  const title=header[i].text.replace(/MEM0RANDUM/gi,'MEMORANDUM');
-  if(memoRe.test(title)){heading=i;result.docType='Memorandum';result.isMemo=true;break;}
-  const type=types.find(name=>new RegExp(`^${prefix}${name.replace(/ /g,'\\s+')}(?:\\s+(?:N[O0]\\.?|NUMBER)\\s*[:#.-]?.*|\\s*[:#.-]?\\s*\\d[\\d /._,-]*)?\\s*$`,'i').test(title));
-  if(type){heading=i;result.docType=type;break;}
- }
- function field(names,limit=6){
-  const pattern=new RegExp(`^(?:${names})$`,'i');
-  for(let i=0;i<header.length;i++){
-   const line=header[i].text,match=line.match(labelRe);
-   if(!(match&&pattern.test(match[1]))&&!pattern.test(line))continue;
-   const parts=match?.[2]?[match[2]]:[];let j=i+1;
-   while(j<Math.min(header.length,i+1+limit)){
-    const next=header[j].text;
-    if(!next){
-     let probe=j+1;while(probe<header.length&&!header[probe].text&&probe-j<=2)probe++;
-     if(probe<header.length&&probe-j<=2&&(!parts.length||(/^(?:FOR|OF|ON|AND|OR|WITH|REGARDING|DURING)\b/i.test(header[probe].text)&&!bodyRe.test(header[probe].text)&&!labelRe.test(header[probe].text)))){j=probe;continue;}
-     break;
-    }
-    if(labelRe.test(next)||bareRe.test(next)||bodyRe.test(next)||memoRe.test(next)||/^[-_=]{3,}$/.test(next)||(limit===1&&parts.length))break;
-    parts.push(next);j++;
-   }
-   const value=parts.join(' ').trim();if(value)return {value,line:header[i].number,text:header.slice(i,j).map(x=>x.text).join('\n')};
-  }
-  return {value:'',line:null,text:''};
- }
- if(heading>=0){
-  const block=header.slice(heading,heading+5);const end=block.findIndex((x,i)=>i&&(labelRe.test(x.text)||bareRe.test(x.text)));
-  const numberText=block.slice(0,end<0?block.length:end).map(x=>x.text).join('\n');
-  const number=numberText.match(/\b(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*([A-Z0-9][A-Z0-9/._-]*)/i)||block[0].text.match(/(?:MEMORANDUM(?:\s+(?:ORDER|CIRCULAR))?|MEMO|ORDER)\s*[:#.-]?\s*(\d[\d/._-]*)/i);
-  if(number){const series=numberText.match(/(?:[,;]\s*s\.?\s*|\bseries(?:\s+of)?\s+)(\d{4})\b/i);result.controlNo=number[1]+(series?`, s. ${series[1]}`:'');result.evidence.controlNo=header[heading].number;if(result.isMemo){result.memoNo=result.controlNo;result.evidence.memoNo=header[heading].number;}}
- }
- const printed=field('CONTROL (?:NO\\.?|NUMBER)',1),reference=printed.value?printed:field('REFERENCE(?: NO\\.?| NUMBER)?|REF(?: NO\\.?)?',1);
- if((printed.value||!result.controlNo)&&/^[A-Z0-9][A-Z0-9/._-]*(?:,?\s*s\.?\s*\d{4})?$/i.test(reference.value)){result.controlNo=reference.value;result.evidence.controlNo=reference.line;if(result.isMemo&&!result.memoNo)result.memoNo=reference.value;}
- for(const[key,names]of Object.entries({addressedTo:'TO|T0|FOR|ADDRESSED TO|MEMORANDUM FOR|RECIPIENT OFFICE',issuedBy:'FROM|ISSUED BY|ISSUING OFFICE|ORIGINATING OFFICE|SIGNATORY',sender:'RECEIVED FROM|FROM|SENDER|ORIGINATING OFFICE|ISSUING OFFICE',subject:'SUBJECT|SUBJECT MATTER|SUBJ|RE',signatory:'SIGNATORY'})){
-  const f=field(names);result[key]=f.value;result.evidence[key]=f.line;result.fieldEvidence[key]=f.text;
- }
- const explicitSender=result.sender;
- if(!result.sender){
-  const firstLabel=header.findIndex(x=>labelRe.test(x.text)||bareRe.test(x.text)),firstDate=header.findIndex(x=>dateLine.test(x.text));
-  const top=header.slice(0,Math.min(heading<0?header.length:heading,subjectIndex<0?header.length:subjectIndex,firstLabel<0?header.length:firstLabel,firstDate<0?header.length:firstDate,20));
-  const office=top.filter(x=>/\b(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY)\b/i.test(x.text)&&!types.some(name=>x.text.toLowerCase().includes(name.toLowerCase()))&&!/^(?:email|tel|contact|www\.|https?:)/i.test(x.text)).at(-1);
-  if(office){result.sender=office.text;result.evidence.sender=office.number;}
- }
- const author=printedHeaderSignatory(rawText);
- if(author.name){result.signatory=author.name;if(!explicitSender)result.sender=author.name;if(!result.issuedBy)result.issuedBy=author.name;}
- for(const[key,names]of Object.entries({date:'DATE|DATE ISSUED|DATED',receivedDate:'DATE RECEIVED|RECEIVED DATE',releasedDate:'DATE RELEASED|RELEASED DATE'})){
-  const f=field(names,1);if(f.value){result[key]=parseMemoDate(f.value);result.evidence[key]=f.line;result.fieldEvidence[key]=f.text;if(!result[key])result.warnings.push('The printed date is invalid or ambiguous. Enter it manually.');}
- }
- if(!result.evidence.date){const standalone=header.find(x=>dateLine.test(x.text));if(standalone){result.date=parseMemoDate(standalone.text);result.evidence.date=standalone.number;}}
- result.recipient=result.addressedTo;result.sourceOffice=result.sender;result.documentType=result.docType;
- for(const[key,label]of [['memoNo','Memo number'],['date','Issue date'],['addressedTo','Recipient'],['subject','Subject'],['issuedBy','Issuing office']])if(!result[key])result.warnings.push(`${label} was not detected.`);
- result.needsReview=['controlNo','date','addressedTo','subject','sender'].filter(key=>!result[key]);
- return result;
+ return window.PGENRO_OcrFields.parseHeader(rawText, printedHeaderSignatory);
 }
 function printedHeaderSignatory(rawText=''){
  rawText=String(rawText||'').replace(/^((?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards))[,.:]\s+(?=[A-ZÀ-Þ])/gim,'$1,\n');
  const closing=/^(?:respectfully(?: yours| submitted)?|sincerely(?: yours)?|very truly yours|yours(?: truly| sincerely| faithfully)?|truly yours|best regards|kind regards|for your (?:compliance|information and compliance|guidance and compliance))\s*[,.;:!]*$/i;
+ const signed=/^(?:signed(?: by)?|signatory|nilagdaan ni)\s*[:：-]?\s*(.*)$/i;
  const role=/\b(?:PGDH|PGADH|PGENRO|PG\s*ENRO|OFFICER|DIRECTOR|CHIEF|MAYOR|GOVERNOR|ADMINISTRATOR|SUPERVISOR|MANAGER|SECRETARY|PRESIDENT|DEAN|PRINCIPAL|HEAD|COORDINATOR)\b/i;
  const stop=/^(?:cc\s*:|copy (?:furnished|to)|enclosures?\s*:|attachments?\s*:|annex\b|appendix\b|prepared by\b|reviewed by\b|approved by\b|recommending approval\b|ground floor\b|email\b|tel\b|www\.|https?:)|@/i;
  const pages=String(rawText||'').replace(/\r/g,'').split('\f'),lines=[];
@@ -738,8 +605,10 @@ function printedHeaderSignatory(rawText=''){
  }
  const candidates=[];
  for(let i=0;i<lines.length;i++){
-  if(!closing.test(lines[i]))continue;
-  const block=[];for(const s of lines.slice(i+1,i+15)){if(stop.test(s))break;if(s)block.push(s);}
+  const mark=lines[i].match(signed);
+  if(!mark&&!closing.test(lines[i]))continue;
+  const block=mark?.[1]?[mark[1]]:[];
+  for(const s of lines.slice(i+1,i+15)){if(stop.test(s)||signed.test(s)||closing.test(s))break;if(s)block.push(s);}
   for(let j=0;j<Math.min(6,block.length);j++){
    const name=block[j].replace(/\.{2,}/g,'.').replace(/\b([A-Z])(?=\s)/g,'$1.').replace(/^[ |;:'‘’"“”]+|[ |;:'‘’"“”]+$/g,'');
    if(role.test(name)||name.length<7||name.length>110||/[\d:!?@/]/.test(name)||/\b(?:REPUBLIC|PROVINCE|GOVERNMENT|OFFICE|DEPARTMENT|DIVISION|PERSONNEL|SUBJECT|ORDER|COMPLIANCE|DIRECTOR|MAYOR|CHIEF|GOVERNOR|SECRETARY|MANAGER|PLEASE|THANK|SHOULD|MUST|REQUEST)\b/i.test(name))continue;
@@ -749,73 +618,58 @@ function printedHeaderSignatory(rawText=''){
    if(!candidates.includes(name))candidates.push(name);
   }
  }
- return {name:candidates.length===1?candidates[0]:''};
+ return {name:candidates.length===1?candidates[0]:'',needsReview:candidates.length>1};
 }
 
 /* End memo document parser. */
 
-/* Printed heading and letter-purpose extraction for native text/browser reads. */
-function parseLetterDetails(rawText=''){
- const rules={"headings":[["Memorandum",{"pattern":"^(?:OFFICE\\s+)?(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\\s+(?:ORDER|CIRCULAR))?(?:\\s+(?:N[O0]\\.?|NUMBER|FOR|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Travel Order",{"pattern":"^(?:REVISED\\s+)?TRAVEL\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Special Order",{"pattern":"^SPECIAL\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Office Order",{"pattern":"^(?:OFFICE|ADMINISTRATIVE)\\s+ORDER(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$","flags":"i"}],["Notice of Meeting",{"pattern":"^(?:NOTICE\\s+OF\\s+(?:A\\s+)?MEETING|MEETING\\s+NOTICE)(?:\\s*[:\\-].*)?$","flags":"i"}],["Request Letter",{"pattern":"^(?:REQUEST\\s+LETTER|LETTER\\s+OF\\s+REQUEST)(?:\\s*[:\\-].*)?$","flags":"i"}],["Endorsement Letter",{"pattern":"^(?:ENDORSEMENT(?:\\s+LETTER)?|LETTER\\s+OF\\s+ENDORSEMENT)(?:\\s*[:\\-].*)?$","flags":"i"}],["Transmittal Letter",{"pattern":"^(?:TRANSMITTAL(?:\\s+LETTER)?|LETTER\\s+OF\\s+TRANSMITTAL)(?:\\s*[:\\-].*)?$","flags":"i"}],["Response Letter",{"pattern":"^(?:RESPONSE|REPLY)\\s+LETTER(?:\\s*[:\\-].*)?$","flags":"i"}],["Invitation",{"pattern":"^(?:INVITATION(?:\\s+LETTER)?|LETTER\\s+OF\\s+INVITATION)(?:\\s*[:\\-].*)?$","flags":"i"}],["Report",{"pattern":"^(?:(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT|NARRATIVE)\\s+){0,2}REPORT(?:\\s*[:\\-].*)?$","flags":"i"}]],"subjectRules":[["Request Letter",{"pattern":"(?:^(?:REQUEST(?:ING)?(?:\\s+(?:FOR|TO))?|APPLICATION\\s+FOR|REQUISITION\\s+FOR|PURCHASE\\s+REQUEST)\\b|\\b(?:EQUIPMENT|SUPPLY|SUPPLIES|FUNDING|ASSISTANCE|PURCHASE|PERMISSION|APPROVAL|DOCUMENT|RECORDS|FINANCIAL|BUDGET|SPONSORSHIP)\\s+REQUEST\\b)","flags":"i"}],["Notice of Meeting",{"pattern":"^(?:NOTICE\\s+OF\\s+(?:A\\s+)?MEETING|MEETING\\s+NOTICE|(?:STAFF|PERSONNEL|COORDINATION|REGULAR|SPECIAL)\\s+MEETING)\\b","flags":"i"}],["Invitation",{"pattern":"^INVITATION\\b","flags":"i"}],["Endorsement Letter",{"pattern":"^ENDORSEMENT\\b","flags":"i"}],["Transmittal Letter",{"pattern":"^(?:TRANSMITTAL\\b|(?:SUBMISSION|FORWARDING)\\s+OF\\b)","flags":"i"}],["Response Letter",{"pattern":"^(?:RESPONSE|REPLY)\\s+TO\\b","flags":"i"}],["Report",{"pattern":"^(?:(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT|NARRATIVE)\\s+){0,2}REPORT\\b","flags":"i"}]],"bodyRules":[["Response Letter",{"pattern":"\\b(?:in\\s+(?:response|reply)\\s+to|respond(?:ing)?\\s+to|reply(?:ing)?\\s+to)\\b","flags":"i"}],["Invitation",{"pattern":"\\b(?:invite\\s+(?:you|your|the)|inviting\\s+(?:you|your|the)|extend\\s+(?:an?|our)\\s+invitation)\\b","flags":"i"}],["Endorsement Letter",{"pattern":"\\b(?:(?:we|I)\\s+(?:(?:hereby|respectfully)\\s+)?endorse|endorsing\\s+(?:the|this|Mr|Ms|Dr))\\b","flags":"i"}],["Transmittal Letter",{"pattern":"\\b(?:(?:we|I)\\s+(?:(?:hereby|respectfully|are)\\s+)?(?:transmit|forward|submit|transmitting|forwarding|submitting)|herewith\\s+(?:transmitted|submitted|forwarded)|transmittal\\s+of)\\b","flags":"i"}],["Request Letter",{"pattern":"\\b(?:request(?:ing)?\\s+(?:for|to|your|the|a|an|permission|approval|assistance|funding|technical\\s+assistance)|application\\s+for)\\b","flags":"i"}],["Notice of Meeting",{"pattern":"\\b(?:please\\s+be\\s+informed|inform\\s+(?:you|all)|notify\\s+(?:you|all))\\b[^.!?]{0,180}\\bmeeting\\b","flags":"i"}],["Report",{"pattern":"\\b(?:report\\s+on|(?:monthly|annual|accomplishment|activity|inspection|progress|incident)\\s+report)\\b","flags":"i"}]],"subjectLabel":{"pattern":"^(?:SUBJECT(?:\\s+(?:MATTER|OF\\s+(?:THE\\s+)?LETTER))?|SUBJEC[TIL1]|SUB3ECT|SUBJ\\.?|RE|REGARDING|PAKSA)(?:\\s*[:;\\-–—]\\s*|\\s+|$)(.*)$","flags":"i"},"fieldLabel":{"pattern":"^(?:DATE(?:\\s+(?:ISSUED|RECEIVED|RELEASED))?|DATED|TO|T0|FOR|FROM|SENDER|THRU|THROUGH|CC|ATTACHMENTS?|ENCLOSURES?|REFERENCE|REF\\.?|CONTROL(?:\\s+(?:NO\\.?|NUMBER))?|ISSUED\\s+BY|SIGNATORY|REMARKS|N[O0]\\.?|NUMBER)\\s*[:;\\-]","flags":"i"},"salutation":{"pattern":"^(?:DEAR\\b|SIR\\s*[,!:]|MADAM\\s*[,!:]|MA'AM\\s*[,!:]|TO\\s+WHOM\\s+IT\\s+MAY\\s+CONCERN)","flags":"i"},"closing":{"pattern":"^(?:(?:VERY\\s+)?(?:YOURS\\s+)?(?:SINCERELY|RESPECTFULLY|FAITHFULLY|TRULY)|YOURS\\s+(?:TRULY|FAITHFULLY|SINCERELY)|BEST\\s+REGARDS|KIND\\s+REGARDS|LUBOS\\s+NA\\s+GUMAGALANG|SIGNED\\s+BY|PREPARED\\s+BY|APPROVED\\s+BY)\\b","flags":"i"},"body":{"pattern":"^(?:DEAR\\b|GREETINGS\\b|GOOD\\s+(?:DAY|MORNING|AFTERNOON)\\b|PLEASE\\b|KINDLY\\b|WE\\b|I\\s+(?:AM|WOULD|HEREBY|WRITE|RESPECTFULLY)\\b|MAY\\s+(?:WE|I)\\b|THIS\\s+(?:IS|LETTER|REFERS|HAS|WILL)\\b|YOU\\s+ARE\\b|THE\\s+(?:UNDERSIGNED|ATTACHED|PURPOSE)\\b|ATTACHED\\s+(?:IS|ARE|HEREWITH)\\b|IN\\s+(?:CONNECTION|VIEW|LIGHT)\\b|WITH\\s+REFERENCE\\b|PURSUANT\\b|FOR\\s+YOUR\\s+(?:INFORMATION|COMPLIANCE|GUIDANCE)\\b)","flags":"i"},"titlePurpose":{"pattern":"^(?:REQUEST\\s+(?:FOR|TO)|INVITATION\\s+(?:TO|FOR)|ENDORSEMENT\\s+(?:OF|FOR)|TRANSMITTAL\\s+OF|RESPONSE\\s+TO|REPLY\\s+TO|NOTICE\\s+OF\\s+MEETING|(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT)\\s+REPORT)\\b","flags":"i"}};
- const header=parseDocumentHeader(rawText),first=String(rawText||'').replace(/\r/g,'').split('\f')[0],lines=first.split('\n').map(s=>s.trim());
- const regex=key=>new RegExp(rules[key].pattern,rules[key].flags||'i');
- const greeting=lines.findIndex(line=>regex('salutation').test(line));
- let opening='';
- if(greeting>=0){const parts=[];for(const line of lines.slice(greeting+1,greeting+24)){
-  if(!line){if(parts.length)break;continue;}
-  if(regex('closing').test(line))break;
-  if(regex('fieldLabel').test(line)||regex('subjectLabel').test(line))continue;
-  parts.push(line);if(parts.join(' ').length>=650)break;
- }opening=parts.join(' ');}else opening=lines.find(line=>regex('body').test(line))||'';
- let subject=header.subject||'',subjectSource=subject?'header':'none',documentType=header.docType||'',documentTypeSource=documentType?'heading':'none';
- const top=lines.slice(0,greeting>=0?greeting:lines.findIndex(line=>regex('body').test(line))<0?60:lines.findIndex(line=>regex('body').test(line)));
- if(!subject){const title=top.find(line=>regex('titlePurpose').test(line));if(title){subject=title;subjectSource='heading';}}
- if(!subject&&/\b(?:request(?:ing)?|invite|invitation|endorse|endorsement|transmit|transmittal|submit|forward|respond|response|reply|inform|report)\b/i.test(opening)){
-  const sentence=opening.match(/^.*?[.!?](?=\s+[A-Z]|$)/)?.[0]||opening;subject=sentence.length<=240?sentence:sentence.slice(0,240).replace(/\s+\S*$/,'')+'…';subjectSource='body';
- }
- if(!documentType){for(const [type,rule] of rules.headings){if(top.some(line=>new RegExp(rule.pattern,rule.flags).test(line))){documentType=type;documentTypeSource='heading';break;}}}
- if(!documentType&&subjectSource!=='body'){for(const [type,rule] of rules.subjectRules){if(new RegExp(rule.pattern,rule.flags).test(subject)){documentType=type;documentTypeSource='subject';break;}}}
- if(!documentType){for(const [type,rule] of rules.bodyRules){if(new RegExp(rule.pattern,rule.flags).test(opening)){documentType=type;documentTypeSource='body';break;}}}
- if(!documentType&&first.trim()){documentType=greeting>=0?'Letter':'Other Communication';documentTypeSource='fallback';}
- return {subject,subjectSource,documentType,documentTypeSource,isMemo:header.isMemo,needsReview:[...(subjectSource==='body'||!subject?['subject']:[]),...(['body','subject','fallback'].includes(documentTypeSource)?['documentType']:[])]};
-}
-/* End letter-purpose extraction. */
-
-
-  function parseMemoOcr(text) { return parseDocumentHeader(text); }
-
   const memoOcrValues=new Map(),memoManualFields=new Set();
   for(const[key,input]of Object.entries(memoFieldInputs()))input.addEventListener('input',()=>memoManualFields.add(key));
-  let generatedMemoNumber='',generatedMemoDate='',memoSavedText='';
+  let generatedMemoNumber='',generatedMemoDate='',lastMemoRead=null;
   function splitMemoNotes(value='') {
     const text=String(value||''),marker='\n\nExtracted document text:\n',index=text.indexOf(marker);
     return index<0?{notes:text,text:''}:{notes:text.slice(0,index),text:text.slice(index+marker.length)};
   }
   function clearMemoDetection(){
     for(const [key,previous]of memoOcrValues){const input=memoFieldInputs()[key];if(input.value===previous&&!memoManualFields.has(key))input.value='';}
-    memoOcrValues.clear();memoSavedText='';memoOcrText.value='';document.getElementById('memoExtractionReview').hidden=true;
+    memoOcrValues.clear();lastMemoRead=null;memoOcrText.value='';document.getElementById('memoExtractionReview').hidden=true;
   }
-  function memoFieldInputs(){return {memoNo:formControlNo,date:formDate,addressedTo:formAddressedTo,subject:formSubject,issuedBy:formIssuedBy};}
-  function applyMemoFields(text,metadata=null){
-    const detected=parseDocumentHeader(text),inputs=memoFieldInputs(),labels={memoNo:'Memo number',date:'Issue date',addressedTo:'Addressed to',subject:'Subject',issuedBy:'Issued by'},statuses={};
-    if(metadata){Object.assign(detected,{isMemo:metadata.isMemo||detected.isMemo,memoNo:metadata.memoNo||detected.memoNo,date:metadata.date||detected.date,addressedTo:metadata.recipient||detected.addressedTo,subject:metadata.subject||detected.subject,issuedBy:metadata.issuedBy||metadata.signatory||detected.issuedBy});}
-    if(!detected.isMemo){document.getElementById('memoReviewSummary').textContent='A memorandum heading was not detected. Check the original document before entering its details.';}
-    for(const [key,input]of Object.entries(inputs)){
-      const current=input.value.trim(),previous=memoOcrValues.get(key),isGenerated=(key==='memoNo'&&current===generatedMemoNumber)||(key==='date'&&current===generatedMemoDate);
-      const mayFill=!current||(!memoManualFields.has(key)&&(current===previous||isGenerated));
-      if(detected.isMemo&&detected[key]&&mayFill){input.value=detected[key];memoOcrValues.set(key,detected[key]);statuses[key]='Detected from the document';}
-      else if(detected.isMemo&&!detected[key]&&mayFill&&(previous!==undefined||(key==='date'&&isGenerated))){input.value=key==='memoNo'?generatedMemoNumber:'';memoOcrValues.delete(key);statuses[key]=key==='memoNo'&&generatedMemoNumber?'Generated registry number; printed number not detected':'Not detected; review manually';}
-      else if(current&&!mayFill)statuses[key]='Manual value kept';
-      else if(key==='memoNo'&&isGenerated)statuses[key]='Generated registry number; printed number not detected';
-      else statuses[key]='Not detected; review manually';
+  function memoFieldInputs(){
+    return {memoNo:formControlNo,date:formDate,addressedTo:formAddressedTo,subject:formSubject,issuedBy:formIssuedBy,remarks:formRemarks};
+  }
+  function applyMemoFields(text,result=null){
+    const detected=result?.formSchemaVersion===2&&result.metadata?result.metadata:parseDocumentHeader(text);
+    const inputs=memoFieldInputs();
+    const labels={memoNo:'Memo number',date:'Issue date',addressedTo:'Addressed to',subject:'Subject',issuedBy:'Issued by',remarks:'Remarks'};
+    const statuses={},suggestions={};
+    for(const [key,input] of Object.entries(inputs)){
+      const current=input.value.trim(),previous=memoOcrValues.get(key);
+      const generated=key==='memoNo'?generatedMemoNumber:key==='date'?generatedMemoDate:'';
+      const value=detected.isMemo?detected[key]||'':'';
+      suggestions[key]=value;
+      if(memoManualFields.has(key)||(current&&current!==previous&&current!==generated)){
+        statuses[key]='Your value is kept';
+      }else if(value){
+        input.value=value;
+        memoOcrValues.set(key,input.value);
+        statuses[key]=detected.needsReview?.includes(key)?'Confirm against the original':'Detected from the document';
+      }else{
+        if(previous!==undefined||(key==='date'&&current===generatedMemoDate))input.value=key==='memoNo'?generatedMemoNumber:'';
+        memoOcrValues.delete(key);
+        statuses[key]=key==='memoNo'&&input.value===generatedMemoNumber&&generatedMemoNumber?
+          'Generated registry number':key==='remarks'?'Optional':'Enter or confirm this value';
+      }
     }
     document.getElementById('memoExtractionReview').hidden=false;
-    const found=['memoNo','date','addressedTo','subject','issuedBy'].filter(k=>detected[k]).length;
-    document.getElementById('memoReviewSummary').textContent=`${found} of 5 fields detected. ${detected.warnings.join(' ')} Manual edits are preserved.`;
-    document.getElementById('memoReviewFields').innerHTML=Object.keys(inputs).map(key=>`<div class="memo-review-field ${detected[key]?'':'needs-review'}"><dt>${labels[key]}</dt><dd>${escapeHtml(detected[key]||'Not detected')}</dd><small>${statuses[key]}</small></div>`).join('');
-    memoSavedText=String(text||'');return detected;
+    const found=Object.entries(suggestions).filter(([key,value])=>key!=='remarks'&&value).length;
+    const summary=detected.isMemo?found+' of 5 memo details detected.':'Confirm the document type. The OCR found no memorandum heading or type.';
+    document.getElementById('memoReviewSummary').textContent=[summary,...(detected.warnings||[])].join(' ');
+    document.getElementById('memoReviewFields').innerHTML=Object.keys(inputs).map(key=>
+      '<div class="memo-review-field '+(suggestions[key]?'':'needs-review')+'"><dt>'+labels[key]+'</dt><dd>'+
+      escapeHtml(suggestions[key]||'—')+'</dd><small>'+statuses[key]+'</small></div>'
+    ).join('');
   }
-  document.getElementById('recheckMemoFieldsBtn').onclick=()=>{if(busy||fileBusy||ocrBusy)return;if(!memoOcrText.value.trim()){showToast('Extract or paste document text first.','warning');return;}applyMemoFields(memoOcrText.value);};
+  document.getElementById('recheckMemoFieldsBtn').onclick=()=>{if(busy||fileBusy||ocrBusy)return;if(!memoOcrText.value.trim()){showToast('Extract or paste document text first.','warning');return;}const text=memoOcrText.value;applyMemoFields(text,lastMemoRead?.text===text?lastMemoRead.result:null);};
   function setMemoFieldsBusy(value){for(const input of memoForm.querySelectorAll('input,textarea,select'))input.disabled=value;document.getElementById('recheckMemoFieldsBtn').disabled=value;fileDropzone.setAttribute('aria-disabled',String(value));}
 
   function setMemoOcrStatus(message, state = "ready") {
@@ -889,7 +743,7 @@ async function extractDocument(source,progress=()=>{}){
  const operation=readerRuntime.operation,checkRead=()=>{if(operation?.cancelled)throw Error('Reading stopped. Your draft is kept; you can retry.');};
  const started=performance.now(),previous=readerResults.get(source);
  if(previous){progress('Using the document already read…',98);return {...previous,cacheHit:true,durationMs:Math.round(performance.now()-started)};}
- const remember=result=>{checkRead();const finished={...result,metadata:{...parseLetterDetails(result.text),...(result.metadata||{})},durationMs:Math.round(performance.now()-started)};readerResults.set(source,finished);return finished;};
+ const remember=result=>{checkRead();const finished={...result,durationMs:Math.round(performance.now()-started)};readerResults.set(source,finished);return finished;};
  const extension=source.name.split('.').pop().toLowerCase();
  if(/^(txt|csv)$/.test(extension)){
   const bytes=new Uint8Array(await source.arrayBuffer()),encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';
@@ -927,7 +781,7 @@ async function extractDocument(source,progress=()=>{}){
    if(operation)pollTimer=setTimeout(pollProgress,700);
    const response=await fetch(endpoint,{method:'POST',body,headers:operation?{'X-OCR-Request-ID':operation.requestId}:{},signal:controller.signal});
    // A static server has no OCR endpoint. Continue to the local/browser reader.
-   if([404,405,501,503].includes(response.status))continue;
+   if([404,405].includes(response.status)||response.status>=500)continue;
    let result;try{result=await response.json();}catch{throw Error('The document reader returned an invalid response. Reload and retry.');}
    if(!response.ok||result.success===false)throw Error(result.error||'The document reader could not read this file.');
    if(typeof result.text!=='string')throw Error('The document reader returned no document text.');
@@ -1069,7 +923,7 @@ async function extractDocument(source,progress=()=>{}){
       setMemoOcrStatus('Reading the document…','working');
       const result=await readWithCancellation(file,(message,pct)=>{setMemoOcrStatus(message,'working');setMemoUploadProgress(pct,message,true);}),text=String(result.text||'').trim();
       if(token!==memoOcrToken)return;if(!text)throw Error('No readable text detected. Enter the fields manually.');
-      memoOcrText.value=text;applyMemoFields(text,result.metadata);
+      memoOcrText.value=text;lastMemoRead={text,result};applyMemoFields(text,result);
       setMemoOcrStatus(`Read ${result.pages||text.split('\f').length} pages in ${((result.durationMs||0)/1000).toFixed(1)}s${result.cacheHit?' · reused result':''}. ${text.length.toLocaleString()} characters. Review the detected fields. ${(result.warnings||[]).join(' ')}`,'success');showToast('Document text extracted. Review the fields before saving.');
     }catch(error){setMemoOcrStatus(error.message,'error');showToast(error.message,'error');}
     finally{document.getElementById('memoOcrStopControls').hidden=true;ocrBusy=false;setMemoFieldsBusy(false);memoFormModal.dataset.busy='false';runMemoOcrBtn.disabled=!selectedMemoFile;saveMemoSubmitBtn.disabled=false;formPdfFile.disabled=false;removeAttachmentBtn.disabled=false;setMemoUploadProgress(0,'',false);M.renderIcons();}
@@ -1136,7 +990,7 @@ async function extractDocument(source,progress=()=>{}){
     if (formPdfFile) formPdfFile.value = "";
     if (formExistingPdfBase64) formExistingPdfBase64.value = "";
     selectedMemoFile = null;
-    memoOcrToken += 1;memoOcrValues.clear();memoSavedText="";document.getElementById("memoExtractionReview").hidden=true;
+    memoOcrToken += 1;memoOcrValues.clear();lastMemoRead=null;document.getElementById("memoExtractionReview").hidden=true;
 
     refreshMemoFileCard();
     setMemoUploadProgress(0, "Preparing document...", false);
@@ -1247,7 +1101,7 @@ async function extractDocument(source,progress=()=>{}){
   }
 
   function resetForm() {
-    memoForm.reset();memoManualFields.clear();memoOcrValues.clear();memoSavedText="";setMemoFieldsBusy(false);
+    memoForm.reset();memoManualFields.clear();memoOcrValues.clear();lastMemoRead=null;setMemoFieldsBusy(false);
     memoDocId.value = "";
     modalFormTitle.textContent = "Issue Office Memorandum";
     formDate.value=M.today();const prefix=`MEMO-${new Date().getFullYear()}-`;const highest=Math.max(0,...rawMemos.map(m=>String(m.memoNo||"").startsWith(prefix)?Number(String(m.memoNo).slice(prefix.length))||0:0));formControlNo.value=prefix+String(highest+1).padStart(3,"0");
@@ -1288,7 +1142,7 @@ async function extractDocument(source,progress=()=>{}){
     formAddressedTo.value = memo.addressedTo || "";
     formSubject.value = memo.subject || memo.title || "";
     formIssuedBy.value = memo.issuedBy || "";
-    const notes=splitMemoNotes(memo.remarks);formRemarks.value=notes.notes;memoOcrText.value=notes.text;memoSavedText=notes.text;generatedMemoNumber=generatedMemoDate="";
+    const notes=splitMemoNotes(memo.remarks);formRemarks.value=notes.notes;memoOcrText.value=notes.text;generatedMemoNumber=generatedMemoDate="";
     formIsPinned.checked = Boolean(memo.isPinned);
 
     if (memo.pdfUrl) {

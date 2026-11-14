@@ -1,0 +1,701 @@
+/* Load after the page theme. UI sizes use rem so browser text settings still apply. */
+@layer responsive-layout, viewer;
+
+@layer responsive-layout {
+  @media screen {
+    body.pgenro-responsive {
+      --read-body: 1rem;
+      --read-detail: .9375rem;
+      --read-label: .875rem;
+      --read-target: 2.75rem;
+      --read-gutter: clamp(.875rem, 2.5vw, 1.5rem);
+      font-size: var(--read-body) !important;
+      line-height: 1.55 !important;
+      min-width: 0;
+    }
+
+    .pgenro-responsive :is(.main-content, .main-wrapper, .content-shell, .settings-shell,
+      .tab-content, .records-card, .card, .panel, .public-main, .request-workspace,
+      .portal-shell, .portal-panel, .auth-content, .form-panel, .ics-form-panel,
+      .app-shell, .dashboard-layout, .table-responsive, .table-wrapper, .table-wrap) {
+      min-width: 0;
+    }
+
+    .pgenro-responsive :is(.unified-page-header, .page-header, .settings-heading,
+      .panel-heading, .hero-heading, .auth-content, .request-form-heading, .ics-form-heading,
+      .public-intro, .viewer-dialog-header, .modal-header, .modal-head) :is(h1, h2, h3, p) {
+      overflow-wrap: anywhere;
+    }
+
+    .pgenro-responsive :is(.unified-page-header, .page-header, .settings-heading,
+      .panel-heading, .hero-heading, .dashboard-hero-copy, .public-intro,
+      .auth-content, .request-form-heading, .ics-form-heading, .modal-header,
+      .modal-head, .drawer-header, .viewer-dialog-header) p {
+      font-size: var(--read-body) !important;
+      line-height: 1.55 !important;
+    }
+
+    .pgenro-responsive :is(.section-description, .encoder-upload-description,
+      .encoder-section-heading p, .request-intro, .request-section-copy p,
+      .review-group-heading p, .ics-section-heading p, .settings-description,
+      .field-help, .field-hint, .field-note, .error-msg, .error-message,
+      .form-alert, .workspace-field-error, .form-feedback, .request-form-feedback,
+      .ics-form-feedback, .modal-action-note, .ocr-review-note, .communication-memo-review,
+      .document-destination, .memo-review-field small, .memo-upload-help,
+      .signature-help, .signature-status, .progress-meta, .ics-progress-meta,
+      .result-message, .empty-table-cell, .empty-state-content, .modern-empty-state,
+      .viewer-load-error, .viewer-document-status, .module-notification-empty,
+      .access-copy small, .hero-points p, .v4-visit-preview dt, .portal-footer, .records-header p, .table-subtitle, .last-updated) {
+      font-size: var(--read-label) !important;
+      line-height: 1.55 !important;
+      overflow-wrap: anywhere;
+    }
+
+    .pgenro-responsive :is(.record-identity p, .detail-grid dd, .detail-stack dd,
+      .viewer-detail-grid dd, .detail-value, .long-value, .read-value-box, .ocr-content,
+      .viewer-page-text, .v4-visit-preview dd, .module-notification-title,
+      .memo-review-field dd, .signature-heading h3,
+      .attendance-message, .activity-chart-description) {
+      font-size: var(--read-body) !important;
+      line-height: 1.55 !important;
+      overflow-wrap: anywhere;
+    }
+
+    .pgenro-responsive :is(form, .toolbar, .filter-bar, .filters-bar, .table-toolbar,
+      .viewer-registry-tools, .search-field, .global-search, .pager,
+      .analytics-controls, .viewer-document-tools, .doc-viewer-actions) label,
+    .pgenro-responsive :is(.field-label, .input-label, .detail-grid dt, .detail-stack dt, .viewer-detail-grid dt,
+      .profile-button-name,
+      .workspace-context-label, .nav-item > span, .modules-list a span,
+      .breadcrumb, .depth-topbar-breadcrumb, .kpi-label, .metric-label,
+      .stat-copy > p, .attendance-metric dt, .analytics-metric-label,
+      .memo-dashboard-card small, .chart-card-header > p, .dashboard-chart-header p,
+      .settings-nav-card span, .ics-step-copy strong, .access-copy strong,
+      .hero-points strong, .v4-visit-preview summary, .unit-label) {
+      font-size: var(--read-detail) !important;
+      line-height: 1.45 !important;
+    }
+
+    .pgenro-responsive :is(.pagination-info, .table-info, .registry-page-label,
+      .registry-range, .pagination-count, .table-timezone, .workspace-table-controls,
+      .modern-table-toolbar-label, .profile-button-role, .record-date, .table-secondary,
+      .employee-sub, .table-subtext, .badge-status, .status-badge, .table-tag,
+      .audit-event-tag, .attendance-badge, .ocr-field-badge, .ocr-stats-chip,
+      .encoder-eyebrow, .encoder-required-note, .preview-badge, .encoder-auto-chip,
+      .encoder-drop-hint, #fileMetaDisplay, #ocrActionSubtext, #memoOcrStatus,
+      .analytics-legend-copy > small, .analytics-comparison, .dashboard-hero-tag,
+      .ics-step-copy small) {
+      font-size: var(--read-label) !important;
+      line-height: 1.45 !important;
+    }
+
+    .pgenro-responsive :is(.analytics-tooltip-title, .analytics-tooltip-row,
+      .analytics-legend-copy, .analytics-legend-item > strong, .chart-caption,
+      .dashboard-analytics-metric > small, .workspace-chart-data, .dashboard-chart-data,
+      .activity-chart-summary, .activity-chart-legend, .activity-chart-statuses) {
+      font-size: var(--read-label) !important;
+      line-height: 1.45 !important;
+    }
+
+    .pgenro-responsive :is(input:not([type]), input[type="text"], input[type="search"],
+      input[type="email"], input[type="password"], input[type="tel"], input[type="url"],
+      input[type="date"], input[type="month"], input[type="time"], input[type="datetime-local"],
+      input[type="number"], input[type="week"], select, textarea) {
+      font-size: var(--read-body) !important;
+      line-height: 1.4 !important;
+      box-sizing: border-box;
+      min-inline-size: 0;
+      max-inline-size: 100%;
+    }
+
+    .pgenro-responsive :is(input:not([type]), input[type="text"], input[type="search"],
+      input[type="email"], input[type="password"], input[type="tel"], input[type="url"],
+      input[type="date"], input[type="month"], input[type="time"], input[type="datetime-local"],
+      input[type="number"], input[type="week"], select) {
+      min-height: var(--read-target) !important;
+      height: auto !important;
+      max-height: none !important;
+      padding-block: .55rem;
+    }
+
+    .pgenro-responsive :is(select, input[type="date"], input[type="month"], input[type="time"]) {
+      white-space: normal;
+    }
+
+    .pgenro-responsive :is(input[type="checkbox"], input[type="radio"]) {
+      flex-shrink: 0;
+    }
+
+    .pgenro-responsive textarea {
+      min-height: 5.5rem;
+    }
+
+    .pgenro-responsive :is(.btn, .primary-action, .secondary-action, .primary-btn,
+      .secondary-btn, .outline-btn, .ghost-btn, .refresh-btn, .submit-btn, .btn-solid,
+      .primary-sign-btn, .file-picker-button, .btn-ocr, .viewer-button, .filter-tab,
+      .tab-btn, .attendance-tabs button, .ics-step-navigation button,
+      .request-step-button, .modern-density-switch, .workspace-find-button,
+      .signature-clear, .panel-return, .ics-guide-back, .viewer-legacy-details) {
+      font-size: var(--read-detail) !important;
+      line-height: 1.3 !important;
+      min-inline-size: 0;
+      max-inline-size: 100%;
+      min-height: var(--read-target) !important;
+      white-space: normal !important;
+      overflow-wrap: anywhere;
+    }
+
+    .pgenro-responsive :is(.btn, .viewer-button, .file-picker-button, .btn-ocr) > svg {
+      flex-shrink: 0;
+    }
+
+    .pgenro-responsive :is(.table-responsive, .table-wrapper, .table-wrap,
+      .table-container, .analytics-table-scroll, .audit-scroll-box, .table-scroll,
+      .monitor-table-scroll, .modal-results-table-wrap, .ui-table-scroll) {
+      min-inline-size: 0;
+      max-inline-size: 100%;
+      overflow-x: auto;
+      overscroll-behavior-inline: contain;
+    }
+
+    .pgenro-responsive :is(.main-content table, .modal-results-table-wrap table,
+      .modal-body .table-responsive table, .monitor-table) :is(th, td) {
+      font-size: var(--read-detail) !important;
+      line-height: 1.45 !important;
+    }
+
+    .pgenro-responsive :is(.main-content table, .modal-results-table-wrap table,
+      .modal-body .table-responsive table, .monitor-table) th,
+    .pgenro-responsive .viewer-column-sort {
+      font-size: var(--read-label) !important;
+      letter-spacing: .025em !important;
+      line-height: 1.35 !important;
+    }
+
+    .pgenro-responsive :is(.main-content table, .monitor-table) td :is(strong, .memo-subject-text,
+      .employee-name, .activity-title, .communication-subject) {
+      font-size: inherit !important;
+      overflow-wrap: anywhere;
+    }
+
+    .pgenro-responsive :is(.profile-dropdown, .module-notification-panel,
+      .search-palette-dropdown, .notification-dropdown, .workspace-finder-panel,
+      .viewer-document-dialog, .viewer-record-dialog, .modal-container, .modal-card,
+      .inspect-modal-card, .admin-modal-dialog, .portal-dialog, .settings-modal) {
+      max-inline-size: calc(100% - 1.5rem);
+    }
+
+    .pgenro-responsive :is(.settings-shell, .settings-topbar, .settings-heading, .settings-panel,
+      .viewer-record-dialog, #encodingModalBody, #communicationForm, #memoForm,
+      .public-main, .app-shell, .portal-viewport, .portal-panel, .content-shell) > * {
+      min-inline-size: 0;
+    }
+
+    .pgenro-responsive :is(.encoder-file-actions, .encoder-reader-buttons,
+      .file-preview-actions, .doc-viewer-actions, .doc-viewer-toolbar, .memo-pdf-controls,
+      .viewer-document-tools, .form-controls, .form-actions, .request-form-actions,
+      .ics-form-actions, .table-actions, .bulk-actions, .viewer-registry-tools,
+      .viewer-pagination, .registry-page-controls, .header-actions, .pagination) {
+      flex-wrap: wrap !important;
+    }
+
+    .pgenro-responsive :is(.communication-modal-copy, .encoder-file-copy,
+      .encoder-document-column, .encoder-fields-column, .encoder-section-heading,
+      .file-preview-header, .file-preview-body, .document-viewer-modal-dialog,
+      .modal-body, .viewer-detail-grid, .settings-form-grid, .settings-form) {
+      min-inline-size: 0;
+    }
+
+    .pgenro-responsive :is(.status-badge, .badge-status, .table-tag,
+      .file-preview-title, .encoder-result-heading, .ocr-field-badge, .ocr-stats-chip,
+      .module-notification-title, .module-notification-copy, .contact-cell) {
+      white-space: normal;
+      overflow-wrap: anywhere;
+      max-inline-size: 100%;
+    }
+
+    .pgenro-responsive :is(.unified-dialog-body, .viewer-page-text, .modal-body,
+      .inspect-modal-card) {
+      min-height: 0;
+      scroll-padding-block: 1rem;
+    }
+
+    .pgenro-responsive #encodingModalBody > .encoder-ocr-result {
+      margin-top: .75rem;
+    }
+
+    .pgenro-responsive #recheckCommunicationFieldsBtn {
+      margin-top: .625rem;
+    }
+
+    .pgenro-responsive #visitorSignature {
+      width: 100%;
+      max-inline-size: 100%;
+      aspect-ratio: 600 / 270;
+      height: auto;
+    }
+
+    .pgenro-responsive .responsive-select-all {
+      display: none;
+    }
+
+    @media (max-width: 64rem) {
+      .pgenro-responsive :is(.encoder-upload-header, .encoder-upload-workspace,
+        .file-preview-header, .settings-topbar, .viewer-document-tools) {
+        flex-wrap: wrap;
+      }
+
+      .pgenro-responsive :is(.form-group, .field-group, .input-group,
+        .input-container, .ics-form-field, .service-form-field, .settings-form label) {
+        min-inline-size: 0;
+        max-inline-size: 100%;
+      }
+
+      .pgenro-responsive :is(.encoder-content-grid, .memo-details-grid, .settings-form-grid) {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .pgenro-responsive .form-group.full-width {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 56.25rem) {
+      .pgenro-responsive :is(.main-wrapper, .pgenro-user .main-content) {
+        width: 100%;
+        margin-inline-start: 0;
+      }
+
+      .pgenro-responsive :is(.topbar-right, .depth-topbar-actions, .settings-topbar-actions) {
+        min-width: 0;
+        gap: .375rem;
+      }
+
+      .pgenro-responsive :is(.topbar, .depth-user-topbar, .settings-topbar) {
+        padding-inline-start: max(.75rem, env(safe-area-inset-left));
+        padding-inline-end: max(.75rem, env(safe-area-inset-right));
+      }
+
+      .pgenro-responsive :is(.topbar-module, .depth-topbar-breadcrumb,
+        .settings-brand, .profile-btn-copy) {
+        min-width: 0;
+      }
+
+      .pgenro-responsive :is(.nav-item, .modules-list a, .dropdown-links a) {
+        min-height: var(--read-target);
+        white-space: normal !important;
+      }
+
+      .pgenro-responsive :is(.sidebar, .sidebar-nav, .modules-list) {
+        scroll-padding-block: .75rem;
+      }
+    }
+
+    @media (max-width: 54rem) {
+      .pgenro-responsive :is(.portal-viewport, .public-main, .settings-shell, .content-shell) {
+        padding-inline-start: max(var(--read-gutter), env(safe-area-inset-left)) !important;
+        padding-inline-end: max(var(--read-gutter), env(safe-area-inset-right)) !important;
+      }
+
+      .pgenro-responsive :is(.modal-container:not(.viewer-document-dialog), .modal-card,
+        .inspect-modal-card, .portal-dialog, .workspace-jump-dialog, .viewer-record-dialog) {
+        max-width: calc(100vw - 1rem) !important;
+        max-height: calc(100vh - 1rem);
+        max-height: calc(var(--ui-viewport-height, 100dvh) - 1rem) !important;
+      }
+
+      .pgenro-responsive .viewer-document-dialog[open] {
+        max-inline-size: 100% !important;
+      }
+
+      .pgenro-responsive :is(.modal-body, .unified-dialog-body, .modal-body-panel) {
+        padding-inline: var(--read-gutter);
+        overflow-y: auto;
+      }
+
+      .pgenro-responsive :is(.modal-actions, .unified-dialog-footer, .portal-dialog-actions) {
+        padding-inline: var(--read-gutter);
+        flex-wrap: wrap;
+        gap: .5rem;
+      }
+
+      .pgenro-responsive :is(.modal-actions, .unified-dialog-footer, .modal-footer) > .btn {
+        flex: 1 1 8rem;
+      }
+
+      .pgenro-responsive :is(.modal-action-buttons, .upload-controls, .memo-form-actions) {
+        display: flex;
+        gap: .5rem;
+        flex-wrap: wrap;
+        min-width: 0;
+      }
+
+      .pgenro-responsive :is(.modal-action-buttons, .memo-form-actions) > .btn {
+        flex: 1 1 7.5rem;
+      }
+
+      .pgenro-responsive .responsive-registry {
+        display: block !important;
+        table-layout: auto !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+      }
+
+      .pgenro-responsive :is(.table-wrap, .table-wrapper, .table-responsive,
+        .table-container, .analytics-table-scroll, .audit-scroll-box, .ui-table-scroll):has(> .responsive-registry) {
+        min-height: 0;
+        max-height: none !important;
+      }
+
+      .pgenro-responsive :is(.table-wrap, .table-wrapper, .table-responsive,
+        .table-container, .analytics-table-scroll, .audit-scroll-box, .ui-table-scroll):has(> .responsive-registry)
+        + .workspace-table-controls {
+        display: none !important;
+      }
+
+      .pgenro-responsive .responsive-registry > thead {
+        position: absolute !important;
+        inline-size: 1px !important;
+        block-size: 1px !important;
+        overflow: hidden !important;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .pgenro-responsive .responsive-registry > thead.responsive-registry-controls {
+        position: static !important;
+        display: block !important;
+        inline-size: auto !important;
+        block-size: auto !important;
+        overflow: visible !important;
+        clip-path: none;
+        white-space: normal;
+      }
+
+      .pgenro-responsive .responsive-registry-controls > tr {
+        display: flex !important;
+        flex-wrap: wrap;
+        gap: .375rem .75rem;
+        padding: .625rem .875rem;
+        border-bottom: 1px solid var(--app-border, var(--ui-border, #dfe8e2));
+        background: var(--app-soft, var(--viewer-bg, #f3f7f5));
+      }
+
+      .pgenro-responsive .responsive-registry-controls th:not(.responsive-registry-control) {
+        position: absolute !important;
+        inline-size: 1px !important;
+        block-size: 1px !important;
+        min-inline-size: 0 !important;
+        min-block-size: 0 !important;
+        overflow: hidden !important;
+        clip-path: inset(50%);
+        padding: 0 !important;
+        border: 0 !important;
+        white-space: nowrap !important;
+      }
+
+      .pgenro-responsive .responsive-registry-controls .responsive-registry-control {
+        position: static !important;
+        display: inline-flex !important;
+        align-items: center;
+        gap: .5rem;
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        padding: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        text-transform: none !important;
+        letter-spacing: normal !important;
+        inset-inline: auto !important;
+      }
+
+      .pgenro-responsive .responsive-registry-control .responsive-select-all {
+        display: inline-flex;
+        gap: .5rem;
+        align-items: center;
+        min-height: var(--read-target);
+        cursor: pointer;
+      }
+
+      .pgenro-responsive .responsive-registry :is(thead, tbody) input[type="checkbox"] {
+        inline-size: 1.25rem;
+        block-size: 1.25rem;
+      }
+
+      .pgenro-responsive .responsive-registry .viewer-column-sort {
+        min-height: var(--read-target) !important;
+        white-space: normal !important;
+        text-transform: none !important;
+        padding: .375rem .25rem !important;
+      }
+
+      .pgenro-responsive .responsive-registry > tbody {
+        display: grid !important;
+        width: 100%;
+        padding: .625rem;
+        gap: .625rem;
+        background: var(--app-soft, var(--viewer-bg, #f3f7f5));
+      }
+
+      .pgenro-responsive .responsive-registry > tbody > tr {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: .875rem 1rem;
+        padding: .875rem;
+        width: auto !important;
+        min-width: 0;
+        border: 1px solid var(--app-border, var(--ui-border, #dfe8e2));
+        border-radius: .625rem;
+        background: var(--app-surface, var(--viewer-surface, #fff));
+      }
+
+      .pgenro-responsive .responsive-registry > tbody > tr > :is(td, th) {
+        display: block !important;
+        position: static !important;
+        min-width: 0 !important;
+        width: auto !important;
+        max-width: 100% !important;
+        min-height: 0;
+        padding: 0 !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        white-space: normal !important;
+        text-align: start !important;
+        overflow-wrap: anywhere;
+        font-size: var(--read-body) !important;
+        line-height: 1.45 !important;
+      }
+
+      .pgenro-responsive .responsive-registry > tbody > tr > :is(td, th)[data-responsive-label]::before {
+        display: block !important;
+        content: attr(data-responsive-label) !important;
+        font-size: var(--read-label) !important;
+        line-height: 1.35 !important;
+        font-weight: 650 !important;
+        margin-bottom: .3rem;
+        color: var(--app-muted, var(--viewer-muted, var(--ui-muted, #466457)));
+      }
+
+      .pgenro-responsive .responsive-registry > tbody > tr > :is(
+        td:first-child:not(.responsive-row-choice), th:first-child,
+        .responsive-row-choice + td, .responsive-row-choice, td[colspan]:not([colspan="1"]),
+        .action-column, .communication-subject) {
+        grid-column: 1 / -1;
+      }
+
+      .pgenro-responsive .responsive-registry > tbody > tr > td.responsive-row-choice {
+        grid-column: 1 / -1;
+        justify-self: start;
+      }
+
+      .pgenro-responsive .responsive-registry > tbody > tr > td[colspan]:not([colspan="1"]) {
+        padding-block: 1.375rem !important;
+      }
+
+      .pgenro-responsive .responsive-registry td :is(.actions, .row-actions,
+        .action-buttons, .table-actions, .registry-actions, .memo-actions) {
+        display: flex;
+        flex-wrap: wrap !important;
+        gap: .375rem;
+        min-width: 0;
+        max-width: 100%;
+      }
+
+      .pgenro-responsive .responsive-registry td :is(.user-cell, .employee-cell,
+        .visitor-profile, .memo-subject-cell, .memo-recipient, .service-client-cell,
+        .visitor-contact, .accountable-cell, .badge-status, .status-badge, .contact-cell) {
+        min-width: 0 !important;
+        max-width: 100% !important;
+        white-space: normal !important;
+        text-overflow: clip !important;
+        overflow-wrap: anywhere;
+      }
+
+      .pgenro-responsive .responsive-registry :is(.communication-office, .communication-subject,
+        .memo-subject-cell span, .memo-remarks-preview, .employee-sub, .remarks-cell,
+        .audit-details-copy, .record-particulars) {
+        max-width: 100% !important;
+        white-space: normal !important;
+        overflow: visible !important;
+        -webkit-line-clamp: unset !important;
+      }
+
+      .pgenro-responsive .responsive-registry td :is(.btn-action, .row-btn,
+        .btn-icon-action, .icon-btn-sm, .viewer-bookmark, .viewer-button, .viewer-legacy-details) {
+        min-height: var(--read-target) !important;
+        min-width: var(--read-target) !important;
+        height: auto !important;
+        margin: .125rem .125rem .125rem 0 !important;
+      }
+
+      .pgenro-responsive .responsive-registry td.action-column {
+        display: flex !important;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: .375rem;
+      }
+
+      .pgenro-responsive .responsive-registry td.action-column::before {
+        flex: 1 0 100%;
+      }
+
+      .pgenro-responsive .responsive-registry .responsive-card-actions {
+        grid-column: 1 / -1;
+      }
+
+      .pgenro-responsive .responsive-registry[hidden],
+      .pgenro-responsive .responsive-registry :is(thead, tbody, tr, th, td)[hidden] {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 43.75rem) {
+      .pgenro-responsive :is(.unified-dialog, .portal-panel, .settings-form,
+        .request-form-main, .ics-form-panel, .supply-request-form,
+        .attendance-filters) :is(.form-grid, .form-row, .settings-form-grid,
+        .memo-details-grid, .ics-form-grid, .request-form-grid, .field-grid,
+        .form-grid-2, .form-grid-3, .form-grid-4, .service-form-grid) {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      .pgenro-responsive :is(.unified-dialog, .settings-form, .ics-form-panel,
+        .request-form-main) :is(.form-grid, .form-grid-2, .form-grid-3, .form-grid-4) > * {
+        grid-column: 1 / -1;
+        min-width: 0;
+      }
+
+      .pgenro-responsive :is(.portal-shell.visitor-shell, .app-shell,
+        .request-workspace, .ics-workspace, .encoder-meta-grid, .encoder-content-grid,
+        .settings-form-grid, .memo-details-grid, .supply-form-grid) {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      .pgenro-responsive #visitorFields {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      .pgenro-responsive :is(.portal-panel, .encoder-upload-panel, .encoder-section,
+        .memo-form-section, .ics-entry-card, .request-form-main) {
+        padding-inline: var(--read-gutter);
+      }
+
+      .pgenro-responsive :is(.encoder-section-heading, .portal-topbar,
+        .visitor-clock, .encoder-file-actions, .encoder-reader-buttons) {
+        flex-wrap: wrap;
+      }
+
+      .pgenro-responsive .encoder-upload-workspace {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .pgenro-responsive .encoder-file-picker {
+        width: 100%;
+      }
+
+      .pgenro-responsive :is(.records-header, .table-header-row, .panel-header,
+        .unified-page-header, .settings-heading) :is(.header-copy, .header-title, .header-actions) {
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 30rem) {
+      .pgenro-responsive .responsive-registry > tbody > tr {
+        gap: .875rem .625rem;
+      }
+
+      .pgenro-responsive :is(.workspace-table-controls, .table-footer, .registry-pagination,
+        .viewer-pagination, .attachment-actions) {
+        flex-wrap: wrap;
+      }
+
+      .pgenro-responsive .viewer-registry-tools :is(.viewer-size-label, .viewer-sort-label) {
+        min-width: 0;
+        max-width: 100%;
+        flex-wrap: wrap;
+      }
+
+      .pgenro-responsive :is(.workspace-finder-panel, .module-notification-panel,
+        .profile-dropdown, .search-palette-dropdown) {
+        max-width: calc(100vw - 1.5rem) !important;
+      }
+
+      .pgenro-responsive :is(.encoder-required-note, .ocr-stats-chip, .signature-clear) {
+        max-inline-size: 100%;
+      }
+    }
+
+    @media (max-width: 23rem) {
+      .pgenro-responsive {
+        --read-gutter: .75rem;
+      }
+
+      .pgenro-responsive .responsive-registry > tbody > tr {
+        grid-template-columns: minmax(0, 1fr) !important;
+      }
+
+      .pgenro-responsive.pgenro-user .depth-topbar-breadcrumb {
+        flex: 1 1 0;
+        min-width: 0;
+      }
+
+      .pgenro-responsive.pgenro-user .depth-topbar-breadcrumb span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .pgenro-responsive :is(.modal-action-buttons, .request-form-actions, .form-controls) > :is(button, a) {
+        flex: 1 1 100%;
+      }
+    }
+
+    @media (max-width: 26rem) and (any-pointer: coarse) {
+      .pgenro-responsive.pgenro-user .depth-user-topbar {
+        display: grid !important;
+        grid-template-columns: auto minmax(0, 1fr);
+        height: auto !important;
+        min-height: 0 !important;
+        gap: .375rem .5rem !important;
+        padding-block: .375rem .5rem;
+      }
+
+      .pgenro-responsive.pgenro-user .depth-topbar-actions {
+        justify-content: flex-end;
+        grid-column: 2;
+        grid-row: 1;
+      }
+
+      .pgenro-responsive.pgenro-user .depth-topbar-breadcrumb {
+        grid-column: 1 / -1;
+        grid-row: 2;
+      }
+    }
+
+    @media (any-pointer: coarse) {
+      .pgenro-responsive :is(.hamburger-menu, .mobile-menu-btn, .admin-sidebar-close,
+        .module-notification-button, .user-appearance-toggle, .modern-theme-toggle,
+        .workspace-find-button, .workspace-jump-btn, .profile-btn, .settings-back,
+        .settings-signout, .depth-settings-link, .modal-close-btn, .modal-close,
+        .viewer-close, .password-toggle, .pagination-btn, .page-btn, .audit-page-btn,
+        .registry-page-btn, .btn-action, .row-btn, .signature-clear) {
+        min-width: 44px !important;
+        min-height: 44px !important;
+      }
+    }
+
+    @media (max-height: 31.25rem) and (orientation: landscape) {
+      .pgenro-responsive :is(.topbar, .depth-user-topbar, .settings-topbar) {
+        position: relative !important;
+      }
+
+      .pgenro-responsive :is(.modal-container, .modal-card, .inspect-modal-card, .portal-dialog) {
+        max-height: calc(var(--ui-viewport-height, 100dvh) - .75rem);
+      }
+    }
+  }
+}

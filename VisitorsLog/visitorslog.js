@@ -575,7 +575,10 @@
     const status = $("signatureStatus");
     const ink = canvas.getContext("2d");
     let pointerId = null;
+    let bounds = null;
     let lastPoint = null;
+    let frame = null;
+    const points = [];
     let hasInk = false;
 
     function showStatus(message) {
@@ -591,9 +594,12 @@
     }
 
     function finishStroke() {
+      flushInk();
       const id = pointerId;
       pointerId = null;
+      bounds = null;
       lastPoint = null;
+      delete document.body.dataset.signing;
       if (id !== null && canvas.hasPointerCapture(id)) canvas.releasePointerCapture(id);
     }
 
@@ -606,51 +612,96 @@
       onChange();
     }
 
+    function point(event) {
+      return {
+        x: (event.pageX - bounds.left) * bounds.scaleX,
+        y: (event.pageY - bounds.top) * bounds.scaleY
+      };
+    }
+
+    function drawInk() {
+      frame = null;
+      if (!points.length) return;
+      ink.beginPath();
+      ink.moveTo(lastPoint.x, lastPoint.y);
+      for (const next of points) ink.lineTo(next.x, next.y);
+      lastPoint = points[points.length - 1];
+      points.length = 0;
+      ink.stroke();
+      if (!hasInk) {
+        hasInk = true;
+        clearButton.disabled = false;
+        showStatus("Signature added.");
+        onChange();
+      }
+    }
+
+    function flushInk() {
+      if (frame !== null) cancelAnimationFrame(frame);
+      drawInk();
+    }
+
+    function queuePoint(event) {
+      const next = point(event);
+      const previous = points.length ? points[points.length - 1] : lastPoint;
+      if (next.x !== previous.x || next.y !== previous.y) points.push(next);
+    }
+
     if (ink) {
       ink.strokeStyle = "#19382e";
       ink.lineWidth = 4;
       ink.lineCap = "round";
       ink.lineJoin = "round";
 
-      function point(event) {
-        const rect = canvas.getBoundingClientRect();
-        return {
-          x: (event.clientX - rect.left) * canvas.width / rect.width,
-          y: (event.clientY - rect.top) * canvas.height / rect.height
-        };
-      }
-
+      // Read layout once per stroke. Subsequent samples only update the canvas.
       canvas.addEventListener("pointerdown", (event) => {
         if (locked() || pointerId !== null || !event.isPrimary || event.button !== 0) return;
+        const rect = canvas.getBoundingClientRect();
+        const width = rect.width - (canvas.offsetWidth - canvas.clientWidth);
+        const height = rect.height - (canvas.offsetHeight - canvas.clientHeight);
+        if (width <= 0 || height <= 0) return;
         event.preventDefault();
         canvas.setPointerCapture(event.pointerId);
+        bounds = {
+          left: rect.left + window.scrollX + canvas.clientLeft,
+          top: rect.top + window.scrollY + canvas.clientTop,
+          scaleX: canvas.width / width,
+          scaleY: canvas.height / height
+        };
         pointerId = event.pointerId;
         lastPoint = point(event);
+        document.body.dataset.signing = "true";
       });
       canvas.addEventListener("pointermove", (event) => {
         if (locked() || event.pointerId !== pointerId) return;
-        const nextPoint = point(event);
-        if (nextPoint.x === lastPoint.x && nextPoint.y === lastPoint.y) return;
-        ink.beginPath();
-        ink.moveTo(lastPoint.x, lastPoint.y);
-        ink.lineTo(nextPoint.x, nextPoint.y);
-        ink.stroke();
-        lastPoint = nextPoint;
-        if (!hasInk) {
-          hasInk = true;
-          clearButton.disabled = false;
-          showStatus("Signature added.");
-          onChange();
-        }
+        for (const sample of event.getCoalescedEvents?.() ?? []) queuePoint(sample);
+        queuePoint(event);
+        if (points.length && frame === null) frame = requestAnimationFrame(drawInk);
       });
-      for (const eventName of ["pointerup", "pointercancel", "lostpointercapture"]) {
+      canvas.addEventListener("pointerup", (event) => {
+        if (event.pointerId !== pointerId) return;
+        if (!locked()) queuePoint(event);
+        finishStroke();
+      });
+      for (const eventName of ["pointercancel", "lostpointercapture"]) {
         canvas.addEventListener(eventName, (event) => {
           if (event.pointerId === pointerId) finishStroke();
         });
       }
+      window.addEventListener("resize", () => {
+        if (pointerId !== null) finishStroke();
+      });
       clearButton.addEventListener("click", clear);
     }
-    return { clear, showError, hasInk: () => hasInk, image: () => hasInk ? canvas.toDataURL("image/png") : null };
+    return {
+      clear,
+      showError,
+      hasInk: () => hasInk,
+      image() {
+        flushInk();
+        return hasInk ? canvas.toDataURL("image/png") : null;
+      }
+    };
   }
 })();
 

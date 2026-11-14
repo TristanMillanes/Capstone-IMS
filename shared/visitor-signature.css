@@ -60,9 +60,16 @@
   background: #fcfefc;
   cursor: crosshair;
   touch-action: none;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
 #visitorFields:disabled #visitorSignature { pointer-events: none; }
+
+body[data-signing="true"] :is(.emerald-scene *, .v4-workspace-art *) {
+  animation-play-state: paused !important;
+}
 
 #visitorSignature[aria-invalid="true"] {
   border-color: var(--app-danger, var(--danger));

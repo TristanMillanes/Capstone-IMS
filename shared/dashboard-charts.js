@@ -128,6 +128,8 @@
 
   function chartOptions({ horizontal = false, doughnut = false, legend = false } = {}) {
     const theme = chartTheme();
+    const rootFontSize = Number.parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const labelSize = Math.max(13, Math.round(rootFontSize * .8125));
     // Fresh nested options for every instance prevent Chart.js mutation leaking across charts.
     const result = {
       responsive: true, maintainAspectRatio: false, resizeDelay: 0,
@@ -136,7 +138,7 @@
       interaction: { mode: doughnut ? "nearest" : "index", intersect: doughnut, axis: doughnut ? "xy" : horizontal ? "y" : "x" },
       layout: { padding: { top: 8, bottom: 2, left: 0, right: 8 } },
       plugins: {
-        legend: { display: legend, position: "bottom", labels: { color: theme.text, usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7, padding: 13, font: { family: "Inter, system-ui, sans-serif", size: 11 } } },
+        legend: { display: legend, position: "bottom", labels: { color: theme.text, usePointStyle: true, pointStyle: "circle", boxWidth: 7, boxHeight: 7, padding: 13, font: { family: "Inter, system-ui, sans-serif", size: labelSize } } },
         tooltip: { enabled: false, external: renderChartTooltip, position: "pgenroPointer", animation: false, animations: false,
           backgroundColor: theme.tip, titleColor: "#fff", bodyColor: "#ddefe4", padding: 12, cornerRadius: 10, displayColors: true,
           callbacks: { label(context) {
@@ -148,8 +150,8 @@
     };
     if (doughnut) { result.cutout = "74%"; return result; }
     result.indexAxis = horizontal ? "y" : "x";
-    const numbers = { beginAtZero: true, suggestedMax: 1, border: { display: false }, grid: { color: theme.grid, drawTicks: false }, ticks: { precision: 0, padding: 8, color: theme.text, font: { size: 11 } } };
-    const labels = { border: { display: false }, grid: { display: false }, ticks: { autoSkip: !horizontal, maxRotation: 0, maxTicksLimit: horizontal ? 24 : 8, padding: 8, color: theme.text, font: { size: 11 } } };
+    const numbers = { beginAtZero: true, suggestedMax: 1, border: { display: false }, grid: { color: theme.grid, drawTicks: false }, ticks: { precision: 0, padding: 8, color: theme.text, font: { size: labelSize } } };
+    const labels = { border: { display: false }, grid: { display: false }, ticks: { autoSkip: true, maxRotation: 0, maxTicksLimit: horizontal ? 24 : 8, padding: 8, color: theme.text, font: { size: labelSize } } };
     result.scales = horizontal ? { x: numbers, y: labels } : { x: labels, y: numbers };
     return result;
   }

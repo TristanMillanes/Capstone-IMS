@@ -93,6 +93,80 @@ class FunctionalReaderTests(unittest.TestCase):
         self.assertFalse(fields['isMemo'])
         self.record('Printed sender, issue/registry dates and body memo reference stay separate')
 
+    def test_field_mapping_keeps_registry_dates_and_adjacent_labels_separate(self):
+        text = (
+            'REPUBLIC OF THE PHILIPPINES\nREQUEST LETTER\n'
+            'COMMUNICATION TYPE: Outgoing\n'
+            'CONTROL NO.: COMM-2026-17  |  DOCUMENT TYPE: Request Letter\n'
+            'RECEIVED FROM: Receiving Office\n'
+            'SENT TO: Municipal Environment Office\n'
+            'DATE ISSUED: November 7, 2026\nDATE RECEIVED:\nNovember 8, 2026\n'
+            'RELEASED DATE: November 9, 2026\n'
+            'SUBJECT / PARTICULARS: Seedling request\nFOR RIVER REHABILITATION\n'
+            'ACTION TAKEN: Forwarded to Planning Division\nDATE FORWARDED: November 10, 2026\n'
+            'REMARKS:\nSTATUS: Forwarded\n\n'
+            'Dear Sir:\nThe activity will take place on November 11, 2026.\n'
+            'REMARKS: This line is part of the letter body.'
+        )
+        with reader.app.test_client() as client:
+            for direction, date, office in (
+                ('Incoming', '2026-11-08', 'Receiving Office'),
+                ('Outgoing', '2026-11-09', 'Municipal Environment Office'),
+            ):
+                response = client.post('/ocr', data={
+                    'file': (io.BytesIO(text.encode()), 'registry.txt'), 'communicationType': direction,
+                })
+                self.assertEqual(response.status_code, 200)
+                result = response.get_json()
+                values = result['formValues']
+                self.assertEqual(result['metadata']['direction'], 'Outgoing')
+                self.assertEqual(values['dateInput'], date)
+                self.assertEqual(values['officeInput'], office)
+                self.assertEqual(values['controlNoInput'], 'COMM-2026-17')
+                self.assertEqual(values['subjectInput'], 'Seedling request FOR RIVER REHABILITATION')
+                self.assertEqual(values['actionTakenInput'], 'Forwarded to Planning Division\nDate forwarded: November 10, 2026')
+                self.assertEqual(values['statusSelect'], 'Forwarded')
+                self.assertEqual(values['remarksInput'], '')
+        fields = reader.extract_document_metadata('REQUEST LETTER\nDATE ISSUED: November 7, 2026\nSUBJECT: Work')
+        self.assertEqual(reader.communication_form_payload(fields, '', 'Incoming')['formValues']['dateInput'], '')
+        self.assertEqual(reader.communication_form_payload(fields, '', 'Outgoing')['formValues']['dateInput'], '')
+        self.assertEqual(reader.parse_date('11/09/2026'), '')
+        self.record('Direction, date, sender/recipient and workflow values map to their own fields')
+
+    def test_memo_uses_the_printed_issuer_and_leaves_missing_fields_empty(self):
+        text = (
+            'MEMORANDUM NO. 12, s. 2026\nCONTROL NO: COMM-99\n'
+            'TO  ALL SECTION CHIEFS\nISSUED BY  PGENRO ADMIN DIVISION\n'
+            'DATE ISSUED:\n14 Nobyembre 2026\nSUBJECT: Work plans\n'
+            'REMARKS:\n\nKeep the original with the official records.\n\n'
+            'The annual work plans are due on November 30, 2026.\n'
+            'Signed by: ANA R. REYES\nDirector'
+        )
+        fields = reader.extract_document_metadata(text)
+        self.assertEqual(fields['issuedBy'], 'PGENRO ADMIN DIVISION')
+        self.assertEqual(fields['signatory'], 'ANA R. REYES')
+        self.assertEqual(fields['remarks'], 'Keep the original with the official records.')
+        values = reader.communication_form_payload(fields, text)['formValues']
+        self.assertEqual(values['controlNoInput'], '12, s. 2026')
+        self.assertEqual(values['memoRecipientInput'], 'ALL SECTION CHIEFS')
+        self.assertEqual(values['memoIssuerInput'], 'PGENRO ADMIN DIVISION')
+        self.assertEqual(values['dateInput'], '2026-11-14')
+        incomplete = reader.extract_document_metadata(
+            'MEMORANDUM\nTO: N/A\nISSUED BY: ---\nSUBJECT: Update\n\n'
+            'Please submit the reports on November 30, 2026.\nSigned by: ANA R. REYES\nDirector'
+        )
+        self.assertEqual((incomplete['date'], incomplete['issuedBy'], incomplete['recipient']), ('', '', ''))
+        self.record('Memo number, issue date, issuer and signatory are read separately')
+
+    def test_mixed_pdf_recovers_the_scanned_header(self):
+        with reader.app.test_client() as client:
+            result = upload(client, 'mixed-incoming.pdf').get_json()
+        self.assertTrue(result['success'])
+        self.assertEqual(result['formValues']['controlNoInput'], 'REF-2026-181')
+        self.assertEqual(result['formValues']['officeInput'], 'OFFICE OF THE MUNICIPAL MAYOR')
+        self.assertEqual(result['formValues']['dateInput'], '2026-10-01')
+        self.record('A scanned PDF header supplies the fields when selectable text only contains an archive notice')
+
     def test_unheaded_letter_suggestions(self):
         text = 'September 20, 2026\nTO: PROVINCIAL ENRO\n\nDear Sir:\n\nI respectfully request technical assistance for river rehabilitation.\n\nRespectfully yours,\nMARIA L. SANTOS\nMunicipal Mayor'
         fields = reader.extract_document_metadata(text)

@@ -35,9 +35,11 @@
 <link href="admincommunication.css?v=20261027-emerald-v6" rel="stylesheet">
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
+<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
+<script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
 
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Communications" data-design="emerald-v6">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified pgenro-responsive" data-admin-page="admincommunication.html" data-css-scope="admin-communication" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Communications" data-design="emerald-v6">
 <p class="admin-module-loading" role="status">Checking your access…</p>
 
 
@@ -666,6 +668,7 @@
           <summary class="encoder-result-heading"><span><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="file-search" class="lucide lucide-file-search"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><circle cx="11.5" cy="14.5" r="2.5"></circle><path d="M13.3 16.3 15 18"></path></svg> Extracted document text</span><span class="ocr-stats-chip" id="ocrStatsChip" style="display:none">0 characters</span></summary>
           <label for="ocrTextInput" class="encoder-text-label">Review or correct the readable text from every page.</label>
           <textarea class="form-control ocr-result-textarea" id="ocrTextInput" rows="8" placeholder="Extracted text will appear automatically after reading the file."></textarea>
+          <button class="btn btn-secondary" id="recheckCommunicationFieldsBtn" type="button">Recheck fields</button>
         </details>
       </div>
       <footer class="modal-actions communication-modal-actions">
@@ -769,7 +772,8 @@
 <!-- Scripts -->
 
 <!-- Start the local interface before external database dependencies. -->
-<script defer src="admincommunication.js?v=20261108-admin-grants"></script>
+<script defer src="../shared/ocr-form-fields.js?v=20261113-field-mapping"></script>
+<script defer src="admincommunication.js?v=20261113-field-mapping"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
 <script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>

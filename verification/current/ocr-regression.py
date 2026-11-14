@@ -117,7 +117,7 @@ class RegressionTests(unittest.TestCase):
         def work(label):
             results[label] = upload(label + '.txt', (text + label).encode(), label).status_code
         with patch.object(OCR, 'read_document', slow_read):
-            first = threading.Thread(target=work, args=('qa-busy',))
+            first = threading.Thread(target=work, args=('qa-busy-1',))
             queued = threading.Thread(target=work, args=('qa-queued',))
             first.start()
             self.assertTrue(entered.wait(2))
@@ -136,7 +136,7 @@ class RegressionTests(unittest.TestCase):
             release.set()
             first.join(3)
         self.assertEqual(results['qa-queued'], 409)
-        self.assertEqual(results['qa-busy'], 200)
+        self.assertEqual(results['qa-busy-1'], 200)
         self.assertEqual(upload('retry.txt', text.encode(), 'qa-retry').status_code, 200)
 
     def test_deployment_pages_assets_and_access_boundary(self):

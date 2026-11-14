@@ -45,7 +45,7 @@ except ImportError:
 MAX_BYTES = 50 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'tif', 'tiff', 'docx', 'txt', 'csv', 'xlsx', 'pptx'}
 OCR_LANG_REQUESTED = os.getenv('OCR_LANG', 'eng+fil').strip() or 'eng'
-OCR_PARSER_VERSION = 21
+OCR_PARSER_VERSION = 22
 OCR_TIMEOUT = max(5, int(os.getenv('OCR_TIMEOUT', '45')))
 OCR_DOCUMENT_TIMEOUT = max(OCR_TIMEOUT, int(os.getenv('OCR_DOCUMENT_TIMEOUT', '180')))
 OCR_WORKERS = max(1, min(4, int(os.getenv('OCR_WORKERS', str(min(2, os.cpu_count() or 1))))))
@@ -243,15 +243,6 @@ SIGN_LABEL = re.compile(
     r'SUBMITTED\s+BY|PREPARED\s+BY|APPROVED\s+BY|NOTED\s+BY|CERTIFIED\s+BY|RECOMMENDING\s+APPROVAL|'
     r'RESPECTFULLY\s+SUBMITTED\s+BY|NAME\s+OF\s+(?:SENDER|SIGNATORY)|NILAGDAAN\s+NI|INIHANDA\s+NI|INAPRUBAHAN\s+NI|'
     r'PINAGTIBAY\s+NI|PANGALAN\s+AT\s+LAGDA)\s*[:：-]?\s*(.*)$',
-    re.I
-)
-
-FIELD_LABEL = re.compile(
-    r'^(?:S[Uu0]BJ[Ee3]CT(?:\s+MATTER)?|S[Uu0]BJ[Ee3]C[TIL1]|S[Uu0]BJ|R[Ee]|'
-    r'D[Aa@]T[Ee](?:\s+(?:[I1]SSU[Ee]D|R[Ee]C[Ee][I1]V[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D))?|D[Aa@]T[Ee]D|P[Ee]TS[Aa]|'
-    r'T[O0]|F[O0]R|P[Aa]R[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|FR[O0]M|S[Ee]ND[Ee]R|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|'
-    r'THR[O0]UGH|THRU|CC|ATTACHM[Ee]NTS?|ENCL[O0]SUR[Ee]S?|R[Ee]F(?:[Ee]R[Ee]NC[Ee])?|'
-    r'C[O0]NTR[O0]L(?:\s+(?:N[O0]\.?|N[Uu]MB[Ee]R))?|[I1]SSU[Ee]D\s+BY|S[I1]GN[Aa]T[O0]RY|R[Ee]M[Aa]RKS)\s*[:：;\-]',
     re.I
 )
 
@@ -594,21 +585,21 @@ def scan_sender_candidates(text, signature_region=False):
     return dict(entries=entries, candidates=candidates, primary=primary, selected=primary[0] if len(primary) == 1 else None)
 
 
-def parse_correspondence(text, signature_region=False):
-    header, scan = parse_header(text), scan_sender_candidates(text, signature_region)
+def parse_correspondence(text, signature_region=False, header=None):
+    header = parse_header(text) if header is None else header
+    scan = scan_sender_candidates(text, signature_region)
     candidates = scan['candidates']
 
-    # Keep a tentative top candidate when several names are close in score.
-    # The value can then be shown in the form with a REVIEW state instead of
-    # silently leaving a useful field blank.
-    selected = scan['selected'] or (scan['primary'][0] if scan['primary'] else None)
-    source = selected['kind'] if scan['selected'] and selected else 'ambiguous' if scan['primary'] else 'missing'
-    received = selected['name'] if selected else ''
-
+    selected = scan['selected']
     # A document can name the originating sender in its FROM field and have a
     # different person sign it. Keep those two people distinct.
     signature_candidates = [c for c in candidates if c['kind'] == 'signature']
-    signatory_selected = signature_candidates[0] if signature_candidates else selected
+    ambiguous_signature = len(signature_candidates) > 1
+    if ambiguous_signature and selected and selected['kind'] == 'signature':
+        selected = None
+    source = selected['kind'] if selected else 'ambiguous' if scan['primary'] else 'missing'
+    received = selected['name'] if selected else ''
+    signatory_selected = (None if ambiguous_signature else signature_candidates[0]) if signature_candidates else selected
     signatory = signatory_selected['name'] if signatory_selected else ''
     signatory_role = signatory_selected['role'] if signatory_selected else ''
     signatory_source = signatory_selected['kind'] if signatory_selected else 'missing'
@@ -631,7 +622,7 @@ def parse_correspondence(text, signature_region=False):
             or signatory_selected['score'] < 90
             or (not signature_candidates and source == 'ambiguous')
         ))
-        or (len(signature_candidates) > 1 and signature_candidates[0]['score'] - signature_candidates[1]['score'] < 10)
+        or ambiguous_signature
     )
 
     if selected and selected['inkCleanup']:
@@ -643,7 +634,7 @@ def parse_correspondence(text, signature_region=False):
         review = True
         reasons.append('The sender field and printed signatory differ. Confirm both names.')
     if source == 'ambiguous':
-        reasons.append('Several possible senders were found. Confirm the suggested originating person.')
+        reasons.append('Several possible senders were found. Choose the originating person.')
     elif not received:
         reasons.append('No readable sender name was identified. A signature mark alone cannot establish a person\'s name.')
     elif source == 'footer-name':
@@ -701,53 +692,73 @@ def parse_date(value):
         'june': 6, 'jun': 6, 'hunyo': 6, 'hun': 6,
         'july': 7, 'jul': 7, 'hulyo': 7, 'hul': 7,
         'august': 8, 'aug': 8, 'agosto': 8, 'ago': 8,
-        'september': 9, 'sep': 9, 'sept': 9, 'setyembre': 9, 'set': 9,
+        'september': 9, 'sep': 9, 'sept': 9, 'setyembre': 9, 'septiyembre': 9, 'set': 9,
         'october': 10, 'oct': 10, 'oktubre': 10, 'okt': 10,
         'november': 11, 'nov': 11, 'nobyembre': 11, 'nob': 11,
         'december': 12, 'dec': 12, 'disyembre': 12, 'dis': 12
     }
     text = str(value or '').strip()
-    m = re.search(r'\b([A-Za-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})\b', text, re.I)
+    m = re.fullmatch(r'([A-Za-z]+)\.?\s+(\d{1,2})(?:st|nd|rd|th)?,?\s+(\d{4})', text, re.I)
     if m and m.group(1).lower() in months:
         try: return datetime(int(m[3]), months[m[1].lower()], int(m[2])).date().isoformat()
         except ValueError: return ''
-    m = re.search(r'\b(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)\.?,?\s+(\d{4})\b', text, re.I)
+    m = re.fullmatch(r'(\d{1,2})(?:st|nd|rd|th)?\s+([A-Za-z]+)\.?,?\s+(\d{4})', text, re.I)
     if m and m.group(2).lower() in months:
         try: return datetime(int(m[3]), months[m[2].lower()], int(m[1])).date().isoformat()
         except ValueError: return ''
-    m = re.search(r'\b(\d{4})[-/](\d{1,2})[-/](\d{1,2})\b', text)
+    m = re.fullmatch(r'(\d{4})[-/](\d{1,2})[-/](\d{1,2})', text)
     if m:
         try: return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3))).date().isoformat()
         except ValueError: pass
-    m = re.search(r'\b(\d{1,2})[/-](\d{1,2})[/-](\d{4})\b', text)
+    m = re.fullmatch(r'(\d{1,2})[/-](\d{1,2})[/-](\d{4})', text)
     if m:
         d1, d2, y = int(m.group(1)), int(m.group(2)), int(m.group(3))
         if d1 > 12 >= d2: day, month = d1, d2
         elif d2 > 12 >= d1: month, day = d1, d2
-        else: month, day = d1, d2
+        elif d1 == d2: month, day = d1, d2
+        else: return ''
         try: return datetime(y, month, day).date().isoformat()
         except ValueError: pass
     return ''
 
-HEADER_LABELS = (
-    r'S[Uu0]BJ[Ee3]CT(?:\s+M[Aa]TT[Ee]R)?|S[Uu0]BJ(?:[Ee3]C[TIL1]|\.)?|S[Uu0]B3[Ee3]CT|R[Ee]|R[Ee]G[Aa]RD[Ii]NG|P[Aa]KS[Aa]|'
-    r'[Aa]DDR[Ee]SS[Ee]D\s+T[O0]|M[Ee]M[O0]R[Aa]ND[Uu]M\s+F[O0]R|R[Ee]C[Ii]P[Ii][Ee]NT(?:\s+[O0]FF[Ii]C[Ee])?|'
+SUBJECT_LABEL = r'S[Uu0]BJ[Ee3]CT(?:\s+M[Aa]TT[Ee]R|\s*/\s*PARTICULARS)?|S[Uu0]BJ(?:[Ee3]C[TIL1]|\.)?|S[Uu0]B3[Ee3]CT|R[Ee]|R[Ee]G[Aa]RD[Ii]NG|P[Aa]KS[Aa]'
+HEADER_LABELS = SUBJECT_LABEL + '|' + (
+    r'PARTICULARS|'
+    r'[Aa]DDR[Ee]SS[Ee]D\s+T[O0]|M[Ee]M[O0]R[Aa]ND[Uu]M\s+F[O0]R|R[Ee]C[Ii]P[Ii][Ee]NT(?:\s+[O0]FF[Ii]C[Ee])?|S[Ee]NT\s+T[O0]|'
     r'R[Ee]C[Ee][Ii]V[Ee]D\s+FR[O0]M|S[Ee]ND[Ee]R|FR[O0]M|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|P[Aa]R[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|'
     r'[I1]SSU[Ee]D\s+BY|[I1]SSU[Ii]NG\s+[O0]FF[Ii]C[Ee]|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]|S[I1]GN[Aa]T[O0]RY|'
-    r'D[Aa@]T[Ee]\s+(?:R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D|[I1]SSU[Ee]D)|(?:R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D)\s+D[Aa@]T[Ee]|'
+    r'MEMO(?:RANDUM)?\s+(?:N[O0]\.?|NUMBER|#)|'
+    r'D[Aa@]T[Ee]\s+(?:R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D|S[Ee]NT|[I1]SSU[Ee]D|F[O0]RW[Aa]RD[Ee]D)|(?:R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D|[I1]SSU[Ee]|S[Ee]NT)\s+D[Aa@]T[Ee]|'
     r'D[Aa@]T[Ee]D|D[Aa@]T[Ee]|P[Ee]TS[Aa]|T[O0]|F[O0]R|THR[O0]UGH|THRU|CC|ATTACHM[Ee]NTS?|ENCL[O0]SUR[Ee]S?|'
     r'(?:D[O0]CUM[Ee]NT\s+)?(?:C[O0]NTR[O0]L|TR[Aa]CK[Ii]NG)(?:\s*(?:N[O0]\.?|N[Uu]MB[Ee]R|#))?|'
     r'R[Ee]F(?:[Ee]R[Ee]NC[Ee])?(?:\s+(?:N[O0]\.?|N[Uu]MB[Ee]R))?|REF(?:\.?\s*(?:N[O0]\.?|N[Uu]MB[Ee]R))?|'
-    r'D[O0]CUM[Ee]NT\s+TYP[Ee]|C[O0]MMUN[Ii]C[Aa]T[Ii][O0]N\s+TYP[Ee]|D[Ii]R[Ee]CT[Ii][O0]N|ST[Aa]TUS|'
-    r'[Aa]CT[Ii][O0]N\s+T[Aa]K[Ee]N|D[Aa@]T[Ee]\s+F[O0]RW[Aa]RD[Ee]D|R[Ee]M[Aa]RKS'
+    r'D[O0]CUM[Ee]NT\s+TYP[Ee]|C[O0]MMUN[Ii]C[Aa]T[Ii][O0]N\s+TYP[Ee]|D[Ii]R[Ee]CT[Ii][O0]N|(?:RECORD\s+)?ST[Aa]TUS|'
+    r'[Aa]CT[Ii][O0]N(?:\s+T[Aa]K[Ee]N)?\s*/\s*D[Aa@]T[Ee]\s+F[O0]RW[Aa]RD[Ee]D|[Aa]CT[Ii][O0]N\s+T[Aa]K[Ee]N|R[Ee]M[Aa]RKS?|NOTES?'
 )
 HEADER_FIELD = re.compile(r'^(' + HEADER_LABELS + r')\s*(?:[:：;]|[–—-])\s*(.*)$', re.I)
-HEADER_BARE = re.compile(r'^(?:' + HEADER_LABELS + r')\s*[:：;]?\s*$', re.I)
+HEADER_BARE = re.compile(r'^(' + HEADER_LABELS + r')$', re.I)
+HEADER_COLUMNS = re.compile(r'(?:[ \t]{2,}|\t+|\s*\|\s*)(?=(?:' + HEADER_LABELS + r')\s*[:：;])', re.I)
+HEADER_TABLE_CELL = re.compile(r'^(' + HEADER_LABELS + r')(?:[ \t]{2,}|\t+|\s*\|\s*)(?=[^\s:：;–—-])', re.I)
 
 MEMO_HEADING = re.compile(
-    r'^(?:[A-Z0-9&./-]*\s+){0,6}(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\s+(?:ORDER|CIRCULAR))?'
-    r'(?:\s+(?:N[O0]\.?|NUMBER|FOR|SERIES)\b.*|\s*[:#.-]?\s*\d.*)?$', re.I
+    r'^(?:(?:PG\s*ENRO|PROVINCIAL ENRO)\s+)?(?:OFFICE\s+)?(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\s+(?:ORDER|CIRCULAR|JOINT))?'
+    r'(?:\s+(?:N[O0]\.?|NUMBER|FOR|SERIES)\b.*|\s*[:#.-]?\s*\d.*|\s*:)?$', re.I
 )
+ORDER_HEADING = re.compile(
+    r'^(?:(?:PG\s*ENRO|PROVINCIAL ENRO)\s+)?(?P<type>OFFICE ORDER|SPECIAL ORDER|TRAVEL ORDER)'
+    r'(?:\s+(?:N[O0]\.?|NUMBER|SERIES)\b.*|\s*[:#.-]?\s*\d.*)?$', re.I
+)
+HEADER_SUBJECT = re.compile(r'^(?:' + SUBJECT_LABEL + r'|PARTICULARS)$', re.I)
+HEADER_CONTINUATION = re.compile(r'^(?:FOR|OF|ON|AND|OR|WITH|REGARDING|DURING)\b', re.I)
+DATE_LINE = re.compile(r'^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4}|[A-Za-z]+\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}|\d{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\.?,?\s+\d{4})$', re.I)
+EMPTY_FIELD = re.compile(r'^[:：;|]*$|^[-_.=–—]{2,}$')
+UNKNOWN_FIELD = re.compile(r'^(?:N/?A|NONE|NIL|NOT APPLICABLE|NOT AVAILABLE|[-_.=–—]{2,})$', re.I)
+REFERENCE_NUMBER = re.compile(r'(?=[A-Z0-9/._-]*\d)[A-Z0-9][A-Z0-9/._-]*(?:,?\s*s\.?\s*\d{4})?', re.I)
+DATE_FIELDS = {
+    'date': r'D[Aa@]T[Ee]|D[Aa@]T[Ee]\s+[I1]SSU[Ee]D|[I1]SSU[Ee]\s+D[Aa@]T[Ee]|D[Aa@]T[Ee]D|P[Ee]TS[Aa]',
+    'receivedDate': r'D[Aa@]T[Ee]\s+R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]C[Ee][Ii]V[Ee]D\s+D[Aa@]T[Ee]',
+    'releasedDate': r'D[Aa@]T[Ee]\s+(?:R[Ee]L[Ee][Aa]S[Ee]D|S[Ee]NT)|(?:R[Ee]L[Ee][Aa]S[Ee]D|S[Ee]NT)\s+D[Aa@]T[Ee]',
+}
 
 def primary_document_pages(text):
     pages = str(text or '').replace('\r', '').split('\f')
@@ -757,124 +768,204 @@ def primary_document_pages(text):
             break
         yield page
 
+
+def document_header_lines(text):
+    first = str(text or '').replace('\r\n', '\n').replace('\r', '\n').split('\f', 1)[0].replace('\u00a0', ' ')
+    lines = [
+        tidy(HEADER_TABLE_CELL.sub(r'\1: ', cell.strip()))
+        for line in first.split('\n')[:140] for cell in HEADER_COLUMNS.split(line)
+    ]
+    subject_started = False
+    for index, line in enumerate(lines):
+        label = HEADER_FIELD.match(line) or HEADER_BARE.fullmatch(line)
+        if label:
+            if HEADER_SUBJECT.fullmatch(label[1]) and label.lastindex == 2 and not EMPTY_FIELD.fullmatch(label[2]):
+                subject_started = True
+            continue
+        if BODY.match(line) or CLOSING.match(line) or SIGN_LABEL.match(line) or re.match(r'^(?:ANNEX|APPENDIX|COPY FURNISHED)\b', line, re.I):
+            return lines[:index]
+        if (subject_started and line and index and not lines[index - 1] and
+                not (HEADER_CONTINUATION.match(line) or DATE_LINE.fullmatch(line) or EMPTY_FIELD.fullmatch(line))):
+            previous = next((value for value in reversed(lines[:index]) if value), '')
+            label = HEADER_FIELD.match(previous) or HEADER_BARE.fullmatch(previous)
+            if not label or (label.lastindex == 2 and label[2]):
+                return lines[:index]
+        previous_label = (HEADER_FIELD.match(lines[index - 1]) or HEADER_BARE.fullmatch(lines[index - 1])) if index else None
+        if line and previous_label and HEADER_SUBJECT.fullmatch(previous_label[1]):
+            subject_started = True
+    return lines
+
+
+def read_header_field(lines, names, limit=4, subject=False, stop_at_sentence=True):
+    wanted = re.compile(r'^(?:' + names + r')$', re.I)
+    empty_label = ''
+    for index, line in enumerate(lines):
+        match = HEADER_FIELD.match(line) or HEADER_BARE.fullmatch(line)
+        if not match or not wanted.fullmatch(match[1]):
+            continue
+        inline = match[2] if match.lastindex == 2 else ''
+        parts = [inline] if inline and not EMPTY_FIELD.fullmatch(inline) else []
+        if not parts and inline:
+            empty_label = empty_label or line
+            continue
+        for offset, following in enumerate(lines[index + 1:index + 1 + limit + 2], 1):
+            if len(parts) == limit:
+                break
+            if not following:
+                if not parts and offset <= 2:
+                    continue
+                next_value = next((value for value in lines[index + offset + 1:index + offset + 3] if value), '')
+                if subject and HEADER_CONTINUATION.match(next_value) and not HEADER_FIELD.match(next_value):
+                    continue
+                break
+            if re.fullmatch(r'[:：;|]+', following) and not parts:
+                continue
+            if (HEADER_FIELD.match(following) or HEADER_BARE.fullmatch(following) or
+                    MEMO_HEADING.fullmatch(following) or ORDER_HEADING.fullmatch(following) or
+                    EMPTY_FIELD.fullmatch(following) or (limit > 1 and DATE_LINE.fullmatch(following))):
+                break
+            if stop_at_sentence and len(following.split()) >= 5 and re.search(r'[.!?]$', following) and not HEADER_CONTINUATION.match(following):
+                break
+            parts.append(following)
+        value = tidy(' '.join(parts))
+        if value:
+            return value, line
+        empty_label = empty_label or line
+    return '', empty_label
+
+
 def parse_header(text):
-    first = str(text or '').replace('\r', '').split('\f', 1)[0].replace('\u00a0', ' ')
-    first = re.sub(r'[ \t|]{2,}(?=(?:' + HEADER_LABELS + r')\s*[:：;])', '\n', first, flags=re.I)
-    lines = [tidy(l) for l in first.split('\n')[:140] if tidy(l)]
-    boundary = next((i for i, line in enumerate(lines) if BODY.match(line) and not re.match(r'^DEAR\b|^(?:SIR|MADAM)\s*[,!:]', line, re.I)), len(lines))
-    lines = lines[:boundary]
+    lines = document_header_lines(text)
     evidence, warnings = {}, []
 
-    def field(names, limit=6):
-        wanted = re.compile(r'^(?:' + names + r')\s*[:：;]?$', re.I)
-        for i, line in enumerate(lines):
-            match = HEADER_FIELD.match(line)
-            if not (match and wanted.fullmatch(match[1])) and not wanted.fullmatch(line):
-                continue
-            parts = [match[2]] if match and match[2] else []
-            for following in lines[i + 1:i + 1 + limit]:
-                if HEADER_FIELD.match(following) or BODY.match(following) or CLOSING.match(following) or SIGN_LABEL.match(following) or MEMO_HEADING.match(following):
-                    break
-                if parse_date(following) or re.match(r'^[-_=]{3,}$', following):
-                    break
-                parts.append(following)
-            value = tidy(' '.join(parts))
-            if value: return value, line
-        return '', ''
+    def field(names, limit=4, subject=False):
+        return read_header_field(lines, names, limit, subject)
 
     result = {
         'subject': '', 'controlNo': '', 'memoNo': '', 'date': '', 'receivedDate': '', 'releasedDate': '',
-        'recipient': '', 'addressedTo': '', 'senderOffice': '', 'signatory': '', 'issuedBy': '',
-        'documentType': '', 'isMemo': False, 'fieldEvidence': evidence, 'warnings': warnings
+        'recipient': '', 'addressedTo': '', 'senderOffice': '', 'receivedFromLabel': '',
+        'signatory': '', 'issuedBy': '', 'issuedBySource': '',
+        'documentType': '', 'direction': '', 'isMemo': False, 'fieldEvidence': evidence, 'warnings': warnings
     }
 
-    heading = next((i for i, line in enumerate(lines) if MEMO_HEADING.match(line)), -1)
+    first_subject = next((index for index, line in enumerate(lines)
+                          if (match := HEADER_FIELD.match(line) or HEADER_BARE.fullmatch(line)) and HEADER_SUBJECT.fullmatch(match[1])), len(lines))
+    heading = next((i for i, line in enumerate(lines[:first_subject]) if MEMO_HEADING.fullmatch(line) or ORDER_HEADING.fullmatch(line)), -1)
     if heading >= 0:
-        result.update(isMemo=True, documentType='Memorandum')
-        block = lines[heading:heading + 5]
+        order = ORDER_HEADING.fullmatch(lines[heading])
+        result.update(isMemo=not order, documentType=order['type'].title() if order else 'Memorandum')
+        block = [lines[heading]]
+        for following in lines[heading + 1:heading + 5]:
+            if HEADER_FIELD.match(following) or HEADER_BARE.fullmatch(following):
+                break
+            if re.match(r'^(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*(?=[A-Z0-9/._-]*\d)[A-Z0-9]|^(?:SERIES(?:\s+OF)?|S\.)\s*\d{4}\b', following, re.I):
+                block.append(following)
         number_text = ' '.join(block)
         number = re.search(r'\b(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*([A-Z0-9][A-Z0-9/._-]*)', number_text, re.I)
         if not number:
-            number = re.search(r'(?:MEMORANDUM|MEM0RANDUM|MEMO)\s*[:#.-]?\s*(\d[\d/._-]*)', lines[heading], re.I)
-        if number and re.search(r'\d', number[1]):
-            series = re.search(r'(?:[,;]\s*s\.?\s*|\bseries(?:\s+of)?\s+)(\d{4})\b', number_text, re.I)
-            result['memoNo'] = number[1] + (', s. ' + series[1] if series else '')
-            result['controlNo'] = result['memoNo']
-            evidence['controlNo'] = lines[heading]
+            number = re.search(r'(?:MEMORANDUM|MEM0RANDUM|MEMO|ORDER|CIRCULAR)\s*[:#.-]?\s*(\d[\d/._-]*)', lines[heading], re.I)
+        if number and REFERENCE_NUMBER.fullmatch(number[1]):
+            series = re.search(r'(?:(?:[,;]|\s)\s*s\.?\s*|\bseries(?:\s+of)?\s+)(\d{4})\b', number_text, re.I)
+            result['controlNo'] = number[1] + (', s. ' + series[1] if series else '')
+            evidence['controlNo'] = number_text
+            if result['isMemo']:
+                result['memoNo'], evidence['memoNo'] = result['controlNo'], number_text
 
     for key, names in {
-        'subject': r'S[Uu0]BJ[Ee3]CT(?:\s+M[Aa]TT[Ee]R)?|S[Uu0]BJ(?:[Ee3]C[TIL1]|\.)?|R[Ee]|P[Aa]KS[Aa]',
-        'recipient': r'T[O0]|F[O0]R|P[Aa]R[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|[Aa]DDR[Ee]SS[Ee]D\s+T[O0]|M[Ee]M[O0]R[Aa]ND[Uu]M\s+F[O0]R',
+        'subject': SUBJECT_LABEL,
+        'recipient': r'T[O0]|F[O0]R|P[Aa]R[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|[Aa]DDR[Ee]SS[Ee]D\s+T[O0]|M[Ee]M[O0]R[Aa]ND[Uu]M\s+F[O0]R|R[Ee]C[Ii]P[Ii][Ee]NT(?:\s+[O0]FF[Ii]C[Ee])?|S[Ee]NT\s+T[O0]',
         'senderOffice': r'FR[O0]M|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|S[Ee]ND[Ee]R|R[Ee]C[Ee][Ii]V[Ee]D\s+FR[O0]M|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]',
-        'issuedBy': r'FR[O0]M|[I1]SSU[Ee]D\s+BY|[I1]SSU[Ii]NG\s+[O0]FF[Ii]C[Ee]',
+        'receivedFromLabel': r'R[Ee]C[Ee][Ii]V[Ee]D\s+FR[O0]M|S[Ee]ND[Ee]R',
+        'issuedBy': r'[I1]SSU[Ee]D\s+BY|[I1]SSU[Ii]NG\s+[O0]FF[Ii]C[Ee]',
         'signatory': r'S[I1]GN[Aa]T[O0]RY'
     }.items():
-        result[key], evidence[key] = field(names, 8 if key == 'subject' else 4)
+        result[key], evidence[key] = field(names, 6 if key == 'subject' else 4, subject=key == 'subject')
+        if key != 'subject' and UNKNOWN_FIELD.fullmatch(result[key]):
+            result[key] = ''
+
+    if not evidence['issuedBy']:
+        result['issuedBy'], evidence['issuedBy'] = field(r'FR[O0]M|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]')
+        if UNKNOWN_FIELD.fullmatch(result['issuedBy']):
+            result['issuedBy'] = ''
+    if result['issuedBy']:
+        result['issuedBySource'] = 'printed'
+    if not result['subject'] and not evidence['subject']:
+        result['subject'], evidence['subject'] = field(r'PARTICULARS', 6, subject=True)
+    if not evidence['recipient'] and heading >= 0:
+        recipient = re.match(r'^(?:OFFICE\s+)?MEM[O0]RANDUM\s+F[O0]R\s+(.*)$', lines[heading], re.I)
+        if recipient:
+            result['recipient'], evidence['recipient'] = recipient[1], lines[heading]
 
     result['addressedTo'] = result['recipient']
     control, control_ev = field(r'(?:D[O0]CUM[Ee]NT\s+)?(?:C[O0]NTR[O0]L|TR[Aa]CK[Ii]NG)(?:\s*(?:N[O0]\.?|N[Uu]MB[Ee]R|#))?', 1)
     if not control and not result['controlNo']:
         control, control_ev = field(r'R[Ee]F(?:[Ee]R[Ee]NC[Ee])?(?:\s+(?:N[O0]\.?|N[Uu]MB[Ee]R))?|REF(?:\.?\s*(?:N[O0]\.?|N[Uu]MB[Ee]R))?', 1)
-    if control and re.search(r'\d', control):
+    if REFERENCE_NUMBER.fullmatch(control):
         result['controlNo'], evidence['controlNo'] = control, control_ev
-        if result['isMemo'] and not result['memoNo']: result['memoNo'] = control
 
-    for key, names in {
-        'date': r'D[Aa@]T[Ee]|D[Aa@]T[Ee]\s+[I1]SSU[Ee]D|D[Aa@]T[Ee]D|P[Ee]TS[Aa]',
-        'receivedDate': r'D[Aa@]T[Ee]\s+R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]C[Ee][Ii]V[Ee]D\s+D[Aa@]T[Ee]',
-        'releasedDate': r'D[Aa@]T[Ee]\s+R[Ee]L[Ee][Aa]S[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D\s+D[Aa@]T[Ee]'
-    }.items():
+    for key, names in DATE_FIELDS.items():
         val, evidence[key] = field(names, 1)
         if val: result[key] = parse_date(val)
+        if val and not result[key]:
+            warnings.append('A printed date could not be interpreted unambiguously.')
 
-    if not result['date']:
-        standalone = next((line for line in lines if parse_date(line) and len(line) < 35), '')
-        if standalone:
-            result['date'] = parse_date(standalone)
-            evidence['date'] = standalone
+    if not evidence['date']:
+        previous = ''
+        for line in filter(None, lines[:first_subject]):
+            label = HEADER_FIELD.match(previous) or HEADER_BARE.fullmatch(previous)
+            if DATE_LINE.fullmatch(line) and not label:
+                result['date'] = parse_date(line)
+                evidence['date'] = line
+                if not result['date']:
+                    warnings.append('A printed date could not be interpreted unambiguously.')
+                break
+            previous = line
 
-    if not result['senderOffice']:
-        result['senderOffice'] = letterhead_office(lines[:20])
+    printed_type, type_evidence = field(r'D[O0]CUM[Ee]NT\s+TYP[Ee]', 1)
+    printed_direction, evidence['direction'] = field(r'C[O0]MMUN[Ii]C[Aa]T[Ii][O0]N\s+TYP[Ee]|D[Ii]R[Ee]CT[Ii][O0]N', 1)
+    if printed_direction.casefold() in ('incoming', 'outgoing'):
+        result['direction'] = printed_direction.title()
+    known_types = ('Memorandum', 'Office Order', 'Special Order', 'Travel Order', 'Request Letter', 'Endorsement Letter',
+                   'Transmittal Letter', 'Response Letter', 'Notice of Meeting', 'Invitation', 'Report', 'Letter', 'Other Communication')
+    if not result['documentType']:
+        result['documentType'] = next((kind for kind in known_types if kind.casefold() == printed_type.casefold()), '')
+        if result['documentType']:
+            result['isMemo'] = result['documentType'] == 'Memorandum'
+            evidence['documentType'] = type_evidence
+    if result['isMemo'] and not result['memoNo']:
+        memo_number, memo_evidence = field(r'MEMO(?:RANDUM)?\s+(?:N[O0]\.?|NUMBER|#)', 1)
+        if REFERENCE_NUMBER.fullmatch(memo_number):
+            result['memoNo'], evidence['memoNo'] = memo_number, memo_evidence
+
+    if not result['senderOffice'] and not evidence['senderOffice']:
+        first_label = next((index for index, line in enumerate(lines)
+                            if HEADER_FIELD.match(line) or HEADER_BARE.fullmatch(line) or DATE_LINE.fullmatch(line)), len(lines))
+        result['senderOffice'] = letterhead_office(lines[:min(first_label, heading if heading >= 0 else len(lines), 20)])
         evidence['senderOffice'] = result['senderOffice']
+        result['senderOfficeSource'] = 'letterhead' if result['senderOffice'] else ''
+    elif result['senderOffice']:
+        result['senderOfficeSource'] = 'printed'
+    else:
+        result['senderOfficeSource'] = ''
 
     result['needsReview'] = [k for k in ('subject', 'controlNo', 'date', 'recipient', 'senderOffice') if not result[k]]
     return result
 
 def letterhead_office(lines):
     generic = re.compile(r'^(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY)$', re.I)
-    for line in lines:
-        # Do not mistake registry labels or their values for an office name.
-        # For example, "ACTION TAKEN: Forwarded to Planning Division" contains
-        # the word "Division" but is not the document's letterhead.
-        if HEADER_FIELD.match(line) or SIGN_LABEL.match(line):
+    offices = []
+    for line in filter(None, lines):
+        if re.search(r'\b(?:ORDER|MEMORANDUM)\b|@|https?://', line, re.I):
             continue
-        if re.match(r'^(?:STATUS|ACTION\s+TAKEN|DATE\s+FORWARDED|REMARKS?)\s*[:：;–—-]', line, re.I):
-            continue
-        if re.search(r'\b(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|PROVINCIAL\s+GOVERNMENT|REPUBLIC|MUNICIPALITY)\b', line, re.I):
-            if not generic.fullmatch(line) and len(line.split()) >= 2:
-                return line
-    return ''
+        if re.search(r'\b(?:OFFICE|DEPARTMENT|BUREAU|DIVISION|COMMISSION|AUTHORITY|UNIVERSITY|MUNICIPALITY)\b', line, re.I) and not generic.fullmatch(line):
+            offices.append(line)
+    return offices[-1] if offices else ''
 
 # =========================================================================
 # MULTI-SIGNAL LETTER TYPE CLASSIFICATION ENGINE
 # =========================================================================
 
 LETTER_CLASSIFIER_RULES = [
-    {
-        'type': 'Memorandum',
-        'headings': [
-            r'^(?:OFFICE\s+)?(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\s+(?:ORDER|CIRCULAR|JOINT))?\b',
-            r'^MEMORANDUM\s+FOR\b'
-        ],
-        'subject': [r'\bMEMO\b', r'\bMEMORANDUM\b'],
-        'body': [
-            r'\bFOR\s+YOUR\s+(?:INFORMATION|GUIDANCE|COMPLIANCE|APPROPRIATE\s+ACTION)\b',
-            r'\bBE\s+GUIDED\s+ACCORDINGLY\b',
-            r'\bPLEASE\s+BE\s+INFORMED\s+THAT\b',
-            r'\bDIRECTED\s+TO\s+COMPLY\b'
-        ],
-        'structure': r'(?m)^\s*(?:MEMORANDUM\s+FOR|TO)\s*[:：].*^\s*FROM\s*[:：]'
-    },
     {
         'type': 'Request Letter',
         'headings': [
@@ -1034,9 +1125,8 @@ LETTER_CLASSIFIER_RULES = [
 def classify_letter_type(raw_text='', extracted_subject=''):
     clean = str(raw_text or '').replace('\r', '').split('\f', 1)[0]
     lines = [tidy(l) for l in clean.split('\n') if tidy(l)]
-    top_lines = lines[:20]
-    top_block = ' '.join(top_lines)
-    body_block = ' '.join(lines[:45])
+    top_lines = [line for line in document_header_lines(clean) if line and not HEADER_FIELD.match(line)][:20]
+    body_block = ' '.join(line for line in lines[:45] if not HEADER_FIELD.match(line))
     subject_text = str(extracted_subject or '').strip()
 
     scores = {}
@@ -1100,52 +1190,49 @@ def classify_letter_type(raw_text='', extracted_subject=''):
         'score': best_score
     }
 
-def parse_letter_details(raw_text=''):
+def parse_letter_details(raw_text='', header=None):
     first = str(raw_text or '').replace('\r', '').split('\f', 1)[0]
-    lines = [tidy(line) for line in first.split('\n') if tidy(line)]
-    subject = ''
+    header = parse_header(raw_text) if header is None else header
+    subject = header['subject']
+    source = 'header' if subject else ''
+    if not subject:
+        subject = next((line for line in document_header_lines(first) if re.match(
+            r'^(?:REQUEST\s+(?:FOR|TO)|INVITATION\s+(?:TO|FOR)|ENDORSEMENT\s+OF|TRANSMITTAL\s+OF|RESPONSE\s+TO|'
+            r'NOTICE\s+OF\s+MEETING|(?:MONTHLY|ANNUAL|ACCOMPLISHMENT|ACTIVITY|INSPECTION|PROGRESS|INCIDENT)\s+REPORT)\b', line, re.I)), '')
+        if subject:
+            source = 'heading'
+
+    lines = [tidy(line) for line in first.split('\n')]
     opening = ''
-    printed_subject = False
+    if not subject and not header['isMemo']:
+        for index, line in enumerate(lines[:80]):
+            if (BODY.match(line) or re.match(r'^[|!¦]?\s*(?:(?:I|WE)\s+)?(?:respectfully|humbly)\s+request\b|^MAY\s+(?:WE|I)\b', line, re.I)) and re.search(
+                    r'\b(?:request(?:ing)?|invite|invitation|endorse|transmit|submit|forward|respond|inform|report|humihiling|hinihiling|ipinapabatid)\b', line, re.I):
+                parts = [line]
+                for following in lines[index + 1:index + 3]:
+                    if not following or HEADER_FIELD.match(following) or CLOSING.match(following) or SIGN_LABEL.match(following):
+                        break
+                    parts.append(following)
+                opening = re.sub(r'^[|!¦]\s*(?=respectfully\s+request)', 'I ', ' '.join(parts), flags=re.I)
+                break
+        if opening:
+            match = re.match(r'^.*?[.!?](?=\s+[A-Z]|$)', opening)
+            subject = match.group(0) if match else opening
+            if len(subject) > 240:
+                subject = subject[:240].rsplit(' ', 1)[0] + '…'
+            source = 'body'
 
-    for index, line in enumerate(lines[:80]):
-        match = re.match(
-            r'^(?:S[Uu0]BJ[Ee3]CT(?:\s+M[Aa]TT[Ee]R)?|S[Uu0]BJ(?:[Ee3]C[TIL1]|\.)?|R[Ee](?=\s*[:：;\-])|P[Aa]KS[Aa])\s*[:：;\-]?\s*(.*)$',
-            line,
-            re.I,
-        )
-        if match:
-            parts = [match.group(1)] if match.group(1) else []
-            for following in lines[index + 1:min(len(lines), index + 6)]:
-                if FIELD_LABEL.match(following) or BODY.match(following) or CLOSING.match(following):
-                    break
-                parts.append(following)
-            subject = tidy(' '.join(parts))
-            printed_subject = bool(subject)
-            break
-        if not opening and re.match(r'^(?:DEAR\b|SIR\s*[,!:]|MADAM\s*[,!:]|MA.M\s*[,!:]|GREETINGS\b|GOOD\s+(?:DAY|MORNING|AFTERNOON)\b|TO\s+WHOM\b)', line, re.I):
-            continue
-        if not opening and not CLOSING.match(line) and (
-            BODY.match(line)
-            or re.match(r'^[|!¦]?\s*(?:(?:I|WE)\s+)?(?:respectfully|humbly)\s+request\b', line, re.I)
-            or re.match(r'^(?:I|WE)\s+(?:hereby|would\s+like\s+to|am\s+writing\s+to|wish\s+to|request|seek)\b', line, re.I)
-        ):
-            opening = re.sub(r'^[|!¦]\s*(?=respectfully\s+request)', 'I ', ' '.join(lines[index:index + 3]), flags=re.I).strip()
-            opening = re.sub(r'^[|!¦]\s*', '', opening).strip()
-
-    if not subject and opening:
-        match = re.match(r'^.*?[.!?](?=\s+[A-Z]|$)', opening)
-        subject = match.group(0) if match else opening[:180] + '…'
-
-    classification = classify_letter_type(raw_text, subject)
+    classification = ({'documentType': header['documentType'], 'confidence': 'high', 'evidence': header['documentType']}
+                      if header['documentType'] else classify_letter_type(raw_text, subject))
     needs_review = []
-    if not printed_subject:
+    if not subject or source == 'body':
         needs_review.append('subject')
-    if classification['confidence'] != 'high' or classification['documentType'] == 'Other Communication':
+    if not header['documentType'] and (classification['confidence'] != 'high' or classification['documentType'] == 'Other Communication'):
         needs_review.append('documentType')
 
     return {
         'subject': subject,
-        'subjectSource': 'printed' if printed_subject else 'body',
+        'subjectSource': source,
         'subjectEvidence': subject,
         'documentType': classification['documentType'],
         'documentTypeSource': classification['confidence'],
@@ -1155,58 +1242,16 @@ def parse_letter_details(raw_text=''):
 
 FORM_FIELD_PATTERNS = {
     'status': r'(?:RECORD\s+)?STATUS',
-    'actionTaken': r'(?:ACTION\s+TAKEN(?:\s*/\s*DATE\s+FORWARDED)?|ACTION\s*/\s*DATE\s+FORWARDED|DATE\s+FORWARDED)',
+    'actionTaken': r'ACTION(?:\s+TAKEN)?\s*/\s*DATE\s+FORWARDED|ACTION\s+TAKEN',
+    'forwardedDate': r'DATE\s+FORWARDED',
     'remarks': r'(?:REMARKS?|NOTES?)',
 }
 
 
-def _read_labeled_form_value(text, label_pattern, max_lines=3):
-    """Read only explicitly labelled registry fields, never infer them from letter prose."""
-    first_page = str(text or '').replace('\r', '').split('\f', 1)[0]
-    lines = first_page.splitlines()
-    label = rf'(?:{label_pattern})'
-    inline_pattern = re.compile(
-        rf'^\s*{label}\s*(?::|：|;|–|—|-)\s*(.*?)\s*$',
-        re.I,
-    )
-    bare_pattern = re.compile(rf'^\s*{label}\s*$', re.I)
-    for index, raw_line in enumerate(lines[:160]):
-        line = raw_line.strip()
-        match = inline_pattern.match(line)
-        if match:
-            value = tidy(match.group(1))
-            if value:
-                return value, line
-        elif not bare_pattern.fullmatch(line):
-            continue
-
-        parts = []
-        for following in lines[index + 1:index + 1 + max_lines]:
-            candidate = tidy(following)
-            if not candidate:
-                if parts:
-                    break
-                continue
-            if (
-                inline_pattern.match(candidate)
-                or bare_pattern.fullmatch(candidate)
-                or FIELD_LABEL.match(candidate)
-                or BODY.match(candidate)
-                or CLOSING.match(candidate)
-            ):
-                break
-            parts.append(candidate)
-        value = tidy(' '.join(parts))
-        if value:
-            return value, line + '\n' + value
-    return '', ''
-
-
 def extract_registry_form_fields(text):
     """Extract optional workflow fields when a document labels them explicitly."""
-    raw_status, status_evidence = _read_labeled_form_value(
-        text, FORM_FIELD_PATTERNS['status'], max_lines=1
-    )
+    lines = document_header_lines(text)
+    raw_status, status_evidence = read_header_field(lines, FORM_FIELD_PATTERNS['status'], 1)
     normalized_status = re.sub(r'[^a-z]+', ' ', raw_status.casefold()).strip()
     status = ''
     status_aliases = {
@@ -1229,12 +1274,12 @@ def extract_registry_form_fields(text):
     }
     status = status_aliases.get(normalized_status, '')
 
-    action_taken, action_evidence = _read_labeled_form_value(
-        text, FORM_FIELD_PATTERNS['actionTaken'], max_lines=3
-    )
-    remarks, remarks_evidence = _read_labeled_form_value(
-        text, FORM_FIELD_PATTERNS['remarks'], max_lines=3
-    )
+    action_taken, action_evidence = read_header_field(lines, FORM_FIELD_PATTERNS['actionTaken'], 3, stop_at_sentence=False)
+    forwarded_date, forwarded_evidence = read_header_field(lines, FORM_FIELD_PATTERNS['forwardedDate'], 1)
+    if parse_date(forwarded_date):
+        action_taken = '\n'.join(filter(None, (action_taken, f'Date forwarded: {forwarded_date}')))
+        action_evidence = '\n'.join(filter(None, (action_evidence, forwarded_evidence)))
+    remarks, remarks_evidence = read_header_field(lines, FORM_FIELD_PATTERNS['remarks'], 3, stop_at_sentence=False)
 
     evidence = {}
     if status:
@@ -1257,42 +1302,54 @@ def extract_registry_form_fields(text):
 
 def extract_document_metadata(text):
     header = parse_header(text)
-    details = parse_letter_details(text)
-    sender = parse_correspondence(text)
+    details = parse_letter_details(text, header)
+    sender = parse_correspondence(text, header=header)
     registry_fields = extract_registry_form_fields(text)
 
-    if not sender['recipient']:
-        lines = [tidy(l) for l in str(text).split('\f', 1)[0].splitlines() if tidy(l)]
-        greet_idx = next((i for i, l in enumerate(lines) if re.match(r'^Dear\b|^(?:Sir|Madam|Ma.am)\s*[:,]', l, re.I)), -1)
-        if greet_idx > 0:
-            block = lines[max(0, greet_idx - 6):greet_idx]
-            sender['recipient'] = ' '.join(block)
+    recipient = header['recipient']
+    recipient_source = 'printed' if recipient else ''
+    if not recipient and not header['isMemo'] and not header['fieldEvidence']['recipient']:
+        recipient = letter_recipient(text)
+        if recipient:
+            recipient_source = 'address-block'
 
-    source_office = sender.get('sender') or header.get('senderOffice') or ''
-    received_from = sender.get('receivedFrom') or ''
-    received_from_source = sender.get('receivedFromSource') or 'missing'
-    received_from_needs_review = bool(sender.get('receivedFromNeedsReview'))
+    source_office = header['senderOffice']
+    explicit_received = bool(header['fieldEvidence']['receivedFromLabel'])
+    received_from = header['receivedFromLabel'] if explicit_received else sender['receivedFrom']
+    received_from_source = ('printed' if received_from else 'missing') if explicit_received else sender['receivedFromSource']
+    received_from_needs_review = not received_from if explicit_received else sender['receivedFromNeedsReview']
     combined_review = list(dict.fromkeys(header['needsReview'] + details['needsReview'] + sender['needsReview']))
-    # If a printed originating office is available but the letter has no
-    # person-name signatory, use that explicit office in the required
-    # "Received from" field. Ambiguous person candidates still require review.
-    if not received_from and source_office and received_from_source == 'missing':
+    if not explicit_received and not received_from and source_office and received_from_source == 'missing':
         received_from = source_office
-        received_from_source = 'office'
+        received_from_source = header['senderOfficeSource']
         received_from_needs_review = False
+    if not received_from_needs_review:
         combined_review = [key for key in combined_review if key != 'receivedFrom']
+    if recipient:
+        combined_review = [key for key in combined_review if key != 'recipient']
+
+    issued_by = header['issuedBy']
+    if not header['fieldEvidence']['issuedBy'] and not sender['signatoryNeedsReview']:
+        issued_by = sender['signatory']
+    issued_by_source = header['issuedBySource'] or (sender['signatorySource'] if issued_by else '')
+    received_evidence = header['fieldEvidence']['receivedFromLabel'] or sender['fieldEvidence']['receivedFrom'] or header['fieldEvidence']['senderOffice']
+    issued_evidence = header['fieldEvidence']['issuedBy'] or (sender['fieldEvidence']['signatory'] if issued_by else '')
 
     result = {
         **header, **sender,
+        'recipient': recipient,
+        'recipientSource': recipient_source,
+        'addressedTo': recipient,
         'receivedFrom': received_from,
         'receivedFromSource': received_from_source,
         'receivedFromNeedsReview': received_from_needs_review,
-        'subject': header['subject'] or details['subject'],
-        'subjectSource': 'header' if header['subject'] else details['subjectSource'],
+        'subject': details['subject'],
+        'subjectSource': details['subjectSource'],
         'documentType': header['documentType'] or details['documentType'],
-        'documentTypeSource': 'heading' if header['documentType'] else details['documentTypeSource'],
-        'issuedBy': sender['signatory'] or header['issuedBy'] or sender['sender'],
-        'sourceOffice': sender['sender'],
+        'documentTypeSource': ('printed' if header['fieldEvidence'].get('documentType') else 'heading') if header['documentType'] else details['documentTypeSource'],
+        'issuedBy': issued_by,
+        'issuedBySource': issued_by_source,
+        'sourceOffice': source_office,
         'status': registry_fields['status'],
         'statusSource': registry_fields['statusSource'],
         'actionTaken': registry_fields['actionTaken'],
@@ -1302,13 +1359,38 @@ def extract_document_metadata(text):
         'detectedNumbers': extract_numeric_tokens(text),
         'fieldEvidence': {
             **header['fieldEvidence'], **sender['fieldEvidence'], **registry_fields['fieldEvidence'],
-            'receivedFrom': sender['fieldEvidence'].get('receivedFrom') or (source_office if received_from_source == 'office' else ''),
+            'receivedFrom': received_evidence,
+            'recipient': header['fieldEvidence']['recipient'] or recipient,
+            'issuedBy': issued_evidence,
             'subject': header['fieldEvidence'].get('subject') or details['subject'],
-            'documentType': header['documentType'] or details['documentType']
+            'documentType': header['fieldEvidence'].get('documentType') or header['documentType'] or details['documentTypeEvidence']
         },
         'needsReview': combined_review
     }
     return result
+
+
+def letter_recipient(text):
+    lines = [tidy(line) for line in str(text or '').split('\f', 1)[0].split('\n')]
+    greeting = next((i for i, line in enumerate(lines) if re.match(r'^DEAR\b|^(?:SIR|MADAM|MA.AM)\s*[:,]', line, re.I)), -1)
+    if greeting < 0:
+        return ''
+    block = []
+    for line in reversed(lines[max(0, greeting - 10):greeting]):
+        if not line:
+            if block:
+                break
+            continue
+        if HEADER_FIELD.match(line) or HEADER_BARE.fullmatch(line) or DATE_LINE.fullmatch(line):
+            break
+        block.insert(0, line)
+    for index, line in enumerate(block):
+        if name_value(line, contextual=True) and any(
+                ROLE.search(detail) or re.search(r'\b(?:OFFICE|DEPARTMENT|DIVISION|UNIVERSITY|COLLEGE|SCHOOL)\b', detail, re.I)
+                for detail in block[index + 1:]):
+            return ' '.join(block[index:])
+    return ''
+
 
 def extract_numeric_tokens(text):
     return list(dict.fromkeys(re.findall(r'(?<!\w)\d[\d,./:-]*', text or '')))
@@ -1316,39 +1398,37 @@ def extract_numeric_tokens(text):
 def communication_form_payload(metadata, text, communication_type=''):
     evidence = dict(metadata.get('fieldEvidence') or {})
     direction = communication_type if communication_type in ('Incoming', 'Outgoing') else 'Incoming'
-    memo = bool(metadata.get('isMemo') or metadata.get('documentType') == 'Memorandum')
+    memo = bool(metadata.get('isMemo'))
     uncertain = set(metadata.get('needsReview') or [])
-    # Keep OCR suggestions visible even when confidence is imperfect. The UI
-    # receives a REVIEW state so staff can verify the value instead of losing it.
+    recipient = metadata.get('recipient') or ''
     received = metadata.get('receivedFrom') or ''
-    signatory = metadata.get('signatory') or metadata.get('issuedBy') or ''
+    signatory = metadata.get('signatory') or ''
     signatory_role = metadata.get('signatoryRole') or ''
+    date_key = 'date' if memo else 'releasedDate' if direction == 'Outgoing' else 'receivedDate'
+    office_key = 'signatory' if memo else 'recipient' if direction == 'Outgoing' else 'receivedFrom'
+    number_key = 'memoNo' if memo else 'controlNo'
 
     values = {
-        'controlNoInput': (metadata.get('memoNo') if memo else '') or metadata.get('controlNo') or '',
-        'docTypeSelect': metadata.get('documentType') or 'Other Communication',
+        'controlNoInput': metadata.get(number_key) or '',
+        'docTypeSelect': metadata.get('documentType') or '',
         'subjectInput': metadata.get('subject') or '',
-        'officeInput': (metadata.get('recipient') or metadata.get('addressedTo') or '') if direction == 'Outgoing' else (received or metadata.get('sourceOffice') or metadata.get('senderOffice') or ''),
-        'dateInput': (metadata.get('date') if memo else metadata.get('releasedDate' if direction == 'Outgoing' else 'receivedDate')) or metadata.get('date') or '',
+        'officeInput': signatory if memo else recipient if direction == 'Outgoing' else received,
+        'dateInput': metadata.get(date_key) or '',
         'statusSelect': metadata.get('status') or '',
         'actionTakenInput': metadata.get('actionTaken') or '',
         'remarksInput': metadata.get('remarks') or '',
         'signatoryInput': signatory,
         'signatoryRoleInput': signatory_role,
+        'memoRecipientInput': recipient if memo else '',
+        'memoIssuerInput': metadata.get('issuedBy', '') if memo else '',
     }
-    if memo:
-        values['memoRecipientInput'] = metadata.get('recipient') or ''
-        values['memoIssuerInput'] = signatory
 
     states = {}
-    office_key = 'recipient' if direction == 'Outgoing' else (
-        'receivedFrom' if received else 'sourceOffice' if values.get('officeInput') else 'receivedFrom'
-    )
-    keys = {'controlNoInput': 'controlNo', 'docTypeSelect': 'documentType', 'subjectInput': 'subject',
-            'officeInput': office_key, 'dateInput': 'date',
+    keys = {'controlNoInput': number_key, 'docTypeSelect': 'documentType', 'subjectInput': 'subject',
+            'officeInput': office_key, 'dateInput': date_key,
             'statusSelect': 'status', 'actionTakenInput': 'actionTaken', 'remarksInput': 'remarks',
             'signatoryInput': 'signatory', 'signatoryRoleInput': 'signatoryRole',
-            'memoRecipientInput': 'recipient', 'memoIssuerInput': 'signatory'}
+            'memoRecipientInput': 'recipient', 'memoIssuerInput': 'issuedBy'}
     for input_id, value in values.items():
         key = keys[input_id]
         review = key in uncertain
@@ -1356,15 +1436,13 @@ def communication_form_payload(metadata, text, communication_type=''):
             review = review or bool(metadata.get('receivedFromNeedsReview'))
         if key in ('signatory', 'signatoryRole'):
             review = review or bool(metadata.get('signatoryNeedsReview'))
-        if input_id == 'dateInput' and not memo and not metadata.get('releasedDate' if direction == 'Outgoing' else 'receivedDate'):
-            review = True
         states[input_id] = {
             'state': 'missing' if not value else 'review' if review else 'detected',
             'source': metadata.get(key + 'Source', 'ocr'), 'evidence': evidence.get(key, '')
         }
     required = ['controlNoInput', 'docTypeSelect', 'dateInput', 'subjectInput', 'memoRecipientInput' if memo else 'officeInput']
     return {
-        'formSchemaVersion': 1,
+        'formSchemaVersion': 2,
         'formValues': values,
         'fieldStates': states,
         'missingFields': [k for k in required if not values.get(k)],
@@ -1571,8 +1649,8 @@ def _ocr_candidate_score(candidate):
     words = re.findall(r'[\wÀ-ž]+', text, re.UNICODE)
     score = confidence + min(12, len(words) * 0.08)
     header = parse_header(text)
-    details = parse_letter_details(text)
-    sender = parse_correspondence(text)
+    details = parse_letter_details(text, header)
+    sender = parse_correspondence(text, header=header)
     score += 6 if header.get('subject') else 0
     score += 4 if header.get('date') or header.get('receivedDate') or header.get('releasedDate') else 0
     score += 4 if header.get('controlNo') else 0
@@ -1592,10 +1670,14 @@ def fast_ocr_image(image, header_metadata=None):
     page_key = f'{OCR_PARSER_VERSION}:{OCR_LANG}:{processed.size}:' + hashlib.sha256(processed.tobytes()).hexdigest()
     with _page_cache_lock:
         cached = _page_cache.get(page_key)
-        if cached and time.monotonic() - cached[0] <= OCR_CACHE_TTL:
-            if cached[1].get('lowConfidence'):
-                mark_sender_ocr_review()
-            return cached[1]['text']
+    if cached and time.monotonic() - cached[0] <= OCR_CACHE_TTL and (cached[1]['signatureChecked'] or not allow_signature_scan):
+        current = _state.get()
+        if current:
+            with current.lock:
+                current.cached_pages += 1
+        if cached[1]['lowConfidence']:
+            mark_sender_ocr_review()
+        return cached[1]['text']
 
     first = run_tesseract(processed, 3, with_data=True)
     # Orientation detection is conditional: clear portrait scans skip the extra
@@ -1611,14 +1693,14 @@ def fast_ocr_image(image, header_metadata=None):
     candidates = [first]
     first_text = first.get('text', '')
     first_header = parse_header(first_text)
-    first_sender = parse_correspondence(first_text)
+    first_sender = parse_correspondence(first_text, header=first_header)
     header_gaps = sum(not first_header.get(key) for key in ('subject', 'date', 'controlNo'))
     # A readable body can still have a missed header or signature. Try a
     # single-column layout whenever the first pass is weak or incomplete.
     needs_alternate = (
         not first_text.strip()
         or first['confidence'] < max(OCR_MIN_CONFIDENCE, 72)
-        or not first_sender.get('receivedFrom')
+        or not (first_sender['receivedFrom'] or first_header['senderOffice'])
         or header_gaps >= 2
     )
     if needs_alternate:
@@ -1666,12 +1748,17 @@ def fast_ocr_image(image, header_metadata=None):
     # Inspect the signature/footer even when a FROM field was already found.
     # A digitally readable body may contain a scanned signature image that
     # native PDF text extraction cannot see.
-    needs_signature_scan = allow_signature_scan and (
+    signature_hint = (
+        not first_header['senderOffice'] or best.get('confidence', 0) < 75 or
+        any(CLOSING.match(line) or SIGN_LABEL.match(line) or ROLE.search(line)
+            for line in (tidy(value) for value in text.split('\n')[-8:]))
+    )
+    needs_signature_scan = signature_hint and processed.height > 500 and (
         not corr.get('signatory')
         or not corr.get('signatoryRole')
         or corr.get('signatoryNeedsReview')
     )
-    if needs_signature_scan and processed.height > 500:
+    if allow_signature_scan and needs_signature_scan:
         signature_result = _read_signature_zone(processed)
         if signature_result:
             signature_scan = scan_sender_candidates(signature_result.get('text', ''), True)
@@ -1724,7 +1811,9 @@ def fast_ocr_image(image, header_metadata=None):
         mark_sender_ocr_review()
     if OCR_PAGE_CACHE_SIZE and len(text) <= 128000:
         with _page_cache_lock:
-            _page_cache[page_key] = (time.monotonic(), {'text': text, 'lowConfidence': low})
+            _page_cache[page_key] = (time.monotonic(), {
+                'text': text, 'lowConfidence': low, 'signatureChecked': allow_signature_scan or not needs_signature_scan
+            })
             while len(_page_cache) > OCR_PAGE_CACHE_SIZE:
                 _page_cache.popitem(last=False)
     return text
@@ -1751,7 +1840,6 @@ def extract_pdf(file_path):
             # A digital body can coexist with a scanned signatory. Inspect images
             # instead of accepting the body character count as proof of completeness.
             has_images = bool(page.get_images(full=True))
-            sender = parse_correspondence(native)
             signature_marker = bool(re.search(
                 r'(?i)\b(?:sincerely|respectfully|faithfully|truly yours|very truly yours|'
                 r'signed by|signatory|signature over printed name|lubos na gumagalang)\b',
@@ -1762,7 +1850,7 @@ def extract_pdf(file_path):
             # printed closing/signature labels, without running a footer pass on
             # every ordinary continuation page.
             signature_page = i == len(doc) - 1 or signature_marker or has_images
-            needs_scan = not usable or has_images or (not sender.get('signatoryRole') and signature_page)
+            needs_scan = not usable or has_images
             if needs_scan:
                 scale = min(OCR_DPI/72, OCR_MAX_SIDE/max(page.rect.width, page.rect.height))
                 pix = page.get_pixmap(matrix=fitz.Matrix(scale, scale), colorspace=fitz.csRGB, alpha=False)
@@ -1770,7 +1858,15 @@ def extract_pdf(file_path):
                     Image.frombytes('RGB', (pix.width, pix.height), pix.samples),
                     header_metadata={'signature_scan': signature_page}
                 )
-                output[i] = supplement_sender_evidence(native, scanned) if usable else scanned or native
+                native_header = parse_header(native) if usable else {}
+                scanned_header = parse_header(scanned)
+                header_keys = ('subject', 'controlNo', 'memoNo', 'recipient', 'date', 'receivedDate', 'releasedDate')
+                gained = sum(bool(scanned_header[key]) and not native_header.get(key) for key in header_keys)
+                kept = sum(bool(native_header.get(key)) and not scanned_header[key] for key in header_keys)
+                if i == 0 and has_images and gained >= 2 and gained > kept:
+                    output[i] = supplement_sender_evidence(scanned, native)
+                else:
+                    output[i] = supplement_sender_evidence(native, scanned) if usable else scanned or native
             else: output[i] = native
             reading_progress(completed=i+1)
         return '\n\f\n'.join(output)
@@ -1926,8 +2022,8 @@ if app is not None:
         with _reads_lock:
             state = _active_reads.get(request_id)
             recent = _recent_reads.get(request_id)
-        if state: return jsonify(success=True, requestId=request_id, **state.snapshot())
-        if recent: return jsonify(success=True, requestId=request_id, **recent)
+        if state: return jsonify(success=True, active=True, requestId=request_id, **state.snapshot())
+        if recent: return jsonify(success=True, active=False, requestId=request_id, **recent)
         return jsonify(success=False, error='Read not found.'), 404
 
     @app.route('/ocr', methods=['POST'])

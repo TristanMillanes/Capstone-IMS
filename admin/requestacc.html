@@ -12,8 +12,10 @@
 <link href="requestacc.css?v=20261027-emerald-v6" rel="stylesheet">
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
+<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
+<script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Account Requests" data-design="emerald-v6">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified pgenro-responsive" data-admin-page="requestacc.html" data-css-scope="admin-account-requests" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Account Requests" data-design="emerald-v6">
 <p class="admin-module-loading" role="status">Checking your access…</p>
 
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
@@ -276,7 +278,7 @@
 <option value="Office of the PG-ENRO">Office of the PG-ENRO</option>
 </optgroup>
 </select><select class="filter-select" id="statusFilterSelect"><option value="ALL">All Status</option><option value="Pending">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></div><div class="table-toolbar-right"><button class="btn btn-secondary btn-sm" disabled id="bulkApproveBtn" type="button"><i data-lucide="check-check"></i> Approve Selected</button><button class="btn btn-danger btn-sm" disabled id="bulkRejectBtn" type="button"><i data-lucide="x-circle"></i> Reject Selected</button></div></div></div>
-<div class="table-responsive"><table class="data-table data-table unified-records-table" data-ui-columns="9" style="--ui-table-min:1080px;"><thead><tr><th width="40"><input id="selectAllCheckbox" type="checkbox"></th><th>Request / Date</th><th>Applicant</th><th>Division</th><th>Requested Role</th><th>Assigned Role</th><th>Endorsement</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead><tbody id="requestTableBody"><tr><td colspan="8" style="text-align:center;padding:36px;color:#64748b">Loading access requests...</td></tr></tbody></table></div>
+<div class="table-responsive"><table class="data-table data-table unified-records-table" data-ui-columns="9" style="--ui-table-min:1080px;"><thead><tr><th width="40"><input aria-label="Select all visible account requests" id="selectAllCheckbox" type="checkbox"></th><th>Request / Date</th><th>Applicant</th><th>Division</th><th>Requested Role</th><th>Assigned Role</th><th>Endorsement</th><th>Status</th><th style="text-align:right">Actions</th></tr></thead><tbody id="requestTableBody"><tr><td colspan="8" style="text-align:center;padding:36px;color:#64748b">Loading access requests...</td></tr></tbody></table></div>
 <div class="table-footer"><span class="text-muted" id="tableRangeText">Showing 0 of 0 access requests</span><span class="text-muted">Live Registry</span></div>
 </section>
 <footer class="admin-footer"><p>© 2026 PGENRO · Records and operations workspace</p><div class="footer-links"><a href="admin.html">Dashboard</a><a href="Usermanagement.html">User Management</a><a href="admin.html#settings">Preferences</a></div></footer></main>

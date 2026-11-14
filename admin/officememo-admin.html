@@ -17,8 +17,10 @@
 <link href="officememo-admin.css?v=20261027-emerald-v6" rel="stylesheet">
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
+<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
+<script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
-<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Office Memos" data-design="emerald-v6">
+<body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified pgenro-responsive" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Office Memos" data-design="emerald-v6">
 <p class="admin-module-loading" role="status">Checking your access…</p>
 
 <a class="admin-ui-skip-link" href="#adminMainContent">Skip to main content</a>
@@ -641,7 +643,8 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
-<script defer src="officememo-admin.js?v=20261103-frontend-fix"></script>
+<script defer src="../shared/ocr-form-fields.js?v=20261113-field-mapping"></script>
+<script defer src="officememo-admin.js?v=20261113-field-mapping"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
