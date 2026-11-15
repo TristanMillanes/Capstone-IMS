@@ -18,6 +18,7 @@
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 <link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
+<link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261114-document-intake">
 <script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified pgenro-responsive" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Office Memos" data-design="emerald-v6">
@@ -404,31 +405,62 @@
 <!-- ========================================================================= -->
 <!-- 1. CREATE / EDIT MEMORANDUM MODAL -->
 <div aria-hidden="true" class="modal-backdrop" id="memoFormModal">
-<div aria-labelledby="modalFormTitle" aria-modal="true" class="modal-container memo-form-modal" role="dialog">
+<div aria-labelledby="modalFormTitle" aria-modal="true" class="modal-container memo-form-modal document-intake-dialog" role="dialog">
 <div class="modal-header memo-form-header">
 <div class="modal-title-group">
 <div class="modal-header-icon"><i data-lucide="file-plus-2"></i></div>
 <div>
 <h2 id="modalFormTitle">Issue Office Memorandum</h2>
-<p>Review the document details and attach the official copy.</p>
+<p>Upload a document, review the detected details, then save.</p>
 </div>
 </div>
 <button aria-label="Close memorandum form" class="modal-close-btn" id="closeFormModalBtn" type="button">
 <i data-lucide="x"></i>
 </button>
 </div>
-<div class="ocr-stop-controls" hidden="" id="memoOcrStopControls"><button class="btn btn-secondary" id="cancelMemoOcrBtn" type="button">Stop reading</button></div>
 <form id="memoForm" novalidate="">
 <input id="memoDocId" type="hidden" value="">
-<div class="modal-body memo-form-body modal-body">
-<div class="memo-form-intro">
-<div>
-<span class="memo-form-eyebrow">Office Memorandum Registry</span>
-<strong>Complete the memorandum details</strong>
-<p>Upload and extract the document first, or enter the details manually. OCR preserves your manual edits and flags fields that need review.</p>
-</div>
-<div class="memo-form-required"><span>*</span> Required</div>
-</div>
+<input id="formExistingPdfBase64" type="hidden" value="">
+<div class="modal-body memo-form-body document-intake-form">
+<aside class="encoder-document-column" aria-label="Document and automatic reading">
+          <section class="document-intake-panel" aria-labelledby="memoDocumentHeading">
+            <h3 id="memoDocumentHeading">Upload document</h3>
+            <div class="document-intake-dropzone" id="fileDropzone">
+              <strong id="attachedFileName">Choose a document</strong>
+              <span class="document-intake-file-meta" id="attachedFileMeta">PDF, images, Word, Excel, PowerPoint or text · Max 10 MB</span>
+              <div class="document-intake-controls">
+                <input id="formPdfFile" type="file" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff,.docx,.xlsx,.pptx,.txt,.csv" hidden>
+                <button class="btn btn-primary" id="browseMemoDocumentBtn" type="button">Browse file</button>
+                <button class="btn btn-secondary" id="removeAttachmentBtn" type="button" hidden>Remove</button>
+              </div>
+            </div>
+            <div class="document-intake-reader">
+              <strong id="memoOcrStage" role="status">Ready for a document</strong>
+              <p id="memoOcrStatus">Reading starts automatically when you select a file.</p>
+              <div class="document-intake-controls">
+                <button class="btn btn-secondary" id="runMemoOcrBtn" type="button" disabled>Read again</button>
+                <span id="memoOcrStopControls" hidden><button class="btn btn-secondary" id="cancelMemoOcrBtn" type="button">Stop reading</button></span>
+              </div>
+              <div id="memoUploadProgress" hidden>
+                <p id="memoUploadProgressLabel">Preparing document…</p>
+                <progress class="document-intake-progress" id="memoOcrProgress" aria-label="Document reading progress" max="100" value="0"></progress>
+              </div>
+            </div>
+            <section class="attachment-preview" id="memoInlinePreview" aria-label="Document preview" hidden>
+              <div class="attachment-preview-heading">
+                <h4>Document preview</h4>
+                <a class="btn btn-secondary" data-preview-download hidden>Download</a>
+              </div>
+              <div data-preview-body></div>
+            </section>
+          </section>
+<section aria-labelledby="memoReviewHeading" class="memo-extraction-review document-intake-review" hidden id="memoExtractionReview">
+<h4 id="memoReviewHeading">Detected fields</h4>
+<p aria-live="polite" id="memoReviewSummary" role="status"></p>
+<dl class="memo-review-fields" id="memoReviewFields"></dl>
+</section>
+</aside>
+<div class="encoder-fields-column">
 <section aria-labelledby="memoDetailsHeading" class="memo-form-section">
 <div class="memo-section-heading">
 <div class="memo-section-icon"><i data-lucide="clipboard-list"></i></div>
@@ -459,7 +491,7 @@
 </div>
 <div class="form-group">
 <label class="form-label" for="formIssuedBy">Signatory / Issued By</label>
-<input class="form-input" id="formIssuedBy" placeholder="e.g. Provincial Department Head" type="text">
+<input class="form-input" id="formIssuedBy" placeholder="Printed name or issuing office" type="text">
 </div>
 <div class="form-group">
 <label class="form-label" for="formRemarks">Remarks / Reference</label>
@@ -478,88 +510,20 @@
 </span>
 </label>
 </section>
-<section aria-labelledby="memoDocumentHeading" class="memo-form-section memo-document-section">
-<div class="memo-section-heading">
-<div class="memo-section-icon"><i data-lucide="paperclip"></i></div>
-<div>
-<h3 id="memoDocumentHeading">Official document &amp; field review</h3>
-<p>PDF, images, DOCX, TXT, CSV, XLSX or PPTX. Maximum 10 MB. Check scanned text against the original document.</p>
 </div>
-<span class="memo-optional-badge">Optional</span>
-</div>
-<div aria-describedby="memoUploadHint" aria-label="Upload memorandum document" class="file-dropzone memo-upload-zone" id="fileDropzone" role="button" tabindex="0">
-<input accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.tif,.tiff,.txt,.csv,.docx,.xlsx,.pptx" aria-label="Choose memorandum attachment" id="formPdfFile" type="file">
-<div class="memo-upload-icon"><i data-lucide="upload-cloud"></i></div>
-<div class="memo-upload-copy">
-<strong>Drop the memorandum document here</strong>
-<span>or click anywhere in this area to browse your files</span>
-<small id="memoUploadHint">PDF · images · DOCX · text • Maximum 10 MB</small>
-</div>
-<span class="memo-upload-browse">Choose document</span>
-</div>
-<div aria-live="polite" class="memo-upload-status" data-state="idle" id="memoUploadStatus">
-<i data-lucide="info"></i>
-<span id="memoUploadStatusText">No document selected yet.</span>
-</div>
-<div class="attached-file-info memo-file-card" id="attachedFileInfo">
-<div class="memo-file-main">
-<div class="memo-file-icon"><i data-lucide="file-text"></i></div>
-<div class="memo-file-copy">
-<strong id="attachedFileName">document.pdf</strong>
-<span id="attachedFileMeta">PDF document</span>
-</div>
-</div>
-<div class="memo-file-actions">
-<span class="memo-file-ready" id="attachedFileState"><i data-lucide="check-circle-2"></i> Ready</span>
-<button aria-label="Preview selected document" class="btn-action" id="previewSelectedPdfBtn" title="Preview attachment" type="button">
-<i data-lucide="eye"></i>
-</button>
-<button aria-label="Remove selected document" class="btn-action delete" id="removeAttachmentBtn" title="Remove attachment" type="button">
-<i data-lucide="trash-2"></i>
-</button>
-</div>
-</div>
-<div aria-hidden="true" class="memo-upload-progress" hidden="" id="memoUploadProgress">
-<div class="memo-upload-progress-track"><span id="memoUploadProgressBar"></span></div>
-<span id="memoUploadProgressLabel">Preparing document...</span>
-</div>
-<div class="memo-ocr-panel" id="memoOcrPanel">
-<div class="memo-ocr-header">
-<div class="memo-ocr-title">
-<i data-lucide="scan-text"></i>
-<div>
-<strong>Document text extraction</strong>
-<small data-state="ready" id="memoOcrStatus">Choose a document, then extract and review its fields.</small>
-</div>
-</div>
-<button class="btn btn-secondary btn-sm memo-ocr-btn" disabled id="runMemoOcrBtn" type="button">
-<i data-lucide="scan-text"></i>
-<span>Run OCR</span>
-</button>
-</div>
-<section aria-labelledby="memoReviewHeading" class="memo-extraction-review" hidden="" id="memoExtractionReview">
-<h4 id="memoReviewHeading">Detected fields</h4>
-<p aria-live="polite" id="memoReviewSummary" role="status"></p>
-<dl class="memo-review-fields" id="memoReviewFields"></dl>
-</section>
-<div class="memo-ocr-results">
-<label class="memo-ocr-result-label" for="memoOcrText">
-<span>Extracted OCR Text</span>
-<small>Detected details may automatically fill the form above. Review them before saving.</small>
-</label>
-<textarea class="form-textarea memo-ocr-text" id="memoOcrText" placeholder="Extracted text will appear here. Correct reading errors, then choose Recheck fields." rows="5"></textarea>
-<button class="btn btn-secondary btn-sm" id="recheckMemoFieldsBtn" type="button">Recheck fields from text</button>
-</div>
-</div>
-<input id="formExistingPdfBase64" type="hidden" value="">
-</section>
+<details class="document-intake-text">
+<summary>Extracted document text</summary>
+<label for="memoOcrText">Review or correct the readable text from every page.</label>
+<textarea class="form-textarea" id="memoOcrText" placeholder="Extracted text will appear automatically after reading the file." rows="8"></textarea>
+<button class="btn btn-secondary" id="recheckMemoFieldsBtn" type="button">Recheck fields</button>
+</details>
 </div>
 <div class="modal-footer memo-form-footer modal-actions">
 <div class="memo-save-note">
 <i data-lucide="shield-check"></i>
 <span>Review the registry details before saving.</span>
 </div>
-<div class="memo-footer-actions">
+<div class="memo-footer-actions modal-action-buttons">
 <button class="btn btn-secondary" id="cancelFormModalBtn" type="button">Cancel</button>
 <button class="btn btn-primary" id="saveMemoSubmitBtn" type="submit">
 <i data-lucide="save"></i>
@@ -643,8 +607,10 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
-<script defer src="../shared/ocr-form-fields.js?v=20261113-field-mapping"></script>
-<script defer src="officememo-admin.js?v=20261113-field-mapping"></script>
+<script defer src="../shared/ocr-form-fields.js?v=20261115-memo-issuer"></script>
+<script defer src="../shared/admin-document-preview.js?v=20261114-document-intake"></script>
+<script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
+<script defer src="officememo-admin.js?v=20261115-memo-issuer"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

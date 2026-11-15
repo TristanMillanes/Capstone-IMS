@@ -178,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // =========================================================================
   // 1. SUPABASE CONFIGURATION & INITIALIZATION
   // =========================================================================
-  let online=false,busy=false,fileBusy=false,ocrBusy=false,readVersion=0,channel=null,returnToEditor=false;
+  let online=false,busy=false,ocrBusy=false,readVersion=0,channel=null;
   // =========================================================================
   // 2. STATE MANAGEMENT & DOM ELEMENTS
   // =========================================================================
@@ -218,29 +218,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const formRemarks = document.getElementById("formRemarks");
   const formIsPinned = document.getElementById("formIsPinned");
   const formPdfFile = document.getElementById("formPdfFile");
-  const formExistingPdfBase64 = document.getElementById("formExistingPdfBase64");
-  const attachedFileInfo = document.getElementById("attachedFileInfo");
+  const existingMemoUrl = document.getElementById("formExistingPdfBase64");
   const attachedFileName = document.getElementById("attachedFileName");
   const removeAttachmentBtn = document.getElementById("removeAttachmentBtn");
+  const browseMemoDocumentBtn = document.getElementById("browseMemoDocumentBtn");
   const fileDropzone = document.getElementById("fileDropzone");
   const attachedFileMeta = document.getElementById("attachedFileMeta");
-  const attachedFileState = document.getElementById("attachedFileState");
-  const previewSelectedPdfBtn = document.getElementById("previewSelectedPdfBtn");
-  const memoUploadStatus = document.getElementById("memoUploadStatus");
-  const memoUploadStatusText = document.getElementById("memoUploadStatusText");
   const memoUploadProgress = document.getElementById("memoUploadProgress");
-  const memoUploadProgressBar = document.getElementById("memoUploadProgressBar");
+  const memoOcrProgress = document.getElementById("memoOcrProgress");
   const memoUploadProgressLabel = document.getElementById("memoUploadProgressLabel");
   const saveMemoSubmitBtn = document.getElementById("saveMemoSubmitBtn");
-  const saveMemoSubmitText = document.getElementById("saveMemoSubmitText");
+  const memoInlinePreview = window.PGENRO_DocumentPreview.create(document.getElementById("memoInlinePreview"));
 
   // Memorandum OCR
   const runMemoOcrBtn = document.getElementById("runMemoOcrBtn");
+  const memoOcrStage = document.getElementById("memoOcrStage");
   const memoOcrStatus = document.getElementById("memoOcrStatus");
   const memoOcrText = document.getElementById("memoOcrText");
+  const memoOcrStopControls = document.getElementById("memoOcrStopControls");
 
   let selectedMemoFile = null;
   let memoOcrToken = 0;
+  let memoTextEdited = false;
+  memoOcrText.addEventListener('input', () => { memoTextEdited = true; });
 
   // PDF Viewer Modal
   const viewPdfModal = document.getElementById("viewPdfModal");
@@ -326,7 +326,7 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('memoPriorityList').innerHTML=quick.length?quick.map(m=>`<button class="memo-quick-item" type="button" data-memo-open="${escapeHtml(m.id)}"><i data-lucide="${m.isPinned?'pin':'file-text'}"></i><span class="memo-quick-copy"><strong>${escapeHtml(m.memoNo||'Memorandum')}</strong><span>${escapeHtml(m.subject||m.title||'No subject recorded')}</span><small>${m.isPinned?'Pinned · ':''}${escapeHtml(m.date||'Date not recorded')}</small></span></button>`).join(''):'<p class="memo-dashboard-note">Your pinned and recent memorandums will appear here.</p>';
     M.renderIcons();
   }
-  document.getElementById('memoPriorityList').addEventListener('click',e=>{const button=e.target.closest('[data-memo-open]');if(!button||busy||ocrBusy||fileBusy)return;const memo=rawMemos.find(m=>m.id===button.dataset.memoOpen);if(memo)openEditModal(memo);});
+  document.getElementById('memoPriorityList').addEventListener('click',e=>{const button=e.target.closest('[data-memo-open]');if(!button||busy)return;const memo=rawMemos.find(m=>m.id===button.dataset.memoOpen);if(memo)openEditModal(memo);});
   function updateMemoSelection(){
     const visible=filteredMemos.slice((currentPage-1)*rowsPerPage,currentPage*rowsPerPage),count=visible.filter(m=>selectedMemoIds.has(m.id)).length;
     selectAllCheckbox.checked=visible.length>0&&count===visible.length;selectAllCheckbox.indeterminate=count>0&&count<visible.length;
@@ -526,61 +526,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // 8. MEMORANDUM OCR ENGINE
   // =========================================================================
 /* Sender detection reads every page, including signature blocks. */
-function parseCorrespondence(rawText='',signatureRegion=false) {
- const tidy=s=>String(s||'').normalize('NFC').replace(/[\u00a0\t]+/g,' ').replace(/\s+/g,' ').trim();
- const entries=[];
- for(const [p,page] of String(rawText||'').replace(/\r/g,'').split('\f').entries()){
-  const top=page.split('\n').map(tidy).filter(Boolean).slice(0,8);
-  if(p&&top.some(line=>/^(?:ANNEX|APPENDIX|ATTACHMENT|ENCLOSURE)\b|^(?:(?:PG\s*ENRO|PGENRO)\s+)?(?:OFFICE\s+)?(?:MEMORANDUM|MEMO|REQUEST LETTER|OFFICE ORDER)\b/i.test(line)))break;
-  let excluded=false;
-  page.split('\n').forEach((s,l)=>{const text=tidy(s);if(/^(?:CC\s*:|COPY\s+(?:TO|FURNISHED)|ANNEX\b|APPENDIX\b|ATTACHMENTS?\s*:|ENCLOSURES?\s*:)/i.test(text))excluded=true;if(text)entries.push({text,page:p+1,line:l+1,excluded});});
- }
- const closing=/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards|regards|cordially|lubos\s+na\s+gumagalang|sumasainyo|for\s+your\s+(?:compliance|information\s+and\s+compliance|guidance\s+and\s+compliance))\s*[,.:!]?$/i;
- const role=/\b(?:PGDH|PGENRO|ENRO|officer|director|chief|mayor|governor|administrator|supervisor|manager|secretary|head|president|chairperson|chairman|coordinator|principal|teacher|engineer|treasurer|representative|proprietor|owner|student|applicant|dean|professor|specialist|staff|assistant|councilor|punong\s+barangay)\b/i;
- const label=/^(?:signed(?:\s+by)?|signatory|submitted\s+by|prepared\s+by|approved\s+by|noted\s+by|certified\s+by|recommending\s+approval|respectfully\s+submitted\s+by|name\s+of\s+(?:sender|signatory))\s*[:：-]?\s*(.*)$/i;
- function name(value) {
-  let s=tidy(value).replace(/^(?:\(\s*sgd\.?\s*\)|sgd\.?|\/s\/|by\s*:)\s*/i,'').replace(/^[|:_\-]+|[|:_\-]+$/g,'').trim();
-  s=s.split(/\s+[—–]\s+/)[0];
-  if(s.length<4||s.length>100||/[\d@:/;!?()]/.test(s)||/\b(?:republic|province|government|office|department|division|subject|memorandum|dear|thank|please|request|hereby|attached|enclosed|address|telephone|email|received|copy|cc|page|for|to|from)\b/i.test(s))return '';
-  const base=s.replace(/^(?:(?:Mr|Mrs|Ms|Miss|Dr|Dra|Atty|Engr|EnP|Hon|Prof|Rev|Fr|Bro|Sis)\.?\s+)+/i,'').replace(/,?\s+(?:Ph\.?D\.?|M\.?D\.?|MBA|CPA|RN|LPT|CESO(?:\s+[IVX]+)?|EnP)(?:[,\s].*)?$/i,'');
-  const words=base.match(/[\p{L}][\p{L}.'’\-]*/gu)||[];
-  if(words.length<2||words.length>8||role.test(base))return '';
-  // Names may contain lower-case particles (de la, del, van, etc.).
-  if(words.some(w=>!(/^(?:de|del|dela|la|las|los|da|dos|di|du|van|von|bin|al|y|jr\.?|sr\.?|II|III|IV)$/i.test(w)||/^\p{Lu}/u.test(w))))return '';
-  if(words.filter(w=>w.replace(/[^\p{L}]/gu,'').length>1).length<2)return '';
-  return s.replace(/\.{2,}/g,'.').replace(/(?<=\s)([A-Z])(?=\s)/g,'$1.');
- }
- const candidates=[];
- for(let i=0;i<entries.length;i++){
-  const entry=entries[i];if(entry.excluded)continue;const m=entry.text.match(label),n=name(m?.[1]||entry.text);if(!n)continue;
-  const before=entries.slice(Math.max(0,i-6),i).filter(e=>e.page===entry.page);
-  const marker=[...before].reverse().find(e=>label.test(e.text));
-  const nearClosing=before.some(e=>closing.test(e.text));
-  const next=entries[i+1]?.page===entry.page?entries[i+1].text:'';
-  const hasRole=role.test(next)&&!/^dear\b/i.test(next);
-  const pageEntries=entries.filter(e=>e.page===entry.page),position=pageEntries.indexOf(entry)/Math.max(1,pageEntries.length);
-  const immediateMarker=marker&&before.slice(-2).includes(marker);
-  let score=m?120:nearClosing?110:immediateMarker?100:hasRole&&(signatureRegion||position>.45)?75:0;
-  if(/^(?:prepared|noted|certified|recommending)\b/i.test(m?entry.text:marker?.text||''))score=60;
-  if(!score)continue;
-  const candidate={name:n,role:hasRole?next:'',page:entry.page,line:entry.line,score,evidence:[nearClosing?before.find(e=>closing.test(e.text))?.text:'',entry.text,hasRole?next:''].filter(Boolean).join('\n')};
-  const prior=candidates.find(c=>c.name.toLocaleLowerCase()===n.toLocaleLowerCase());if(!prior)candidates.push(candidate);else if(score>prior.score)Object.assign(prior,candidate);
- }
- candidates.sort((a,b)=>b.score-a.score||a.page-b.page||a.line-b.line);
- const primary=candidates.filter(c=>c.score===candidates[0]?.score),signatory=primary.length===1?primary[0]:null;
- function labeled(pattern){
-  for(let i=0;i<entries.length;i++){
-   const e=entries[i];if(e.page!==1)continue;
-   if(closing.test(e.text)||/^(?:dear|please|kindly|pursuant|this (?:is|letter)|I (?:am|would|respectfully)|we (?:are|would|request))\b/i.test(e.text))break;
-   const m=e.text.match(pattern);if(!m)continue;
-   let value=tidy(m[1]||'');if(!value){const next=entries[i+1];if(next?.page===e.page&&!/^(?:to|from|date|subject|dear|thru|through)\b/i.test(next.text))value=next.text;}
-   if(value)return {value,page:e.page,line:e.line};
-  }return {value:'',page:null,line:null};
- }
- let sender=labeled(/^(?:from|sender|received\s+from|issued\s+by|issuing\s+office|originating\s+office)\s*[:：-]\s*(.*)$/i);
- let recipient=labeled(/^(?:to|t0|for|addressed\s+to|recipient(?:\s+office)?|memorandum\s+for)\s*[:：-]\s*(.*)$/i);
- if(typeof parseDocumentHeader==='function'){const h=parseDocumentHeader(rawText);sender={value:h.sender===h.signatory?(signatory?.name||''):h.sender};recipient={value:h.addressedTo};}
- return {signatory:signatory?.name||'',signatoryRole:signatory?.role||'',signatoryCandidates:candidates,receivedFrom:signatory?.name||(!primary.length?sender.value:''),sender:sender.value,recipient:recipient.value,fieldEvidence:{receivedFrom:signatory?.evidence||sender.value},needsReview:primary.length>1?['receivedFrom']:[]};
+function memoSignatory(text, signatureRegion=false) {
+ return window.PGENRO_OcrFields.findPrintedSignatory(text, signatureRegion);
 }
 /* End sender detection. */
 
@@ -589,38 +536,8 @@ function parseMemoDate(value) {
  return window.PGENRO_OcrFields.parseDate(value);
 }
 function parseDocumentHeader(rawText='') {
- return window.PGENRO_OcrFields.parseHeader(rawText, printedHeaderSignatory);
+ return window.PGENRO_OcrFields.parseHeader(rawText);
 }
-function printedHeaderSignatory(rawText=''){
- rawText=String(rawText||'').replace(/^((?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards))[,.:]\s+(?=[A-ZÀ-Þ])/gim,'$1,\n');
- const closing=/^(?:respectfully(?: yours| submitted)?|sincerely(?: yours)?|very truly yours|yours(?: truly| sincerely| faithfully)?|truly yours|best regards|kind regards|for your (?:compliance|information and compliance|guidance and compliance))\s*[,.;:!]*$/i;
- const signed=/^(?:signed(?: by)?|signatory|nilagdaan ni)\s*[:：-]?\s*(.*)$/i;
- const role=/\b(?:PGDH|PGADH|PGENRO|PG\s*ENRO|OFFICER|DIRECTOR|CHIEF|MAYOR|GOVERNOR|ADMINISTRATOR|SUPERVISOR|MANAGER|SECRETARY|PRESIDENT|DEAN|PRINCIPAL|HEAD|COORDINATOR)\b/i;
- const stop=/^(?:cc\s*:|copy (?:furnished|to)|enclosures?\s*:|attachments?\s*:|annex\b|appendix\b|prepared by\b|reviewed by\b|approved by\b|recommending approval\b|ground floor\b|email\b|tel\b|www\.|https?:)|@/i;
- const pages=String(rawText||'').replace(/\r/g,'').split('\f'),lines=[];
- for(let p=0;p<pages.length;p++){
-  const page=pages[p].split('\n').map(s=>s.replace(/[ \t]+/g,' ').trim());
-  if(p&&page.filter(Boolean).slice(0,8).some(s=>/^(?:ANNEX|APPENDIX|ATTACHMENT|ENCLOSURE)\b|^(?:(?:PG\s*ENRO|PGENRO)\s+)?(?:OFFICE\s+)?(?:MEMORANDUM|MEMO|REQUEST LETTER|OFFICE ORDER)\b/i.test(s)))break;
-  lines.push(...page);
- }
- const candidates=[];
- for(let i=0;i<lines.length;i++){
-  const mark=lines[i].match(signed);
-  if(!mark&&!closing.test(lines[i]))continue;
-  const block=mark?.[1]?[mark[1]]:[];
-  for(const s of lines.slice(i+1,i+15)){if(stop.test(s)||signed.test(s)||closing.test(s))break;if(s)block.push(s);}
-  for(let j=0;j<Math.min(6,block.length);j++){
-   const name=block[j].replace(/\.{2,}/g,'.').replace(/\b([A-Z])(?=\s)/g,'$1.').replace(/^[ |;:'‘’"“”]+|[ |;:'‘’"“”]+$/g,'');
-   if(role.test(name)||name.length<7||name.length>110||/[\d:!?@/]/.test(name)||/\b(?:REPUBLIC|PROVINCE|GOVERNMENT|OFFICE|DEPARTMENT|DIVISION|PERSONNEL|SUBJECT|ORDER|COMPLIANCE|DIRECTOR|MAYOR|CHIEF|GOVERNOR|SECRETARY|MANAGER|PLEASE|THANK|SHOULD|MUST|REQUEST)\b/i.test(name))continue;
-   const words=name.match(/[\p{L}][\p{L}.'’\-]*/gu)||[],designation=block[j+1]||'';
-   if(words.length<2||words.length>12||words.filter(w=>w.replace(/[^\p{L}]/gu,'').length>=2).length<2)continue;
-   if(name!==name.toUpperCase()&&!(words.every(w=>/^\p{Lu}/u.test(w)||/^(?:de|del|dela|la|van|von)$/i.test(w))&&role.test(designation)))continue;
-   if(!candidates.includes(name))candidates.push(name);
-  }
- }
- return {name:candidates.length===1?candidates[0]:'',needsReview:candidates.length>1};
-}
-
 /* End memo document parser. */
 
   const memoOcrValues=new Map(),memoManualFields=new Set();
@@ -631,14 +548,16 @@ function printedHeaderSignatory(rawText=''){
     return index<0?{notes:text,text:''}:{notes:text.slice(0,index),text:text.slice(index+marker.length)};
   }
   function clearMemoDetection(){
-    for(const [key,previous]of memoOcrValues){const input=memoFieldInputs()[key];if(input.value===previous&&!memoManualFields.has(key))input.value='';}
-    memoOcrValues.clear();lastMemoRead=null;memoOcrText.value='';document.getElementById('memoExtractionReview').hidden=true;
+    const inputs=memoFieldInputs();
+    for(const [key,previous]of memoOcrValues){const input=inputs[key];if(input.value===previous&&!memoManualFields.has(key))input.value=key==='memoNo'?generatedMemoNumber:'';}
+    memoOcrValues.clear();lastMemoRead=null;memoOcrText.value='';memoTextEdited=false;document.getElementById('memoExtractionReview').hidden=true;
   }
   function memoFieldInputs(){
     return {memoNo:formControlNo,date:formDate,addressedTo:formAddressedTo,subject:formSubject,issuedBy:formIssuedBy,remarks:formRemarks};
   }
   function applyMemoFields(text,result=null){
-    const detected=result?.formSchemaVersion===2&&result.metadata?result.metadata:parseDocumentHeader(text);
+    const detected=result?.formSchemaVersion===2&&result.metadata?
+      window.PGENRO_OcrFields.reconcileMemoIssuer(text,result.metadata):parseDocumentHeader(text);
     const inputs=memoFieldInputs();
     const labels={memoNo:'Memo number',date:'Issue date',addressedTo:'Addressed to',subject:'Subject',issuedBy:'Issued by',remarks:'Remarks'};
     const statuses={},suggestions={};
@@ -657,7 +576,7 @@ function printedHeaderSignatory(rawText=''){
         if(previous!==undefined||(key==='date'&&current===generatedMemoDate))input.value=key==='memoNo'?generatedMemoNumber:'';
         memoOcrValues.delete(key);
         statuses[key]=key==='memoNo'&&input.value===generatedMemoNumber&&generatedMemoNumber?
-          'Generated registry number':key==='remarks'?'Optional':'Enter or confirm this value';
+          'Generated registry number':key==='remarks'?'Optional':key==='issuedBy'?'Check the printed issuer or signature block':'Enter or confirm this value';
       }
     }
     document.getElementById('memoExtractionReview').hidden=false;
@@ -665,31 +584,18 @@ function printedHeaderSignatory(rawText=''){
     const summary=detected.isMemo?found+' of 5 memo details detected.':'Confirm the document type. The OCR found no memorandum heading or type.';
     document.getElementById('memoReviewSummary').textContent=[summary,...(detected.warnings||[])].join(' ');
     document.getElementById('memoReviewFields').innerHTML=Object.keys(inputs).map(key=>
-      '<div class="memo-review-field '+(suggestions[key]?'':'needs-review')+'"><dt>'+labels[key]+'</dt><dd>'+
+      '<div class="memo-review-field '+(suggestions[key]&&!detected.needsReview?.includes(key)?'':'needs-review')+'"><dt>'+labels[key]+'</dt><dd>'+
       escapeHtml(suggestions[key]||'—')+'</dd><small>'+statuses[key]+'</small></div>'
     ).join('');
   }
-  document.getElementById('recheckMemoFieldsBtn').onclick=()=>{if(busy||fileBusy||ocrBusy)return;if(!memoOcrText.value.trim()){showToast('Extract or paste document text first.','warning');return;}const text=memoOcrText.value;applyMemoFields(text,lastMemoRead?.text===text?lastMemoRead.result:null);};
-  function setMemoFieldsBusy(value){for(const input of memoForm.querySelectorAll('input,textarea,select'))input.disabled=value;document.getElementById('recheckMemoFieldsBtn').disabled=value;fileDropzone.setAttribute('aria-disabled',String(value));}
+  document.getElementById('recheckMemoFieldsBtn').onclick=()=>{if(busy||ocrBusy)return;if(!memoOcrText.value.trim()){showToast('Extract or paste document text first.','warning');return;}const text=memoOcrText.value;applyMemoFields(text,lastMemoRead?.text===text?lastMemoRead.result:null);};
+  function setMemoFieldsBusy(value){for(const input of memoForm.querySelectorAll('input,textarea,select'))input.disabled=value;document.getElementById('recheckMemoFieldsBtn').disabled=value;fileDropzone.setAttribute('aria-disabled',String(value));syncMemoControls();}
 
-  function setMemoOcrStatus(message, state = "ready") {
-    if (memoOcrStatus) {
-      memoOcrStatus.textContent = message;
-      memoOcrStatus.dataset.state = state;
-    }
-
-    if (selectedMemoFile && attachedFileState) {
-      if (state === "working") {
-        attachedFileState.innerHTML = '<i data-lucide="loader-2" class="spin-icon"></i> OCR';
-      } else if (state === "success") {
-        attachedFileState.innerHTML = '<i data-lucide="check-circle-2"></i> OCR ready';
-      } else if (state === "error") {
-        attachedFileState.innerHTML = '<i data-lucide="file-check-2"></i> PDF ready';
-      } else {
-        attachedFileState.innerHTML = '<i data-lucide="check-circle-2"></i> Ready';
-      }
-      if (window.lucide) M.renderIcons();
-    }
+  function setMemoOcrStatus(label, message, state = 'ready') {
+    memoFormModal.dataset.ocrState = state;
+    memoOcrStage.textContent = label;
+    memoOcrStatus.textContent = message;
+    memoOcrStatus.dataset.state = state;
   }
 
 /* Full-document reader, kept inside the owning module. */
@@ -715,101 +621,68 @@ function mergeDocumentText(base,extra){
 }
 
 const readerResults=new WeakMap();
-const readerRuntime={worker:null,promise:null,logger:null,idle:null,operation:null};
-function notifyReaderCancel(op){
- if(!op?.requestId||!op.endpoint)return;
- const url=new URL(op.endpoint,location.href);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/cancel');
- fetch(url.href,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestId:op.requestId}),keepalive:true}).catch(()=>{});
-}
-function cancelDocumentRead(){
+const readerRuntime={worker:null,promise:null,logger:null,idle:null,operation:null,owner:null,workerToken:null,stopping:null};
+function cancelDocumentRead(reason='stopped'){
  const op=readerRuntime.operation;if(!op)return;
- op.cancelled=true;op.controller?.abort();notifyReaderCancel(op);
+ if(op.cancelled)return;op.cancelled=true;op.reason=reason;op.controller?.abort();window.PGENRO_AdminOcrService.cancel(op);
  op.reject?.(new Error('Reading stopped. Your draft is kept; you can retry.'));
- stopReaderWorker();
+ stopReaderWorker(op);
 }
-async function readWithCancellation(source,progress){
- const op={cancelled:false,controller:null,requestId:null,endpoint:null,reject:null};readerRuntime.operation=op;
+async function readWithCancellation(source,progress,stillCurrent=()=>true){
+ await readerRuntime.stopping;
+ if(!stillCurrent())throw Error('Reading stopped. Your draft is kept; you can retry.');
+ const op={cancelled:false,controller:null,requestId:null,endpoint:null,reject:null,notifiedRequest:null};readerRuntime.operation=op;
  const stopped=new Promise((_,reject)=>op.reject=reject);
- try{return await Promise.race([extractDocument(source,progress),stopped]);}
- finally{if(readerRuntime.operation===op)readerRuntime.operation=null;}
+ const deadline=setTimeout(()=>{op.cancelled=true;op.reason='timeout';op.controller?.abort();window.PGENRO_AdminOcrService.cancel(op);stopReaderWorker(op);op.reject?.(new Error('Reading reached the time limit. Your draft is kept; retry or choose a smaller document.'));},180000);
+ try{return await Promise.race([extractDocument(source,progress,op),stopped]);}
+ finally{clearTimeout(deadline);if(readerRuntime.operation===op)readerRuntime.operation=null;}
 }
-async function stopReaderWorker(){
+async function stopReaderWorker(operation=null){
+ if(operation&&readerRuntime.owner!==operation)return;
  clearTimeout(readerRuntime.idle);const worker=readerRuntime.worker;
- readerRuntime.worker=null;readerRuntime.promise=null;readerRuntime.logger=null;
- if(worker)try{await worker.terminate();}catch{}
+ readerRuntime.worker=null;readerRuntime.promise=null;readerRuntime.logger=null;readerRuntime.owner=null;readerRuntime.workerToken=null;
+ if(worker){
+  let timer;const stopping=Promise.race([Promise.resolve().then(()=>worker.terminate()).catch(()=>{}),new Promise(resolve=>timer=setTimeout(resolve,1500))]);
+  readerRuntime.stopping=stopping;try{await stopping;}finally{clearTimeout(timer);if(readerRuntime.stopping===stopping)readerRuntime.stopping=null;}
+ }
 }
 window.addEventListener('pagehide',()=>{cancelDocumentRead();stopReaderWorker();});
-async function extractDocument(source,progress=()=>{}){
- const operation=readerRuntime.operation,checkRead=()=>{if(operation?.cancelled)throw Error('Reading stopped. Your draft is kept; you can retry.');};
+async function extractDocument(source,progress=()=>{},operation=readerRuntime.operation){
+ const checkRead=()=>{if(operation?.cancelled)throw Error('Reading stopped. Your draft is kept; you can retry.');};
  const started=performance.now(),previous=readerResults.get(source);
  if(previous){progress('Using the document already read…',98);return {...previous,cacheHit:true,durationMs:Math.round(performance.now()-started)};}
  const remember=result=>{checkRead();const finished={...result,durationMs:Math.round(performance.now()-started)};readerResults.set(source,finished);return finished;};
- const extension=source.name.split('.').pop().toLowerCase();
+ const extension=source.name.split('.').pop().toLowerCase(),warnings=[];
  if(/^(txt|csv)$/.test(extension)){
-  const bytes=new Uint8Array(await source.arrayBuffer()),encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';
-  const text=new TextDecoder(encoding).decode(bytes);return remember({text,metadata:{},warnings:[],pages:text.split('\f').length,engine:'native-text'});
+  const text=await window.PGENRO_DocumentPreview.decodeText(source);
+  return remember({text,metadata:{},warnings,pages:text.split('\f').length,engine:'native-text'});
  }
- const warnings=[],configuredEndpoint=document.querySelector('meta[name="pgenro-ocr-endpoint"]')?.content?.trim();
- const endpoints=configuredEndpoint?[configuredEndpoint]:[];
- // Local static previews can use the supplied Python server without editing HTML.
- if(['localhost','127.0.0.1','[::1]'].includes(location.hostname)&&location.port!=='5000')endpoints.push('http://127.0.0.1:5000/ocr');
- for(const address of [...new Set(endpoints)]){
-  const endpoint=new URL(address,location.href).href,sameOrigin=new URL(endpoint).origin===location.origin;
-  let health=sameOrigin?{ok:true,documentTimeoutSeconds:180}:null;
-  if(!sameOrigin){
-   const probe=new AbortController(),probeTimer=setTimeout(()=>probe.abort(),3500);if(operation)operation.controller=probe;
-   try{const url=new URL(endpoint);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/health');progress('Connecting to the document reader…',3);
-    const response=await fetch(url,{signal:probe.signal,cache:'no-store'});if(response.ok)health=await response.json();
-   }catch{}finally{clearTimeout(probeTimer);}
-  }
-  checkRead();if(!health?.ok&&!health?.success)continue;
-  const controller=new AbortController(),waitMs=Math.max(45000,Math.min(900000,(Number(health.documentTimeoutSeconds)||180)*1000+15000));
-  const timer=setTimeout(()=>controller.abort(),waitMs);let pollTimer=null,pollAbort=null,posting=true;
-  async function pollProgress(){
-   if(!posting||operation?.cancelled)return;
-   pollAbort=new AbortController();const deadline=setTimeout(()=>pollAbort?.abort(),2500);
-   try{const url=new URL(endpoint);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/ocr/status/')+operation.requestId;
-    const response=await fetch(url,{signal:pollAbort.signal,cache:'no-store'});if(response.ok){const state=await response.json();if(posting&&!operation.cancelled&&state.success){
-     const total=Number(state.pages)||0,done=Number(state.completedPages)||0;
-     progress(total?`${state.stage} · ${done} of ${total} pages`:state.stage||'Reading the full document…',total?Math.min(96,8+88*done/total):8);
-    }}
-   }catch{}finally{clearTimeout(deadline);pollAbort=null;if(posting&&!operation?.cancelled)pollTimer=setTimeout(pollProgress,1000);}
-  }
-  try{
-   if(operation){operation.controller=controller;operation.endpoint=endpoint;operation.requestId=crypto.randomUUID();controller.signal.addEventListener('abort',()=>notifyReaderCancel(operation),{once:true});}
-   progress('Reading all pages, the letter body and printed signatures…',8);const body=new FormData();body.append('file',source);
-   if(operation)pollTimer=setTimeout(pollProgress,700);
-   const response=await fetch(endpoint,{method:'POST',body,headers:operation?{'X-OCR-Request-ID':operation.requestId}:{},signal:controller.signal});
-   // A static server has no OCR endpoint. Continue to the local/browser reader.
-   if([404,405].includes(response.status)||response.status>=500)continue;
-   let result;try{result=await response.json();}catch{throw Error('The document reader returned an invalid response. Reload and retry.');}
-   if(!response.ok||result.success===false)throw Error(result.error||'The document reader could not read this file.');
-   if(typeof result.text!=='string')throw Error('The document reader returned no document text.');
-   return remember({...result,metadata:result.metadata||{},warnings:result.warnings||[]});
-  }catch(error){
-   checkRead();
-   if(error.name==='AbortError')throw Error('The document reached the reading time limit. Use a smaller file and retry.');
-   // Do not silently repeat an interrupted upload in slower browser OCR.
-   if(error instanceof TypeError&&sameOrigin)throw Error('The reader connection was interrupted. Your draft is kept; retry the read.');
-   if(!(error instanceof TypeError))throw error;
-  }finally{posting=false;clearTimeout(timer);clearTimeout(pollTimer);pollAbort?.abort();}
- }
- if(endpoints.length)warnings.push('The document service is unavailable; the browser reader was used.');
+ const result=await window.PGENRO_AdminOcrService.read(source,{
+  operation,assertActive:checkRead,progress,uuid:M.uuid,warnings,
+ });
+ if(result)return remember(result);
  let worker=null,pdf=null,stage='Reading scanned text…',floor=0,span=90;
  async function recognize(input,psm='3'){
   checkRead();clearTimeout(readerRuntime.idle);
+  readerRuntime.owner=operation;
   readerRuntime.logger=info=>{if(info.status==='recognizing text')progress(stage,Math.min(98,Math.round(floor+info.progress*span)));};
   if(!readerRuntime.promise){
+   const workerToken={};readerRuntime.workerToken=workerToken;
    readerRuntime.promise=(async()=>{
     await loadReaderScript('https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js');
-    const ready=await Tesseract.createWorker('eng',1,{logger:info=>readerRuntime.logger?.(info)});if(operation?.cancelled){await ready.terminate();checkRead();}readerRuntime.worker=ready;return ready;
+    checkRead();
+    const logger=info=>{if(readerRuntime.workerToken===workerToken)readerRuntime.logger?.(info);};
+    let ready;
+    try{ready=await Tesseract.createWorker('eng+fil',1,{logger});}
+    catch(languageError){checkRead();ready=await Tesseract.createWorker('eng',1,{logger});}
+    if(operation?.cancelled){await ready.terminate();checkRead();}readerRuntime.worker=ready;return ready;
    })();
   }
   const workerPromise=readerRuntime.promise;try{worker=await workerPromise;}catch(error){if(readerRuntime.promise===workerPromise)readerRuntime.promise=null;throw error;}
   checkRead();await worker.setParameters({preserve_interword_spaces:'1',tessedit_pageseg_mode:psm,user_defined_dpi:'240'});
   return (await worker.recognize(input,{rotateAuto:true},{text:true})).data;
  }
- function score(text){const words=String(text).match(/[\p{L}\p{N}]+/gu)||[];return words.length+new Set(words.map(w=>w.toLocaleLowerCase())).size*.2+(parseCorrespondence(text).signatory?20:0);}
+ function score(text){const words=String(text).match(/[\p{L}\p{N}]+/gu)||[];return words.length+new Set(words.map(w=>w.toLocaleLowerCase())).size*.2+(memoSignatory(text).kind==='signature'?20:0);}
  async function imageCanvas(blob){
   const url=URL.createObjectURL(blob);
   try{const img=new Image();img.src=url;await img.decode();const scale=Math.min(Math.max(1,1600/img.naturalWidth),3,3000/Math.max(img.naturalWidth,img.naturalHeight));const canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(img.naturalWidth*scale));canvas.height=Math.max(1,Math.round(img.naturalHeight*scale));const ctx=canvas.getContext('2d');ctx.fillStyle='white';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(img,0,0,canvas.width,canvas.height);return canvas;}
@@ -821,24 +694,29 @@ async function extractDocument(source,progress=()=>{}){
   if((text.match(/\S+/g)||[]).length<12||Number(first.confidence??100)<65){
    const alternate=await recognize(canvas,'6');
    if(score(alternate.text||'')>score(text)){chosen=alternate;text=alternate.text||'';}
-   if(!parseCorrespondence(text).signatory&&parseCorrespondence(alternate.text||'').signatory)text=mergeDocumentText(text,alternate.text);
+   const signer=memoSignatory(text),other=chosen===first?alternate:first;
+   if(signer.kind!=='signature'&&!signer.ambiguous)text=window.PGENRO_OcrFields.appendSignatureEvidence(text,memoSignatory(other.text||''));
   }
-  const lines=text.split(/\r?\n/),signatureHint=lines.some(line=>/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)|signed(?:\s+by)?|signatory|submitted\s+by|prepared\s+by|approved\s+by)\b/i.test(line))||lines.slice(Math.floor(lines.length*.55)).some(line=>/\b(?:officer|director|chief|mayor|governor|secretary|manager|president|chairperson|coordinator|principal|engineer)\b/i.test(line));
-  const senderFields=parseCorrespondence(text);
-  if(text&&!senderFields.signatory&&!senderFields.signatoryCandidates.length&&signatureHint){
+  const issuer=parseDocumentHeader(text);
+  const signer=memoSignatory(text);
+  const missingSigner=issuer.isMemo&&!['printed-issuer','printed-origin-person'].includes(issuer.issuedBySource);
+  if(text&&signer.kind!=='signature'&&!signer.ambiguous&&(missingSigner||(canvas.height>canvas.width*.65&&(text.match(/\S+/g)||[]).length>=12))){
    const marker=chosen.lines?.find(line=>/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)|signed|submitted|prepared|approved)\b/i.test(line.text||''));
    const top=Math.max(0,marker?.bbox?.y0!=null?marker.bbox.y0-30:Math.floor(canvas.height*.45));
    const crop=document.createElement('canvas');crop.width=canvas.width;crop.height=canvas.height-top;const ctx=crop.getContext('2d');ctx.drawImage(canvas,0,top,canvas.width,crop.height,0,0,canvas.width,crop.height);
    const data=ctx.getImageData(0,0,crop.width,crop.height);
    for(let i=0;i<data.data.length;i+=4){const r=data.data[i],g=data.data[i+1],b=data.data[i+2];if(b>r*1.25&&b>g*1.18&&b-r>12)data.data[i]=data.data[i+1]=data.data[i+2]=255;}
    ctx.putImageData(data,0,0);
-   try{const recovered=await recognize(crop,'6');if(parseCorrespondence(recovered.text||'').signatory)text=mergeDocumentText(text,recovered.text);}finally{crop.width=crop.height=0;}
+   try{const recovered=await recognize(crop,'11');text=window.PGENRO_OcrFields.appendSignatureEvidence(text,memoSignatory(recovered.text||'',true));}finally{crop.width=crop.height=0;}
   }
   if(Number(chosen.confidence??100)<65&&!warnings.includes('Some scanned text has low confidence. Review the detected fields.'))warnings.push('Some scanned text has low confidence. Review the detected fields.');
   return text;
  }
  function pdfNeedsOcr(lib,ops,items,native,page){
   if(native.trim().length<40||native.includes('\ufffd'))return true;
+  const header=parseDocumentHeader(native);
+  if(header.isMemo&&!['printed-issuer','printed-origin-person','printed-signatory'].includes(header.issuedBySource)&&
+   ops.fnArray.some(op=>[lib.OPS.paintImageXObject,lib.OPS.paintInlineImageXObject,lib.OPS.paintImageMaskXObject].includes(op)))return true;
   const multiply=(a,b)=>[a[0]*b[0]+a[2]*b[1],a[1]*b[0]+a[3]*b[1],a[0]*b[2]+a[2]*b[3],a[1]*b[2]+a[3]*b[3],a[0]*b[4]+a[2]*b[5]+a[4],a[1]*b[4]+a[3]*b[5]+a[5]];
   let matrix=[1,0,0,1,0,0];const stack=[],images=[],view=page.view,area=Math.max(1,(view[2]-view[0])*(view[3]-view[1]));
   for(let i=0;i<ops.fnArray.length;i++){
@@ -884,13 +762,15 @@ async function extractDocument(source,progress=()=>{}){
   return parts.filter(s=>s.trim()).join(extension==='docx'?'\n\n':'\n\f\n');
  }
  try{
-  const extension=source.name.split('.').pop().toLowerCase();let text='';
-  if(/^(txt|csv)$/.test(extension)){
-   const bytes=new Uint8Array(await source.arrayBuffer()),encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';text=new TextDecoder(encoding).decode(bytes);
-  }else if(/^(docx|pptx|xlsx)$/.test(extension))text=await archiveText(extension);
+  checkRead();
+  let text='';
+  if(/^(docx|pptx|xlsx)$/.test(extension))text=await archiveText(extension);
   else if(extension==='pdf'){
-   const lib=await import('../vendor/pdfjs/pdf.min.mjs');lib.GlobalWorkerOptions.workerSrc=new URL('../vendor/pdfjs/pdf.worker.min.mjs',location.href).href;pdf=await lib.getDocument({data:await source.arrayBuffer(),isEvalSupported:false,cMapUrl:new URL('../vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('../vendor/pdfjs/standard_fonts/',location.href).href}).promise;const pages=[];
+   const lib=await window.PGENRO_DocumentPreview.loadPdfLibrary();
+   pdf=await lib.getDocument({data:await source.arrayBuffer(),...window.PGENRO_DocumentPreview.pdfOptions()}).promise;
+   const pages=[];
    for(let number=1;number<=pdf.numPages;number++){
+    checkRead();
     stage=`Reading page ${number} of ${pdf.numPages}, including the body and signature…`;floor=(number-1)/pdf.numPages*90;span=90/pdf.numPages;progress(stage,Math.round(floor));
     const page=await pdf.getPage(number),content=await page.getTextContent(),native=pdfTextLines(content.items),ops=await page.getOperatorList();
     let pageText=native;
@@ -898,8 +778,8 @@ async function extractDocument(source,progress=()=>{}){
      const base=page.getViewport({scale:1}),viewport=page.getViewport({scale:Math.min(240/72,3000/Math.max(base.width,base.height))}),canvas=document.createElement('canvas');canvas.width=Math.ceil(viewport.width);canvas.height=Math.ceil(viewport.height);
      try{await page.render({canvasContext:canvas.getContext('2d'),viewport,background:'rgb(255,255,255)'}).promise;const scanned=await readPage(canvas);
       const nativeWords=(native.match(/\S+/g)||[]).length,scanWords=(scanned.match(/\S+/g)||[]).length;
-      pageText=nativeWords>=scanWords*.9&&parseCorrespondence(native).signatory?native:mergeDocumentText(scanned,native);
-     }catch(error){if(!native.trim())throw error;warnings.push(`Page ${number}: scanned content could not be read; selectable text was kept. ${error.message}`);}
+      pageText=nativeWords>=scanWords*.9&&memoSignatory(native).kind==='signature'?native:mergeDocumentText(scanned,native);
+     }catch(error){checkRead();if(!native.trim())throw error;warnings.push(`Page ${number}: scanned content could not be read; selectable text was kept. ${error.message}`);}
      finally{canvas.width=canvas.height=0;}
     }
     pages.push(pageText);page.cleanup();
@@ -912,341 +792,239 @@ async function extractDocument(source,progress=()=>{}){
   }else if(/^(png|jpe?g|webp|bmp)$/.test(extension)){const canvas=await imageCanvas(source);try{text=await readPage(canvas);}finally{canvas.width=canvas.height=0;}}
   else throw Error('This file type is not supported by the document reader.');
   return remember({text,metadata:{},warnings,pages:text.split('\f').length,engine:'browser-reader'});
- }finally{if(worker&&readerRuntime.worker===worker)readerRuntime.idle=setTimeout(()=>{stopReaderWorker();},60000);readerRuntime.logger=null;await pdf?.destroy();}
+ }finally{if(worker&&readerRuntime.worker===worker)readerRuntime.idle=setTimeout(()=>{stopReaderWorker();},60000);if(readerRuntime.owner===operation)readerRuntime.logger=null;await pdf?.destroy();}
 }
 /* End full-document reader. */
 
-  document.getElementById('cancelMemoOcrBtn').addEventListener('click',cancelDocumentRead);
-  async function runMemoOcr(file){
-    if(!file||busy||fileBusy||ocrBusy)return;ocrBusy=true;setMemoFieldsBusy(true);const token=++memoOcrToken;memoFormModal.dataset.busy='true';document.getElementById('memoOcrStopControls').hidden=false;runMemoOcrBtn.disabled=true;saveMemoSubmitBtn.disabled=true;formPdfFile.disabled=true;removeAttachmentBtn.disabled=true;
-    try{
-      setMemoOcrStatus('Reading the document…','working');
-      const result=await readWithCancellation(file,(message,pct)=>{setMemoOcrStatus(message,'working');setMemoUploadProgress(pct,message,true);}),text=String(result.text||'').trim();
-      if(token!==memoOcrToken)return;if(!text)throw Error('No readable text detected. Enter the fields manually.');
-      memoOcrText.value=text;lastMemoRead={text,result};applyMemoFields(text,result);
-      setMemoOcrStatus(`Read ${result.pages||text.split('\f').length} pages in ${((result.durationMs||0)/1000).toFixed(1)}s${result.cacheHit?' · reused result':''}. ${text.length.toLocaleString()} characters. Review the detected fields. ${(result.warnings||[]).join(' ')}`,'success');showToast('Document text extracted. Review the fields before saving.');
-    }catch(error){setMemoOcrStatus(error.message,'error');showToast(error.message,'error');}
-    finally{document.getElementById('memoOcrStopControls').hidden=true;ocrBusy=false;setMemoFieldsBusy(false);memoFormModal.dataset.busy='false';runMemoOcrBtn.disabled=!selectedMemoFile;saveMemoSubmitBtn.disabled=false;formPdfFile.disabled=false;removeAttachmentBtn.disabled=false;setMemoUploadProgress(0,'',false);M.renderIcons();}
-  }
   // =========================================================================
   // 8. FORM & MODAL CONTROLS
   // =========================================================================
-  const MAX_MEMO_PDF_SIZE = 10 * 1024 * 1024;
+  const maxMemoFileSize = 10 * 1024 * 1024;
+  const memoFileHint = 'PDF, images, Word, Excel, PowerPoint or text · Max 10 MB';
 
-  function formatMemoFileSize(bytes) {
-    const value = Number(bytes) || 0;
-    if (value < 1024) return `${value} B`;
-    if (value < 1024 * 1024) return `${(value / 1024).toFixed(value < 100 * 1024 ? 1 : 0)} KB`;
-    return `${(value / (1024 * 1024)).toFixed(2)} MB`;
+  function syncMemoControls() {
+    saveMemoSubmitBtn.disabled = busy || ocrBusy;
+    runMemoOcrBtn.disabled = busy || ocrBusy || !selectedMemoFile;
+    browseMemoDocumentBtn.disabled = formPdfFile.disabled = removeAttachmentBtn.disabled = busy;
+    memoOcrStopControls.hidden = !ocrBusy;
+    memoUploadProgress.hidden = !ocrBusy;
   }
 
-  function setMemoUploadStatus(message, state = "idle") {
-    if (memoUploadStatus) memoUploadStatus.dataset.state = state;
-    if (memoUploadStatusText) memoUploadStatusText.textContent = message;
+  function stopMemoRead(reason) {
+    ++memoOcrToken;
+    cancelDocumentRead(reason);
+    ocrBusy = false;
+    syncMemoControls();
   }
 
-  function setMemoUploadProgress(percent = 0, label = "Preparing document...", visible = true) {
-    const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
-    if (memoUploadProgress) {
-      memoUploadProgress.hidden = !visible;
-      memoUploadProgress.setAttribute("aria-hidden", visible ? "false" : "true");
+  async function runMemoOcr(file) {
+    if (!file || file !== selectedMemoFile || busy || ocrBusy) return;
+    const token = ++memoOcrToken;
+    const current = () => token === memoOcrToken && file === selectedMemoFile;
+    ocrBusy = true;
+    memoOcrProgress.value = 0;
+    memoUploadProgressLabel.textContent = 'Preparing the document…';
+    setMemoOcrStatus('Reading your document', 'You can edit the fields while the document is being read.', 'working');
+    memoInlinePreview.setReadState({pending: true});
+    syncMemoControls();
+
+    try {
+      const result = await readWithCancellation(file, (message, percent) => {
+        if (!current()) return;
+        memoUploadProgressLabel.textContent = message;
+        memoOcrProgress.value = Math.max(memoOcrProgress.value, percent);
+      }, current);
+      if (!current()) return;
+      const text = result.text.trim();
+      if (!text) throw new Error('No readable text was detected. You can fill the details manually.');
+      memoInlinePreview.setReadState({text});
+      if (!memoTextEdited) memoOcrText.value = text;
+      lastMemoRead = {text, result};
+      const reviewedText = memoOcrText.value;
+      applyMemoFields(reviewedText, reviewedText === text ? result : null);
+      const seconds = (result.durationMs / 1000).toFixed(1);
+      const complete = [formControlNo, formDate, formAddressedTo, formSubject, formIssuedBy].every(input => input.value.trim());
+      setMemoOcrStatus(complete ? 'Ready to review' : 'Review needed', 'Read in ' + seconds + 's. Confirm the details before saving.', 'success');
+    } catch (error) {
+      if (!current()) return;
+      setMemoOcrStatus('Reading needs attention', error.message || 'Retry reading or enter the details manually.', 'error');
+      memoInlinePreview.setReadState({error: 'No text preview is available. Select Read again to retry.'});
+    } finally {
+      if (current()) {
+        ocrBusy = false;
+        syncMemoControls();
+      }
     }
-    if (memoUploadProgressBar) memoUploadProgressBar.style.width = `${safePercent}%`;
-    if (memoUploadProgressLabel) memoUploadProgressLabel.textContent = label;
   }
 
-  function setSaveMemoState(isSaving, text = "Save Memorandum") {
-    if (!saveMemoSubmitBtn) return;
-    saveMemoSubmitBtn.disabled = Boolean(isSaving);
-    saveMemoSubmitBtn.classList.toggle("is-saving", Boolean(isSaving));
+  function setSaveMemoState(isSaving, text = 'Save Memorandum') {
+    saveMemoSubmitBtn.classList.toggle('is-saving', isSaving);
     saveMemoSubmitBtn.innerHTML = isSaving
       ? '<i data-lucide="loader-2" class="spin-icon"></i><span>Saving...</span>'
-      : `<i data-lucide="save"></i><span id="saveMemoSubmitText">${escapeHtml(text)}</span>`;
-    if (window.lucide) M.renderIcons();
-  }
-
-  function refreshMemoFileCard({ name = "", meta = "", existing = false } = {}) {
-    if (!attachedFileInfo) return;
-
-    if (!name) {
-      attachedFileInfo.classList.remove("show");
-      if (attachedFileName) attachedFileName.textContent = "";
-      if (attachedFileMeta) attachedFileMeta.textContent = "";
-      if (previewSelectedPdfBtn) previewSelectedPdfBtn.disabled = true;
-      return;
-    }
-
-    attachedFileInfo.classList.add("show");
-    if (attachedFileName) attachedFileName.textContent = name;
-    if (attachedFileMeta) attachedFileMeta.textContent = meta || (existing ? "Existing document attachment" : "Document attachment");
-    if (previewSelectedPdfBtn) previewSelectedPdfBtn.disabled = false;
-    if (attachedFileState) {
-      attachedFileState.innerHTML = '<i data-lucide="check-circle-2"></i> Ready';
-    }
+      : '<i data-lucide="save"></i><span id="saveMemoSubmitText">' + escapeHtml(text) + '</span>';
+    syncMemoControls();
     if (window.lucide) M.renderIcons();
   }
 
   function resetMemoAttachmentUi() {
-    if (formPdfFile) formPdfFile.value = "";
-    if (formExistingPdfBase64) formExistingPdfBase64.value = "";
+    formPdfFile.value = '';
+    existingMemoUrl.value = '';
     selectedMemoFile = null;
-    memoOcrToken += 1;memoOcrValues.clear();lastMemoRead=null;document.getElementById("memoExtractionReview").hidden=true;
+    stopMemoRead('removed');
+    memoInlinePreview.clear();
+    clearMemoDetection();
+    attachedFileName.textContent = 'Choose a document';
+    attachedFileMeta.textContent = memoFileHint;
+    removeAttachmentBtn.hidden = true;
+    setMemoOcrStatus('Ready for a document', 'Reading starts automatically when you select a file.');
+  }
 
-    refreshMemoFileCard();
-    setMemoUploadProgress(0, "Preparing document...", false);
-    setMemoUploadStatus("No document selected yet.", "idle");
-
-    if (memoOcrText) memoOcrText.value = "";
-    setMemoOcrStatus("Choose a document to extract memorandum fields.", "ready");
-
-    if (runMemoOcrBtn) {
-      runMemoOcrBtn.disabled = true;
-      runMemoOcrBtn.innerHTML = '<i data-lucide="scan-text"></i><span>Run OCR</span>';
+  function acceptMemoFile(file) {
+    if (!file || busy) return;
+    formPdfFile.value = '';
+    if (!/\.(pdf|png|jpe?g|webp|bmp|tiff?|docx|txt|csv|xlsx|pptx)$/i.test(file.name)) {
+      showToast('Unsupported attachment type.', 'warning');
+      return;
+    }
+    if (!file.size || file.size > maxMemoFileSize) {
+      showToast(file.size ? 'Choose a file no larger than 10 MB.' : 'This file is empty. Choose another document.', 'warning');
+      return;
     }
 
-    if (window.lucide) M.renderIcons();
-  }
-
-  function validateMemoPdf(file) {
-    if (!file) return "No file was selected.";
-
-    const name = String(file.name || "").toLowerCase();
-    const type = String(file.type || "").toLowerCase();
-    const looksLikePdf = type === "application/pdf" || name.endsWith(".pdf");
-
-    if (!looksLikePdf && !/\.(png|jpe?g|webp|bmp|tiff?|txt|csv|docx|xlsx|pptx)$/i.test(name)) return "Choose a PDF, image, DOCX or text document.";
-    if (!file.size) return "The selected document is empty.";
-    if (file.size > MAX_MEMO_PDF_SIZE) return "The document exceeds the 10 MB upload limit.";
-
-    return "";
-  }
-
-  function readMemoPdfAsDataUrl(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-
-      reader.onloadstart = () => {
-        setMemoUploadProgress(8, "Preparing document...", true);
-      };
-
-      reader.onprogress = (event) => {
-        if (!event.lengthComputable) return;
-        const pct = Math.max(10, Math.min(92, Math.round((event.loaded / event.total) * 92)));
-        setMemoUploadProgress(pct, "Reading document...", true);
-      };
-
-      reader.onerror = () => reject(reader.error || new Error("The PDF could not be read."));
-      reader.onabort = () => reject(new Error("File reading was cancelled."));
-      reader.onload = () => resolve(String(reader.result || ""));
-      const types={pdf:"application/pdf",png:"image/png",jpg:"image/jpeg",jpeg:"image/jpeg",webp:"image/webp",bmp:"image/bmp",tif:"image/tiff",tiff:"image/tiff",xlsx:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",pptx:"application/vnd.openxmlformats-officedocument.presentationml.presentation",txt:"text/plain",csv:"text/csv",docx:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"};
-      reader.readAsDataURL(file.slice(0,file.size,types[file.name.split(".").pop().toLowerCase()]||file.type));
-    });
-  }
-
-  async function acceptMemoPdf(file) {
-    if(busy||ocrBusy||fileBusy)return false;const previous={file:selectedMemoFile,url:formExistingPdfBase64.value,name:attachedFileName.textContent};
-    const validationError = validateMemoPdf(file);
-
-    if (validationError) {
-      if (formPdfFile) formPdfFile.value = "";
-      refreshMemoFileCard({name:attachedFileName.textContent,existing:true});
-      setMemoUploadProgress(0, "Preparing document...", false);
-      setMemoUploadStatus(validationError, "error");
-      if (runMemoOcrBtn) runMemoOcrBtn.disabled = !previous.file;
-      showToast(validationError, "error");
-      return false;
-    }
-
-    if(busy||ocrBusy||fileBusy)return false;fileBusy=true;setMemoFieldsBusy(true);memoOcrToken++;memoFormModal.dataset.busy="true";saveMemoSubmitBtn.disabled=true;
+    stopMemoRead('replaced');
+    clearMemoDetection();
     selectedMemoFile = file;
-    setMemoUploadStatus(`Reading ${file.name}...`, "working");
-    setMemoUploadProgress(8, "Preparing document...", true);
-
-    try {
-      const dataUrl = await readMemoPdfAsDataUrl(file);
-
-      if (!dataUrl.startsWith("data:application/pdf") && !dataUrl.startsWith("data:")) {
-        throw new Error("The selected document could not be prepared for preview.");
-      }
-
-      if(!safeAttachment(dataUrl))throw new Error("This document cannot be safely previewed. Choose a supported attachment.");
-      clearMemoDetection();formExistingPdfBase64.value = dataUrl;
-      refreshMemoFileCard({
-        name: file.name,
-        meta: `${formatMemoFileSize(file.size)} • ${file.name.split(".").pop().toUpperCase()} document`
-      });
-
-      setMemoUploadProgress(100, "Document ready", true);
-      setMemoUploadStatus("Document attached successfully. You can preview it or run OCR to extract details.", "success");
-
-      if (runMemoOcrBtn) {
-        runMemoOcrBtn.disabled = false;
-        runMemoOcrBtn.innerHTML = '<i data-lucide="scan-text"></i><span>Run OCR</span>';
-      }
-
-      window.setTimeout(() => setMemoUploadProgress(0, "Preparing document...", false), 650);
-      if (window.lucide) M.renderIcons();
-
-      setMemoOcrStatus('Document ready. Run OCR to detect memorandum fields.','ready');
-      return true;
-    } catch (error) {
-      console.error("PDF preparation error:", error);
-      if (formPdfFile) formPdfFile.value = "";
-      formExistingPdfBase64.value=previous.url;selectedMemoFile=previous.file;refreshMemoFileCard(previous.url?{name:previous.name,existing:true}:{});
-      setMemoUploadProgress(0, "Preparing document...", false);
-      setMemoUploadStatus(error.message || "Failed to prepare the selected PDF.", "error");
-      showToast(error.message || "Failed to prepare the selected PDF.", "error");
-      return false;
-    }finally{fileBusy=false;setMemoFieldsBusy(false);memoFormModal.dataset.busy="false";saveMemoSubmitBtn.disabled=false;}
+    attachedFileName.textContent = file.name;
+    attachedFileMeta.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB · ' + file.name.split('.').pop().toUpperCase();
+    removeAttachmentBtn.hidden = false;
+    void memoInlinePreview.show({name: file.name, file, pending: true});
+    void runMemoOcr(file);
   }
 
   function resetForm() {
-    memoForm.reset();memoManualFields.clear();memoOcrValues.clear();lastMemoRead=null;setMemoFieldsBusy(false);
-    memoDocId.value = "";
-    modalFormTitle.textContent = "Issue Office Memorandum";
-    formDate.value=M.today();const prefix=`MEMO-${new Date().getFullYear()}-`;const highest=Math.max(0,...rawMemos.map(m=>String(m.memoNo||"").startsWith(prefix)?Number(String(m.memoNo).slice(prefix.length))||0:0));formControlNo.value=prefix+String(highest+1).padStart(3,"0");
-    generatedMemoNumber=formControlNo.value;generatedMemoDate=formDate.value;resetMemoAttachmentUi();
-    setSaveMemoState(false, "Save Memorandum");
+    memoForm.reset();
+    memoManualFields.clear();
+    memoOcrValues.clear();
+    memoDocId.value = '';
+    modalFormTitle.textContent = 'Issue Office Memorandum';
+    formDate.value = M.today();
+    const prefix = 'MEMO-' + new Date().getFullYear() + '-';
+    const highest = Math.max(0, ...rawMemos.map(memo =>
+      String(memo.memoNo || '').startsWith(prefix) ? Number(memo.memoNo.slice(prefix.length)) || 0 : 0
+    ));
+    formControlNo.value = prefix + String(highest + 1).padStart(3, '0');
+    generatedMemoNumber = formControlNo.value;
+    generatedMemoDate = formDate.value;
+    resetMemoAttachmentUi();
+    setSaveMemoState(false);
   }
 
-  function setMemoFormModalOpen(open){if(busy||ocrBusy||fileBusy)return;(open?M.openModal:M.closeModal)('memoFormModal');if(open){const body=memoFormModal.querySelector('.memo-form-body');if(body)body.scrollTop=0;}}
-
-  if (openCreateModalBtn) {
-    openCreateModalBtn.addEventListener("click", () => {
-      if(busy||ocrBusy||fileBusy)return;resetForm();
-      setMemoFormModalOpen(true);
-      window.setTimeout(() => formControlNo?.focus(), 80);
-    });
+  function setMemoFormModalOpen(open) {
+    if (busy) return;
+    if (open) {
+      if (M.openModal('memoFormModal') === false) return;
+      memoFormModal.querySelector('.memo-form-body').scrollTop = 0;
+    } else {
+      M.closeModal('memoFormModal');
+    }
   }
 
-  if (closeFormModalBtn) {
-    closeFormModalBtn.addEventListener("click", () => setMemoFormModalOpen(false));
-  }
-
-  if (cancelFormModalBtn) {
-    cancelFormModalBtn.addEventListener("click", () => setMemoFormModalOpen(false));
-  }
-
-  memoFormModal?.addEventListener("click", (event) => {
-    if (event.target === memoFormModal) setMemoFormModalOpen(false);
+  openCreateModalBtn.addEventListener('click', () => {
+    if (busy) return;
+    resetForm();
+    setMemoFormModalOpen(true);
   });
 
-
+  closeFormModalBtn.addEventListener('click', () => setMemoFormModalOpen(false));
+  cancelFormModalBtn.addEventListener('click', () => setMemoFormModalOpen(false));
+  memoFormModal.addEventListener('click', event => {
+    if (event.target === memoFormModal) setMemoFormModalOpen(false);
+  });
+  memoFormModal.addEventListener('pgenro:modal-close', () => {
+    stopMemoRead('closed');
+    memoInlinePreview.clear();
+  });
+  window.addEventListener('pagehide', event => {
+    if (!event.persisted) memoInlinePreview.clear();
+  });
 
   function openEditModal(memo) {
-    if(busy||ocrBusy||fileBusy)return;resetForm();
-    modalFormTitle.textContent = "Update Office Memorandum";
+    if (busy) return;
+    resetForm();
+    modalFormTitle.textContent = 'Update Office Memorandum';
     memoDocId.value = memo.id;
-    formControlNo.value = memo.memoNo || "";
-    formDate.value = memo.date || "";
-    formAddressedTo.value = memo.addressedTo || "";
-    formSubject.value = memo.subject || memo.title || "";
-    formIssuedBy.value = memo.issuedBy || "";
-    const notes=splitMemoNotes(memo.remarks);formRemarks.value=notes.notes;memoOcrText.value=notes.text;generatedMemoNumber=generatedMemoDate="";
+    formControlNo.value = memo.memoNo || '';
+    formDate.value = memo.date || '';
+    formAddressedTo.value = memo.addressedTo || '';
+    formSubject.value = memo.subject || memo.title || '';
+    formIssuedBy.value = memo.issuedBy || '';
+    const notes = splitMemoNotes(memo.remarks);
+    formRemarks.value = notes.notes;
+    memoOcrText.value = notes.text;
+    generatedMemoNumber = generatedMemoDate = '';
     formIsPinned.checked = Boolean(memo.isPinned);
+    setSaveMemoState(false, 'Update Memorandum');
+    setMemoFormModalOpen(true);
 
     if (memo.pdfUrl) {
-      formExistingPdfBase64.value = memo.pdfUrl;
-      refreshMemoFileCard({
-        name: memo.pdfFileName || "Attached_Document.pdf",
-        meta: "Existing document attachment",
-        existing: true
+      existingMemoUrl.value = memo.pdfUrl;
+      attachedFileName.textContent = memo.pdfFileName || 'Existing attachment';
+      attachedFileMeta.textContent = 'Previously attached file';
+      removeAttachmentBtn.hidden = false;
+      setMemoOcrStatus('Existing attachment', 'Choose a new file to replace the attachment and read its fields.');
+      void memoInlinePreview.show({
+        name: attachedFileName.textContent, text: notes.text,
+        loadFile: async signal => {
+          const url = safeAttachment(memo.pdfUrl);
+          if (!url) throw new Error('The attachment address or file type is invalid.');
+          return readMemoPreviewBlob(url, signal);
+        },
       });
-      selectedMemoFile = null;
-      if (runMemoOcrBtn) runMemoOcrBtn.disabled = true;
-      setMemoUploadStatus("Existing attachment loaded. Choose a new document to replace it.", "success");
-      setMemoOcrStatus("Existing attachment loaded. Choose a new document to extract its text again.", "ready");
     }
-
-    setSaveMemoState(false, "Update Memorandum");
-    setMemoFormModalOpen(true);
-    window.setTimeout(() => formControlNo?.focus(), 80);
   }
 
-  if (formPdfFile) {
-    formPdfFile.addEventListener("change", async (event) => {
-      const file = event.target.files?.[0] || null;
-      if (file) await acceptMemoPdf(file);
-    });
-  }
+  formPdfFile.addEventListener('change', () => acceptMemoFile(formPdfFile.files[0]));
+  browseMemoDocumentBtn.addEventListener('click', () => formPdfFile.click());
+  fileDropzone.addEventListener('dragover', event => {
+    event.preventDefault();
+    if (!busy) fileDropzone.classList.add('is-dragging');
+  });
+  fileDropzone.addEventListener('dragleave', event => {
+    if (!fileDropzone.contains(event.relatedTarget)) fileDropzone.classList.remove('is-dragging');
+  });
+  fileDropzone.addEventListener('drop', event => {
+    event.preventDefault();
+    fileDropzone.classList.remove('is-dragging');
+    const files = event.dataTransfer.files;
+    if (files.length !== 1) {
+      showToast('Choose one document at a time.', 'warning');
+      return;
+    }
+    acceptMemoFile(files[0]);
+  });
 
-  if (fileDropzone) {
-    ["dragenter", "dragover"].forEach((eventName) => {
-      fileDropzone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        fileDropzone.classList.add("drag-active");
-      });
-    });
-
-    ["dragleave", "dragend"].forEach((eventName) => {
-      fileDropzone.addEventListener(eventName, (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        fileDropzone.classList.remove("drag-active");
-      });
-    });
-
-    fileDropzone.addEventListener("drop", async (event) => {
-      event.preventDefault();
-      event.stopPropagation();
-      fileDropzone.classList.remove("drag-active");
-
-      const files = Array.from(event.dataTransfer?.files || []);
-      const file = files[0] || null;
-
-      if (!file) {
-        setMemoUploadStatus("No file was dropped.", "error");
-        return;
-      }
-
-      if (files.length > 1) {
-        showToast("Only one document can be attached at a time.", "error");
-      }
-
-      await acceptMemoPdf(file);
-    });
-
-    fileDropzone.addEventListener('click',event=>{if(event.target===formPdfFile||busy||ocrBusy||fileBusy)return;formPdfFile.click();});
-    fileDropzone.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        if(!busy&&!ocrBusy&&!fileBusy)formPdfFile?.click();
-      }
-    });
-  }
-
-  if (runMemoOcrBtn) {
-    runMemoOcrBtn.addEventListener("click", async () => {
-      if (!selectedMemoFile) {
-        showToast("Choose a document before running OCR.", "error");
-        return;
-      }
-      await runMemoOcr(selectedMemoFile);
-    });
-  }
-
-  if(previewSelectedPdfBtn)previewSelectedPdfBtn.onclick=()=>{
-    if(fileBusy||ocrBusy||busy)return;if(!formExistingPdfBase64.value){showToast('Attach a document before opening the preview.','warning');return;}
-    returnToEditor=true;openPdfViewer({memoNo:formControlNo.value.trim(),subject:formSubject.value.trim()||'Unsaved attachment',pdfUrl:formExistingPdfBase64.value,pdfFileName:attachedFileName.textContent});
-  };
-  viewPdfModal.addEventListener('pgenro:modal-close',()=>{cleanupMemoViewer();if(returnToEditor){returnToEditor=false;M.openModal('memoFormModal');}});
-  if (removeAttachmentBtn) {
-    removeAttachmentBtn.addEventListener("click", () => {
-      if(busy||ocrBusy||fileBusy)return;resetMemoAttachmentUi();
-      showToast("Document attachment removed.");
-    });
-  }
+  runMemoOcrBtn.addEventListener('click', () => runMemoOcr(selectedMemoFile));
+  document.getElementById('cancelMemoOcrBtn').addEventListener('click', () => {
+    stopMemoRead('stopped');
+    setMemoOcrStatus('Reading stopped', 'Select Read again to retry, or fill the details manually.');
+    memoInlinePreview.setReadState({error: 'Reading stopped. Select Read again to load the text preview.'});
+  });
+  removeAttachmentBtn.addEventListener('click', () => {
+    if (busy) return;
+    resetMemoAttachmentUi();
+    browseMemoDocumentBtn.focus({preventScroll:true});
+    showToast('Document attachment removed.');
+  });
+  viewPdfModal.addEventListener('pgenro:modal-close', cleanupMemoViewer);
 
   // Submit Handler
   if (memoForm) {
     memoForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if(busy||fileBusy||ocrBusy)return;if(!online){showToast("Refresh successfully before saving memos.","error");return;}
+      if(busy||ocrBusy)return;if(!online){showToast("Refresh successfully before saving memos.","error");return;}
 
       if (!memoForm.checkValidity()) {
         memoForm.reportValidity();
-        setMemoUploadStatus("Complete the required memorandum details before saving.", "error");
         showToast("Please complete all required memorandum fields.", "error");
         return;
       }
@@ -1266,7 +1044,7 @@ async function extractDocument(source,progress=()=>{}){
         return;
       }
 
-      const hasPdf = Boolean(formExistingPdfBase64.value);
+      const hasAttachment = Boolean(selectedMemoFile || existingMemoUrl.value);
       const payload = {
         memoNo: formControlNo.value.trim(),
         date: formDate.value,
@@ -1276,13 +1054,13 @@ async function extractDocument(source,progress=()=>{}){
         issuedBy: formIssuedBy.value.trim(),
         remarks: formRemarks.value.trim()+(memoOcrText.value.trim()?`\n\nExtracted document text:\n${memoOcrText.value.trim()}`:""),
         isPinned: formIsPinned.checked,
-        pdfUrl: hasPdf ? formExistingPdfBase64.value : "",
-        pdfFileName: hasPdf ? (attachedFileName.textContent || "Memorandum.pdf") : "",
+        pdfUrl: selectedMemoFile ? "" : existingMemoUrl.value,
+        pdfFileName: hasAttachment ? (attachedFileName.textContent || "Memorandum.pdf") : "",
         updatedAt: new Date().toISOString()
       };
 
       if(rawMemos.some(m=>String(m.id)!==docId&&String(m.memoNo||'').trim().toLowerCase()===payload.memoNo.toLowerCase())){showToast('Control number already exists. Choose a unique number.','warning');formControlNo.focus();return;}
-      if(hasPdf&&!safeAttachment(formExistingPdfBase64.value)){showToast("The attachment address or type is invalid.","error");return;}
+      if(!selectedMemoFile&&existingMemoUrl.value&&!safeAttachment(existingMemoUrl.value)){showToast("The attachment address or type is invalid.","error");return;}
       busy=true;setMemoFieldsBusy(true);memoFormModal.dataset.busy="true";setSaveMemoState(true);
 
       let uploadedUrl='';
@@ -1333,16 +1111,6 @@ async function extractDocument(source,progress=()=>{}){
   // Render pages ourselves: Chrome's native PDF plugin cannot run in a sandboxed iframe.
   const memoPreview = {generation:0,renderVersion:0,renderPromise:Promise.resolve(),renderTask:null,
     pdfTask:null,pdf:null,abort:null,blobUrl:'',page:1,resizeTimer:null};
-  let memoPdfLibraryPromise = null;
-  function loadMemoPdfLibrary(){
-    if(!memoPdfLibraryPromise){
-      memoPdfLibraryPromise=import('../vendor/pdfjs/pdf.min.mjs').then(lib=>{
-        lib.GlobalWorkerOptions.workerSrc=new URL('../vendor/pdfjs/pdf.worker.min.mjs',location.href).href;
-        return lib;
-      }).catch(error=>{memoPdfLibraryPromise=null;throw error;});
-    }
-    return memoPdfLibraryPromise;
-  }
   function memoPreviewIsCurrent(generation){
     return generation===memoPreview.generation&&viewPdfModal.classList.contains('open');
   }
@@ -1446,7 +1214,7 @@ async function extractDocument(source,progress=()=>{}){
       memoPreview.blobUrl=URL.createObjectURL(blob);
       setMemoAttachmentLinks(memoPreview.blobUrl,filename);
       if(isPdf){
-        const lib=await memoPreviewTimeout(loadMemoPdfLibrary(),15000,'The PDF renderer is unavailable.');
+        const lib=await memoPreviewTimeout(window.PGENRO_DocumentPreview.loadPdfLibrary(),15000,'The PDF renderer is unavailable.');
         if(!memoPreviewIsCurrent(generation))return;
         const task=lib.getDocument({data:bytes,isEvalSupported:false,cMapUrl:new URL('../vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('../vendor/pdfjs/standard_fonts/',location.href).href});memoPreview.pdfTask=task;
         const pdf=await memoPreviewTimeout(task.promise,20000,'The PDF took too long to open.');
@@ -1488,7 +1256,7 @@ async function extractDocument(source,progress=()=>{}){
   function openPdfViewer(memo){
     if(!M.canStartAction())return;
     const url=safeAttachment(memo.pdfUrl);
-    if(memo.pdfUrl&&!url){returnToEditor=false;showToast('The attachment address or file type is invalid.','error');return;}
+    if(memo.pdfUrl&&!url){showToast('The attachment address or file type is invalid.','error');return;}
     cleanupMemoViewer();
     const filename=String(memo.pdfFileName||'Memorandum.pdf').replace(/[\\/\u0000-\u001f\u007f]/g,'_');
     viewPdfTitle.textContent=memo.memoNo?`Directive ${memo.memoNo}`:'Directive Viewer';

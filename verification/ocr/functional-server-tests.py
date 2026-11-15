@@ -155,8 +155,67 @@ class FunctionalReaderTests(unittest.TestCase):
             'MEMORANDUM\nTO: N/A\nISSUED BY: ---\nSUBJECT: Update\n\n'
             'Please submit the reports on November 30, 2026.\nSigned by: ANA R. REYES\nDirector'
         )
-        self.assertEqual((incomplete['date'], incomplete['issuedBy'], incomplete['recipient']), ('', '', ''))
+        self.assertEqual((incomplete['date'], incomplete['issuedBy'], incomplete['recipient']), ('', 'ANA R. REYES', ''))
+        self.assertEqual(incomplete['issuedBySource'], 'printed-signatory')
         self.record('Memo number, issue date, issuer and signatory are read separately')
+
+    def test_memo_issuer_uses_the_main_documents_printed_signature(self):
+        header = (
+            'OFFICE MEMORANDUM NO. 2026-601\nFOR: ALL SECTION HEADS\nDATE: 14 November 2026\n'
+            'SUBJECT: MONTHLY REPORTS\nREMARKS: Keep the original.\n\n'
+        )
+        body = '\n\nPlease submit the current reports on November 30.\n\n'
+        signed = 'For immediate and strict compliance.\nENGR. ALMA J. DE LA CRUZ\nPGDH - PGENRO'
+        variants = {
+            'office header': (header + 'FROM: ADMINISTRATIVE DIVISION' + body + signed, 'ENGR. ALMA J. DE LA CRUZ'),
+            'blank dash': (header + 'ISSUED BY: —' + body + signed, 'ENGR. ALMA J. DE LA CRUZ'),
+            'named origin': (header + 'MULA KAY: ANA R. REYES' + body + signed, 'ANA R. REYES'),
+            'continuation page': (header + body + '\fOFFICE MEMORANDUM NO. 2026-601\n' + signed, 'ENGR. ALMA J. DE LA CRUZ'),
+            'another memo': (header + body + '\fOFFICE MEMORANDUM NO. 2026-602\n' + signed, ''),
+            'preparer only': (header + body + 'Prepared by: ANA R. REYES\nDirector', ''),
+            'two distinct signers': (header + body + 'Signed by: ANA R. REYES\nDirector\nSigned by: LEO R. RAMOS\nChief', ''),
+        }
+        for scenario, (text, expected) in variants.items():
+            with self.subTest(scenario=scenario):
+                fields = reader.extract_document_metadata(text)
+                form = reader.communication_form_payload(fields, text)
+                self.assertEqual(fields['issuedBy'], expected)
+                self.assertEqual(form['formValues']['memoIssuerInput'], expected)
+                self.assertEqual(fields['memoNo'], '2026-601')
+                self.assertEqual(fields['date'], '2026-11-14')
+                self.assertEqual(fields['addressedTo'], 'ALL SECTION HEADS')
+                self.assertEqual(fields['subject'], 'MONTHLY REPORTS')
+                self.assertEqual(fields['remarks'], 'Keep the original.')
+        self.record('Printed memo authors are recovered across layouts and kept separate from other people')
+
+    def test_ocr_reads_an_issuer_in_an_image_on_a_text_pdf(self):
+        with fitz.open() as signature, fitz.open() as memo:
+            signature_page = signature.new_page(width=290, height=68)
+            signature_page.insert_text((4, 25), 'ENGR. ALMA J. DE LA CRUZ', fontsize=16, fontname='hebo')
+            signature_page.insert_text((4, 49), 'PGDH - PGENRO', fontsize=12)
+            graphic = signature_page.get_pixmap(matrix=fitz.Matrix(2, 2)).tobytes('png')
+            page = memo.new_page()
+            page.insert_text((54, 72), (
+                'OFFICE MEMORANDUM NO. 2026-601\n'
+                'FOR: ALL SECTION HEADS\nFROM: ADMINISTRATIVE DIVISION\n'
+                'DATE: 14 November 2026\nSUBJECT: Monthly reports\n'
+                'REMARKS: Keep the original.\n\nPlease submit the reports by November 30.\n\n'
+                'For immediate and strict compliance.'
+            ), fontsize=12)
+            page.insert_image(fitz.Rect(54, 244, 344, 312), stream=graphic)
+            pdf = memo.tobytes()
+            png = page.get_pixmap(matrix=fitz.Matrix(2, 2)).tobytes('png')
+        with reader.app.test_client() as client:
+            for filename, data in [('memo-hybrid.pdf', pdf), ('memo-scan.png', png)]:
+                with self.subTest(filename=filename):
+                    response = upload(client, filename, data)
+                    self.assertEqual(response.status_code, 200)
+                    payload = response.get_json()
+                    self.assertEqual(payload['formValues']['memoIssuerInput'], 'ENGR. ALMA J. DE LA CRUZ')
+                    self.assertEqual(payload['metadata']['issuedBySource'], 'printed-signatory')
+                    self.assertEqual(payload['formValues']['memoRecipientInput'], 'ALL SECTION HEADS')
+                    self.assertEqual(payload['formValues']['dateInput'], '2026-11-14')
+                    self.record('OCR recovers the raster memo signature from ' + filename, payload)
 
     def test_mixed_pdf_recovers_the_scanned_header(self):
         with reader.app.test_client() as client:

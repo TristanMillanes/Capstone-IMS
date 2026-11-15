@@ -120,3 +120,43 @@ assert.equal(memoInputs.formDate.value, '');
 assert.equal(memoInputs.formRemarks.value, '');
 assert.match(memoElements.memoReviewSummary.textContent, /no memorandum heading/);
 console.log('PASS Office Memos keeps its issuer, fills remarks and clears stale suggestions while preserving manual edits.');
+
+const signedMemo = [
+  'OFFICE MEMORANDUM NO. 2026-601', 'TO: ALL SECTION HEADS', 'DATE: 14 November 2026',
+  'FROM: ADMINISTRATIVE DIVISION', 'ISSUED BY: —', 'SUBJECT: Monthly reports',
+  '', 'Please submit the current reports by November 30.',
+  '', 'For immediate and strict compliance.', 'ENGR. ALMA J. DE LA CRUZ', 'PGDH - PGENRO',
+].join('\n');
+const olderServiceResult = {
+  formSchemaVersion: 2, communicationType: 'Incoming', route: 'office_memos',
+  metadata: {
+    isMemo: true, memoNo: '2026-601', documentType: 'Memorandum', date: '2026-11-14',
+    issuedBy: '', addressedTo: 'ALL SECTION HEADS', recipient: 'ALL SECTION HEADS', subject: 'Monthly reports',
+    fieldEvidence: {issuedBy: 'ISSUED BY: —'},
+  },
+  formValues: {
+    controlNoInput: '2026-601', docTypeSelect: 'Memorandum', dateInput: '2026-11-14',
+    memoRecipientInput: 'ALL SECTION HEADS', memoIssuerInput: '', subjectInput: 'Monthly reports',
+  },
+};
+vm.runInContext("memoManualFields.clear(); memoOcrValues.clear();", memoContext);
+for (const input of Object.values(memoInputs)) input.value = '';
+memoContext.applyMemoFields(signedMemo, olderServiceResult);
+assert.equal(memoInputs.formIssuedBy.value, 'ENGR. ALMA J. DE LA CRUZ');
+assert.equal(memoInputs.formAddressedTo.value, 'ALL SECTION HEADS');
+assert.equal(memoInputs.formDate.value, '2026-11-14');
+assert.equal(memoInputs.formSubject.value, 'Monthly reports');
+memoInputs.formIssuedBy.value = 'Manually confirmed signer';
+vm.runInContext("memoManualFields.add('issuedBy');", memoContext);
+memoContext.applyMemoFields(signedMemo, olderServiceResult);
+assert.equal(memoInputs.formIssuedBy.value, 'Manually confirmed signer');
+
+context.commManualFields.clear();
+context.commOcrValues.clear();
+for (const input of commInputs.values()) input.value = '';
+$('typeSelect').value = 'Incoming';
+context.extractFields(signedMemo, olderServiceResult);
+assert.equal($('memoIssuerInput').value, 'ENGR. ALMA J. DE LA CRUZ');
+assert.equal($('memoRecipientInput').value, 'ALL SECTION HEADS');
+assert.equal($('dateInput').value, '2026-11-14');
+console.log('PASS Both forms recover the printed issuer from full OCR text when older service metadata leaves it blank.');

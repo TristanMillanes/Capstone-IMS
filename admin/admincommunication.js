@@ -319,7 +319,7 @@
  const init = async () => {
   const M = window.PGENRO_Module, $ = id => document.getElementById(id), esc = M.escape;
   const table = 'communications', cacheKey = 'pgenro_communications';
-  let records=[], selected=new Set(), page=1, direction='All', editing=null, file=null, attachment=null, previewUrl=null, busy=false, mode='loading', generation=0, ocrGeneration=0;
+  let records=[], selected=new Set(), page=1, direction='All', editing=null, file=null, attachment=null, busy=false, mode='loading', generation=0, ocrGeneration=0;
   const size=10;
   const fieldInputs={type:'typeSelect',controlNo:'controlNoInput',docType:'docTypeSelect',date:'dateInput',office:'officeInput',subject:'subjectInput',actionTaken:'actionTakenInput',remarks:'remarksInput',status:'statusSelect',ocrText:'ocrTextInput'};
   const aliases={type:['type','communicationType','communication_type','direction','recordType','record_type','commType','comm_type'],controlNo:['controlNo','control_no','control_number'],docType:['docType','documentType','document_type','doc_type'],date:['date','receivedDate','date_received'],office:['office','receivedFrom','received_from','recipient_office'],subject:['subject','particulars'],actionTaken:['actionTaken','action_taken'],remarks:['remarks'],status:['status'],ocrText:['ocrText','ocr_text'],fileName:['fileName','file_name'],fileType:['fileType','file_type'],attachmentId:['attachmentId','attachment_id'],fileUrl:['fileUrl','file_url','attachment_url','driveLink','drive_link']};
@@ -330,7 +330,7 @@
   function newMemoControlNo(){const prefix=`MEMO-${new Date().getFullYear()}-`;const highest=Math.max(0,...(Array.isArray(memoRegistryRows)?memoRegistryRows:[]).map(m=>String(m.memoNo||m.controlNo||'').startsWith(prefix)?Number(String(m.memoNo||m.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
   const commOcrValues=new Map(),commManualFields=new Set();
   const ocrFormIds=new Set([...Object.values(fieldInputs),'memoRecipientInput','memoIssuerInput']);
-  const readerClientId=M.uuid().replace(/[^A-Za-z0-9_-]/g,'');
+  const editorPreview = window.PGENRO_DocumentPreview.create($('filePreviewContainer'));
   let ocrTask=null,pendingRead=null,ocrActive=false,lastOcr=null;
   for(const id of ocrFormIds)$(id).addEventListener('input',()=>{commManualFields.add(id);setFieldState(id,'edited','Your manual edit is kept.');});
   const isMemo=()=>$('docTypeSelect').value==='Memorandum';
@@ -353,160 +353,7 @@
   }
   $('docTypeSelect').addEventListener('change',refreshOcrMapping);
 /* Sender detection reads every page, including signature blocks. */
-function primaryDocumentPages(rawText='') {
- const pages=String(rawText||'').replace(/\r/g,'').split('\f');
- const boundary=pages.findIndex((page,i)=>i&&page.split('\n').map(s=>s.trim()).filter(Boolean).slice(0,6).some(s=>/^(?:ANNEX|APPENDIX|ATTACHMENT|ENCLOSURE)(?:\s+[A-Z0-9IVX.-]+)?\s*[:.â€”-]?$/i.test(s)));
- return boundary<0?pages:pages.slice(0,boundary);
-}
-const correspondenceClosing=/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards|regards|cordially|lubos\s+na\s+gumagalang|sumasainyo|thank\s+you(?:\s+very\s+much)?|for\s+your\s+(?:compliance|information(?:\s+and\s+(?:appropriate\s+action|compliance|guidance))?|guidance(?:\s+and\s+(?:compliance|appropriate\s+action))?))\s*[,.:!]?$/i;
-const correspondenceRole=/\b(?:PGDH|PGENRO|ENRO|OIC|officer|director|chief|mayor|governor|administrator|supervisor|manager|secretary|secretariat|convener|convenor|focal\s+person|head|president|chairperson|chairman|coordinator|principal|teacher|engineer|treasurer|representative|proprietor|owner|student|applicant|dean|professor|specialist|staff|assistant|councilor|registrar|librarian|consultant|aide|clerk|accountant|auditor|analyst|superintendent|rector|pastor|lawyer|pangulo|kalihim|tagapangulo|kagawad|kapitan|punong\s+barangay)\b|^[A-Z]{2,}[#?]?(?:[-/][A-Z]{2,})+$/i;
-const correspondenceLabel=/^(?:signed(?:\s+by)?|signatory|written\s+by|authored\s+by|issued\s+by|notice\s+from|convened\s+by|submitted\s+by|prepared\s+by|approved\s+by|noted\s+by|certified\s+by|recommending\s+approval|respectfully\s+submitted\s+by|name\s+of\s+(?:sender|signatory)|nilagdaan\s+ni|inihanda\s+ni|inaprubahan\s+ni)\s*[:\uff1a-]?\s*(.*)$/i;
-const correspondenceBody=/^(?:DEAR|GREETINGS|SIR|MADAM|MA'AM|TO\s+WHOM|PLEASE|KINDLY|THIS\s+(?:IS|HAS|WILL|REFERS)|WE\s+(?:ARE|WILL|WOULD|REQUEST)|I\s+(?:AM|WOULD)|YOU\s+ARE|THE\s+UNDERSIGNED|IN\s+(?:LIGHT\s+OF|CONNECTION\s+WITH)|PURSUANT\s+TO|FOR\s+YOUR\s+(?:INFORMATION|COMPLIANCE)|SINCERELY|RESPECTFULLY|MAGANDANG\s+(?:ARAW|UMAGA|HAPON)|MAHAL\s+NA|MANGYARING|PAKIUSAP|KAMI\s+(?:AY|PO)|AKO\s+(?:AY|PO)|KAUGNAY|LUBOS\s+NA\s+GUMAGALANG)\b/i;
-const tidyCorrespondence=s=>String(s||'').normalize('NFC').replace(/\s+/g,' ').trim();
-/* Printed sender detection. Kept inside this module to match OCR.py. */
-const senderFields='RECEIVED\\s+FROM|FROM|SENDER|MULA(?:\\s+(?:KAY|SA))?|SENT\\s+BY|ORIGINATOR|ORIGINATED\\s+BY|AUTHOR|AUTHORED\\s+BY|WRITTEN\\s+BY|ISSUED\\s+BY|NOTICE\\s+FROM|CONVENED\\s+BY|TRANSMITTED\\s+BY|ENDORSED\\s+BY|REQUESTED\\s+BY';
-const senderField=new RegExp(`^(?:${senderFields})(?:\\s*[:ï¼š;â€“â€”-]\\s*|[ \\t]+)(.*)$`,'i');
-const senderBare=new RegExp(`^(?:${senderFields})\\s*[:ï¼š;]?$`,'i');
-const senderMark=/^(?:\(\s*(?:s\.?g\.?d\.?|signed|signature)\s*\)|s\.?g\.?d\.?|\/s\/|e[- ]?signed(?:\s+by)?|digitally\s+signed\s+by|signed\s+(?:by|electronically\s+by)|signature\s+(?:over\s+printed\s+name|of)|printed\s+name|pangalan\s+at\s+lagda|nilagdaan\s+ni)\s*[:ï¼š,â€“â€”-]?\s*(.*)$/i;
-const senderContact=/^(?:TEL(?:EPHONE)?|PHONE|CONTACT|MOBILE|FAX|WWW\.|E-?MAIL|PAGE\b|REV\.?\s+NO|DOCUMENT\s+CODE)|@|https?:\/\//i;
-const senderNonName=/\b(?:national|environment|natural|resources|college|school|university|institute|institution|foundation|corporation|company|association|cooperative|agency|committee|secretariat|team|unit|bureau|commission|authority|republic|province|provincial|municipal|regional|district|government|office|department|division|subject|memorandum|notice|meeting|report|document|reference|control|end|signature|remarks|status|dear|thank|please|request|hereby|attached|enclosed|address|telephone|email|contact|mobile|fax|street|road|avenue|barangay|brgy|city|municipality|center|centre|metro|disaster|risk|management|operations|services|council|members|participants|personnel|regards|copy|cc|page|for|to|from|education|health|planning|workshop|agenda|attendance|schedule|venue|date|time|location|activity|program|event|safety|training|session|annual|quarterly|project|inc|ltd|everyone|see|you|all|welcome|regards|regarding|compliance|information|attention)\b/i;
-const senderTitles='Mr|Mrs|Ms|Miss|Dr|Dra|Atty|Attorney|Engr|Engineer|EnP|Hon|Prof|Professor|Rev|Fr|Bro|Sis|Gov|Governor|Mayor|Dir|Director|Capt|Col|Gen|Lt|Major';
-const senderCredentials='Ph\\.?D\\.?|Ed\\.?D\\.?|DPA|DMD|M\\.?D\\.?|MBA|MPA|MAEd|MSc|MA|MS|CPA|RN|LPT|RGC|RMT|RPh|RCE|RME|REE|CESO(?:\\s+[IVX]+)?|EnP|LLB|JD';
-const senderHeaderLabels='SUBJECT(?:\\s+MATTER)?|SUBJ(?:EC[TIL1]|\\.)?|SUB3ECT|RE|REGARDING|PAKSA|ADDRESSED\\s+TO|MEMORANDUM\\s+FOR|RECIPIENT(?:\\s+OFFICE)?|RECEIVED\\s+FROM|SENDER|FROM|MULA(?:\\s+(?:KAY|SA))?|PARA(?:\\s+(?:KAY|SA))?|ISSUED\\s+BY|ISSUING\\s+OFFICE|ORIGINATING\\s+OFFICE|SIGNATORY|DATE\\s+(?:RECEIVED|RELEASED|ISSUED)|(?:RECEIVED|RELEASED)\\s+DATE|DATED|DATE|TO|T0|FOR|PETSA|THROUGH|THRU|CC|ATTACHMENTS?|ENCLOSURES?|(?:DOCUMENT\\s+)?(?:CONTROL|TRACKING)(?:\\s*(?:NO\\.?|NUMBER|#))?|REFERENCE(?:\\s+(?:NO\\.?|NUMBER))?|REF(?:\\.?\\s*(?:NO\\.?|NUMBER))?|DOCUMENT\\s+TYPE|COMMUNICATION\\s+TYPE|DIRECTION|STATUS|ACTION\\s+TAKEN|DATE\\s+FORWARDED|REMARKS';
-const senderHeaderField=new RegExp(`^(${senderHeaderLabels})\\s*(?:[:ï¼š;]|[â€“â€”-])\\s*(.*)$`,'i');
-const senderHeaderBare=new RegExp(`^(?:${senderHeaderLabels})\\s*[:ï¼š;]?\\s*$`,'i');
-const senderMemoHeading=/^(?:[A-Z][A-Z0-9&./-]*\s+){0,6}(?:MEMORANDUM|MEM0RANDUM|MEMO)(?:\s+(?:ORDER|CIRCULAR))?(?:\s+(?:N[O0]\.?|NUMBER|FOR|SERIES)\b.*|\s*[:#.-]?\s*\d.*)?$/i;
-function splitSignatureNameRole(value) {
- const s=tidyCorrespondence(value),paren=s.match(/\s*\(([^()]*)\)\s*$/);
- const labelledRole=s.match(/^([^:ï¼š]{2,65})\s*[:ï¼š]\s*(.+)$/);if(labelledRole&&correspondenceRole.test(labelledRole[1]))return [labelledRole[2].trim(),labelledRole[1].trim()];
- if(paren&&correspondenceRole.test(paren[1]))return [s.slice(0,paren.index).trim(),paren[1].trim()];
- const separators=[...s.matchAll(/\s*[|,]\s*|\s+[-â€“â€”]\s+/g)];
- for(let i=0;i<separators.length;i++){
-  const m=separators[i],end=separators[i+1]?.index??s.length,start=m.index+m[0].length;
-  if(correspondenceRole.test(s.slice(start,end)))return [s.slice(0,m.index).trim(),s.slice(start).trim()];
- }
- const trailingRole=s.match(/\s+(?:(?:Acting|Assistant|Deputy|Municipal|Provincial|City|Regional|District|Division|Department|Administrative|School|General|Executive|Senior|Junior)\s+)*(?:PGDH(?:[-/][A-Z]+)?|PGENRO|ENRO|OIC|Officer|Director|Chief|Manager|Mayor|Governor|President|Secretary|Chairperson|Chairman|Coordinator|Principal|Superintendent|Engineer|Treasurer|Administrator|Clerk|Aide|Registrar|Librarian|Head)\b/i);
- if(trailingRole&&s.slice(0,trailingRole.index).trim().split(/\s+/).length>=2)return [s.slice(0,trailingRole.index).trim(),s.slice(trailingRole.index).trim()];
- return [s,''];
-}
-function senderNameKey(value) {
- return String(value).replace(new RegExp(`^(?:(?:${senderTitles})\\.?\\s+)+`,'i'),'').replace(new RegExp(`,?\\s+(?:${senderCredentials})(?:[,\\s].*)?$`,'i'),'').normalize('NFC').toLocaleLowerCase().replace(/[^\p{L}\p{N}_]/gu,'');
-}
-function senderInkSpacing(value) {
- // Keep readable letters; restore only the boundary before a middle initial.
- return value.replace(/(?<=\p{L})\s*[?*|_~]+\s*(?=[A-Z]\.\s*\p{L})/gu,' ');
-}
-function printedSenderName(value,contextual=false) {
- let s=tidyCorrespondence(value),mark=s.match(senderMark);if(mark)s=mark[1];
- s=s.replace(/^by\s*:\s*/i,'').replace(/^[|:_\-\s"â€œâ€]+|[|:_\-\s"â€œâ€]+$/g,'');
- [s]=splitSignatureNameRole(s);const inkCleanup=contextual&&senderInkSpacing(s)!==s;if(contextual)s=senderInkSpacing(s);s=s.replace(new RegExp(`^(${senderTitles})\\.(?=\\p{L})`,'iu'),'$1. ');
- if(s.length<4||s.length>120||/[\d@:/;!?()]/.test(s)||correspondenceBody.test(s)||correspondenceClosing.test(s))return '';
- let base=s.replace(new RegExp(`^(?:(?:${senderTitles})\\.?\\s+)+`,'i'),'').replace(new RegExp(`,?\\s+(?:${senderCredentials})(?:[,\\s].*)?$`,'i'),'');
- if(senderNonName.test(base)||correspondenceRole.test(base))return '';
- const words=base.replace(/,/g,' ').trim().split(/\s+/),particles=new Set(['de','del','dela','la','las','los','da','dos','di','du','van','von','bin','al','y','san','santa']),suffixes=new Set(['jr','sr','ii','iii','iv','v']);
- if(words.length<2||words.length>9)return '';
- const particle=w=>particles.has(w.toLocaleLowerCase().replace(/\./g,''))||suffixes.has(w.toLocaleLowerCase().replace(/\./g,''));
- // Mixed lowercase debris is not a reliable printed name. Keep uniformly lowercase labeled names.
- if((!contextual||inkCleanup||base!==base.toLocaleLowerCase())&&words.some(w=>!particle(w)&&!/^\p{Lu}/u.test(w)))return '';
- const lengths=words.map(w=>(w.match(/\p{L}/gu)||[]).length),substantive=words.map((w,i)=>particle(w)?-1:i).filter(i=>i>=0);
- const initials=substantive.length&&lengths[substantive.at(-1)]>1&&substantive.slice(0,-1).every(i=>lengths[i]===1);
- if(substantive.length<2||(substantive.filter(i=>lengths[i]>1).length<2&&!initials)||words.some(w=>!/^[\p{L}.'â€™-]+$/u.test(w)))return '';
- return s.replace(/\.{2,}/g,'.').replace(/(?<=\s)([A-Z])(?=\s)/g,'$1.');
-}
-function senderEntries(rawText) {
- rawText=String(rawText||'').replace(/^((?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)(?:\s+(?:yours|submitted))?|yours\s+(?:truly|faithfully|sincerely|respectfully)|best\s+regards|kind\s+regards|lubos\s+na\s+gumagalang))[,.:][ \t]+(?=\p{L})/gimu,'$1,\n');
- const entries=[];let excluded=false;
- for(const [p,page] of primaryDocumentPages(rawText).entries()){
-  page.split('\n').forEach((raw,line)=>{
-   raw=raw.replace(new RegExp(`[ \\t]{2,}(?=(?:${senderHeaderLabels}|${senderFields})\\s*[:ï¼š;])`,'gi'),'\n');
-   for(const cell of raw.split('\n')){
-    if(/^\s*(?:CC\s*:|COPY\s+(?:TO|FURNISHED)|ANNEX\b|APPENDIX\b|ATTACHMENTS?\s*:|ENCLOSURES?\s*:)/i.test(cell))excluded=true;
-    const text=tidyCorrespondence(cell);if(text)entries.push({text,raw:cell.trim(),page:p+1,line:line+1,excluded});
-   }
-  });
- }
- return entries;
-}
-function senderBodyLine(value) {
- if(correspondenceClosing.test(value)||senderHeaderField.test(value)||senderHeaderBare.test(value)||correspondenceLabel.test(value)||senderMark.test(value))return false;
- if(correspondenceBody.test(value))return true;
- const words=value.split(/\s+/);return Boolean(((words.length>=6&&/[.!?]$/.test(value))||words.length>=10)&&/\p{Ll}/u.test(value)&&!correspondenceRole.test(value));
-}
-function scanPrintedSignatories(rawText='',signatureRegion=false) {
- const entries=senderEntries(rawText),candidates=[],consumed=new Set();
- const firstBody=entries.findIndex(e=>senderBodyLine(e.text)),greeting=entries.findIndex(e=>/^DEAR\b|^(?:SIR|MADAM|MA.AM)\s*[:,]/i.test(e.text));
- const compact=entries.length>0&&entries.length<=6&&!entries.some(e=>senderHeaderField.test(e.text)||senderHeaderBare.test(e.text)||correspondenceBody.test(e.text)||parseMemoDate(e.text));
- function roleAt(index,step,page){
-  const parts=[];
-  for(let j=index;step>0?j<index+step*3:j>index+step*3;j+=step){
-   if(j<0||j>=entries.length)break;
-   const e=entries[j],s=e.text;
-   if(e.page!==page||e.excluded||senderHeaderField.test(s)||senderHeaderBare.test(s)||correspondenceLabel.test(s)||senderMark.test(s)||correspondenceBody.test(s)||correspondenceClosing.test(s)||printedSenderName(s)||senderContact.test(s))break;
-   if(s.length>120||s.split(/\s+/).length>18||/\d{3}/.test(s)||(s.split(/\s+/).length>7&&/[.!?]$/.test(s)))break;
-   if(step>0)parts.push(s);else parts.unshift(s);if(correspondenceRole.test(parts.join(' ')))return parts.join(' ');
-  }
-  return '';
- }
- function add(name,role,entry,score,kind,evidence,inkCleanup=false){
-  const candidate={name,role,page:entry.page,line:entry.line,score,kind,evidence,inkCleanup,confidence:inkCleanup?'low':score>=100?'high':'medium'},key=senderNameKey(name),prior=candidates.find(c=>senderNameKey(c.name)===key);
-  if(!prior)candidates.push(candidate);else if(score>prior.score)Object.assign(prior,candidate);
- }
- for(let i=0;i<entries.length;i++){
-  const entry=entries[i];if(entry.excluded||consumed.has(i))continue;
-  const s=entry.text,field=entry.raw.match(senderField),bare=senderBare.test(s),label=s.match(correspondenceLabel),mark=s.match(senderMark);
-  const explicit=Boolean((field||bare)&&(firstBody<0||i<firstBody||/^(?:AUTHOR|AUTHORED|WRITTEN|ISSUED|NOTICE|CONVENED)\b/i.test(s)));
-  let anchor=null;
-  for(let j=i-1;j>Math.max(-1,i-7);j--){
-   const previous=entries[j];if(previous.page!==entry.page||previous.excluded)break;
-   if(correspondenceClosing.test(previous.text)||correspondenceLabel.test(previous.text)||senderMark.test(previous.text)){anchor=previous;break;}
-   if(printedSenderName(previous.text)||senderHeaderField.test(previous.text)||correspondenceBody.test(previous.text)||previous.text.split(/\s+/).length>18)break;
-  }
-  const context=Boolean(explicit||label||mark||anchor);let rawName=explicit?(field?.[1]||''):label?label[1]:mark?mark[1]:entry.raw,index=i;
-  if((explicit||label||mark)&&!rawName){index=i+1;if(index>=entries.length||entries[index].page!==entry.page||entries[index].excluded||senderHeaderField.test(entries[index].text)||correspondenceLabel.test(entries[index].text))continue;rawName=entries[index].text;}
-  if(explicit&&!printedSenderName(rawName,true)){
-   for(let probe=index+1;probe<Math.min(entries.length,index+5);probe++){
-    const e=entries[probe];if(e.page!==entry.page||e.excluded||senderHeaderField.test(e.text)||senderHeaderBare.test(e.text)||correspondenceBody.test(e.text)||correspondenceClosing.test(e.text)||correspondenceLabel.test(e.text))break;
-    if(printedSenderName(e.text,true)){index=probe;rawName=e.text;break;}
-   }
-  }
-  const columns=rawName.split(/[ \t]{2,}|\s+\|\s+/),columnNames=columns.map(part=>printedSenderName(part,context||signatureRegion||(firstBody>=0&&index>firstBody)));
-  if(columns.length>1&&columnNames.every(Boolean)&&(context||signatureRegion||(firstBody>=0&&index>firstBody))){columnNames.forEach((columnName,column)=>add(columnName,'',entries[index],explicit?130:anchor?110:78,explicit?'explicit-sender':'footer-name',s,senderInkSpacing(columns[column])!==columns[column]));if(index!==i)consumed.add(index);continue;}
-  const [inlineName,inlineRole]=splitSignatureNameRole(rawName),nearbyRole=inlineRole||roleAt(index+1,1,entry.page)||roleAt(index-1,-1,entry.page);
-  let name=printedSenderName(rawName,context||Boolean(nearbyRole)||signatureRegion),nextIndex=index+1;
-  if(nextIndex<entries.length&&entries[nextIndex].page===entry.page&&!entries[nextIndex].excluded){
-   const surname=entries[nextIndex],shortSurname=surname.text.split(/\s+/).length===1||/^(?:DE|DEL|DELA|VAN|VON)\s+\S+$/i.test(surname.text);
-   if(shortSurname&&!correspondenceRole.test(surname.text)&&!senderHeaderField.test(surname.text)&&!correspondenceLabel.test(surname.text)&&inlineName.split(/\s+/).length<=3&&roleAt(nextIndex+1,1,entry.page)){
-    const joined=printedSenderName(inlineName+' '+surname.text,context);if(joined){name=joined;nextIndex++;consumed.add(index+1);}
-   }
-  }
-  if(!name)continue;
-  const role=inlineRole||roleAt(nextIndex,1,entry.page)||roleAt(index-1,-1,entry.page);
-  if(!context){
-   if((greeting>=0&&index<greeting)||(firstBody>=0&&index<firstBody))continue;
-   const laterHeader=entries.slice(nextIndex,nextIndex+8).some(e=>!e.excluded&&e.page===entry.page&&(senderHeaderField.test(e.text)||senderHeaderBare.test(e.text)||senderMemoHeading.test(e.text)||/^NOTICE\s+OF\s+MEETING\b/i.test(e.text)||parseMemoDate(e.text)));
-   if(firstBody<0&&laterHeader)continue;
-   const previousField=entries.slice(0,index).reverse().find(e=>e.page===entry.page&&(senderHeaderField.test(e.text)||senderHeaderBare.test(e.text))),fieldIndex=entries.indexOf(previousField);
-   if(previousField&&/^(?:TO|T0|FOR|PARA|RECIPIENT|ADDRESSED|SUBJECT|SUBJ|PAKSA|THRU|THROUGH|ATTN|ATTENTION)\b/i.test(previousField.text)&&index-fieldIndex<=8&&!entries.slice(fieldIndex+1,index).some(e=>correspondenceBody.test(e.text)||e.text.split(/\s+/).length>6||(/[.!?]$/.test(e.text)&&!printedSenderName(e.text)))&&entry.line-previousField.line<=index-fieldIndex)continue;
-  }
-  const meaningfulAfter=entries.slice(nextIndex).filter(e=>!e.excluded&&!senderContact.test(e.text)&&!/^[-_=\s]+$/.test(e.text)),contentBefore=(firstBody>=0&&index>firstBody)||entries.slice(0,index).some(e=>senderHeaderField.test(e.text)||senderHeaderBare.test(e.text));
-  let score,kind;
-  if(explicit){score=130;kind='explicit-sender';}
-  else if(label||(mark&&mark[1])||(anchor&&senderMark.test(anchor.text))){score=120;kind='signature';}
-  else if(anchor){score=110;kind='signature';}
-  else if(role&&(contentBefore||signatureRegion||compact)){score=90;kind='signature';}
-  else if((!meaningfulAfter.length||meaningfulAfter.every(e=>printedSenderName(e.text)))&&(contentBefore||signatureRegion||compact)&&!role){score=78;kind='footer-name';}
-  else continue;
-  const markerText=label?s:anchor?.text||'';
-  if(/^(?:prepared|submitted|respectfully\s+submitted|inihanda)\b/i.test(markerText)){score=85;kind='prepared-by';}
-  else if(/^(?:noted|certified|recommending)\b/i.test(markerText)){score=55;kind='supporting';}
-  else if(/^(?:approved|inaprubahan)\b/i.test(markerText)){score=65;kind='approval';}
-  const inkCleanup=senderInkSpacing(inlineName)!==inlineName,proof=[...new Set([explicit||label||mark?s:anchor?.text||'',inkCleanup?inlineName:name,role].filter(Boolean))].join('\n');
-  add(name,role,entries[index],score,kind,proof,inkCleanup);if(index!==i)consumed.add(index);
- }
- candidates.sort((a,b)=>b.score-a.score||a.page-b.page||a.line-b.line);
- const eligible=candidates.filter(c=>c.kind!=='supporting'),primary=eligible.filter(c=>eligible[0].score-c.score<10),selected=primary.length===1?primary[0]:null;
- return {entries,candidates,primary,selected,signatory:selected};
-}
+const {scanPrintedSignatories, printedSenderName, senderNameKey, letterRecipient} = window.PGENRO_OcrFields;
 function parseCorrespondence(rawText='',signatureRegion=false,header=parseDocumentHeader(rawText)) {
  const scan=scanPrintedSignatories(rawText,signatureRegion);
  const signatures=scan.candidates.filter(candidate=>candidate.kind==='signature');
@@ -517,25 +364,10 @@ function parseCorrespondence(rawText='',signatureRegion=false,header=parseDocume
  if(selected?.inkCleanup)reasons.push('Signature ink affected the spacing of the printed name. Confirm the name against the document.');
  if(selected&&source==='explicit-sender'&&scan.candidates.some(c=>c.kind==='signature'&&senderNameKey(c.name)!==senderNameKey(received))){review=true;reasons.push('The sender field and a printed signatory name differ. Confirm the originating person.');}
  if(source==='ambiguous')reasons.push('Several possible senders were found. Choose the originating person.');
- else if(!received)reasons.push('No readable sender name was identified. A signature alone cannot establish a personâ€™s name.');
+ else if(!received)reasons.push('No readable sender name was identified. A signature alone cannot establish a person’s name.');
  else if(source==='footer-name')reasons.push('An unlabeled printed name was found. Confirm that this person sent the document.');
  else if(['prepared-by','approval'].includes(source))reasons.push(`A ${source==='prepared-by'?'preparer':'approver'} was found. Confirm the originating person.`);
- let recipient=header.addressedTo;
- if(!recipient&&!header.isMemo&&!header.fieldEvidence.recipient){
-  const lines=String(rawText).split('\f')[0].split('\n').map(tidyCorrespondence),greeting=lines.findIndex(line=>/^Dear\b|^(?:Sir|Madam|Ma.am)\s*[:,]/i.test(line));
-  if(greeting>=0){
-   const block=[];
-   for(const line of lines.slice(Math.max(0,greeting-10),greeting).reverse()){
-    if(!line){if(block.length)break;continue;}
-    if(senderHeaderField.test(line)||senderHeaderBare.test(line)||parseMemoDate(line))break;
-    block.unshift(line);
-   }
-   const start=block.findIndex(line=>printedSenderName(line));
-   if(start>=0&&block.slice(start+1).some(line=>correspondenceRole.test(line)||/\b(?:OFFICE|DEPARTMENT|DIVISION|UNIVERSITY|COLLEGE|SCHOOL)\b/i.test(line))){
-    recipient=block.slice(start).join(' ');
-   }
-  }
- }
+ const recipient=header.addressedTo||(!header.isMemo&&!header.fieldEvidence.recipient?letterRecipient(rawText):'');
  const signatory=ambiguousSignature?null:signatures[0]||selected;
  const explicit=header.receivedFromLabel;
  const hasSenderLabel=Boolean(header.fieldEvidence.receivedFromLabel);
@@ -558,15 +390,7 @@ function parseMemoDate(value) {
  return window.PGENRO_OcrFields.parseDate(value);
 }
 function parseDocumentHeader(rawText='') {
- return window.PGENRO_OcrFields.parseHeader(rawText, printedHeaderSignatory);
-}
-function printedHeaderSignatory(rawText='') {
- const scan=scanPrintedSignatories(rawText);
- const signatures=scan.candidates.filter(candidate=>candidate.kind==='signature');
- if(signatures.length>1)return {name:'',needsReview:true};
- const signatory=signatures[0]||scan.selected;
- const needsReview=Boolean(signatory&&(signatory.inkCleanup||signatory.score<90));
- return signatory?{...signatory,needsReview}:{name:'',needsReview:scan.primary.length>1};
+ return window.PGENRO_OcrFields.parseHeader(rawText);
 }
 /* End memo document parser. */
 
@@ -705,7 +529,6 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    if(!M.storage.set(cacheKey,next))throw new Error('Browser storage is full or unavailable. The record was not saved.');records=next;return saved;
   }
   function newControlNo() {const prefix=`COMM-${new Date().getFullYear()}-`;const highest=Math.max(0,...records.map(r=>String(r.controlNo||'').startsWith(prefix)?Number(String(r.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
-  function releasePreview() {if(previewUrl){URL.revokeObjectURL(previewUrl);previewUrl=null;}}
   function clearAutoDetectedFields() {
    for(const[id,value]of commOcrValues)if($(id).value===value&&!commManualFields.has(id))$(id).value='';
    commOcrValues.clear();lastOcr=null;
@@ -719,24 +542,10 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
   function resetFile(remove=false) {
    ocrGeneration++;pendingRead=null;cancelDocumentRead('removed');file=null;attachment=null;
    if(remove){remoteAttachmentRemoved=true;clearAutoDetectedFields();}
-   $('documentFileInput').value='';releasePreview();$('fileNameDisplay').textContent='Choose a document';$('fileMetaDisplay').textContent='PDF, images, Word, Excel, PowerPoint or text \xb7 Max 50 MB';
-   $('removeDocumentBtn').style.display='none';$('runOcrBtn').disabled=true;$('filePreviewContainer').style.display='none';$('filePreviewBody').replaceChildren();
+   $('documentFileInput').value='';editorPreview.clear();$('fileNameDisplay').textContent='Choose a document';$('fileMetaDisplay').textContent='PDF, images, Word, Excel, PowerPoint or text · Max 50 MB';
+   $('removeDocumentBtn').hidden=true;$('runOcrBtn').disabled=true;
    setReaderState('idle','Ready for a document');$('ocrActionSubtext').textContent='Reading starts automatically when you select a file.';
-   $('encodingUploadProgressBox').classList.remove('active');$('ocrStopControls').hidden=true;
-  }
-  function setPreview(blob) {
-   releasePreview();previewUrl=URL.createObjectURL(blob);const root=$('filePreviewBody');root.replaceChildren();let node;
-   root.classList.toggle('is-text-document',!blob.type.startsWith('image/')&&!(blob.type==='application/pdf'||/\.pdf$/i.test(blob.name||'')));
-   if(blob.type.startsWith('image/')){node=document.createElement('img');node.alt='Attached document preview';node.src=previewUrl;}
-   else if(blob.type==='application/pdf'||/\.pdf$/i.test(blob.name||'')){
-    node=document.createElement('div');node.className='communication-pdf-preview-card';
-    const label=document.createElement('p');label.textContent='PDF attachment ready for preview.';
-    const button=document.createElement('button');button.type='button';button.className='btn btn-secondary';button.id='previewSelectedDocumentBtn';button.textContent='Preview document';
-    button.addEventListener('click',()=>viewFile({previewBlob:blob,fileName:blob.name||'Communication.pdf',fileType:blob.type,controlNo:$('controlNoInput').value,subject:$('subjectInput').value},true));
-    node.append(label,button);
-   }
-   else {node=document.createElement('p');node.textContent='Document attached. Readable text appears below after extraction.';}
-   root.append(node);$('filePreviewContainer').style.display='block';$('previewOpenExternalBtn').href=previewUrl;$('previewOpenExternalBtn').style.display='inline-flex';
+   $('encodingUploadProgressBox').hidden=true;$('ocrStopControls').hidden=true;
   }
   async function openEditor(id=null) {
    if(busy)return;pendingRead=null;cancelDocumentRead('closed');routeCommitted=false;remoteAttachmentRemoved=false;commOcrValues.clear();commManualFields.clear();$('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcr=null;
@@ -744,6 +553,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=false;
    $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=false;
    editing=id;$('communicationForm').reset();resetFile();$('editIndex').value=id||'';$('modalTitle').textContent=id?'Edit Communication Record':'New Communication Record';$('saveRecordBtn').querySelector('span').textContent=id?'Save Changes':'Save Record';
+   const draftVersion = ocrGeneration;
    const docTypeSelect=$('docTypeSelect');
    docTypeSelect.querySelectorAll('option[data-existing-type]').forEach(option=>option.remove());
    const r=records.find(r=>String(r.id)===String(id));if(r){
@@ -754,9 +564,8 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     for(const[key,input]of Object.entries(fieldInputs))$(input).value=r[key]||'';
     attachment=r.attachmentId||r.fileUrl?{id:r.attachmentId||null,name:r.fileName,type:r.fileType}:null;
     if(attachment){
-     $('fileNameDisplay').textContent=attachment.name||'Existing attachment';$('fileMetaDisplay').textContent='Previously attached file';$('removeDocumentBtn').style.display='inline-flex';
-     const root=$('filePreviewBody');root.classList.add('is-text-document');const button=document.createElement('button');button.type='button';button.className='btn btn-secondary';button.textContent='View existing document';button.addEventListener('click',()=>viewFile(r,true));root.replaceChildren(button);$('filePreviewContainer').style.display='block';
-     const remote=safeCommunicationAttachment(r.fileUrl);$('previewOpenExternalBtn').style.display=remote?'inline-flex':'none';if(remote)$('previewOpenExternalBtn').href=remote;
+     $('fileNameDisplay').textContent=attachment.name||'Existing attachment';$('fileMetaDisplay').textContent='Previously attached file';$('removeDocumentBtn').hidden=false;
+     $('ocrActionSubtext').textContent='Choose a new file to replace the attachment and read its fields.';
     }
    }
    else {$('dateInput').value=M.today();$('controlNoInput').value=newControlNo();$('typeSelect').value='Incoming';$('statusSelect').value='Pending';}
@@ -764,19 +573,34 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    const pending=M.storage.get(routeJournalKey,{})[`communication:${id}`];
    if(id&&pending&&M.client()&&window.PGENRO_API.adminCan('office_memos'))try{
     const saved=(await M.read('office_memos')).find(m=>String(m.id)===pending.id);
-    if(saved&&String(editing)===String(id)){
+    if(saved&&draftVersion===ocrGeneration){
      routeCommitted=true;$('docTypeSelect').value='Memorandum';$('controlNoInput').value=saved.memoNo||'';$('memoRecipientInput').value=saved.addressedTo||'';$('memoIssuerInput').value=saved.issuedBy||'';$('subjectInput').value=saved.subject||'';
      for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=true;
      $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=$('runOcrBtn').disabled=true;
      M.toast('This memo is already saved in Office Memos. Finish Move will remove the original communication.','warning');
     }
    }catch{}
-   updateDestination();syncOcrControls();M.openModal('encodingModal');
+   if(draftVersion!==ocrGeneration)return;
+   updateDestination();syncOcrControls();if(M.openModal('encodingModal')===false)return;
+   $('encodingModalBody').scrollTop=0;
+   if(attachment&&r)void editorPreview.show({
+    name:attachment.name||'Existing attachment',text:r.ocrText,
+    loadFile:async signal=>readCommunicationPreviewBlob(await communicationAttachmentSource(r),signal),
+   });
   }
   // IndexedDB retains large attachments without exhausting localStorage.
   let dbPromise;
   function attachmentDB(){if(!dbPromise)dbPromise=new Promise((resolve,reject)=>{const req=indexedDB.open('pgenro_communication_attachments',1);req.onupgradeneeded=()=>req.result.createObjectStore('files');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(new Error('Attachment storage is unavailable.'));});return dbPromise;}
   async function attachmentIO(action,id,value){const db=await attachmentDB();return new Promise((resolve,reject)=>{const tx=db.transaction('files',action==='get'?'readonly':'readwrite');const req=action==='put'?tx.objectStore('files').put(value,id):action==='delete'?tx.objectStore('files').delete(id):tx.objectStore('files').get(id);let result;req.onsuccess=()=>result=req.result;tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(new Error('Could not store the attachment. Browser storage may be full.'));tx.onabort=()=>reject(new Error('Attachment storage was interrupted.'));});}
+  async function communicationAttachmentSource(record) {
+   const remote=safeCommunicationAttachment(record.fileUrl);
+   if(record.attachmentId){
+    try{const local=await attachmentIO('get',record.attachmentId);if(local)return local;}
+    catch(error){if(!remote)throw error;}
+   }
+   if(remote)return remote;
+   throw new Error('This attachment is available in the browser where it was uploaded. Reattach the original file to replace it.');
+  }
   function selectDocument(chosen) {
    if(!chosen||busy||routeCommitted)return;if(chosen.size>50*1024*1024){M.toast('Choose a file no larger than 50 MB.','warning');$('documentFileInput').value='';return;}
    if(!chosen.size){M.toast('This file is empty. Choose another document.','warning');$('documentFileInput').value='';return;}
@@ -784,14 +608,17 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    ocrGeneration++;cancelDocumentRead('replaced');clearAutoDetectedFields();
    $('communicationInlineNotice').hidden=true;
    file=chosen;attachment=null;$('fileNameDisplay').textContent=chosen.name;$('fileMetaDisplay').textContent=`${(chosen.size/1024/1024).toFixed(2)} MB \xb7 ${chosen.name.split('.').pop().toUpperCase()}`;
-   $('removeDocumentBtn').style.display='inline-flex';setPreview(chosen);scheduleDocumentRead();
+   $('documentFileInput').value='';$('removeDocumentBtn').hidden=false;
+   void editorPreview.show({name:chosen.name,file:chosen,pending:true});
+   scheduleDocumentRead();
   }
   $('documentFileInput').addEventListener('change',()=>selectDocument($('documentFileInput').files[0]));
   const dropZone=$('communicationDropZone');
   dropZone.addEventListener('dragover',event=>{event.preventDefault();if(!busy&&!routeCommitted)dropZone.classList.add('is-dragging');});
   dropZone.addEventListener('dragleave',event=>{if(!dropZone.contains(event.relatedTarget))dropZone.classList.remove('is-dragging');});
   dropZone.addEventListener('drop',event=>{event.preventDefault();dropZone.classList.remove('is-dragging');if(event.dataTransfer.files.length!==1){M.toast('Choose one document at a time.','warning');return;}selectDocument(event.dataTransfer.files[0]);});
-  $('browseDocumentBtn').addEventListener('click',()=>$('documentFileInput').click());$('removeDocumentBtn').addEventListener('click',()=>resetFile(true));
+  $('browseDocumentBtn').addEventListener('click',()=>$('documentFileInput').click());
+  $('removeDocumentBtn').addEventListener('click',()=>{resetFile(true);$('browseDocumentBtn').focus({preventScroll:true});});
   $('communicationForm').addEventListener('submit',async e=>{
    e.preventDefault();if(busy)return;
    if(ocrActive||pendingRead){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
@@ -831,7 +658,6 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
   const commPdfPrevPage=$('commPdfPrevPage'),commPdfNextPage=$('commPdfNextPage'),commPdfPageLabel=$('commPdfPageLabel');
   const commPdfZoom=$('commPdfZoom'),commPdfRenderStatus=$('commPdfRenderStatus');
   const communicationAttachmentImage=$('docViewerImage'),communicationAttachmentText=$('docViewerText');
-  let returnToEncoding=false;
   function safeCommunicationAttachment(value){
     const raw=String(value||'').trim();if(!raw)return '';
     if(/^data:(?:application\/(?:pdf|vnd\.openxmlformats-officedocument\.(?:wordprocessingml\.document|spreadsheetml\.sheet|presentationml\.presentation)|octet-stream)|image\/(?:png|jpeg|webp|bmp|tiff)|text\/(?:plain|csv))(?:;[^,]*)?,/i.test(raw))return raw;
@@ -840,16 +666,6 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
   // Render pages ourselves: Chrome's native PDF plugin cannot run in a sandboxed iframe.
   const commPreview = {generation:0,renderVersion:0,renderPromise:Promise.resolve(),renderTask:null,
     pdfTask:null,pdf:null,abort:null,blobUrl:'',page:1,resizeTimer:null};
-  let communicationPdfLibraryPromise = null;
-  function loadCommunicationPdfLibrary(){
-    if(!communicationPdfLibraryPromise){
-      communicationPdfLibraryPromise=import('../vendor/pdfjs/pdf.min.mjs').then(lib=>{
-        lib.GlobalWorkerOptions.workerSrc=new URL('../vendor/pdfjs/pdf.worker.min.mjs',location.href).href;
-        return lib;
-      }).catch(error=>{communicationPdfLibraryPromise=null;throw error;});
-    }
-    return communicationPdfLibraryPromise;
-  }
   function communicationPreviewIsCurrent(generation){
     return generation===commPreview.generation&&viewDocumentModal.classList.contains('open');
   }
@@ -958,7 +774,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
       commPreview.blobUrl=URL.createObjectURL(blob);
       setCommunicationAttachmentLinks(commPreview.blobUrl,filename);
       if(isPdf){
-        const lib=await communicationPreviewTimeout(loadCommunicationPdfLibrary(),15000,'The PDF renderer is unavailable.');
+        const lib=await communicationPreviewTimeout(window.PGENRO_DocumentPreview.loadPdfLibrary(),15000,'The PDF renderer is unavailable.');
         if(!communicationPreviewIsCurrent(generation))return;
         const task=lib.getDocument({data:bytes,isEvalSupported:false,cMapUrl:new URL('../vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('../vendor/pdfjs/standard_fonts/',location.href).href});commPreview.pdfTask=task;
         const pdf=await communicationPreviewTimeout(task.promise,20000,'The PDF took too long to open.');
@@ -997,12 +813,12 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
       showCommunicationPreviewState('Preview unavailable',message,'error');
     }finally{if(commPreview.abort===controller)commPreview.abort=null;}
   }
-  async function viewFile(r,fromEditor=false){
+  async function viewFile(r){
     if(busy||!M.canStartAction())return;
     const remote=safeCommunicationAttachment(r.fileUrl);
-    if(r.fileUrl&&!remote&&!r.previewBlob&&!r.attachmentId){M.toast('The attachment address or file type is invalid.','error');return;}
-    cleanupCommunicationViewer();returnToEncoding=fromEditor;
-    const filename=String(r.fileName||r.previewBlob?.name||'document').replace(/[\\/\u0000-\u001f\u007f]/g,'_');
+    if(r.fileUrl&&!remote&&!r.attachmentId){M.toast('The attachment address or file type is invalid.','error');return;}
+    cleanupCommunicationViewer();
+    const filename=String(r.fileName||'document').replace(/[\\/\u0000-\u001f\u007f]/g,'_');
     $('docViewerTitle').textContent=r.controlNo?`Communication ${r.controlNo}`:'Document Viewer';
     $('docViewerSubtitle').textContent=[r.subject,filename].filter(Boolean).join(' \xb7 ');
     showCommunicationPreviewState('Loading attachment\u2026','Preparing the document preview.');
@@ -1010,23 +826,15 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     const version=commPreview.generation;
     if(remote&&/^(?:https?:|blob:)/i.test(remote))setCommunicationAttachmentLinks(remote,filename);
     try{
-      let source=r.previewBlob||null;
-      if(!source&&r.attachmentId){
-        try{source=await attachmentIO('get',r.attachmentId);}catch(error){if(!remote)throw error;}
-      }
+      const source=await communicationAttachmentSource(r);
       if(!communicationPreviewIsCurrent(version))return;
-      source=source||remote;
-      if(!source)throw new Error('This attachment is stored in the browser where it was uploaded. Open it there, or reattach the original file.');
       M.audit('RETRIEVE_DOCUMENT',r.controlNo||filename);
       void loadCommunicationPreview(source,filename,version);
     }catch(error){
       if(communicationPreviewIsCurrent(version))showCommunicationPreviewState('Attachment unavailable',error.message||'Reattach the original document to view it.','error');
     }
   }
-  viewDocumentModal.addEventListener('pgenro:modal-close',()=>{
-    cleanupCommunicationViewer();
-    if(returnToEncoding){returnToEncoding=false;M.openModal('encodingModal');}
-  });
+  viewDocumentModal.addEventListener('pgenro:modal-close',cleanupCommunicationViewer);
   $('dismissDocViewerBtn').addEventListener('click',()=>M.closeModal('viewDocumentModal'));
   commPdfPrevPage.addEventListener('click',()=>{if(commPreview.pdf&&commPreview.page>1){commPreview.page--;renderCommunicationPdfPage();}});
   commPdfNextPage.addEventListener('click',()=>{if(commPreview.pdf&&commPreview.page<commPreview.pdf.numPages){commPreview.page++;renderCommunicationPdfPage();}});
@@ -1079,7 +887,12 @@ function pdfTextLines(items){
  return lines.join('\n');
 }
 function supplementSenderEvidence(base,extra,signatureRegion=false){
- base=String(base||'');const existing=parseCorrespondence(base);
+ base=String(base||'');
+ const header=parseDocumentHeader(base),existing=parseCorrespondence(base,false,header);
+ if(header.isMemo&&!['printed-issuer','printed-origin-person','printed-signatory'].includes(header.issuedBySource)){
+  const reader=window.PGENRO_OcrFields,current=reader.findPrintedSignatory(base);
+  if(!current.ambiguous)return reader.appendSignatureEvidence(base,reader.findPrintedSignatory(extra,signatureRegion));
+ }
  if(existing.signatory||existing.receivedFromSource==='ambiguous')return base;
  const candidates=scanPrintedSignatories(extra,signatureRegion).primary,evidence=candidates.map(c=>c.evidence).join('\n\n');
  if(!evidence)return base;
@@ -1095,15 +908,9 @@ function choosePdfPageText(native,scanned,preferNative=false){
 
 const readerResults=new WeakMap();
 const readerRuntime={worker:null,promise:null,logger:null,idle:null,operation:null,owner:null,workerToken:null,stopping:null};
-function notifyReaderCancel(op){
- if(!op?.requestId||!op.endpoint)return;
- if(op.notifiedRequest===op.requestId)return;op.notifiedRequest=op.requestId;
- const url=new URL(op.endpoint,location.href);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/cancel');
- fetch(url.href,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({requestId:op.requestId}),keepalive:true}).catch(()=>{});
-}
 function cancelDocumentRead(reason='stopped'){
  const op=readerRuntime.operation;if(!op)return;
- if(op.cancelled)return;op.cancelled=true;op.reason=reason;op.controller?.abort();notifyReaderCancel(op);
+ if(op.cancelled)return;op.cancelled=true;op.reason=reason;op.controller?.abort();window.PGENRO_AdminOcrService.cancel(op);
  op.reject?.(new Error('Reading stopped. Your draft is kept; you can retry.'));
  stopReaderWorker(op);
 }
@@ -1112,7 +919,7 @@ async function readWithCancellation(source,progress,stillCurrent=()=>true){
  if(!stillCurrent())throw Error('Reading stopped. Your draft is kept; you can retry.');
  const op={cancelled:false,controller:null,requestId:null,endpoint:null,reject:null,notifiedRequest:null};readerRuntime.operation=op;
  const stopped=new Promise((_,reject)=>op.reject=reject);
- const deadline=setTimeout(()=>{op.cancelled=true;op.reason='timeout';op.controller?.abort();notifyReaderCancel(op);stopReaderWorker(op);op.reject?.(new Error('Reading reached the time limit. Your draft is kept; retry or choose a smaller document.'));},180000);
+ const deadline=setTimeout(()=>{op.cancelled=true;op.reason='timeout';op.controller?.abort();window.PGENRO_AdminOcrService.cancel(op);stopReaderWorker(op);op.reject?.(new Error('Reading reached the time limit. Your draft is kept; retry or choose a smaller document.'));},180000);
  try{return await Promise.race([extractDocument(source,progress,op),stopped]);}
  finally{clearTimeout(deadline);if(readerRuntime.operation===op)readerRuntime.operation=null;}
 }
@@ -1131,62 +938,15 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
  const started=performance.now(),previous=readerResults.get(source);
  if(previous){progress('Using the document already read\u2026',98);return {...previous,cacheHit:true,durationMs:Math.round(performance.now()-started)};}
  const remember=result=>{checkRead();const finished={...result,durationMs:Math.round(performance.now()-started)};readerResults.set(source,finished);return finished;};
- const extension=source.name.split('.').pop().toLowerCase();
- const warnings=[],configuredEndpoint=document.querySelector('meta[name="pgenro-ocr-endpoint"]')?.content?.trim();
- const endpoints=configuredEndpoint?[configuredEndpoint]:[];
- // Local static previews can use the supplied Python server without editing HTML.
- if((['localhost','127.0.0.1','[::1]'].includes(location.hostname)||location.protocol==='file:')&&location.port!=='5000')endpoints.push('http://127.0.0.1:5000/ocr');
- for(const address of [...new Set(endpoints)]){
-  const endpoint=new URL(address,location.href).href,sameOrigin=new URL(endpoint).origin===location.origin;
-  let health=null;
-  {
-   const probe=new AbortController(),probeTimer=setTimeout(()=>probe.abort(),3500);if(operation)operation.controller=probe;
-   try{const url=new URL(endpoint);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/health');progress('Connecting to the document reader\u2026',3);
-    const response=await fetch(url,{signal:probe.signal,cache:'no-store'});if(response.ok)health=await response.json();
-   }catch{}finally{clearTimeout(probeTimer);}
-  }
-  checkRead();if(!health?.ok&&!health?.success)continue;
-  const controller=new AbortController(),waitMs=Math.max(45000,Math.min(900000,(Number(health.documentTimeoutSeconds)||180)*1000+15000));
-  const timer=setTimeout(()=>controller.abort(),waitMs);let pollTimer=null,pollAbort=null,posting=true;
-  async function pollProgress(){
-   if(!posting||operation?.cancelled)return;
-   pollAbort=new AbortController();const deadline=setTimeout(()=>pollAbort?.abort(),2500);
-   try{const url=new URL(endpoint);url.pathname=url.pathname.replace(/\/ocr\/?$/,'/ocr/status/')+operation.requestId;
-    const response=await fetch(url,{signal:pollAbort.signal,cache:'no-store'});if(response.ok){const state=await response.json();if(posting&&!operation.cancelled&&state.success){
-     const total=Number(state.pages)||0,done=Number(state.completedPages)||0;
-     progress(total?`${state.stage} \xb7 ${done} of ${total} pages`:state.stage||'Reading the full document\u2026',total?Math.min(96,8+88*done/total):8);
-    }}
-   }catch{}finally{clearTimeout(deadline);pollAbort=null;if(posting&&!operation?.cancelled)pollTimer=setTimeout(pollProgress,1000);}
-  }
-  try{
-   if(operation){operation.controller=controller;operation.endpoint=endpoint;operation.requestId=M.uuid();controller.signal.addEventListener('abort',()=>notifyReaderCancel(operation),{once:true});}
-   progress('Reading all pages, the letter body and printed signatures\u2026',8);const body=new FormData();body.append('file',source);body.append('clientId',readerClientId);body.append('communicationType',$('typeSelect').value||'Incoming');
-   if(operation)pollTimer=setTimeout(pollProgress,700);
-   const response=await fetch(endpoint,{method:'POST',body,headers:operation?{'X-OCR-Request-ID':operation.requestId}:{},signal:controller.signal});
-   // A static server, a temporarily unavailable OCR worker, or a missing
-   // native Tesseract installation should not block the browser reader.
-   if([404,405,501,503].includes(response.status)||response.status>=500){
-    warnings.push(`The document service returned HTTP ${response.status}; the browser reader was tried.`);
-    continue;
-   }
-   let result;try{result=await response.json();}catch{throw Error('The document reader returned an invalid response. Reload and retry.');}
-   if(!response.ok||result.success===false)throw Error(result.error||'The document reader could not read this file.');
-   if(typeof result.text!=='string')throw Error('The document reader returned no document text.');
-   checkRead();if(result.requestId&&operation&&result.requestId!==operation.requestId)throw Error('The reader response does not match this document. Retry the read.');
-   return remember({...result,metadata:result.metadata||{},warnings:result.warnings||[]});
-  }catch(error){
-   checkRead();
-   if(error.name==='AbortError')throw Error('The document reached the reading time limit. Use a smaller file and retry.');
-   // Do not silently repeat an interrupted upload in slower browser OCR.
-   if(error instanceof TypeError&&sameOrigin)throw Error('The reader connection was interrupted. Your draft is kept; retry the read.');
-   if(!(error instanceof TypeError))throw error;
-  }finally{posting=false;clearTimeout(timer);clearTimeout(pollTimer);pollAbort?.abort();}
- }
- if(endpoints.length)warnings.push('The document service is unavailable; the browser reader was used.');
+ const extension=source.name.split('.').pop().toLowerCase(),warnings=[];
  if(/^(txt|csv)$/.test(extension)){
-  const bytes=new Uint8Array(await source.arrayBuffer()),encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';
-  const text=new TextDecoder(encoding).decode(bytes);return remember({text,metadata:{},warnings,pages:text.split('\f').length,engine:'native-text'});
+  const text=await window.PGENRO_DocumentPreview.decodeText(source);
+  return remember({text,metadata:{},warnings,pages:text.split('\f').length,engine:'native-text'});
  }
+ const result=await window.PGENRO_AdminOcrService.read(source,{
+  operation,assertActive:checkRead,progress,uuid:M.uuid,direction:$('typeSelect').value||'Incoming',warnings,
+ });
+ if(result)return remember(result);
  let worker=null,pdf=null,stage='Reading scanned text\u2026',floor=0,span=90;
  async function recognize(input,psm='3'){
   checkRead();clearTimeout(readerRuntime.idle);
@@ -1232,8 +992,11 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    if(!parseCorrespondence(text).signatory&&parseCorrespondence(alternate.text||'').signatory)text=supplementSenderEvidence(text,alternate.text);
   }
   const lines=text.split(/\r?\n/),signatureHint=lines.some(line=>/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)|signed(?:\s+by)?|signatory|submitted\s+by|prepared\s+by|approved\s+by)\b/i.test(line))||lines.slice(Math.floor(lines.length*.55)).some(line=>/\b(?:officer|director|chief|mayor|governor|secretary|manager|president|chairperson|coordinator|principal|engineer)\b/i.test(line));
-  const senderFields=parseCorrespondence(text);
-  if(text&&!senderFields.receivedFrom&&senderFields.receivedFromSource!=='ambiguous'&&(signatureHint||(canvas.height>canvas.width*.65&&(text.match(/\S+/g)||[]).length>=12))){
+  const header=parseDocumentHeader(text),senderFields=parseCorrespondence(text,false,header);
+  const missingMemoSigner=header.isMemo&&!['printed-issuer','printed-origin-person','printed-signatory'].includes(header.issuedBySource);
+  const lookForSender=!senderFields.receivedFrom&&senderFields.receivedFromSource!=='ambiguous'&&
+   (signatureHint||(canvas.height>canvas.width*.65&&(text.match(/\S+/g)||[]).length>=12));
+  if(text&&(missingMemoSigner||lookForSender)){
    const marker=chosen.lines?.find(line=>/^(?:(?:very\s+)?(?:yours\s+)?(?:sincerely|respectfully|faithfully|truly)|signed|submitted|prepared|approved)\b/i.test(line.text||''));
    const top=canvas.height<canvas.width*.65?0:Math.max(0,marker?.bbox?.y0!=null?marker.bbox.y0-30:Math.floor(canvas.height*.45));
    const crop=document.createElement('canvas');crop.width=canvas.width;crop.height=canvas.height-top;const ctx=crop.getContext('2d');ctx.drawImage(canvas,0,top,canvas.width,crop.height,0,0,canvas.width,crop.height);
@@ -1314,12 +1077,13 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   return parts.filter(s=>s.trim()).join(extension==='docx'?'\n\n':'\n\f\n');
  }
  try{
-  const extension=source.name.split('.').pop().toLowerCase();let text='';
-  if(/^(txt|csv)$/.test(extension)){
-   const bytes=new Uint8Array(await source.arrayBuffer()),encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';text=new TextDecoder(encoding).decode(bytes);
-  }else if(/^(docx|pptx|xlsx)$/.test(extension))text=await archiveText(extension);
+  checkRead();
+  let text='';
+  if(/^(docx|pptx|xlsx)$/.test(extension))text=await archiveText(extension);
   else if(extension==='pdf'){
-   const lib=await import('../vendor/pdfjs/pdf.min.mjs');lib.GlobalWorkerOptions.workerSrc=new URL('../vendor/pdfjs/pdf.worker.min.mjs',location.href).href;pdf=await lib.getDocument({data:await source.arrayBuffer(),isEvalSupported:false,cMapUrl:new URL('../vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('../vendor/pdfjs/standard_fonts/',location.href).href}).promise;const pages=[];
+   const lib=await window.PGENRO_DocumentPreview.loadPdfLibrary();
+   pdf=await lib.getDocument({data:await source.arrayBuffer(),...window.PGENRO_DocumentPreview.pdfOptions()}).promise;
+   const pages=[];
    for(let number=1;number<=pdf.numPages;number++){
     checkRead();
     stage=`Reading page ${number} of ${pdf.numPages}, including the body and signature\u2026`;floor=(number-1)/pdf.numPages*90;span=90/pdf.numPages;progress(stage,Math.round(floor));
@@ -1357,7 +1121,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   }
   function setReaderState(state,label) {
    $('encodingModal').dataset.ocrState=state;$('filePickerState').dataset.state=state;$('ocrStateLabel').textContent=label;
-   $('filePickerState').setAttribute('aria-busy',String(state==='processing'));
   }
   function syncOcrControls() {
    const reading=ocrActive||Boolean(pendingRead);
@@ -1392,7 +1155,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
 
   function extractFields(text,result=null) {
    const contract=result?.formSchemaVersion===2&&result.formValues&&result.metadata;
-   const data=contract?result.metadata:browserOcrMetadata(text);
+   const data=contract?window.PGENRO_OcrFields.reconcileMemoIssuer(text,result.metadata):browserOcrMetadata(text);
    lastOcr={text,result};
    if(!editing&&!commManualFields.has('typeSelect')){
     if(applyOcrValue('typeSelect',data.direction,true)){
@@ -1417,14 +1180,15 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    for(const [id,key] of Object.entries(keys)) {
     if(commManualFields.has(id))continue;
     const hiddenMemoField=!memo&&(id==='memoRecipientInput'||id==='memoIssuerInput');
-    const value=hiddenMemoField?'':(sameMapping?result.formValues[id]:data[key])||'';
+    const value=hiddenMemoField?'':(sameMapping&&id!=='memoIssuerInput'?result.formValues[id]:data[key])||'';
     const fieldState=sameMapping?result.fieldStates?.[id]:null;
     const needsReview=fieldState?.state==='review'||data.needsReview?.includes(key)||
      (key==='receivedFrom'&&data.receivedFromNeedsReview)||(key==='signatory'&&data.signatoryNeedsReview)||
      ['body','subject','fallback','address-block','letterhead','approval','footer-name','prepared-by'].includes(data[key+'Source']);
     const applied=applyOcrValue(id,value,!needsReview||!editing);
     if(applied){
-     setFieldState(id,needsReview?'review':'detected',fieldState?.evidence||data.fieldEvidence?.[key]||'Detected from the uploaded document.');
+     const proof=id==='memoIssuerInput'?data.fieldEvidence?.issuedBy:fieldState?.evidence;
+     setFieldState(id,needsReview?'review':'detected',proof||data.fieldEvidence?.[key]||'Detected from the uploaded document.');
     }else if(!value){
      setFieldState(id,'');
      // An issue date is independent of when a communication entered or left the registry.
@@ -1484,14 +1248,17 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   async function runDocumentRead(request) {
    const current=()=>request.version===ocrGeneration&&request.source===file;
    if(!current())return;ocrActive=true;syncOcrControls();setReaderState('processing','Reading your document');
-   $('ocrStopControls').hidden=false;$('encodingUploadProgressBox').classList.add('active');
+   $('ocrStopControls').hidden=false;$('encodingUploadProgressBox').hidden=false;
+   $('ocrActionSubtext').textContent='You can edit the fields while the document is being read.';
    const started=performance.now();let stageMessage='Preparing the document\u2026',lastPercent=0;
    const elapsed=setInterval(()=>{if(current())$('encodingUploadStatusText').textContent=`${stageMessage} \xb7 ${Math.floor((performance.now()-started)/1000)}s`;},1000);
    const progress=(message,pct)=>{if(!current())return;stageMessage=message;lastPercent=Math.max(lastPercent,Math.max(0,Math.min(100,pct)));
-    $('encodingUploadStatusText').textContent=message;$('encodingProgressBar').style.width=`${lastPercent}%`;$('communicationOcrProgress').setAttribute('aria-valuenow',String(Math.round(lastPercent)));};
-   $('encodingProgressBar').style.width='0%';$('communicationOcrProgress').setAttribute('aria-valuenow','0');
+    $('encodingUploadStatusText').textContent=message;$('communicationOcrProgress').value=Math.round(lastPercent);};
+   $('communicationOcrProgress').value=0;
    try {
     progress('Reading all pages automatically\u2026',2);const result=await readWithCancellation(request.source,progress,current);if(!current())return;
+    if(!result.text.trim())throw new Error('No readable text was detected. You can fill the details manually.');
+    editorPreview.setReadState({text:result.text});
     const manualText=commManualFields.has('ocrTextInput');if(!manualText)$('ocrTextInput').value=result.text;
     const missing=extractFields($('ocrTextInput').value,manualText?null:result);
     const seconds=((result.durationMs??(performance.now()-started))/1000).toFixed(1);
@@ -1501,13 +1268,15 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     progress('Document read. Detected details are ready for review.',100);
    } catch(error) {
     if(!current())return;setReaderState('error','Reading needs attention');$('ocrActionSubtext').textContent=error.message||'Reading failed. Retry or fill the details manually.';
+    editorPreview.setReadState({error:'No text preview is available. Select Read again to retry.'});
     $('ocrFieldSummary').textContent='Your draft is kept. Retry reading or enter the required fields manually.';M.toast($('ocrActionSubtext').textContent,'error');
    } finally {
-    clearInterval(elapsed);ocrActive=false;if(current()){$('encodingUploadProgressBox').classList.remove('active');$('ocrStopControls').hidden=true;}syncOcrControls();
+    clearInterval(elapsed);ocrActive=false;if(current()){$('encodingUploadProgressBox').hidden=true;$('ocrStopControls').hidden=true;}syncOcrControls();
    }
   }
   function scheduleDocumentRead() {
    if(!file||busy||routeCommitted)return;
+   editorPreview.setReadState({pending:true});
    pendingRead={source:file,version:ocrGeneration};setReaderState('processing','Preparing automatic reading');syncOcrControls();
    if(ocrTask){cancelDocumentRead('replaced');return;}
    const task=(async()=>{while(pendingRead){const request=pendingRead;pendingRead=null;await runDocumentRead(request);}})();ocrTask=task;
@@ -1515,10 +1284,11 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   }
   $('cancelOcrBtn').addEventListener('click',()=>{
    pendingRead=null;ocrGeneration++;cancelDocumentRead();setReaderState('stopped','Reading stopped');
+   editorPreview.setReadState({error:'Reading stopped. Select Read again to load the text preview.'});
    $('ocrActionSubtext').textContent='Your draft is kept. Select Read again to retry, or fill the details manually.';
-   $('encodingUploadProgressBox').classList.remove('active');$('ocrStopControls').hidden=true;syncOcrControls();
+   $('encodingUploadProgressBox').hidden=true;$('ocrStopControls').hidden=true;syncOcrControls();
   });
-  $('encodingModal').addEventListener('pgenro:modal-close',()=>{if(returnToEncoding)return;pendingRead=null;ocrGeneration++;cancelDocumentRead('closed');});
+  $('encodingModal').addEventListener('pgenro:modal-close',()=>{pendingRead=null;ocrGeneration++;cancelDocumentRead('closed');editorPreview.clear();});
   function selectOcrSender(name) {
    if(!name)return;
    if(!printedSenderName(name,true)){
@@ -1546,7 +1316,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   window.addEventListener('pgenro:backend-ready',()=>{connectRecords();if(mode!=='loading')load();});
   await load();connectRecords();
   window.addEventListener('storage',e=>{if(e.key===cacheKey&&!M.client())load();});
-  window.addEventListener('pagehide',(event)=>{if(event.persisted)return;clearTimeout(timer);generation++;releasePreview();if(channel)M.client()?.removeChannel(channel);});
+  window.addEventListener('pagehide',(event)=>{if(event.persisted)return;clearTimeout(timer);generation++;editorPreview.clear();if(channel)M.client()?.removeChannel(channel);});
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

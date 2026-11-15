@@ -45,7 +45,7 @@ except ImportError:
 MAX_BYTES = 50 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'tif', 'tiff', 'docx', 'txt', 'csv', 'xlsx', 'pptx'}
 OCR_LANG_REQUESTED = os.getenv('OCR_LANG', 'eng+fil').strip() or 'eng'
-OCR_PARSER_VERSION = 22
+OCR_PARSER_VERSION = 23
 OCR_TIMEOUT = max(5, int(os.getenv('OCR_TIMEOUT', '45')))
 OCR_DOCUMENT_TIMEOUT = max(OCR_TIMEOUT, int(os.getenv('OCR_DOCUMENT_TIMEOUT', '180')))
 OCR_WORKERS = max(1, min(4, int(os.getenv('OCR_WORKERS', str(min(2, os.cpu_count() or 1))))))
@@ -219,11 +219,14 @@ OCR_LANG = resolve_ocr_language(OCR_LANG_REQUESTED)
 # GENERAL LETTER & ADMINISTRATIVE FUZZY PATTERNS
 # =========================================================================
 
+MEMO_CLOSING_ACTION = (r'(?:(?:IMMEDIATE|STRICT|WIDE)(?:\s+AND\s+(?:IMMEDIATE|STRICT|WIDE))?\s+)?'
+                       r'(?:COMPLIANCE|INFORMATION|GUIDANCE|DISSEMINATION|APPROPRIATE\s+ACTION)')
 CLOSING = re.compile(
     r'^(?:(?:VERY\s+)?(?:YOURS\s+)?(?:SINCERELY|RESPECTFULLY|FAITHFULLY|TRULY)(?:\s+(?:YOURS|SUBMITTED))?|'
     r'YOURS\s+(?:TRULY|FAITHFULLY|SINCERELY|RESPECTFULLY)|BEST\s+REGARDS|KIND\s+REGARDS|WARM\s+REGARDS|REGARDS|CORDIALLY|'
     r'LUBOS\s+NA\s+GUMAGALANG|SUMASAINYO|SUMASAINYO\s+PANGALAN|MARAMING\s+SALAMAT|THANK\s+YOU(?:\s+VERY\s+MUCH)?|'
-    r'FOR\s+YOUR\s+(?:COMPLIANCE|INFORMATION(?:\s+AND\s+(?:APPROPRIATE\s+ACTION|COMPLIANCE|GUIDANCE))?|GUIDANCE))\s*[,.:!]?$',
+    r'FOR\s+(?:YOUR\s+)?' + MEMO_CLOSING_ACTION + r'(?:\s*(?:,\s*(?:AND\s+)?|\s+(?:AND|OR)\s+)' + MEMO_CLOSING_ACTION + r'){0,3}|'
+    r'PARA\s+SA\s+(?:INYONG\s+)?(?:KAALAMAN|KABATIRAN|PAGSUNOD)(?:\s+AT\s+(?:KAALAMAN|KABATIRAN|PAGSUNOD))?)\s*[,.:!]?$',
     re.I
 )
 
@@ -239,8 +242,9 @@ ROLE = re.compile(
 )
 
 SIGN_LABEL = re.compile(
-    r'^(?:SIGNED(?:\s+BY)?|SIGNATORY|WRITTEN\s+BY|AUTHORED\s+BY|ISSUED\s+BY|NOTICE\s+FROM|CONVENED\s+BY|'
-    r'SUBMITTED\s+BY|PREPARED\s+BY|APPROVED\s+BY|NOTED\s+BY|CERTIFIED\s+BY|RECOMMENDING\s+APPROVAL|'
+    r'^(?:SIGNED(?:\s+BY)?|SIGNATORY(?:\s*/\s*ISSUED\s+BY)?|WRITTEN\s+BY|AUTHORED\s+BY|ISSUED\s+BY|NOTICE\s+FROM|CONVENED\s+BY|'
+    r'SUBMITTED\s+BY|PREPARED\s+BY|APPROVED\s+BY|NOTED\s+BY|CERTIFIED\s+BY|REVIEWED\s+BY|CHECKED\s+BY|'
+    r'RECEIVED\s+BY|ACKNOWLEDGED\s+BY|RECOMMENDING\s+APPROVAL|'
     r'RESPECTFULLY\s+SUBMITTED\s+BY|NAME\s+OF\s+(?:SENDER|SIGNATORY)|NILAGDAAN\s+NI|INIHANDA\s+NI|INAPRUBAHAN\s+NI|'
     r'PINAGTIBAY\s+NI|PANGALAN\s+AT\s+LAGDA)\s*[:：-]?\s*(.*)$',
     re.I
@@ -573,7 +577,7 @@ def scan_sender_candidates(text, signature_region=False):
         else: continue
         marker = value if label else anchor['text'] if anchor else ''
         if re.match(r'^(?:prepared|submitted|respectfully\s+submitted|inihanda)\b', marker, re.I): score, kind = 85, 'prepared-by'
-        elif re.match(r'^(?:noted|certified|recommending)\b', marker, re.I): score, kind = 55, 'supporting'
+        elif re.match(r'^(?:noted|certified|reviewed|checked|received|acknowledged|recommending)\b', marker, re.I): score, kind = 55, 'supporting'
         elif re.match(r'^(?:approved|inaprubahan)\b', marker, re.I): score, kind = 65, 'approval'
         ink = sender_ink_spacing(inline_name) != inline_name
         proof = '\n'.join(dict.fromkeys(v for v in [value if explicit or label or mark else anchor['text'] if anchor else '', inline_name if ink else name, role] if v))
@@ -722,11 +726,15 @@ def parse_date(value):
     return ''
 
 SUBJECT_LABEL = r'S[Uu0]BJ[Ee3]CT(?:\s+M[Aa]TT[Ee]R|\s*/\s*PARTICULARS)?|S[Uu0]BJ(?:[Ee3]C[TIL1]|\.)?|S[Uu0]B3[Ee3]CT|R[Ee]|R[Ee]G[Aa]RD[Ii]NG|P[Aa]KS[Aa]'
+ISSUER_LABEL = (r'S[I1]GN[Aa]T[O0]RY\s*/\s*[I1]SSU[Ee]D\s+BY|[I1]SSU[Ee]D\s+BY|[I1]SSU[Ee]R|'
+                r'[I1]SSU[Ii]NG\s+[O0]FF[Ii]C[Ii][Aa]L|N[Aa]M[Ee]\s+[O0]F\s+(?:TH[Ee]\s+)?S[I1]GN[Aa]T[O0]RY|S[I1]GN[Aa]T[O0]RY')
+ISSUER_OFFICE_LABEL = r'[I1]SSU[Ii]NG\s+[O0]FF[Ii]C[Ee]'
+ORIGIN_LABEL = r'FR[O0]M|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]'
 HEADER_LABELS = SUBJECT_LABEL + '|' + (
     r'PARTICULARS|'
     r'[Aa]DDR[Ee]SS[Ee]D\s+T[O0]|M[Ee]M[O0]R[Aa]ND[Uu]M\s+F[O0]R|R[Ee]C[Ii]P[Ii][Ee]NT(?:\s+[O0]FF[Ii]C[Ee])?|S[Ee]NT\s+T[O0]|'
     r'R[Ee]C[Ee][Ii]V[Ee]D\s+FR[O0]M|S[Ee]ND[Ee]R|FR[O0]M|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|P[Aa]R[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|'
-    r'[I1]SSU[Ee]D\s+BY|[I1]SSU[Ii]NG\s+[O0]FF[Ii]C[Ee]|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]|S[I1]GN[Aa]T[O0]RY|'
+    + ISSUER_LABEL + '|' + ISSUER_OFFICE_LABEL + r'|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]|'
     r'MEMO(?:RANDUM)?\s+(?:N[O0]\.?|NUMBER|#)|'
     r'D[Aa@]T[Ee]\s+(?:R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D|S[Ee]NT|[I1]SSU[Ee]D|F[O0]RW[Aa]RD[Ee]D)|(?:R[Ee]C[Ee][Ii]V[Ee]D|R[Ee]L[Ee][Aa]S[Ee]D|[I1]SSU[Ee]|S[Ee]NT)\s+D[Aa@]T[Ee]|'
     r'D[Aa@]T[Ee]D|D[Aa@]T[Ee]|P[Ee]TS[Aa]|T[O0]|F[O0]R|THR[O0]UGH|THRU|CC|ATTACHM[Ee]NTS?|ENCL[O0]SUR[Ee]S?|'
@@ -753,6 +761,7 @@ HEADER_CONTINUATION = re.compile(r'^(?:FOR|OF|ON|AND|OR|WITH|REGARDING|DURING)\b
 DATE_LINE = re.compile(r'^(?:\d{4}[-/]\d{1,2}[-/]\d{1,2}|\d{1,2}[-/]\d{1,2}[-/]\d{4}|[A-Za-z]+\.?\s+\d{1,2}(?:st|nd|rd|th)?,?\s+\d{4}|\d{1,2}(?:st|nd|rd|th)?\s+[A-Za-z]+\.?,?\s+\d{4})$', re.I)
 EMPTY_FIELD = re.compile(r'^[:：;|]*$|^[-_.=–—]{2,}$')
 UNKNOWN_FIELD = re.compile(r'^(?:N/?A|NONE|NIL|NOT APPLICABLE|NOT AVAILABLE|[-_.=–—]{2,})$', re.I)
+ISSUER_PLACEHOLDER = re.compile(r'^(?:[-_.=–—]+|[\[(]?(?:SIGNATURE(?:\s+OVER\s+PRINTED\s+NAME)?|SIGNED|S\.?G\.?D\.?)[\])]?[\s.:]*)$', re.I)
 REFERENCE_NUMBER = re.compile(r'(?=[A-Z0-9/._-]*\d)[A-Z0-9][A-Z0-9/._-]*(?:,?\s*s\.?\s*\d{4})?', re.I)
 DATE_FIELDS = {
     'date': r'D[Aa@]T[Ee]|D[Aa@]T[Ee]\s+[I1]SSU[Ee]D|[I1]SSU[Ee]\s+D[Aa@]T[Ee]|D[Aa@]T[Ee]D|P[Ee]TS[Aa]',
@@ -762,10 +771,20 @@ DATE_FIELDS = {
 
 def primary_document_pages(text):
     pages = str(text or '').replace('\r', '').split('\f')
+    main_number = ''
     for index, page in enumerate(pages):
         top = [line.strip() for line in page.split('\n') if line.strip()][:6]
         if index and any(re.fullmatch(r'(?:ANNEX|APPENDIX|ATTACHMENT|ENCLOSURE)(?:\s+[A-Z0-9IVX.-]+)?\s*[:.—-]?', line, re.I) for line in top):
             break
+        # Repeated headers can be continuation pages. A different printed
+        # memo number identifies a separate memo in the uploaded bundle.
+        heading = next((line for line in top if MEMO_HEADING.fullmatch(line)), '')
+        number = re.search(r'\b(?:N[O0]\.?|NUMBER)\s*[:#.-]?\s*([A-Z0-9][A-Z0-9/._-]*)', heading, re.I)
+        if number and REFERENCE_NUMBER.fullmatch(number[1]):
+            if index == 0:
+                main_number = number[1].casefold()
+            elif main_number and number[1].casefold() != main_number:
+                break
         yield page
 
 
@@ -834,6 +853,26 @@ def read_header_field(lines, names, limit=4, subject=False, stop_at_sentence=Tru
     return '', empty_label
 
 
+def memo_header_issuer(field):
+    """Distinguish a printed issuing person from an office in the header."""
+    issuer, proof = field(ISSUER_LABEL)
+    if issuer and not (UNKNOWN_FIELD.fullmatch(issuer) or ISSUER_PLACEHOLDER.fullmatch(issuer)):
+        person = name_value(issuer, True) or name_value(field(ISSUER_LABEL, 1)[0], True)
+        return person or issuer, proof, 'printed-issuer'
+
+    origin, origin_proof = field(ORIGIN_LABEL)
+    if UNKNOWN_FIELD.fullmatch(origin) or ISSUER_PLACEHOLDER.fullmatch(origin):
+        origin = ''
+    person = name_value(origin, True) or name_value(field(ORIGIN_LABEL, 1)[0], True)
+    if person:
+        return person, origin_proof, 'printed-origin-person'
+
+    office, office_proof = field(ISSUER_OFFICE_LABEL)
+    if office and not (UNKNOWN_FIELD.fullmatch(office) or ISSUER_PLACEHOLDER.fullmatch(office)):
+        return office, office_proof, 'printed-office'
+    return origin, origin_proof or proof or office_proof, 'printed-origin-office' if origin else ''
+
+
 def parse_header(text):
     lines = document_header_lines(text)
     evidence, warnings = {}, []
@@ -876,19 +915,13 @@ def parse_header(text):
         'recipient': r'T[O0]|F[O0]R|P[Aa]R[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|[Aa]DDR[Ee]SS[Ee]D\s+T[O0]|M[Ee]M[O0]R[Aa]ND[Uu]M\s+F[O0]R|R[Ee]C[Ii]P[Ii][Ee]NT(?:\s+[O0]FF[Ii]C[Ee])?|S[Ee]NT\s+T[O0]',
         'senderOffice': r'FR[O0]M|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|S[Ee]ND[Ee]R|R[Ee]C[Ee][Ii]V[Ee]D\s+FR[O0]M|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]',
         'receivedFromLabel': r'R[Ee]C[Ee][Ii]V[Ee]D\s+FR[O0]M|S[Ee]ND[Ee]R',
-        'issuedBy': r'[I1]SSU[Ee]D\s+BY|[I1]SSU[Ii]NG\s+[O0]FF[Ii]C[Ee]',
         'signatory': r'S[I1]GN[Aa]T[O0]RY'
     }.items():
         result[key], evidence[key] = field(names, 6 if key == 'subject' else 4, subject=key == 'subject')
         if key != 'subject' and UNKNOWN_FIELD.fullmatch(result[key]):
             result[key] = ''
 
-    if not evidence['issuedBy']:
-        result['issuedBy'], evidence['issuedBy'] = field(r'FR[O0]M|MUL[Aa](?:\s+(?:K[Aa]Y|S[Aa]))?|[O0]R[Ii]G[Ii]N[Aa]T[Ii]NG\s+[O0]FF[Ii]C[Ee]')
-        if UNKNOWN_FIELD.fullmatch(result['issuedBy']):
-            result['issuedBy'] = ''
-    if result['issuedBy']:
-        result['issuedBySource'] = 'printed'
+    result['issuedBy'], evidence['issuedBy'], result['issuedBySource'] = memo_header_issuer(field)
     if not result['subject'] and not evidence['subject']:
         result['subject'], evidence['subject'] = field(r'PARTICULARS', 6, subject=True)
     if not evidence['recipient'] and heading >= 0:
@@ -1328,12 +1361,23 @@ def extract_document_metadata(text):
     if recipient:
         combined_review = [key for key in combined_review if key != 'recipient']
 
-    issued_by = header['issuedBy']
-    if not header['fieldEvidence']['issuedBy'] and not sender['signatoryNeedsReview']:
+    issued_by, issued_by_source = header['issuedBy'], header['issuedBySource']
+    issued_evidence = header['fieldEvidence']['issuedBy']
+    if header['isMemo']:
+        if (issued_by_source not in ('printed-issuer', 'printed-origin-person')
+                and sender['signatory'] and sender['signatorySource'] == 'signature'):
+            issued_by = sender['signatory']
+            issued_by_source = 'printed-signatory'
+            issued_evidence = sender['fieldEvidence']['signatory']
+            if sender['signatoryNeedsReview']:
+                combined_review.append('issuedBy')
+        if not issued_by:
+            combined_review.append('issuedBy')
+    elif not issued_evidence and not sender['signatoryNeedsReview']:
         issued_by = sender['signatory']
-    issued_by_source = header['issuedBySource'] or (sender['signatorySource'] if issued_by else '')
+        issued_by_source = sender['signatorySource'] if issued_by else ''
+        issued_evidence = sender['fieldEvidence']['signatory'] if issued_by else ''
     received_evidence = header['fieldEvidence']['receivedFromLabel'] or sender['fieldEvidence']['receivedFrom'] or header['fieldEvidence']['senderOffice']
-    issued_evidence = header['fieldEvidence']['issuedBy'] or (sender['fieldEvidence']['signatory'] if issued_by else '')
 
     result = {
         **header, **sender,
@@ -1458,12 +1502,14 @@ def communication_form_payload(metadata, text, communication_type=''):
 def supplement_sender_evidence(base, extra, signature_region=False):
     """Append only useful sender/signature evidence, not a duplicate page OCR pass."""
     existing = parse_correspondence(base)
-    candidates = scan_sender_candidates(extra, signature_region)['primary']
+    scan = scan_sender_candidates(extra, signature_region)
+    candidates = scan['primary']
     if not candidates:
         return base
 
-    signature_candidates = [c for c in candidates if c['kind'] == 'signature']
-    if existing.get('signatory') and existing.get('signatoryRole') and not existing.get('signatoryNeedsReview'):
+    signature_candidates = [c for c in scan['candidates'] if c['kind'] == 'signature']
+    if (existing['signatory'] and existing['signatoryRole'] and not existing['signatoryNeedsReview']
+            and (existing['signatorySource'] == 'signature' or not signature_candidates)):
         return base
     if existing.get('receivedFrom') and not signature_candidates and not signature_region:
         return base
@@ -1655,6 +1701,7 @@ def _ocr_candidate_score(candidate):
     score += 4 if header.get('date') or header.get('receivedDate') or header.get('releasedDate') else 0
     score += 4 if header.get('controlNo') else 0
     score += 7 if sender.get('receivedFrom') else 0
+    score += 9 if header['isMemo'] and sender['signatorySource'] == 'signature' else 0
     score += 3 if details.get('documentType') not in ('', 'Other Communication') else 0
     return score
 
@@ -1710,16 +1757,20 @@ def fast_ocr_image(image, header_metadata=None):
     best = max(candidates, key=_ocr_candidate_score)
     text = best.get('text', '')
 
-    # If a layout pass finds the sender more clearly than the selected pass,
-    # retain the sender evidence without duplicating the rest of the page.
-    if not parse_correspondence(text).get('receivedFrom'):
+    # An office in FROM does not establish who signed the memo. Keep stronger
+    # printed signature evidence from another pass through the same page.
+    header = parse_header(text)
+    correspondence = parse_correspondence(text, header=header)
+    missing_memo_signatory = header['isMemo'] and correspondence['signatorySource'] != 'signature'
+    if not correspondence['receivedFrom'] or missing_memo_signatory:
         for candidate in candidates:
             if candidate is best:
                 continue
             supplemented = supplement_sender_evidence(text, candidate.get('text', ''))
             if supplemented != text:
                 text = supplemented
-                if parse_correspondence(text).get('receivedFrom'):
+                found = parse_correspondence(text)
+                if found['signatorySource'] == 'signature' or (found['receivedFrom'] and not missing_memo_signatory):
                     if _ocr_candidate_score(candidate) >= _ocr_candidate_score(best) - 2:
                         best = candidate
                     break
@@ -1743,7 +1794,8 @@ def fast_ocr_image(image, header_metadata=None):
                     if parse_correspondence(text).get('receivedFrom'):
                         break
 
-    corr = parse_correspondence(text)
+    header = parse_header(text)
+    corr = parse_correspondence(text, header=header)
     signature_low = False
     # Inspect the signature/footer even when a FROM field was already found.
     # A digitally readable body may contain a scanned signature image that
@@ -1753,10 +1805,10 @@ def fast_ocr_image(image, header_metadata=None):
         any(CLOSING.match(line) or SIGN_LABEL.match(line) or ROLE.search(line)
             for line in (tidy(value) for value in text.split('\n')[-8:]))
     )
-    needs_signature_scan = signature_hint and processed.height > 500 and (
-        not corr.get('signatory')
-        or not corr.get('signatoryRole')
-        or corr.get('signatoryNeedsReview')
+    memo_needs_signer = (header['isMemo'] and header['issuedBySource'] not in ('printed-issuer', 'printed-origin-person')
+                         and (corr['signatorySource'] != 'signature' or corr['signatoryNeedsReview']))
+    needs_signature_scan = processed.height > 500 and (
+        memo_needs_signer or (signature_hint and (not corr['signatory'] or not corr['signatoryRole'] or corr['signatoryNeedsReview']))
     )
     if allow_signature_scan and needs_signature_scan:
         signature_result = _read_signature_zone(processed)
@@ -1770,10 +1822,8 @@ def fast_ocr_image(image, header_metadata=None):
             # is absent. A name plus a role is also strong signature evidence.
             strong = [
                 c for c in strong
-                if c.get('role') or re.search(
-                    r'(?i)sincerely|respectfully|faithfully|truly|signed|signature|signatory|s\.g\.d\.',
-                    c.get('evidence', '')
-                )
+                if c.get('role') or any(CLOSING.fullmatch(line) or SIGN_LABEL.match(line) or SENDER_MARK.match(line)
+                                        for line in c['evidence'].splitlines())
             ]
             if strong:
                 supplemented = supplement_sender_evidence(text, signature_result.get('text', ''), True)
@@ -1796,7 +1846,8 @@ def fast_ocr_image(image, header_metadata=None):
     current = _state.get()
     low = best.get('confidence', 0) < OCR_MIN_CONFIDENCE or signature_low
     # Inspect confidence for the printed name itself, not only the body average.
-    selected = parse_correspondence(text)['receivedFrom']
+    correspondence = parse_correspondence(text)
+    selected = correspondence['signatory'] if header['isMemo'] and correspondence['signatory'] else correspondence['receivedFrom']
     if selected:
         name_tokens = set(re.findall(r'[^\W\d_]+', selected.casefold()))
         name_conf = [
@@ -1979,7 +2030,10 @@ def read_document(file_path, extension):
             metadata['senderReviewReasons'].append('Confirm the originating name because part of the scan had low OCR confidence.')
         if 'signatory' in current.review_fields:
             metadata['signatoryNeedsReview'] = True
-            metadata['needsReview'] = list(dict.fromkeys(metadata['needsReview'] + ['signatory']))
+            uncertain_fields = ['signatory']
+            if metadata['issuedBySource'] == 'printed-signatory':
+                uncertain_fields.append('issuedBy')
+            metadata['needsReview'] = list(dict.fromkeys(metadata['needsReview'] + uncertain_fields))
             metadata['senderReviewReasons'].append('Confirm the signatory and designation because the signature area had low OCR confidence.')
     if not text.strip():
         warn('No readable text was found. Upload a clearer scan or enter the fields manually.')
