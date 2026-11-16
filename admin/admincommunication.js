@@ -329,24 +329,23 @@
   const routeJournalKey='pgenro_memo_routes';
   let routeCommitted=false,remoteAttachmentRemoved=false,memoDraftId=null;
   const commOcrValues=new Map(),commManualFields=new Set();
-  const ocrFormIds=new Set([...Object.values(fieldInputs),'memoRecipientInput','memoIssuerInput']);
+  const ocrFormIds=new Set(Object.values(fieldInputs));
   let ocrActive=false,lastOcr=null;
   for(const id of ocrFormIds)$(id).addEventListener('input',()=>{commManualFields.add(id);setFieldState(id,'edited','Your manual edit is kept.');});
   const isMemo=()=>$('docTypeSelect').value==='Memorandum';
   const canRouteMemo=()=>isMemo()&&window.PGENRO_API?.adminCan('office_memos')===true;
   function updateDestination() {
-   const memo=canRouteMemo();
-   $('documentDestination').textContent=memo?'Save destination: Office Memos. Review the memo details below. Attachments: maximum 10 MB.':'Save destination: Communications.';
-   $('documentDestination').classList.toggle('is-memo',memo);
-   $('memoRecipientGroup').hidden=$('memoIssuerGroup').hidden=!memo;
-   $('memoRecipientInput').required=memo;
+   const memo=isMemo(), routeToMemos=canRouteMemo(), outgoing=$('typeSelect').value==='Outgoing';
+   $('documentDestination').textContent=routeToMemos?'Save destination: Office Memos. Attachments: maximum 10 MB.':'Save destination: Communications.';
+   $('documentDestination').classList.toggle('is-memo',routeToMemos);
+   $('officeFieldGroup').hidden=memo;
    $('officeInput').required=!memo;
-   $('officeRequiredMark').hidden=memo;
-   $('officeFieldLabel').textContent=memo?'Sender / signatory':$('typeSelect').value==='Outgoing'?'Recipient office':'Received from';
-   $('officeInput').placeholder=$('typeSelect').value==='Outgoing'?'Person or office receiving this communication':'Originating person or printed signatory';
-   $('dateFieldLabel').textContent=memo?'Date issued':$('typeSelect').value==='Outgoing'?'Date released':'Date received';
-   $('controlFieldLabel').textContent=memo?'Memo number':'Control number';
-   $('saveRecordBtn').querySelector('span').textContent=routeCommitted?'Finish Move to Office Memos':memo?'Save to Office Memos':editing?'Save Changes':'Save Record';
+   if(memo)$('ocrSignatoryGroup').hidden=true;
+   $('officeFieldLabel').textContent=outgoing?'Recipient office':'Received from';
+   $('officeInput').placeholder=outgoing?'Person or office receiving this communication':'Originating person or printed signatory';
+   $('dateFieldLabel').textContent=routeToMemos?'Date issued':outgoing?'Date released':'Date received';
+   $('controlFieldLabel').textContent=routeToMemos?'Memo number':'Control number';
+   $('saveRecordBtn').querySelector('span').textContent=routeCommitted?'Finish Move to Office Memos':routeToMemos?'Save to Office Memos':editing?'Save Changes':'Save Record';
   }
   $('docTypeSelect').addEventListener('change',refreshOcrMapping);
 /* Sender detection reads every page, including signature blocks. */
@@ -419,7 +418,6 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
 /* End letter-purpose extraction. */
 
 
-  function detectMemo(text) {const result=parseDocumentHeader(text);return result.isMemo?result:null;}
   function attachmentMime(name) {
    return ({pdf:'application/pdf',png:'image/png',jpg:'image/jpeg',jpeg:'image/jpeg',webp:'image/webp',bmp:'image/bmp',tif:'image/tiff',tiff:'image/tiff',docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',txt:'text/plain',csv:'text/csv',xlsx:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',pptx:'application/vnd.openxmlformats-officedocument.presentationml.presentation'})[String(name||'').split('.').pop().toLowerCase()];
   }
@@ -439,7 +437,6 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
   async function saveToMemos(payload) {
    if(!M.client())throw new Error('Connect to the database before uploading to Office Memos. Your document is still in this form.');
    const prior=records.find(r=>String(r.id)===String(editing));
-   const addressedTo=$('memoRecipientInput').value.trim(),issuedBy=$('memoIssuerInput').value.trim();
    if(!editing) memoDraftId ??= M.uuid();
    const journal=M.storage.get(routeJournalKey,{});
    const key=editing?`communication:${editing}`:`memo-draft:${memoDraftId}`;
@@ -447,6 +444,9 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    const memos=await M.read('office_memos');
    let saved=pending?memos.find(m=>String(m.id)===pending.id):null;
    if(!saved){
+    const detected=lastOcr?.text.trim()===payload.ocrText?lastOcr.metadata:parseDocumentHeader(payload.ocrText);
+    const addressedTo=detected.isMemo?(detected.addressedTo||detected.recipient||''):'';
+    const issuedBy=detected.isMemo&&!detected.needsReview?.includes('issuedBy')?(detected.issuedBy||''):'';
     const document=await memoAttachment(prior),now=new Date().toISOString();
     const remarks=[payload.remarks,payload.actionTaken?`Action taken: ${payload.actionTaken}`:'',`From Communications (${payload.type}; ${payload.status}).`,payload.ocrText?`Extracted document text:\n${payload.ocrText}`:''].filter(Boolean).join('\n\n');
     const {newUpload,...savedDocument}=document;
@@ -565,12 +565,11 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     }
    }
    else {$('dateInput').value=M.today();$('typeSelect').value='Incoming';$('statusSelect').value='Pending';}
-   const memo=detectMemo(r?.ocrText||'');if(memo){$('memoRecipientInput').value=memo.addressedTo;$('memoIssuerInput').value=memo.issuedBy;}
    const pending=M.storage.get(routeJournalKey,{})[`communication:${id}`];
    if(id&&pending&&M.client()&&window.PGENRO_API.adminCan('office_memos'))try{
     const saved=(await M.read('office_memos')).find(m=>String(m.id)===pending.id);
     if(saved&&draftVersion===ocrGeneration){
-     routeCommitted=true;$('docTypeSelect').value='Memorandum';$('controlNoInput').value=saved.memoNo||'';$('memoRecipientInput').value=saved.addressedTo||'';$('memoIssuerInput').value=saved.issuedBy||'';$('subjectInput').value=saved.subject||'';
+     routeCommitted=true;$('docTypeSelect').value='Memorandum';$('controlNoInput').value=saved.memoNo||'';$('subjectInput').value=saved.subject||'';
      for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=true;
      $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=$('runOcrBtn').disabled=true;
      M.toast('This memo is already saved in Office Memos. Finish Move will remove the original communication.','warning');
@@ -617,6 +616,10 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    if(ocrActive){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
    if(!$('communicationForm').reportValidity())return;
    const payload=Object.fromEntries(Object.entries(fieldInputs).map(([key,id])=>[key,$(id).value.trim()]));
+   if(isMemo()){
+    if(editing)delete payload.office;
+    else payload.office='';
+   }
    if (!payload.controlNo) {
     $('controlNoInput').focus();
     M.toast('Enter the control number.','warning');
@@ -1159,7 +1162,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   function extractFields(text,result=null) {
    const contract=result?.formSchemaVersion===2&&result.formValues&&result.metadata;
    const data=contract?window.PGENRO_OcrFields.reconcileMemoIssuer(text,result.metadata):browserOcrMetadata(text);
-   lastOcr={text,result};
+   lastOcr={text,result,metadata:data};
    if(!editing&&!commManualFields.has('typeSelect')){
     if(applyOcrValue('typeSelect',data.direction,true)){
      setFieldState('typeSelect','detected',data.fieldEvidence?.direction);
@@ -1168,30 +1171,16 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
      setFieldState('typeSelect','');
     }
    }
-   const direction=$('typeSelect').value,outgoing=direction==='Outgoing';
-   const documentType=commManualFields.has('docTypeSelect')?$('docTypeSelect').value:data.documentType;
-   const memo=documentType==='Memorandum'&&window.PGENRO_API?.adminCan('office_memos')===true;
-   const dateKey=memo?'date':outgoing?'releasedDate':'receivedDate';
-   const officeKey=memo?'signatory':outgoing?'recipient':'receivedFrom';
-   const numberKey=memo?'memoNo':'controlNo';
-   const keys={
-    docTypeSelect:'documentType',controlNoInput:numberKey,dateInput:dateKey,officeInput:officeKey,
-    subjectInput:'subject',statusSelect:'status',actionTakenInput:'actionTaken',remarksInput:'remarks',
-    memoRecipientInput:'recipient',memoIssuerInput:'issuedBy'
-   };
-   const sameMapping=contract&&result.communicationType===direction&&memo===(result.route==='office_memos');
-   for(const [id,key] of Object.entries(keys)) {
-    if(commManualFields.has(id))continue;
-    const hiddenMemoField=!memo&&(id==='memoRecipientInput'||id==='memoIssuerInput');
-    const value=hiddenMemoField?'':(sameMapping&&id!=='memoIssuerInput'?result.formValues[id]:data[key])||'';
-    const fieldState=sameMapping?result.fieldStates?.[id]:null;
+   function applyField(id,key,useContract) {
+    if(commManualFields.has(id))return;
+    const value=(useContract?result.formValues[id]:data[key])||'';
+    const fieldState=useContract?result.fieldStates?.[id]:null;
     const needsReview=fieldState?.state==='review'||data.needsReview?.includes(key)||
-     (key==='receivedFrom'&&data.receivedFromNeedsReview)||(key==='signatory'&&data.signatoryNeedsReview)||
+     (key==='receivedFrom'&&data.receivedFromNeedsReview)||
      ['body','subject','fallback','address-block','letterhead','approval','footer-name','prepared-by'].includes(data[key+'Source']);
     const applied=applyOcrValue(id,value,id!=='controlNoInput'&&(!needsReview||!editing));
     if(applied){
-     const proof=id==='memoIssuerInput'?data.fieldEvidence?.issuedBy:fieldState?.evidence;
-     setFieldState(id,needsReview?'review':'detected',proof||data.fieldEvidence?.[key]||'Detected from the uploaded document.');
+     setFieldState(id,needsReview?'review':'detected',fieldState?.evidence||data.fieldEvidence?.[key]||'Detected from the uploaded document.');
     }else if(!value){
      setFieldState(id,'');
      // An issue date is independent of when a communication entered or left the registry.
@@ -1199,6 +1188,24 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
      if(id==='statusSelect'&&!editing&&!$(id).value)$(id).value='Pending';
     }
    }
+
+   applyField('docTypeSelect','documentType',contract);
+   const direction=$('typeSelect').value,outgoing=direction==='Outgoing';
+   const memo=isMemo(),routeToMemos=canRouteMemo();
+   const dateKey=routeToMemos?'date':outgoing?'releasedDate':'receivedDate';
+   const officeKey=outgoing?'recipient':'receivedFrom';
+   const numberKey=routeToMemos?'memoNo':'controlNo';
+   const keys={
+    controlNoInput:numberKey,dateInput:dateKey,subjectInput:'subject',statusSelect:'status',
+    actionTakenInput:'actionTaken',remarksInput:'remarks'
+   };
+   if(!memo)keys.officeInput=officeKey;
+   else {
+    applyOcrValue('officeInput','');
+    setFieldState('officeInput','');
+   }
+   const sameMapping=contract&&result.communicationType===direction&&routeToMemos===(result.route==='office_memos');
+   for(const [id,key] of Object.entries(keys))applyField(id,key,sameMapping);
 
    updateDestination();
    const required=[...$('communicationForm').querySelectorAll('input[required],select[required],textarea[required]')];
@@ -1208,14 +1215,14 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     }
    }
 
-   const candidates=data.signatoryCandidates||[];
+   const candidates=memo?[]:(data.signatoryCandidates||[]);
    const select=$('ocrSignatorySelect');
    select.replaceChildren(new Option('Choose the originating person…',''));
    for(const candidate of candidates){
     select.add(new Option(candidate.name+(candidate.role?' — '+candidate.role:'')+' (page '+candidate.page+')',candidate.name));
    }
-   select.value=data[officeKey]||'';
-   $('ocrSignatoryGroup').hidden=(!memo&&outgoing)||!candidates.length||
+   select.value=memo?'':(data[officeKey]||'');
+   $('ocrSignatoryGroup').hidden=memo||outgoing||!candidates.length||
     (Boolean(data[officeKey])&&!data.receivedFromNeedsReview&&!data.signatoryNeedsReview);
    const review=$('communicationOcrReview'),pageCount=Number(result?.pages)||text.split('\f').length;
    review.hidden=!text.trim();
@@ -1228,7 +1235,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    notes.push(...(data.warnings||[]),...(result?.warnings||[]));
    review.textContent=['Read '+pageCount+' '+(pageCount===1?'page':'pages')+'.',...new Set(notes)].join(' ');
    $('communicationMemoReview').hidden=!data.isMemo;
-   $('communicationMemoReview').textContent=memo?'Confirm the memo number, issue date, recipient and issuing office.':'Check the document type and save destination.';
+   $('communicationMemoReview').textContent=routeToMemos?'Confirm the memo number, issue date and subject.':'Check the document type and save destination.';
    const filled=[...commOcrValues.keys()].filter(id=>['detected','review'].includes($(id).dataset.ocrState)).length;
    const missing=required.filter(input=>!input.value.trim()).length;
    $('ocrFieldSummary').textContent=filled+' '+(filled===1?'field':'fields')+' detected. '+
@@ -1285,7 +1292,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   });
   $('encodingModal').addEventListener('pgenro:modal-close',()=>stopCommunicationRead('closed'));
   function selectOcrSender(name) {
-   if(!name)return;
+   if(!name||isMemo())return;
    if(!printedSenderName(name,true)){
     $('communicationOcrReview').textContent='The selected OCR text is not a reliable printed name. Read the original and enter the correct name manually.';
     return;

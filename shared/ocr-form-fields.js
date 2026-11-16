@@ -41,10 +41,10 @@
   const referenceNumber = /^(?=[A-Z0-9/._-]*\d)[A-Z0-9][A-Z0-9/._-]*(?:,?\s*s\.?\s*\d{4})?$/i;
   const prefix = "(?:(?:PG\\s*ENRO|PROVINCIAL ENRO)\\s+)?";
   const memoHeading = new RegExp("^" + prefix + "(?:OFFICE\\s+)?(?:MEM[O0]RANDUM(?:\\s+(?:ORDER|CIRCULAR|JOINT))?|MEMO)(?:\\s+(?:N[O0]\\.?|NUMBER|FOR|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*|\\s*:)?$", "i");
-  const orderHeading = new RegExp("^" + prefix + "((?:OFFICE|SPECIAL|TRAVEL)\\s+ORDER)(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$", "i");
+  const orderHeading = new RegExp("^" + prefix + "((?:OFFICE|SPECIAL|TRAVEL|EXECUTIVE)\\s+ORDER)(?:\\s+(?:N[O0]\\.?|NUMBER|SERIES)\\b.*|\\s*[:#.-]?\\s*\\d.*)?$", "i");
   const bodyStart = /^(?:DEAR|GREETINGS|GOOD (?:DAY|MORNING|AFTERNOON)|SIR|MADAM|MA'AM|TO WHOM|PLEASE|KINDLY|THIS (?:IS|HAS|WILL|REFERS|SERVES|LETTER|MEMO|MEMORANDUM)|WE (?:ARE|WILL|WOULD|REQUEST|HEREBY)|I (?:AM|WOULD|WRITE|HEREBY|RESPECTFULLY)|YOU ARE|THE UNDERSIGNED|IN (?:LIGHT OF|CONNECTION WITH|ACCORDANCE WITH|VIEW OF)|PURSUANT|FOR YOUR (?:INFORMATION|COMPLIANCE|GUIDANCE)|SINCERELY|RESPECTFULLY|YOURS TRULY|BEST REGARDS|MAGANDANG (?:ARAW|UMAGA|HAPON)|MAHAL NA|MANGYARING|PAKIUSAP|KAMI (?:AY|PO)|AKO (?:AY|PO)|KAUGNAY|LUBOS NA GUMAGALANG|IPINAPABATID|NAIS (?:KO|NAMING)|SIGNED BY|SUBMITTED BY|PREPARED BY|APPROVED BY|ANNEX|APPENDIX|COPY FURNISHED)\b/i;
-  const types = ["Memorandum", "Office Order", "Special Order", "Travel Order", "Request Letter", "Endorsement Letter", "Transmittal Letter", "Response Letter", "Notice of Meeting", "Invitation", "Report", "Letter", "Other Communication"];
-  const headingTypes = types.slice(4, -2);
+  const headingTypes = ["Request Letter", "Endorsement Letter", "Transmittal Letter", "Response Letter", "Notice of Meeting", "Invitation", "Report"];
+  const types = ["Memorandum", "Office Order", "Special Order", "Travel Order", "Executive Order", ...headingTypes, "Letter", "Other Communication"];
   const statusAliases = new Map([
     ["pending", "Pending"], ["for action", "Pending"], ["for review", "Pending"], ["awaiting action", "Pending"],
     ["received", "Received"], ["received and logged", "Received"], ["logged", "Received"], ["accepted", "Received"],

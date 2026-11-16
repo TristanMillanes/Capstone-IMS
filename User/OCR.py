@@ -45,7 +45,7 @@ except ImportError:
 MAX_BYTES = 50 * 1024 * 1024
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg', 'webp', 'bmp', 'tif', 'tiff', 'docx', 'txt', 'csv', 'xlsx', 'pptx'}
 OCR_LANG_REQUESTED = os.getenv('OCR_LANG', 'eng+fil').strip() or 'eng'
-OCR_PARSER_VERSION = 23
+OCR_PARSER_VERSION = 24
 OCR_TIMEOUT = max(5, int(os.getenv('OCR_TIMEOUT', '45')))
 OCR_DOCUMENT_TIMEOUT = max(OCR_TIMEOUT, int(os.getenv('OCR_DOCUMENT_TIMEOUT', '180')))
 OCR_WORKERS = max(1, min(4, int(os.getenv('OCR_WORKERS', str(min(2, os.cpu_count() or 1))))))
@@ -753,7 +753,7 @@ MEMO_HEADING = re.compile(
     r'(?:\s+(?:N[O0]\.?|NUMBER|FOR|SERIES)\b.*|\s*[:#.-]?\s*\d.*|\s*:)?$', re.I
 )
 ORDER_HEADING = re.compile(
-    r'^(?:(?:PG\s*ENRO|PROVINCIAL ENRO)\s+)?(?P<type>OFFICE ORDER|SPECIAL ORDER|TRAVEL ORDER)'
+    r'^(?:(?:PG\s*ENRO|PROVINCIAL ENRO)\s+)?(?P<type>OFFICE ORDER|SPECIAL ORDER|TRAVEL ORDER|EXECUTIVE ORDER)'
     r'(?:\s+(?:N[O0]\.?|NUMBER|SERIES)\b.*|\s*[:#.-]?\s*\d.*)?$', re.I
 )
 HEADER_SUBJECT = re.compile(r'^(?:' + SUBJECT_LABEL + r'|PARTICULARS)$', re.I)
@@ -958,8 +958,9 @@ def parse_header(text):
     printed_direction, evidence['direction'] = field(r'C[O0]MMUN[Ii]C[Aa]T[Ii][O0]N\s+TYP[Ee]|D[Ii]R[Ee]CT[Ii][O0]N', 1)
     if printed_direction.casefold() in ('incoming', 'outgoing'):
         result['direction'] = printed_direction.title()
-    known_types = ('Memorandum', 'Office Order', 'Special Order', 'Travel Order', 'Request Letter', 'Endorsement Letter',
-                   'Transmittal Letter', 'Response Letter', 'Notice of Meeting', 'Invitation', 'Report', 'Letter', 'Other Communication')
+    known_types = ('Memorandum', 'Office Order', 'Special Order', 'Travel Order', 'Executive Order', 'Request Letter',
+                   'Endorsement Letter', 'Transmittal Letter', 'Response Letter', 'Notice of Meeting', 'Invitation',
+                   'Report', 'Letter', 'Other Communication')
     if not result['documentType']:
         result['documentType'] = next((kind for kind in known_types if kind.casefold() == printed_type.casefold()), '')
         if result['documentType']:
@@ -1484,7 +1485,9 @@ def communication_form_payload(metadata, text, communication_type=''):
             'state': 'missing' if not value else 'review' if review else 'detected',
             'source': metadata.get(key + 'Source', 'ocr'), 'evidence': evidence.get(key, '')
         }
-    required = ['controlNoInput', 'docTypeSelect', 'dateInput', 'subjectInput', 'memoRecipientInput' if memo else 'officeInput']
+    required = ['controlNoInput', 'docTypeSelect', 'dateInput', 'subjectInput']
+    if not memo:
+        required.append('officeInput')
     return {
         'formSchemaVersion': 2,
         'formValues': values,

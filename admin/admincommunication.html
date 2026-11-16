@@ -628,17 +628,34 @@
             <div class="form-grid encoder-meta-grid">
               <div class="form-group"><label for="typeSelect">Communication type <span class="required-mark">*</span></label><select class="form-control" id="typeSelect" required><option value="">Select type</option><option value="Incoming">Incoming</option><option value="Outgoing">Outgoing</option></select></div>
               <div class="form-group"><label for="controlNoInput"><span id="controlFieldLabel">Control number</span> <span class="required-mark">*</span></label><input class="form-control" id="controlNoInput" type="text" placeholder="Enter the reference number" required></div>
-              <div class="form-group"><label for="docTypeSelect">Document type <span class="required-mark">*</span></label><select class="form-control" id="docTypeSelect" required><option value="">Select document type</option><option value="Office Order">Office Order</option><option value="Special Order">Special Order</option><option value="Travel Order">Travel Order</option><option value="Memorandum">Memorandum</option><option value="Request Letter">Request Letter</option><option value="Endorsement Letter">Endorsement Letter</option><option value="Transmittal Letter">Transmittal Letter</option><option value="Response Letter">Response Letter</option><option value="Notice of Meeting">Notice of Meeting</option><option value="Invitation">Invitation</option><option value="Report">Report</option><option value="Letter">Letter</option><option value="Other Communication">Other Communication</option></select></div>
+              <div class="form-group">
+                <label for="docTypeSelect">Document type <span class="required-mark">*</span></label>
+                <select class="form-control" id="docTypeSelect" required>
+                  <option value="">Select document type</option>
+                  <option value="Executive Order">Executive Order</option>
+                  <option value="Office Order">Office Order</option>
+                  <option value="Special Order">Special Order</option>
+                  <option value="Travel Order">Travel Order</option>
+                  <option value="Memorandum">Memorandum</option>
+                  <option value="Request Letter">Request Letter</option>
+                  <option value="Endorsement Letter">Endorsement Letter</option>
+                  <option value="Transmittal Letter">Transmittal Letter</option>
+                  <option value="Response Letter">Response Letter</option>
+                  <option value="Notice of Meeting">Notice of Meeting</option>
+                  <option value="Invitation">Invitation</option>
+                  <option value="Report">Report</option>
+                  <option value="Letter">Letter</option>
+                  <option value="Other Communication">Other Communication</option>
+                </select>
+              </div>
               <div class="form-group"><label for="dateInput"><span id="dateFieldLabel">Date received</span> <span class="required-mark">*</span></label><input class="form-control" id="dateInput" type="date" required></div>
               <div class="form-group"><label for="statusSelect">Status <span class="required-mark">*</span></label><select class="form-control" id="statusSelect" required><option value="">Select status</option><option value="Pending">Pending</option><option value="Received">Received</option><option value="Forwarded">Forwarded</option><option value="Released">Released</option><option value="Archived">Archived</option></select></div>
             </div>
           </section>
           <section class="encoder-section encoder-content-section" aria-labelledby="communicationContentHeading">
-            <div class="encoder-section-heading"><div><h3 id="communicationContentHeading">People and particulars</h3><p>Confirm the details against the attached document.</p></div></div>
+            <div class="encoder-section-heading"><div><h3 id="communicationContentHeading">Document particulars</h3><p>Confirm the details against the attached document.</p></div></div>
             <div class="form-grid encoder-content-grid">
-              <div class="form-group full-width"><label for="officeInput"><span id="officeFieldLabel">Received from</span> <span class="required-mark" id="officeRequiredMark">*</span></label><textarea class="form-control compact-textarea" id="officeInput" rows="2" placeholder="Originating person or printed signatory" required></textarea></div>
-              <div class="form-group memo-routing-field" id="memoRecipientGroup" hidden><label for="memoRecipientInput">Addressed to <span class="required-mark">*</span></label><textarea class="form-control compact-textarea" id="memoRecipientInput" rows="2" placeholder="Memo recipient or personnel"></textarea></div>
-              <div class="form-group memo-routing-field" id="memoIssuerGroup" hidden><label for="memoIssuerInput">Issued by</label><input class="form-control" id="memoIssuerInput" type="text" placeholder="Issuing office or signatory"></div>
+              <div class="form-group full-width" id="officeFieldGroup"><label for="officeInput"><span id="officeFieldLabel">Received from</span> <span class="required-mark">*</span></label><textarea class="form-control compact-textarea" id="officeInput" rows="2" placeholder="Originating person or printed signatory" required></textarea></div>
               <div class="form-group full-width"><label for="subjectInput">Subject / particulars <span class="required-mark">*</span></label><textarea class="form-control feature-textarea" id="subjectInput" rows="3" placeholder="Full subject of the communication" required></textarea></div>
               <div class="form-group"><label for="actionTakenInput">Action taken / date forwarded</label><textarea class="form-control compact-textarea" id="actionTakenInput" rows="2" placeholder="e.g. Forwarded to Admin Division"></textarea></div>
               <div class="form-group"><label for="remarksInput">Remarks</label><textarea class="form-control compact-textarea" id="remarksInput" rows="2" placeholder="Additional notes (optional)"></textarea></div>
@@ -753,10 +770,10 @@
 <!-- Scripts -->
 
 <!-- Start the local interface before external database dependencies. -->
-<script defer src="../shared/ocr-form-fields.js?v=20261115-memo-issuer"></script>
+<script defer src="../shared/ocr-form-fields.js?v=20261116-archival"></script>
 <script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="admincommunication.js?v=20261116-manual-control"></script>
+<script defer src="admincommunication.js?v=20261116-archival"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
 <script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>

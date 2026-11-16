@@ -24,6 +24,19 @@ class FunctionalReaderTests(unittest.TestCase):
     def record(self, name, payload=None):
         findings.append({'scenario': name, 'result': 'PASS', **({k: payload[k] for k in ('processingMs', 'readingStats', 'cacheHit')} if payload else {})})
 
+    def test_archival_document_types(self):
+        for heading in ('EXECUTIVE ORDER NO. 12, s. 2026', 'DOCUMENT TYPE: Executive Order'):
+            text = f'{heading}\nSUBJECT: Records committee'
+            metadata = reader.extract_document_metadata(text)
+            self.assertEqual(metadata['documentType'], 'Executive Order')
+            form = reader.communication_form_payload(metadata, text)
+            self.assertEqual(form['route'], 'communications')
+            self.assertEqual(form['formValues']['docTypeSelect'], 'Executive Order')
+        text = 'MEMORANDUM NO. 12, s. 2026\nDATE: November 16, 2026\nSUBJECT: Records committee'
+        form = reader.communication_form_payload(reader.extract_document_metadata(text), text)
+        self.assertEqual(form['route'], 'office_memos')
+        self.assertEqual(form['missingFields'], [])
+
     def test_native_formats(self):
         with reader.app.test_client() as client:
             for name in ('incoming.csv', 'incoming-utf16.txt', 'incoming.xlsx', 'incoming.pptx', 'incoming.docx', 'incoming.pdf'):

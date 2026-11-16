@@ -20,10 +20,10 @@ const commInputs = new Map(Object.entries({
   typeSelect: field('Incoming'), controlNoInput: field(),
   docTypeSelect: field(''), dateInput: field('2026-11-14'), statusSelect: field('Pending'),
   officeInput: field(), subjectInput: field(), actionTakenInput: field(), remarksInput: field(),
-  memoRecipientInput: field(), memoIssuerInput: field(), ocrTextInput: field(),
+  ocrTextInput: field(),
 }));
 commInputs.get('typeSelect').options = ['Incoming', 'Outgoing'].map(value => ({value}));
-commInputs.get('docTypeSelect').options = ['Request Letter', 'Memorandum', 'Other Communication'].map(value => ({value}));
+commInputs.get('docTypeSelect').options = ['Request Letter', 'Executive Order', 'Memorandum', 'Other Communication'].map(value => ({value}));
 commInputs.get('statusSelect').options = ['Pending', 'Forwarded'].map(value => ({value}));
 for (const id of ['typeSelect', 'docTypeSelect', 'statusSelect']) commInputs.get(id).tagName = 'SELECT';
 const elements = {
@@ -31,16 +31,19 @@ const elements = {
   ocrSignatoryGroup: {}, communicationOcrReview: {},
   communicationMemoReview: {}, ocrFieldSummary: {}, ocrStatsChip: {style: {}},
   dateFieldLabel: {textContent: 'Date received'},
-  communicationForm: {querySelectorAll: () => ['dateInput', 'officeInput', 'subjectInput'].map(id => ({id, ...commInputs.get(id)}))},
+  communicationForm: {querySelectorAll: () => ['dateInput', 'officeInput', 'subjectInput']
+    .filter(id => id !== 'officeInput' || commInputs.get(id).required).map(id => ({id, ...commInputs.get(id)}))},
 };
 const $ = id => commInputs.get(id) || elements[id];
+const isMemo = () => $('docTypeSelect').value === 'Memorandum';
 const context = vm.createContext({
   $, window: {PGENRO_API: {adminCan: () => true}}, Option: function (text, value) { Object.assign(this, {text, value}); },
   commManualFields: new Set(), commOcrValues: new Map(), ocrFormIds: new Set(commInputs.keys()),
   editing: null, lastOcr: null,
+  isMemo, canRouteMemo: isMemo,
   updateDestination() {
-    elements.dateFieldLabel.textContent = $('docTypeSelect').value === 'Memorandum' ? 'Date issued' :
-      $('typeSelect').value === 'Outgoing' ? 'Date released' : 'Date received';
+    $('officeInput').required = !isMemo();
+    elements.dateFieldLabel.textContent = isMemo() ? 'Date issued' : $('typeSelect').value === 'Outgoing' ? 'Date released' : 'Date received';
   },
   setFieldState(id, state) { $(id).dataset.ocrState = state; },
 });
@@ -157,10 +160,19 @@ context.commOcrValues.clear();
 for (const input of commInputs.values()) input.value = '';
 $('typeSelect').value = 'Incoming';
 context.extractFields(signedMemo, olderServiceResult);
-assert.equal($('memoIssuerInput').value, 'ENGR. ALMA J. DE LA CRUZ');
-assert.equal($('memoRecipientInput').value, 'ALL SECTION HEADS');
+assert.equal(context.lastOcr.metadata.issuedBy, 'ENGR. ALMA J. DE LA CRUZ');
+assert.equal(context.lastOcr.metadata.recipient, 'ALL SECTION HEADS');
+assert.equal($('officeInput').required, false);
+assert.equal($('ocrSignatoryGroup').hidden, true);
 assert.equal($('dateInput').value, '2026-11-14');
-console.log('PASS Both forms recover the printed issuer from full OCR text when older service metadata leaves it blank.');
+console.log('PASS Both forms recover the printed issuer, and the Communications memo form skips the office field.');
+
+$('controlNoInput').value = '';
+context.extractFields('EXECUTIVE ORDER NO. 12, s. 2026\nSUBJECT: Records committee');
+assert.equal($('docTypeSelect').value, 'Executive Order');
+assert.equal($('controlNoInput').value, '12, s. 2026');
+assert.equal($('officeInput').required, true);
+console.log('PASS Communications recognizes Executive Order and restores non-memo validation.');
 
 const manualNumber = 'Desk 07 / ref A';
 $('controlNoInput').value = manualNumber;
