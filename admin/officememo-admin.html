@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 <link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
-<link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261114-document-intake">
+<link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261116-optional-ocr">
 <script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified pgenro-responsive" data-admin-page="officememo-admin.html" data-css-scope="admin-officememo" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Office Memos" data-design="emerald-v6">
@@ -411,7 +411,7 @@
 <div class="modal-header-icon"><i data-lucide="file-plus-2"></i></div>
 <div>
 <h2 id="modalFormTitle">Issue Office Memorandum</h2>
-<p>Upload a document, review the detected details, then save.</p>
+<p>Enter the memorandum details and attach a document if needed.</p>
 </div>
 </div>
 <button aria-label="Close memorandum form" class="modal-close-btn" id="closeFormModalBtn" type="button">
@@ -422,7 +422,7 @@
 <input id="memoDocId" type="hidden" value="">
 <input id="formExistingPdfBase64" type="hidden" value="">
 <div class="modal-body memo-form-body document-intake-form">
-<aside class="encoder-document-column" aria-label="Document and automatic reading">
+<aside class="encoder-document-column" aria-label="Document and optional OCR">
           <section class="document-intake-panel" aria-labelledby="memoDocumentHeading">
             <h3 id="memoDocumentHeading">Upload document</h3>
             <div class="document-intake-dropzone" id="fileDropzone">
@@ -435,10 +435,10 @@
               </div>
             </div>
             <div class="document-intake-reader">
-              <strong id="memoOcrStage" role="status">Ready for a document</strong>
-              <p id="memoOcrStatus">Reading starts automatically when you select a file.</p>
+              <strong id="memoOcrStage" role="status">Optional OCR</strong>
+              <p id="memoOcrStatus">Choose a document to enable OCR.</p>
               <div class="document-intake-controls">
-                <button class="btn btn-secondary" id="runMemoOcrBtn" type="button" disabled>Read again</button>
+                <button class="btn btn-secondary" id="runMemoOcrBtn" type="button" disabled>Run OCR</button>
                 <span id="memoOcrStopControls" hidden><button class="btn btn-secondary" id="cancelMemoOcrBtn" type="button">Stop reading</button></span>
               </div>
               <div id="memoUploadProgress" hidden>
@@ -446,13 +446,6 @@
                 <progress class="document-intake-progress" id="memoOcrProgress" aria-label="Document reading progress" max="100" value="0"></progress>
               </div>
             </div>
-            <section class="attachment-preview" id="memoInlinePreview" aria-label="Document preview" hidden>
-              <div class="attachment-preview-heading">
-                <h4>Document preview</h4>
-                <a class="btn btn-secondary" data-preview-download hidden>Download</a>
-              </div>
-              <div data-preview-body></div>
-            </section>
           </section>
 <section aria-labelledby="memoReviewHeading" class="memo-extraction-review document-intake-review" hidden id="memoExtractionReview">
 <h4 id="memoReviewHeading">Detected fields</h4>
@@ -514,7 +507,7 @@
 <details class="document-intake-text">
 <summary>Extracted document text</summary>
 <label for="memoOcrText">Review or correct the readable text from every page.</label>
-<textarea class="form-textarea" id="memoOcrText" placeholder="Extracted text will appear automatically after reading the file." rows="8"></textarea>
+<textarea class="form-textarea" id="memoOcrText" placeholder="Text appears here after you run OCR." rows="8"></textarea>
 <button class="btn btn-secondary" id="recheckMemoFieldsBtn" type="button">Recheck fields</button>
 </details>
 </div>
@@ -608,9 +601,9 @@
 <script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/ocr-form-fields.js?v=20261115-memo-issuer"></script>
-<script defer src="../shared/admin-document-preview.js?v=20261114-document-intake"></script>
+<script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="officememo-admin.js?v=20261115-memo-issuer"></script>
+<script defer src="officememo-admin.js?v=20261116-optional-ocr"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

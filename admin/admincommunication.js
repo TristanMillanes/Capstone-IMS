@@ -330,8 +330,7 @@
   function newMemoControlNo(){const prefix=`MEMO-${new Date().getFullYear()}-`;const highest=Math.max(0,...(Array.isArray(memoRegistryRows)?memoRegistryRows:[]).map(m=>String(m.memoNo||m.controlNo||'').startsWith(prefix)?Number(String(m.memoNo||m.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
   const commOcrValues=new Map(),commManualFields=new Set();
   const ocrFormIds=new Set([...Object.values(fieldInputs),'memoRecipientInput','memoIssuerInput']);
-  const editorPreview = window.PGENRO_DocumentPreview.create($('filePreviewContainer'));
-  let ocrTask=null,pendingRead=null,ocrActive=false,lastOcr=null;
+  let ocrActive=false,lastOcr=null;
   for(const id of ocrFormIds)$(id).addEventListener('input',()=>{commManualFields.add(id);setFieldState(id,'edited','Your manual edit is kept.');});
   const isMemo=()=>$('docTypeSelect').value==='Memorandum';
   const canRouteMemo=()=>isMemo()&&window.PGENRO_API?.adminCan('office_memos')===true;
@@ -540,15 +539,14 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    updateDestination();
   }
   function resetFile(remove=false) {
-   ocrGeneration++;pendingRead=null;cancelDocumentRead('removed');file=null;attachment=null;
+   file=null;attachment=null;stopCommunicationRead('removed');
    if(remove){remoteAttachmentRemoved=true;clearAutoDetectedFields();}
-   $('documentFileInput').value='';editorPreview.clear();$('fileNameDisplay').textContent='Choose a document';$('fileMetaDisplay').textContent='PDF, images, Word, Excel, PowerPoint or text · Max 50 MB';
-   $('removeDocumentBtn').hidden=true;$('runOcrBtn').disabled=true;
-   setReaderState('idle','Ready for a document');$('ocrActionSubtext').textContent='Reading starts automatically when you select a file.';
-   $('encodingUploadProgressBox').hidden=true;$('ocrStopControls').hidden=true;
+   $('documentFileInput').value='';$('fileNameDisplay').textContent='Choose a document';$('fileMetaDisplay').textContent='PDF, images, Word, Excel, PowerPoint or text · Max 50 MB';
+   $('removeDocumentBtn').hidden=true;
+   setReaderState('idle','Optional OCR');$('ocrActionSubtext').textContent='Choose a document to enable OCR.';
   }
   async function openEditor(id=null) {
-   if(busy)return;pendingRead=null;cancelDocumentRead('closed');routeCommitted=false;remoteAttachmentRemoved=false;commOcrValues.clear();commManualFields.clear();$('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcr=null;
+   if(busy)return;routeCommitted=false;remoteAttachmentRemoved=false;commOcrValues.clear();commManualFields.clear();$('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcr=null;
    for(const id of ocrFormIds)setFieldState(id,'');$('ocrFieldSummary').textContent='Detected fields will appear here after reading.';$('communicationInlineNotice').hidden=true;
    for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=false;
    $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=false;
@@ -565,7 +563,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     attachment=r.attachmentId||r.fileUrl?{id:r.attachmentId||null,name:r.fileName,type:r.fileType}:null;
     if(attachment){
      $('fileNameDisplay').textContent=attachment.name||'Existing attachment';$('fileMetaDisplay').textContent='Previously attached file';$('removeDocumentBtn').hidden=false;
-     $('ocrActionSubtext').textContent='Choose a new file to replace the attachment and read its fields.';
+     $('ocrActionSubtext').textContent='Choose a new file to replace this attachment.';
     }
    }
    else {$('dateInput').value=M.today();$('controlNoInput').value=newControlNo();$('typeSelect').value='Incoming';$('statusSelect').value='Pending';}
@@ -583,10 +581,6 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    if(draftVersion!==ocrGeneration)return;
    updateDestination();syncOcrControls();if(M.openModal('encodingModal')===false)return;
    $('encodingModalBody').scrollTop=0;
-   if(attachment&&r)void editorPreview.show({
-    name:attachment.name||'Existing attachment',text:r.ocrText,
-    loadFile:async signal=>readCommunicationPreviewBlob(await communicationAttachmentSource(r),signal),
-   });
   }
   // IndexedDB retains large attachments without exhausting localStorage.
   let dbPromise;
@@ -605,12 +599,13 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    if(!chosen||busy||routeCommitted)return;if(chosen.size>50*1024*1024){M.toast('Choose a file no larger than 50 MB.','warning');$('documentFileInput').value='';return;}
    if(!chosen.size){M.toast('This file is empty. Choose another document.','warning');$('documentFileInput').value='';return;}
    if(!/\.(pdf|png|jpe?g|webp|bmp|tiff?|docx|txt|csv|xlsx|pptx)$/i.test(chosen.name)){M.toast('Unsupported attachment type.','warning');$('documentFileInput').value='';return;}
-   ocrGeneration++;cancelDocumentRead('replaced');clearAutoDetectedFields();
+   stopCommunicationRead('replaced');clearAutoDetectedFields();
    $('communicationInlineNotice').hidden=true;
    file=chosen;attachment=null;$('fileNameDisplay').textContent=chosen.name;$('fileMetaDisplay').textContent=`${(chosen.size/1024/1024).toFixed(2)} MB \xb7 ${chosen.name.split('.').pop().toUpperCase()}`;
    $('documentFileInput').value='';$('removeDocumentBtn').hidden=false;
-   void editorPreview.show({name:chosen.name,file:chosen,pending:true});
-   scheduleDocumentRead();
+   setReaderState('ready','Document selected');
+   $('ocrActionSubtext').textContent='Select Run OCR to fill fields, or enter the details manually.';
+   syncOcrControls();
   }
   $('documentFileInput').addEventListener('change',()=>selectDocument($('documentFileInput').files[0]));
   const dropZone=$('communicationDropZone');
@@ -621,7 +616,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
   $('removeDocumentBtn').addEventListener('click',()=>{resetFile(true);$('browseDocumentBtn').focus({preventScroll:true});});
   $('communicationForm').addEventListener('submit',async e=>{
    e.preventDefault();if(busy)return;
-   if(ocrActive||pendingRead){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
+   if(ocrActive){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
    if(!$('communicationForm').reportValidity())return;
    const payload=Object.fromEntries(Object.entries(fieldInputs).map(([k,id])=>[k,$(id).value.trim()]));if(!canRouteMemo()&&records.some(r=>String(r.id)!==String(editing)&&String(r.controlNo||'').trim().toLowerCase()===payload.controlNo.toLowerCase()))return M.toast('This control number already exists. Use a unique number.','warning');
    let newAttachment=null,newRemoteUrl='';const priorAttachment=records.find(r=>String(r.id)===String(editing))?.attachmentId;
@@ -1123,12 +1118,17 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    $('encodingModal').dataset.ocrState=state;$('filePickerState').dataset.state=state;$('ocrStateLabel').textContent=label;
   }
   function syncOcrControls() {
-   const reading=ocrActive||Boolean(pendingRead);
-   $('saveRecordBtn').disabled=busy||reading;
-   $('runOcrBtn').disabled=busy||reading||routeCommitted||!file;
+   $('saveRecordBtn').disabled=busy||ocrActive;
+   $('runOcrBtn').disabled=busy||ocrActive||routeCommitted||!file;
    $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=busy||routeCommitted;
    $('documentFileInput').disabled=busy||routeCommitted;
-   if(!reading)$('ocrStopControls').hidden=true;
+   $('ocrStopControls').hidden=$('encodingUploadProgressBox').hidden=!ocrActive;
+  }
+  function stopCommunicationRead(reason) {
+   ++ocrGeneration;
+   cancelDocumentRead(reason);
+   ocrActive=false;
+   syncOcrControls();
   }
   function applyOcrValue(id,value,force=false) {
    const input=$(id);if(!input||!ocrFormIds.has(id)||commManualFields.has(id))return false;
@@ -1245,10 +1245,13 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    else updateDestination();
   }
 
-  async function runDocumentRead(request) {
-   const current=()=>request.version===ocrGeneration&&request.source===file;
-   if(!current())return;ocrActive=true;syncOcrControls();setReaderState('processing','Reading your document');
-   $('ocrStopControls').hidden=false;$('encodingUploadProgressBox').hidden=false;
+  async function runDocumentRead() {
+   if(!file||busy||routeCommitted||ocrActive)return;
+   const source=file,version=++ocrGeneration;
+   const current=()=>version===ocrGeneration&&source===file;
+   ocrActive=true;
+   syncOcrControls();
+   setReaderState('processing','Reading your document');
    $('ocrActionSubtext').textContent='You can edit the fields while the document is being read.';
    const started=performance.now();let stageMessage='Preparing the document\u2026',lastPercent=0;
    const elapsed=setInterval(()=>{if(current())$('encodingUploadStatusText').textContent=`${stageMessage} \xb7 ${Math.floor((performance.now()-started)/1000)}s`;},1000);
@@ -1256,9 +1259,8 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     $('encodingUploadStatusText').textContent=message;$('communicationOcrProgress').value=Math.round(lastPercent);};
    $('communicationOcrProgress').value=0;
    try {
-    progress('Reading all pages automatically\u2026',2);const result=await readWithCancellation(request.source,progress,current);if(!current())return;
+    progress('Reading all pages\u2026',2);const result=await readWithCancellation(source,progress,current);if(!current())return;
     if(!result.text.trim())throw new Error('No readable text was detected. You can fill the details manually.');
-    editorPreview.setReadState({text:result.text});
     const manualText=commManualFields.has('ocrTextInput');if(!manualText)$('ocrTextInput').value=result.text;
     const missing=extractFields($('ocrTextInput').value,manualText?null:result);
     const seconds=((result.durationMs??(performance.now()-started))/1000).toFixed(1);
@@ -1268,27 +1270,21 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     progress('Document read. Detected details are ready for review.',100);
    } catch(error) {
     if(!current())return;setReaderState('error','Reading needs attention');$('ocrActionSubtext').textContent=error.message||'Reading failed. Retry or fill the details manually.';
-    editorPreview.setReadState({error:'No text preview is available. Select Read again to retry.'});
     $('ocrFieldSummary').textContent='Your draft is kept. Retry reading or enter the required fields manually.';M.toast($('ocrActionSubtext').textContent,'error');
    } finally {
-    clearInterval(elapsed);ocrActive=false;if(current()){$('encodingUploadProgressBox').hidden=true;$('ocrStopControls').hidden=true;}syncOcrControls();
+    clearInterval(elapsed);
+    if(current()){
+     ocrActive=false;
+     syncOcrControls();
+    }
    }
   }
-  function scheduleDocumentRead() {
-   if(!file||busy||routeCommitted)return;
-   editorPreview.setReadState({pending:true});
-   pendingRead={source:file,version:ocrGeneration};setReaderState('processing','Preparing automatic reading');syncOcrControls();
-   if(ocrTask){cancelDocumentRead('replaced');return;}
-   const task=(async()=>{while(pendingRead){const request=pendingRead;pendingRead=null;await runDocumentRead(request);}})();ocrTask=task;
-   task.catch(error=>{setReaderState('error','Reading needs attention');M.toast(error.message||'The reader stopped. Retry the document.','error');}).finally(()=>{if(ocrTask===task)ocrTask=null;if(pendingRead)scheduleDocumentRead();else syncOcrControls();});
-  }
   $('cancelOcrBtn').addEventListener('click',()=>{
-   pendingRead=null;ocrGeneration++;cancelDocumentRead();setReaderState('stopped','Reading stopped');
-   editorPreview.setReadState({error:'Reading stopped. Select Read again to load the text preview.'});
-   $('ocrActionSubtext').textContent='Your draft is kept. Select Read again to retry, or fill the details manually.';
-   $('encodingUploadProgressBox').hidden=true;$('ocrStopControls').hidden=true;syncOcrControls();
+   stopCommunicationRead('stopped');
+   setReaderState('stopped','Reading stopped');
+   $('ocrActionSubtext').textContent='Select Run OCR to retry, or enter the details manually.';
   });
-  $('encodingModal').addEventListener('pgenro:modal-close',()=>{pendingRead=null;ocrGeneration++;cancelDocumentRead('closed');editorPreview.clear();});
+  $('encodingModal').addEventListener('pgenro:modal-close',()=>stopCommunicationRead('closed'));
   function selectOcrSender(name) {
    if(!name)return;
    if(!printedSenderName(name,true)){
@@ -1302,7 +1298,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   $('typeSelect').addEventListener('change',refreshOcrMapping);
   $('ocrTextInput').addEventListener('change',()=>extractFields($('ocrTextInput').value));
   $('recheckCommunicationFieldsBtn').addEventListener('click',refreshOcrMapping);
-  $('runOcrBtn').addEventListener('click',scheduleDocumentRead);
+  $('runOcrBtn').addEventListener('click',runDocumentRead);
   let channel,timer;
   function connectRecords() {
    if(!M.client()||channel)return;
@@ -1316,7 +1312,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   window.addEventListener('pgenro:backend-ready',()=>{connectRecords();if(mode!=='loading')load();});
   await load();connectRecords();
   window.addEventListener('storage',e=>{if(e.key===cacheKey&&!M.client())load();});
-  window.addEventListener('pagehide',(event)=>{if(event.persisted)return;clearTimeout(timer);generation++;editorPreview.clear();if(channel)M.client()?.removeChannel(channel);});
+  window.addEventListener('pagehide',(event)=>{if(event.persisted)return;clearTimeout(timer);generation++;if(channel)M.client()?.removeChannel(channel);});
  };
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();

@@ -228,7 +228,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const memoOcrProgress = document.getElementById("memoOcrProgress");
   const memoUploadProgressLabel = document.getElementById("memoUploadProgressLabel");
   const saveMemoSubmitBtn = document.getElementById("saveMemoSubmitBtn");
-  const memoInlinePreview = window.PGENRO_DocumentPreview.create(document.getElementById("memoInlinePreview"));
 
   // Memorandum OCR
   const runMemoOcrBtn = document.getElementById("runMemoOcrBtn");
@@ -825,7 +824,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     memoOcrProgress.value = 0;
     memoUploadProgressLabel.textContent = 'Preparing the document…';
     setMemoOcrStatus('Reading your document', 'You can edit the fields while the document is being read.', 'working');
-    memoInlinePreview.setReadState({pending: true});
     syncMemoControls();
 
     try {
@@ -837,7 +835,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
       if (!current()) return;
       const text = result.text.trim();
       if (!text) throw new Error('No readable text was detected. You can fill the details manually.');
-      memoInlinePreview.setReadState({text});
       if (!memoTextEdited) memoOcrText.value = text;
       lastMemoRead = {text, result};
       const reviewedText = memoOcrText.value;
@@ -848,7 +845,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     } catch (error) {
       if (!current()) return;
       setMemoOcrStatus('Reading needs attention', error.message || 'Retry reading or enter the details manually.', 'error');
-      memoInlinePreview.setReadState({error: 'No text preview is available. Select Read again to retry.'});
     } finally {
       if (current()) {
         ocrBusy = false;
@@ -871,12 +867,11 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     existingMemoUrl.value = '';
     selectedMemoFile = null;
     stopMemoRead('removed');
-    memoInlinePreview.clear();
     clearMemoDetection();
     attachedFileName.textContent = 'Choose a document';
     attachedFileMeta.textContent = memoFileHint;
     removeAttachmentBtn.hidden = true;
-    setMemoOcrStatus('Ready for a document', 'Reading starts automatically when you select a file.');
+    setMemoOcrStatus('Optional OCR', 'Choose a document to enable OCR.');
   }
 
   function acceptMemoFile(file) {
@@ -897,8 +892,8 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     attachedFileName.textContent = file.name;
     attachedFileMeta.textContent = (file.size / 1024 / 1024).toFixed(2) + ' MB · ' + file.name.split('.').pop().toUpperCase();
     removeAttachmentBtn.hidden = false;
-    void memoInlinePreview.show({name: file.name, file, pending: true});
-    void runMemoOcr(file);
+    setMemoOcrStatus('Document selected', 'Select Run OCR to fill fields, or enter the details manually.');
+    syncMemoControls();
   }
 
   function resetForm() {
@@ -940,13 +935,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   memoFormModal.addEventListener('click', event => {
     if (event.target === memoFormModal) setMemoFormModalOpen(false);
   });
-  memoFormModal.addEventListener('pgenro:modal-close', () => {
-    stopMemoRead('closed');
-    memoInlinePreview.clear();
-  });
-  window.addEventListener('pagehide', event => {
-    if (!event.persisted) memoInlinePreview.clear();
-  });
+  memoFormModal.addEventListener('pgenro:modal-close', () => stopMemoRead('closed'));
 
   function openEditModal(memo) {
     if (busy) return;
@@ -971,15 +960,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
       attachedFileName.textContent = memo.pdfFileName || 'Existing attachment';
       attachedFileMeta.textContent = 'Previously attached file';
       removeAttachmentBtn.hidden = false;
-      setMemoOcrStatus('Existing attachment', 'Choose a new file to replace the attachment and read its fields.');
-      void memoInlinePreview.show({
-        name: attachedFileName.textContent, text: notes.text,
-        loadFile: async signal => {
-          const url = safeAttachment(memo.pdfUrl);
-          if (!url) throw new Error('The attachment address or file type is invalid.');
-          return readMemoPreviewBlob(url, signal);
-        },
-      });
+      setMemoOcrStatus('Existing attachment', 'Choose a new file to replace this attachment.');
     }
   }
 
@@ -1006,8 +987,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   runMemoOcrBtn.addEventListener('click', () => runMemoOcr(selectedMemoFile));
   document.getElementById('cancelMemoOcrBtn').addEventListener('click', () => {
     stopMemoRead('stopped');
-    setMemoOcrStatus('Reading stopped', 'Select Read again to retry, or fill the details manually.');
-    memoInlinePreview.setReadState({error: 'Reading stopped. Select Read again to load the text preview.'});
+    setMemoOcrStatus('Reading stopped', 'Select Run OCR to retry, or enter the details manually.');
   });
   removeAttachmentBtn.addEventListener('click', () => {
     if (busy) return;

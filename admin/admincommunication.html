@@ -36,7 +36,7 @@
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 <link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
-<link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261114-document-intake">
+<link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261116-optional-ocr">
 <script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
 
@@ -575,7 +575,7 @@
         <div class="communication-modal-copy">
           <span class="encoder-eyebrow">Communications workspace</span>
           <h2 id="modalTitle">New Communication Record</h2>
-          <p>Upload a document, review the detected details, then save.</p>
+          <p>Enter the record details and attach a document if needed.</p>
         </div>
       </div>
       <button class="modal-close-btn" id="closeEncodingModalBtn" type="button" aria-label="Close communication form"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="x" class="lucide lucide-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
@@ -583,7 +583,7 @@
     <form id="communicationForm">
       <div class="modal-body communication-modal-body document-intake-form" id="encodingModalBody">
         <input id="editIndex" type="hidden" value="">
-        <aside class="encoder-document-column" aria-label="Document and automatic reading">
+        <aside class="encoder-document-column" aria-label="Document and optional OCR">
           <section class="document-intake-panel" aria-labelledby="uploadPanelTitle">
             <h3 id="uploadPanelTitle">Upload document</h3>
             <div class="document-intake-dropzone" id="communicationDropZone">
@@ -596,10 +596,10 @@
               </div>
             </div>
             <div class="document-intake-reader" id="filePickerState">
-              <strong id="ocrStateLabel" role="status">Ready for a document</strong>
-              <p id="ocrActionSubtext">Reading starts automatically when you select a file.</p>
+              <strong id="ocrStateLabel" role="status">Optional OCR</strong>
+              <p id="ocrActionSubtext">Choose a document to enable OCR.</p>
               <div class="document-intake-controls">
-                <button class="btn btn-secondary" id="runOcrBtn" type="button" disabled>Read again</button>
+                <button class="btn btn-secondary" id="runOcrBtn" type="button" disabled>Run OCR</button>
                 <span id="ocrStopControls" hidden><button class="btn btn-secondary" id="cancelOcrBtn" type="button">Stop reading</button></span>
               </div>
               <div id="encodingUploadProgressBox" hidden>
@@ -607,13 +607,6 @@
                 <progress class="document-intake-progress" id="communicationOcrProgress" aria-label="Document reading progress" max="100" value="0"></progress>
               </div>
             </div>
-            <section class="attachment-preview" id="filePreviewContainer" aria-label="Document preview" hidden>
-              <div class="attachment-preview-heading">
-                <h4>Document preview</h4>
-                <a class="btn btn-secondary" data-preview-download hidden>Download</a>
-              </div>
-              <div data-preview-body></div>
-            </section>
           </section>
           <section class="encoder-review-panel document-intake-review" aria-label="Reading summary">
             <h4>Detected fields</h4>
@@ -655,7 +648,7 @@
         <details class="encoder-ocr-result document-intake-text">
           <summary>Extracted document text <span class="ocr-stats-chip" id="ocrStatsChip" style="display:none"></span></summary>
           <label for="ocrTextInput" class="encoder-text-label">Review or correct the readable text from every page.</label>
-          <textarea class="form-control ocr-result-textarea" id="ocrTextInput" rows="8" placeholder="Extracted text will appear automatically after reading the file."></textarea>
+          <textarea class="form-control ocr-result-textarea" id="ocrTextInput" rows="8" placeholder="Text appears here after you run OCR."></textarea>
           <button class="btn btn-secondary" id="recheckCommunicationFieldsBtn" type="button">Recheck fields</button>
         </details>
       </div>
@@ -761,9 +754,9 @@
 
 <!-- Start the local interface before external database dependencies. -->
 <script defer src="../shared/ocr-form-fields.js?v=20261115-memo-issuer"></script>
-<script defer src="../shared/admin-document-preview.js?v=20261114-document-intake"></script>
+<script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="admincommunication.js?v=20261115-memo-issuer"></script>
+<script defer src="admincommunication.js?v=20261116-optional-ocr"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
 <script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
