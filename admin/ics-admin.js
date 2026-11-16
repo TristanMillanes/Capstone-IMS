@@ -280,7 +280,6 @@
   }
   function openEditor(record=null){
     if(saving)return;resetForm();
-    if(!record){const prefix=`ICS-${new Date().getFullYear()}-`;const highest=Math.max(0,...state.records.map(r=>String(r.controlNo||'').startsWith(prefix)?Number(String(r.controlNo).slice(prefix.length))||0:0));$('controlNo').value=prefix+String(highest+1).padStart(4,'0');}
     if(record){ if($('editorTitle')) $('editorTitle').textContent='Edit Inventory Custodian Slip'; if($('recordId')) $('recordId').value=record.id||''; populateForm(record); }
     setModalOpen(editorModal,true); $('controlNo')?.focus({preventScroll:true});
   }
@@ -300,7 +299,6 @@
     event.preventDefault();if(saving||!validateForm())return;
     if(!state.dbReady){showFormFeedback('Refresh the registry successfully before saving.');return;}
     const data=getFormData(),id=$('recordId').value.trim();
-    if(state.records.some(r=>String(r.id)!==id&&String(r.controlNo||'').trim().toLowerCase()===data.controlNo.toLowerCase())){showFormFeedback('Control number already exists. Choose a unique number.');$('controlNo').focus();return;}
     saving=true;editorModal.dataset.busy='true';const button=$('saveIcsBtn'),markup=button.innerHTML;button.disabled=true;button.textContent='Saving…';
     try{
       data.updatedAt=new Date().toISOString();if(!id)data.createdAt=data.updatedAt;

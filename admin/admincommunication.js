@@ -112,11 +112,13 @@
     if(!row.data||typeof row.data!=='object'||Array.isArray(row.data))return row;
     const base={...row.data,id:row.id,created_at:row.created_at ?? row.data.created_at,updated_at:row.updated_at ?? row.data.updated_at};
     if(table!=='communications')return base;
-    // Hybrid tables retain older records in real columns. Read them alongside
-    // JSON, including the control number returned by the database trigger.
+    // Hybrid tables can have an older column reference alongside the saved form.
     const {data,...columns}=row,out={...columns,...base};
-    const names={type:'type',controlNo:'control_no',docType:'document_type',date:'date',status:'status',office:'office',subject:'subject',actionTaken:'action_taken',remarks:'remarks',ocrText:'ocr_text',fileName:'file_name',fileSize:'file_size',fileUrl:'drive_link'};
-    for(const[key,column]of Object.entries(names))if(row[column]!=null&&(out[key]==null||key==='type'||key==='controlNo'))out[key]=row[column];
+    const names={type:'type',docType:'document_type',date:'date',status:'status',office:'office',subject:'subject',actionTaken:'action_taken',remarks:'remarks',ocrText:'ocr_text',fileName:'file_name',fileSize:'file_size',fileUrl:'drive_link'};
+    for(const[key,column]of Object.entries(names))if(row[column]!=null&&(out[key]==null||key==='type'))out[key]=row[column];
+    const controlNumber = [data.controlNo, data.control_no, data.controlNumber, data.control_number, row.control_no]
+      .find(number => String(number ?? '').trim());
+    if (controlNumber !== undefined) out.controlNo = controlNumber;
     return out;
   };
   async function read(table) {
@@ -146,7 +148,7 @@
       for (const key of communicationTypeKeys) out[key] = formatCommunicationType(raw,format||communicationFormats.get(key)||preferredCommunicationFormat);
     }
     const canonical = {
-      controlNo:['controlNo','control_no','control_number'],
+      controlNo:['controlNo','control_no','controlNumber','control_number'],
       docType:['docType','documentType','document_type','doc_type'],
       date:['date','receivedDate','date_received'],
       office:['office','receivedFrom','received_from','recipient_office'],
@@ -201,7 +203,7 @@
         break;
       }
       // Only a confirmed direction validation rejection can try another casing.
-      // Network, permissions, duplicate numbers and other errors are returned unchanged.
+      // Return failures outside direction validation to the form.
       const error=response.error,detail=[error.message,error.details,error.hint].filter(Boolean).join(' ');
       const directionRejected=['22P02','23514','P0001','22023'].includes(error.code)&&
         /(?:communication[s]?|comm|record)[_\s-]*type|(?:communication[s]?[_\s-]*)?direction|invalid[^.]*incoming[^.]*outgoing/i.test(detail);
@@ -322,12 +324,10 @@
   let records=[], selected=new Set(), page=1, direction='All', editing=null, file=null, attachment=null, busy=false, mode='loading', generation=0, ocrGeneration=0;
   const size=10;
   const fieldInputs={type:'typeSelect',controlNo:'controlNoInput',docType:'docTypeSelect',date:'dateInput',office:'officeInput',subject:'subjectInput',actionTaken:'actionTakenInput',remarks:'remarksInput',status:'statusSelect',ocrText:'ocrTextInput'};
-  const aliases={type:['type','communicationType','communication_type','direction','recordType','record_type','commType','comm_type'],controlNo:['controlNo','control_no','control_number'],docType:['docType','documentType','document_type','doc_type'],date:['date','receivedDate','date_received'],office:['office','receivedFrom','received_from','recipient_office'],subject:['subject','particulars'],actionTaken:['actionTaken','action_taken'],remarks:['remarks'],status:['status'],ocrText:['ocrText','ocr_text'],fileName:['fileName','file_name'],fileType:['fileType','file_type'],attachmentId:['attachmentId','attachment_id'],fileUrl:['fileUrl','file_url','attachment_url','driveLink','drive_link']};
+  const aliases={type:['type','communicationType','communication_type','direction','recordType','record_type','commType','comm_type'],controlNo:['controlNo','control_no','controlNumber','control_number'],docType:['docType','documentType','document_type','doc_type'],date:['date','receivedDate','date_received'],office:['office','receivedFrom','received_from','recipient_office'],subject:['subject','particulars'],actionTaken:['actionTaken','action_taken'],remarks:['remarks'],status:['status'],ocrText:['ocrText','ocr_text'],fileName:['fileName','file_name'],fileType:['fileType','file_type'],attachmentId:['attachmentId','attachment_id'],fileUrl:['fileUrl','file_url','attachment_url','driveLink','drive_link']};
   const fields={};
   const routeJournalKey='pgenro_memo_routes';
-  let routeCommitted=false,remoteAttachmentRemoved=false;
-  let memoRegistryRows=[];
-  function newMemoControlNo(){const prefix=`MEMO-${new Date().getFullYear()}-`;const highest=Math.max(0,...(Array.isArray(memoRegistryRows)?memoRegistryRows:[]).map(m=>String(m.memoNo||m.controlNo||'').startsWith(prefix)?Number(String(m.memoNo||m.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
+  let routeCommitted=false,remoteAttachmentRemoved=false,memoDraftId=null;
   const commOcrValues=new Map(),commManualFields=new Set();
   const ocrFormIds=new Set([...Object.values(fieldInputs),'memoRecipientInput','memoIssuerInput']);
   let ocrActive=false,lastOcr=null;
@@ -346,8 +346,6 @@
    $('officeInput').placeholder=$('typeSelect').value==='Outgoing'?'Person or office receiving this communication':'Originating person or printed signatory';
    $('dateFieldLabel').textContent=memo?'Date issued':$('typeSelect').value==='Outgoing'?'Date released':'Date received';
    $('controlFieldLabel').textContent=memo?'Memo number':'Control number';
-   if(!commManualFields.has('controlNoInput')&&!editing&&memo&&(!$('controlNoInput').value||$('controlNoInput').value===newControlNo()))$('controlNoInput').value=newMemoControlNo();
-   if(!commManualFields.has('controlNoInput')&&!memo&&!$('controlNoInput').value)$('controlNoInput').value=newControlNo();
    $('saveRecordBtn').querySelector('span').textContent=routeCommitted?'Finish Move to Office Memos':memo?'Save to Office Memos':editing?'Save Changes':'Save Record';
   }
   $('docTypeSelect').addEventListener('change',refreshOcrMapping);
@@ -442,17 +440,18 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    if(!M.client())throw new Error('Connect to the database before uploading to Office Memos. Your document is still in this form.');
    const prior=records.find(r=>String(r.id)===String(editing));
    const addressedTo=$('memoRecipientInput').value.trim(),issuedBy=$('memoIssuerInput').value.trim();
-   const journal=M.storage.get(routeJournalKey,{}),key=editing?`communication:${editing}`:`memo:${payload.controlNo.toLowerCase()}`;
+   if(!editing) memoDraftId ??= M.uuid();
+   const journal=M.storage.get(routeJournalKey,{});
+   const key=editing?`communication:${editing}`:`memo-draft:${memoDraftId}`;
    const pending=journal[key];
    const memos=await M.read('office_memos');
    let saved=pending?memos.find(m=>String(m.id)===pending.id):null;
    if(!saved){
-    if(memos.some(m=>String(m.memoNo||'').trim().toLowerCase()===payload.controlNo.toLowerCase()))throw new Error('This memo number already exists in Office Memos. Use a unique number.');
     const document=await memoAttachment(prior),now=new Date().toISOString();
     const remarks=[payload.remarks,payload.actionTaken?`Action taken: ${payload.actionTaken}`:'',`From Communications (${payload.type}; ${payload.status}).`,payload.ocrText?`Extracted document text:\n${payload.ocrText}`:''].filter(Boolean).join('\n\n');
     const {newUpload,...savedDocument}=document;
     const memo={memoNo:payload.controlNo,date:payload.date,addressedTo,issuedBy,subject:payload.subject,title:payload.subject,remarks,isPinned:false,...savedDocument,createdAt:now,updatedAt:now};
-    const id=pending?.id||M.uuid();
+    const id=pending?.id||memoDraftId||M.uuid();
     journal[key]={id,memoNo:payload.controlNo,sourceId:editing||null};
     if(!M.storage.set(routeJournalKey,journal)){if(newUpload)window.PGENRO_API.removeDocument(document.pdfUrl).catch(()=>{});throw new Error('Browser storage is unavailable. Enable it before saving so an interrupted upload can be retried safely.');}
     try{saved=await M.write('office_memos',memo,null,{insertId:id});}
@@ -527,7 +526,6 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    const saved={...(records.find(r=>String(r.id)===String(id))||{}),...payload,id:id||M.uuid()};const next=id?records.map(r=>String(r.id)===String(id)?saved:r):[saved,...records];
    if(!M.storage.set(cacheKey,next))throw new Error('Browser storage is full or unavailable. The record was not saved.');records=next;return saved;
   }
-  function newControlNo() {const prefix=`COMM-${new Date().getFullYear()}-`;const highest=Math.max(0,...records.map(r=>String(r.controlNo||'').startsWith(prefix)?Number(String(r.controlNo).slice(prefix.length))||0:0));return prefix+String(highest+1).padStart(5,'0');}
   function clearAutoDetectedFields() {
    for(const[id,value]of commOcrValues)if($(id).value===value&&!commManualFields.has(id))$(id).value='';
    commOcrValues.clear();lastOcr=null;
@@ -546,7 +544,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    setReaderState('idle','Optional OCR');$('ocrActionSubtext').textContent='Choose a document to enable OCR.';
   }
   async function openEditor(id=null) {
-   if(busy)return;routeCommitted=false;remoteAttachmentRemoved=false;commOcrValues.clear();commManualFields.clear();$('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcr=null;
+   if(busy)return;routeCommitted=false;remoteAttachmentRemoved=false;memoDraftId=null;commOcrValues.clear();commManualFields.clear();$('communicationMemoReview').hidden=true;$('communicationOcrReview').hidden=true;$('ocrSignatoryGroup').hidden=true;lastOcr=null;
    for(const id of ocrFormIds)setFieldState(id,'');$('ocrFieldSummary').textContent='Detected fields will appear here after reading.';$('communicationInlineNotice').hidden=true;
    for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=false;
    $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=false;
@@ -566,7 +564,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
      $('ocrActionSubtext').textContent='Choose a new file to replace this attachment.';
     }
    }
-   else {$('dateInput').value=M.today();$('controlNoInput').value=newControlNo();$('typeSelect').value='Incoming';$('statusSelect').value='Pending';}
+   else {$('dateInput').value=M.today();$('typeSelect').value='Incoming';$('statusSelect').value='Pending';}
    const memo=detectMemo(r?.ocrText||'');if(memo){$('memoRecipientInput').value=memo.addressedTo;$('memoIssuerInput').value=memo.issuedBy;}
    const pending=M.storage.get(routeJournalKey,{})[`communication:${id}`];
    if(id&&pending&&M.client()&&window.PGENRO_API.adminCan('office_memos'))try{
@@ -618,7 +616,12 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    e.preventDefault();if(busy)return;
    if(ocrActive){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
    if(!$('communicationForm').reportValidity())return;
-   const payload=Object.fromEntries(Object.entries(fieldInputs).map(([k,id])=>[k,$(id).value.trim()]));if(!canRouteMemo()&&records.some(r=>String(r.id)!==String(editing)&&String(r.controlNo||'').trim().toLowerCase()===payload.controlNo.toLowerCase()))return M.toast('This control number already exists. Use a unique number.','warning');
+   const payload=Object.fromEntries(Object.entries(fieldInputs).map(([key,id])=>[key,$(id).value.trim()]));
+   if (!payload.controlNo) {
+    $('controlNoInput').focus();
+    M.toast('Enter the control number.','warning');
+    return;
+   }
    let newAttachment=null,newRemoteUrl='';const priorAttachment=records.find(r=>String(r.id)===String(editing))?.attachmentId;
    try {requireWrite();busy=true;$('encodingModal').dataset.busy='true';$('saveRecordBtn').disabled=true;$('runOcrBtn').disabled=true;
     $('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=true;
@@ -1111,7 +1114,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    let badge=label.querySelector('.ocr-field-badge');
    if(!state){badge?.remove();return;}
    if(!badge){badge=document.createElement('span');badge.className='ocr-field-badge';label.append(badge);}
-   badge.dataset.state=state;badge.textContent=({detected:'Detected',review:'Review',missing:'Enter manually',edited:'Edited',generated:'Generated'})[state]||state;
+   badge.dataset.state=state;badge.textContent=({detected:'Detected',review:'Review',missing:'Enter manually',edited:'Edited'})[state]||state;
    badge.title=String(evidence||'').slice(0,1500);
   }
   function setReaderState(state,label) {
@@ -1185,7 +1188,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     const needsReview=fieldState?.state==='review'||data.needsReview?.includes(key)||
      (key==='receivedFrom'&&data.receivedFromNeedsReview)||(key==='signatory'&&data.signatoryNeedsReview)||
      ['body','subject','fallback','address-block','letterhead','approval','footer-name','prepared-by'].includes(data[key+'Source']);
-    const applied=applyOcrValue(id,value,!needsReview||!editing);
+    const applied=applyOcrValue(id,value,id!=='controlNoInput'&&(!needsReview||!editing));
     if(applied){
      const proof=id==='memoIssuerInput'?data.fieldEvidence?.issuedBy:fieldState?.evidence;
      setFieldState(id,needsReview?'review':'detected',proof||data.fieldEvidence?.[key]||'Detected from the uploaded document.');
@@ -1198,10 +1201,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    }
 
    updateDestination();
-   if(!data[numberKey]&&!commManualFields.has('controlNoInput')&&!editing){
-    applyOcrValue('controlNoInput',memo?newMemoControlNo():newControlNo(),true);
-    setFieldState('controlNoInput','generated','A registry number was generated.');
-   }
    const required=[...$('communicationForm').querySelectorAll('input[required],select[required],textarea[required]')];
    for(const input of required){
     if(!input.value.trim()&&!commManualFields.has(input.id)){
@@ -1303,7 +1302,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   function connectRecords() {
    if(!M.client()||channel)return;
    const readMemoRegistry=()=>{
-    if(window.PGENRO_API.adminCan('office_memos'))M.read('office_memos').then(rows=>{memoRegistryRows=rows;M.storage.set('pgenro_office_memos',rows);}).catch(()=>{});
+    if(window.PGENRO_API.adminCan('office_memos'))M.read('office_memos').then(rows=>M.storage.set('pgenro_office_memos',rows)).catch(()=>{});
    };
    if(document.documentElement.dataset.pgenroAdminModules==='ready')readMemoRegistry();
    else document.addEventListener('pgenro:admin-modules-ready',readMemoRegistry,{once:true});

@@ -541,14 +541,14 @@ function parseDocumentHeader(rawText='') {
 
   const memoOcrValues=new Map(),memoManualFields=new Set();
   for(const[key,input]of Object.entries(memoFieldInputs()))input.addEventListener('input',()=>memoManualFields.add(key));
-  let generatedMemoNumber='',generatedMemoDate='',lastMemoRead=null;
+  let generatedMemoDate='',lastMemoRead=null;
   function splitMemoNotes(value='') {
     const text=String(value||''),marker='\n\nExtracted document text:\n',index=text.indexOf(marker);
     return index<0?{notes:text,text:''}:{notes:text.slice(0,index),text:text.slice(index+marker.length)};
   }
   function clearMemoDetection(){
     const inputs=memoFieldInputs();
-    for(const [key,previous]of memoOcrValues){const input=inputs[key];if(input.value===previous&&!memoManualFields.has(key))input.value=key==='memoNo'?generatedMemoNumber:'';}
+    for(const [key,previous]of memoOcrValues){const input=inputs[key];if(input.value===previous&&!memoManualFields.has(key))input.value='';}
     memoOcrValues.clear();lastMemoRead=null;memoOcrText.value='';memoTextEdited=false;document.getElementById('memoExtractionReview').hidden=true;
   }
   function memoFieldInputs(){
@@ -562,7 +562,7 @@ function parseDocumentHeader(rawText='') {
     const statuses={},suggestions={};
     for(const [key,input] of Object.entries(inputs)){
       const current=input.value.trim(),previous=memoOcrValues.get(key);
-      const generated=key==='memoNo'?generatedMemoNumber:key==='date'?generatedMemoDate:'';
+      const generated=key==='date'?generatedMemoDate:'';
       const value=detected.isMemo?detected[key]||'':'';
       suggestions[key]=value;
       if(memoManualFields.has(key)||(current&&current!==previous&&current!==generated)){
@@ -572,10 +572,9 @@ function parseDocumentHeader(rawText='') {
         memoOcrValues.set(key,input.value);
         statuses[key]=detected.needsReview?.includes(key)?'Confirm against the original':'Detected from the document';
       }else{
-        if(previous!==undefined||(key==='date'&&current===generatedMemoDate))input.value=key==='memoNo'?generatedMemoNumber:'';
+        if(previous!==undefined||(key==='date'&&current===generatedMemoDate))input.value='';
         memoOcrValues.delete(key);
-        statuses[key]=key==='memoNo'&&input.value===generatedMemoNumber&&generatedMemoNumber?
-          'Generated registry number':key==='remarks'?'Optional':key==='issuedBy'?'Check the printed issuer or signature block':'Enter or confirm this value';
+        statuses[key]=key==='remarks'?'Optional':key==='issuedBy'?'Check the printed issuer or signature block':'Enter or confirm this value';
       }
     }
     document.getElementById('memoExtractionReview').hidden=false;
@@ -903,12 +902,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     memoDocId.value = '';
     modalFormTitle.textContent = 'Issue Office Memorandum';
     formDate.value = M.today();
-    const prefix = 'MEMO-' + new Date().getFullYear() + '-';
-    const highest = Math.max(0, ...rawMemos.map(memo =>
-      String(memo.memoNo || '').startsWith(prefix) ? Number(memo.memoNo.slice(prefix.length)) || 0 : 0
-    ));
-    formControlNo.value = prefix + String(highest + 1).padStart(3, '0');
-    generatedMemoNumber = formControlNo.value;
     generatedMemoDate = formDate.value;
     resetMemoAttachmentUi();
     setSaveMemoState(false);
@@ -950,7 +943,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     const notes = splitMemoNotes(memo.remarks);
     formRemarks.value = notes.notes;
     memoOcrText.value = notes.text;
-    generatedMemoNumber = generatedMemoDate = '';
+    generatedMemoDate = '';
     formIsPinned.checked = Boolean(memo.isPinned);
     setSaveMemoState(false, 'Update Memorandum');
     setMemoFormModalOpen(true);
@@ -1012,17 +1005,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
       for(const input of [formControlNo,formDate,formAddressedTo,formSubject])if(!input.value.trim()){input.focus();showToast("Complete the required memorandum details.","warning");return;}
       if(parseMemoDate(formDate.value)!==formDate.value){formDate.focus();showToast("Enter a valid issue date.","warning");return;}
       const docId = memoDocId.value.trim();
-      const normalizedControlNo = formControlNo.value.trim().toLowerCase();
-      const duplicate = rawMemos.some((memo) =>
-        String(memo.id) !== docId &&
-        String(memo.memoNo || "").trim().toLowerCase() === normalizedControlNo
-      );
-
-      if (duplicate) {
-        formControlNo.focus();
-        showToast("That control number is already in the memorandum registry.", "error");
-        return;
-      }
 
       const hasAttachment = Boolean(selectedMemoFile || existingMemoUrl.value);
       const payload = {
@@ -1039,7 +1021,6 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
         updatedAt: new Date().toISOString()
       };
 
-      if(rawMemos.some(m=>String(m.id)!==docId&&String(m.memoNo||'').trim().toLowerCase()===payload.memoNo.toLowerCase())){showToast('Control number already exists. Choose a unique number.','warning');formControlNo.focus();return;}
       if(!selectedMemoFile&&existingMemoUrl.value&&!safeAttachment(existingMemoUrl.value)){showToast("The attachment address or type is invalid.","error");return;}
       busy=true;setMemoFieldsBusy(true);memoFormModal.dataset.busy="true";setSaveMemoState(true);
 

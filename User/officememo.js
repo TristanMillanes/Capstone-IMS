@@ -132,13 +132,15 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       return {
         databaseId: row.id,
         id: text(first(
-          data.controlNo,
-          data.control_no,
           data.memoNo,
           data.memo_no,
-          data.id,
-          row.control_no,
+          data.controlNo,
+          data.control_no,
+          row.memoNo,
           row.memo_no,
+          row.controlNo,
+          row.control_no,
+          data.id,
           row.id
         )),
         date: text(first(
@@ -620,7 +622,7 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
                 <button class="action-btn"
                         type="button"
                         data-view-index="${index}"
-                        aria-label="View attachment for ${escapeHtml(record.id || "memo")}"
+                        aria-label="View attachment for ${escapeHtml(record.subject || record.id || "memo")}"
                         title="View attachment">
                   <i data-lucide="eye"></i>
                 </button>

@@ -627,7 +627,7 @@
             <p class="communication-memo-review" id="communicationMemoReview" role="status" hidden></p>
             <div class="form-grid encoder-meta-grid">
               <div class="form-group"><label for="typeSelect">Communication type <span class="required-mark">*</span></label><select class="form-control" id="typeSelect" required><option value="">Select type</option><option value="Incoming">Incoming</option><option value="Outgoing">Outgoing</option></select></div>
-              <div class="form-group"><label for="controlNoInput"><span id="controlFieldLabel">Control number</span> <span class="required-mark">*</span></label><input class="form-control" id="controlNoInput" type="text" placeholder="Printed number or generated reference" required><small class="field-hint">A reference is generated when no printed number is found.</small></div>
+              <div class="form-group"><label for="controlNoInput"><span id="controlFieldLabel">Control number</span> <span class="required-mark">*</span></label><input class="form-control" id="controlNoInput" type="text" placeholder="Enter the reference number" required></div>
               <div class="form-group"><label for="docTypeSelect">Document type <span class="required-mark">*</span></label><select class="form-control" id="docTypeSelect" required><option value="">Select document type</option><option value="Office Order">Office Order</option><option value="Special Order">Special Order</option><option value="Travel Order">Travel Order</option><option value="Memorandum">Memorandum</option><option value="Request Letter">Request Letter</option><option value="Endorsement Letter">Endorsement Letter</option><option value="Transmittal Letter">Transmittal Letter</option><option value="Response Letter">Response Letter</option><option value="Notice of Meeting">Notice of Meeting</option><option value="Invitation">Invitation</option><option value="Report">Report</option><option value="Letter">Letter</option><option value="Other Communication">Other Communication</option></select></div>
               <div class="form-group"><label for="dateInput"><span id="dateFieldLabel">Date received</span> <span class="required-mark">*</span></label><input class="form-control" id="dateInput" type="date" required></div>
               <div class="form-group"><label for="statusSelect">Status <span class="required-mark">*</span></label><select class="form-control" id="statusSelect" required><option value="">Select status</option><option value="Pending">Pending</option><option value="Received">Received</option><option value="Forwarded">Forwarded</option><option value="Released">Released</option><option value="Archived">Archived</option></select></div>
@@ -756,7 +756,7 @@
 <script defer src="../shared/ocr-form-fields.js?v=20261115-memo-issuer"></script>
 <script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="admincommunication.js?v=20261116-optional-ocr"></script>
+<script defer src="admincommunication.js?v=20261116-manual-control"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
 <script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>

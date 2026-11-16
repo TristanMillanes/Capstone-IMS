@@ -17,7 +17,7 @@ function field(value = '') {
 }
 
 const commInputs = new Map(Object.entries({
-  typeSelect: field('Incoming'), controlNoInput: field('COMM-GENERATED'),
+  typeSelect: field('Incoming'), controlNoInput: field(),
   docTypeSelect: field(''), dateInput: field('2026-11-14'), statusSelect: field('Pending'),
   officeInput: field(), subjectInput: field(), actionTakenInput: field(), remarksInput: field(),
   memoRecipientInput: field(), memoIssuerInput: field(), ocrTextInput: field(),
@@ -37,7 +37,7 @@ const $ = id => commInputs.get(id) || elements[id];
 const context = vm.createContext({
   $, window: {PGENRO_API: {adminCan: () => true}}, Option: function (text, value) { Object.assign(this, {text, value}); },
   commManualFields: new Set(), commOcrValues: new Map(), ocrFormIds: new Set(commInputs.keys()),
-  editing: null, lastOcr: null, newControlNo: () => 'COMM-GENERATED', newMemoControlNo: () => 'MEMO-GENERATED',
+  editing: null, lastOcr: null,
   updateDestination() {
     elements.dateFieldLabel.textContent = $('docTypeSelect').value === 'Memorandum' ? 'Date issued' :
       $('typeSelect').value === 'Outgoing' ? 'Date released' : 'Date received';
@@ -57,6 +57,7 @@ const letter = [
   'Dear Sir,', 'Please assist on November 20, 2026.', 'REMARKS: unrelated body text.',
 ].join('\n');
 context.extractFields(letter);
+assert.equal($('controlNoInput').value, 'REF-2026-20');
 assert.equal($('typeSelect').value, 'Outgoing');
 assert.equal($('officeInput').value, 'MUNICIPAL ENRO');
 assert.equal($('dateInput').value, '');
@@ -85,7 +86,7 @@ assert.equal($('remarksInput').value, '');
 console.log('PASS Communications follows the selected direction, keeps manual values and respects blank server fields.');
 
 const memoInputs = {
-  formControlNo: field('MEMO-GENERATED'), formDate: field('2026-11-14'), formAddressedTo: field(),
+  formControlNo: field(), formDate: field('2026-11-14'), formAddressedTo: field(),
   formSubject: field(), formIssuedBy: field(), formRemarks: field(),
 };
 const memoElements = Object.fromEntries(['memoExtractionReview', 'memoReviewSummary', 'memoReviewFields', 'recheckMemoFieldsBtn'].map(id => [id, {}]));
@@ -95,7 +96,7 @@ const memoContext = vm.createContext({
 });
 vm.runInContext(shared, memoContext);
 vm.runInContext(from(memo, '/* Memo document parser. */', '  function setMemoOcrStatus('), memoContext);
-vm.runInContext("generatedMemoNumber='MEMO-GENERATED';generatedMemoDate='2026-11-14';", memoContext);
+vm.runInContext("generatedMemoDate='2026-11-14';", memoContext);
 memoContext.applyMemoFields([
   'MEMORANDUM NO. 12, s. 2026',
   'TO  ALL SECTION CHIEFS',
@@ -160,3 +161,19 @@ assert.equal($('memoIssuerInput').value, 'ENGR. ALMA J. DE LA CRUZ');
 assert.equal($('memoRecipientInput').value, 'ALL SECTION HEADS');
 assert.equal($('dateInput').value, '2026-11-14');
 console.log('PASS Both forms recover the printed issuer from full OCR text when older service metadata leaves it blank.');
+
+const manualNumber = 'Desk 07 / ref A';
+$('controlNoInput').value = manualNumber;
+context.extractFields(letter);
+assert.equal($('controlNoInput').value, manualNumber);
+$('controlNoInput').value = '';
+context.extractFields('REQUEST LETTER\nSUBJECT: Schedule update');
+assert.equal($('controlNoInput').value, '');
+
+memoInputs.formControlNo.value = manualNumber;
+memoContext.applyMemoFields(signedMemo, olderServiceResult);
+assert.equal(memoInputs.formControlNo.value, manualNumber);
+memoInputs.formControlNo.value = '';
+memoContext.applyMemoFields('MEMORANDUM\nTO: All Personnel\nSUBJECT: Schedule update');
+assert.equal(memoInputs.formControlNo.value, '');
+console.log('PASS OCR preserves entered control numbers and leaves an unreadable or absent number for manual entry.');

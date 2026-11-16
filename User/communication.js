@@ -208,7 +208,8 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
       return {
         id: value(
           first(
-            source.id,
+            row.id,
+            data.id,
             window.crypto?.randomUUID?.(),
             Date.now()
           )
@@ -216,6 +217,10 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
         controlNo: value(
           first(
+            data.controlNo,
+            data.control_no,
+            data.controlNumber,
+            data.control_number,
             source.controlNo,
             source.control_no,
             source.controlNumber,
