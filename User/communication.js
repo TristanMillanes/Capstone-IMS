@@ -217,14 +217,15 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
         controlNo: value(
           first(
+            row.manual_control_no,
             data.controlNo,
             data.control_no,
             data.controlNumber,
             data.control_number,
-            source.controlNo,
-            source.control_no,
-            source.controlNumber,
-            source.control_number,
+            row.controlNo,
+            row.control_no,
+            row.controlNumber,
+            row.control_number,
             source.trackingNo,
             source.tracking_no
           )

@@ -247,6 +247,7 @@ create table if not exists public.office_memos (
 create table if not exists public.communications (
   id text primary key,
   data jsonb not null default '{}'::jsonb,
+  manual_control_no text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

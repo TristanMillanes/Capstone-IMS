@@ -580,7 +580,7 @@
       </div>
       <button class="modal-close-btn" id="closeEncodingModalBtn" type="button" aria-label="Close communication form"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="x" class="lucide lucide-x"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
     </header>
-    <form id="communicationForm">
+    <form id="communicationForm" novalidate>
       <div class="modal-body communication-modal-body document-intake-form" id="encodingModalBody">
         <input id="editIndex" type="hidden" value="">
         <aside class="encoder-document-column" aria-label="Document and optional OCR">
@@ -773,7 +773,7 @@
 <script defer src="../shared/ocr-form-fields.js?v=20261116-archival"></script>
 <script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="admincommunication.js?v=20261120-appearance"></script>
+<script defer src="admincommunication.js?v=20261120-manual-control-storage"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
 <script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>

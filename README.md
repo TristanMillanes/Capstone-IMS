@@ -14,6 +14,8 @@ For manual startup, see [FIXES_AND_SETUP.md](FIXES_AND_SETUP.md). For Docker/Ren
 
 Enter the assigned control number before saving a communication, office memo, inventory item, or attendance record. The OCR reader can fill the other document details.
 
+For an existing Supabase project, run [COMMUNICATION_CONTROL_NUMBER_PATCH.sql](supabase/COMMUNICATION_CONTROL_NUMBER_PATCH.sql) in SQL Editor before deploying the updated site. The patch adds the database field that stores manually assigned Incoming and Outgoing communication numbers.
+
 Use the header button or account preferences to switch between Light and Dark. The browser saves each workspace's selected appearance.
 
 ## Set up accounts

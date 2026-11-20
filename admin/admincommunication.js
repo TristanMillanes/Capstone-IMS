@@ -61,6 +61,23 @@
   }
   const wrapped = new Map();
   const communicationTypeKeys = ['type','communicationType','communication_type','direction','recordType','record_type','commType','comm_type'];
+  const controlNumberKeys = ['controlNo', 'control_no', 'controlNumber', 'control_number'];
+  const manualControlNumberColumn = 'manual_control_no';
+  const controlNumberColumns = new Set();
+  const generatedControlNumberColumns = new Set();
+  let hasManualControlNumberColumn;
+  const readManualControlNumber = record => String(record?.[manualControlNumberColumn] ?? '').trim();
+  const readLegacyControlNumber = record => controlNumberKeys
+    .map(key => String(record?.[key] ?? '').trim())
+    .find(Boolean) ?? '';
+  const readControlNumber = record => readManualControlNumber(record) || readLegacyControlNumber(record);
+
+  function setControlNumber(record, number) {
+    for (const key of controlNumberKeys) {
+      if (key === 'controlNo' || Object.hasOwn(record, key)) record[key] = number;
+    }
+  }
+
   const communicationFormats = new Map();
   let preferredCommunicationFormat = 'title';
   const normalizeCommunicationType = value => /^(?:incoming|outgoing)$/i.test(String(value ?? '').trim())
@@ -116,9 +133,9 @@
     const {data,...columns}=row,out={...columns,...base};
     const names={type:'type',docType:'document_type',date:'date',status:'status',office:'office',subject:'subject',actionTaken:'action_taken',remarks:'remarks',ocrText:'ocr_text',fileName:'file_name',fileSize:'file_size',fileUrl:'drive_link'};
     for(const[key,column]of Object.entries(names))if(row[column]!=null&&(out[key]==null||key==='type'))out[key]=row[column];
-    const controlNumber = [data.controlNo, data.control_no, data.controlNumber, data.control_number, row.control_no]
-      .find(number => String(number ?? '').trim());
-    if (controlNumber !== undefined) out.controlNo = controlNumber;
+    // Only the database column is authoritative over the legacy JSON values.
+    out[manualControlNumberColumn] = row[manualControlNumberColumn];
+    out.controlNo = readManualControlNumber(row) || readLegacyControlNumber(data) || readLegacyControlNumber(row);
     return out;
   };
   async function read(table) {
@@ -136,7 +153,19 @@
       if (batch.length < 500 || (response.count !== null && response.count !== undefined && offset >= response.count)) break;
     }
     const result=rows.map(row=>unwrap(row,table));
-    if(table==='communications')rememberCommunicationFormats(result);
+    if (table === 'communications') {
+      for (const key of controlNumberKeys) {
+        if (rows.some(row => Object.hasOwn(row, key))) controlNumberColumns.add(key);
+      }
+      if (rows.length) {
+        hasManualControlNumberColumn = rows.some(row => Object.hasOwn(row, manualControlNumberColumn));
+      } else if (hasManualControlNumberColumn === undefined) {
+        const probe = await sb.from(table).select(manualControlNumberColumn).limit(0);
+        if (!probe.error) hasManualControlNumberColumn = true;
+        else if (['42703', 'PGRST204'].includes(probe.error.code)) hasManualControlNumberColumn = false;
+      }
+      rememberCommunicationFormats(result);
+    }
     return result;
   }
   function communicationData(payload,format=null) {
@@ -148,7 +177,6 @@
       for (const key of communicationTypeKeys) out[key] = formatCommunicationType(raw,format||communicationFormats.get(key)||preferredCommunicationFormat);
     }
     const canonical = {
-      controlNo:['controlNo','control_no','controlNumber','control_number'],
       docType:['docType','documentType','document_type','doc_type'],
       date:['date','receivedDate','date_received'],
       office:['office','receivedFrom','received_from','recipient_office'],
@@ -166,35 +194,70 @@
   async function write(table, payload, id = null, options = {}) {
     await window.PGENRO_API?.requireAdmin?.();
     const sb = client(); if (!sb) throw new Error('Database client is unavailable.');
-    if (table === 'communications' && wrapped.get(table)) payload = communicationData(payload);
-    let body = wrapped.get(table) ? {data:payload} : payload;
-    if (id && wrapped.get(table)) {
-      const existing = await sb.from(table).select('data').eq('id',id).limit(1);
-      if (existing.error) throw existing.error;
-      if (!existing.data?.length) throw new Error('This record is no longer available. Refresh before saving.');
-      body = {data:{...(existing.data[0].data || {}), ...payload}};
+    const isCommunication = table === 'communications';
+    const storesData = wrapped.get(table);
+    const controlNumber = isCommunication ? readControlNumber(payload) : '';
+    const changes = isCommunication && storesData ? communicationData(payload) : payload;
+    let body = storesData ? {data:{...changes}} : {...changes};
+    let previousVersion;
+    if (id && storesData) {
+      const result = await sb.from(table).select(isCommunication ? '*' : 'data').eq('id',id).limit(1);
+      if (result.error) throw result.error;
+      const existing = result.data?.[0];
+      if (!existing) throw new Error('This record is no longer available. Refresh before saving.');
+      body.data = {...(existing.data || {}), ...changes};
+      if (isCommunication) previousVersion = existing.updated_at;
     }
-    if (table === 'communications' && wrapped.get(table)) body.data = communicationData(body.data);
-    if (!id && wrapped.get(table)) body = {id:uuid(), ...body};
+    if (isCommunication && storesData) body.data = communicationData(body.data);
+    if (controlNumber) {
+      if (storesData) setControlNumber(body.data, controlNumber);
+      if (hasManualControlNumberColumn) body[manualControlNumberColumn] = controlNumber;
+
+      // Older databases can store the same number in JSON and in a regular column.
+      // Send both representations in the same database operation.
+      if (controlNumberColumns.size) {
+        for (const key of controlNumberKeys) {
+          if (!storesData) delete body[key];
+          if (controlNumberColumns.has(key) && !generatedControlNumberColumns.has(key)) {
+            body[key] = controlNumber;
+          }
+        }
+      }
+    }
+    if (!id && storesData) body = {id:uuid(), ...body};
     if (!id && options.insertId) body = {...body,id:options.insertId};
-    if(table==='communications'&&!wrapped.get(table))body=Object.fromEntries(Object.entries(body).map(([key,value])=>
+    if(isCommunication&&!storesData)body=Object.fromEntries(Object.entries(body).map(([key,value])=>
       [key,communicationTypeKeys.includes(key)&&normalizeCommunicationType(value)?formatCommunicationType(value,communicationFormats.get(key)||preferredCommunicationFormat):value]));
     let response;
     const attempted=new Set();
     for(const format of [null,'lower','title','upper']){
-      if(table!=='communications'&&attempted.size)break;
-      const data=wrapped.get(table)?body.data:body;
+      if(!isCommunication&&attempted.size)break;
+      const data=storesData?body.data:body;
       if(format){
-        if(wrapped.get(table))body={...body,data:communicationData(data,format)};
+        if(storesData)body={...body,data:communicationData(data,format)};
         else body=Object.fromEntries(Object.entries(body).map(([key,value])=>[key,communicationTypeKeys.includes(key)&&normalizeCommunicationType(value)?formatCommunicationType(value,format):value]));
       }
-      const current=wrapped.get(table)?body.data:body;
+      const current=storesData?body.data:body;
       const signature=JSON.stringify(communicationTypeKeys.map(key=>current[key]));
       if(attempted.has(signature))continue;
       attempted.add(signature);
-      response=await (id ? sb.from(table).update(body).eq('id',id) : sb.from(table).insert(body)).select('*');
+      while (true) {
+        let query = id ? sb.from(table).update(body).eq('id', id) : sb.from(table).insert(body);
+        if (previousVersion) query = query.eq('updated_at', previousVersion);
+        response = await query.select('*');
+        const error = response.error;
+        if (!controlNumber || !storesData || error?.code !== '428C9') break;
+
+        // A generated column follows JSON automatically. Only retry if the
+        // database specifically rejected a number column as generated.
+        const generated = controlNumberKeys.find(key =>
+          Object.hasOwn(body, key) && error.message?.includes(`"${key}"`));
+        if (!generated) break;
+        generatedControlNumberColumns.add(generated);
+        delete body[generated];
+      }
       if(!response.error){
-        if(table==='communications'){
+        if(isCommunication){
           for(const key of communicationTypeKeys)if(normalizeCommunicationType(current[key])){
             const value=String(current[key]);communicationFormats.set(key,value===value.toLowerCase()?'lower':value===value.toUpperCase()?'upper':'title');
           }
@@ -207,11 +270,24 @@
       const error=response.error,detail=[error.message,error.details,error.hint].filter(Boolean).join(' ');
       const directionRejected=['22P02','23514','P0001','22023'].includes(error.code)&&
         /(?:communication[s]?|comm|record)[_\s-]*type|(?:communication[s]?[_\s-]*)?direction|invalid[^.]*incoming[^.]*outgoing/i.test(detail);
-      if(table!=='communications'||!directionRejected)throw error;
+      if(!isCommunication||!directionRejected)throw error;
     }
     if(response?.error)throw response.error;
-    if (!response.data?.length) throw new Error('The record was not saved or is not accessible. Check your database permissions.');
-    return unwrap(response.data[0],table);
+    if (!response.data?.length) {
+      if (previousVersion) throw new Error('The record changed or is no longer accessible. Refresh before saving again.');
+      throw new Error('The record was not saved or is not accessible. Check your database permissions.');
+    }
+    const saved = unwrap(response.data[0], table);
+    if (controlNumber) {
+      // Read the committed record after legacy synchronization has run.
+      try {
+        const refreshed = await sb.from(table).select('*').eq('id', saved.id).limit(1);
+        if (!refreshed.error && refreshed.data?.length) return unwrap(refreshed.data[0], table);
+      } catch {
+        // Use the write response to report an unconfirmed number if the read fails.
+      }
+    }
+    return saved;
   }
   async function remove(table, ids) {
     await window.PGENRO_API?.requireAdmin?.();
@@ -308,7 +384,8 @@
   window.lucide ||= {};
   window.lucide.createIcons ||= (options = {}) => renderIcons(options.root || document, options);
   const canStartAction = () => !document.querySelector('.modal-overlay.open[data-busy="true"],.modal-backdrop.open[data-busy="true"],.admin-modal.open[data-busy="true"]');
-  window.PGENRO_Module = {canStartAction,normalizeCommunicationType,storage,escape,uuid,today,toast,csv,openModal,closeModal,observeRecords,renderIcons,read,write,remove,audit,client,unwrap,waitForBackend};
+  window.PGENRO_Module = {canStartAction,normalizeCommunicationType,storage,escape,uuid,today,toast,csv,openModal,closeModal,observeRecords,renderIcons,read,write,remove,audit,client,unwrap,waitForBackend,controlNumberKeys,readControlNumber,setControlNumber,
+    hasManualControlNumber: () => hasManualControlNumberColumn === true};
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',initShell,{once:true});else initShell();
 })();
 
@@ -324,7 +401,10 @@
   let records=[], selected=new Set(), page=1, direction='All', editing=null, file=null, attachment=null, busy=false, mode='loading', generation=0, ocrGeneration=0;
   const size=10;
   const fieldInputs={type:'typeSelect',controlNo:'controlNoInput',docType:'docTypeSelect',date:'dateInput',office:'officeInput',subject:'subjectInput',actionTaken:'actionTakenInput',remarks:'remarksInput',status:'statusSelect',ocrText:'ocrTextInput'};
-  const aliases={type:['type','communicationType','communication_type','direction','recordType','record_type','commType','comm_type'],controlNo:['controlNo','control_no','controlNumber','control_number'],docType:['docType','documentType','document_type','doc_type'],date:['date','receivedDate','date_received'],office:['office','receivedFrom','received_from','recipient_office'],subject:['subject','particulars'],actionTaken:['actionTaken','action_taken'],remarks:['remarks'],status:['status'],ocrText:['ocrText','ocr_text'],fileName:['fileName','file_name'],fileType:['fileType','file_type'],attachmentId:['attachmentId','attachment_id'],fileUrl:['fileUrl','file_url','attachment_url','driveLink','drive_link']};
+  const aliases={type:['type','communicationType','communication_type','direction','recordType','record_type','commType','comm_type'],controlNo:M.controlNumberKeys,docType:['docType','documentType','document_type','doc_type'],date:['date','receivedDate','date_received'],office:['office','receivedFrom','received_from','recipient_office'],subject:['subject','particulars'],actionTaken:['actionTaken','action_taken'],remarks:['remarks'],status:['status'],ocrText:['ocrText','ocr_text'],fileName:['fileName','file_name'],fileType:['fileType','file_type'],attachmentId:['attachmentId','attachment_id'],fileUrl:['fileUrl','file_url','attachment_url','driveLink','drive_link']};
+  const readEditorFields = () => Object.fromEntries(
+    Object.entries(fieldInputs).map(([key,id]) => [key, $(id).value.trim()]));
+  let originalEditorFields;
   const fields={};
   const routeJournalKey='pgenro_memo_routes';
   let routeCommitted=false,remoteAttachmentRemoved=false,memoDraftId=null;
@@ -485,6 +565,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     if(actual){fields[key]??=actual;copy[key]=key==='type'?M.normalizeCommunicationType(row[actual]):row[actual];}
     else if(key==='type')copy.type='';
    }
+   copy.controlNo = M.readControlNumber(row);
    return copy;
   }
   function payloadFor(row) {const out={};for(const[key,value]of Object.entries(row))out[fields[key]||key]=value;return out;}
@@ -511,7 +592,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
    try {
     const connection=await M.waitForBackend();if(version!==generation)return false;
     if(connection==='unavailable'&&!M.client())throw new Error('Database connection unavailable.');
-    if(!M.client()){mode='local';const cached=M.storage.get(cacheKey,M.storage.get('communicationRecords',[]));records=(Array.isArray(cached)?cached:[]).map(normalize);}
+    if(!M.client()){mode='local';const cached=M.storage.get(cacheKey,M.storage.get('communicationRecords',[]));records=(Array.isArray(cached)?cached:[]).map(row=>normalize(M.unwrap(row,table)));}
     else {const rows=await M.read(table);if(version!==generation)return false;mode='live';records=rows.map(normalize);M.storage.set(cacheKey,records);}
     M.observeRecords('communications',records);render();return true;
    }catch(error){if(version!==generation)return false;mode='unavailable';const cached=M.storage.get(cacheKey,[]);records=(Array.isArray(cached)?cached:[]).map(normalize);render();M.toast('Records could not refresh. Cached records are available; saving requires a database connection.','error');return false;}
@@ -524,7 +605,12 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     payload={...payload,type};
    }
    requireWrite();if(mode==='live')return normalize(await M.write(table,payloadFor(payload),id));
-   const saved={...(records.find(r=>String(r.id)===String(id))||{}),...payload,id:id||M.uuid()};const next=id?records.map(r=>String(r.id)===String(id)?saved:r):[saved,...records];
+   const saved={...(records.find(r=>String(r.id)===String(id))||{}),...payload,id:id||M.uuid()};
+   if (payload.controlNo) {
+    M.setControlNumber(saved, payload.controlNo);
+    if (Object.hasOwn(saved, 'manual_control_no')) saved.manual_control_no = payload.controlNo;
+   }
+   const next=id?records.map(r=>String(r.id)===String(id)?saved:r):[saved,...records];
    if(!M.storage.set(cacheKey,next))throw new Error('Browser storage is full or unavailable. The record was not saved.');records=next;return saved;
   }
   function clearAutoDetectedFields() {
@@ -577,6 +663,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     }
    }catch{}
    if(draftVersion!==ocrGeneration)return;
+   originalEditorFields = readEditorFields();
    updateDestination();syncOcrControls();if(M.openModal('encodingModal')===false)return;
    $('encodingModalBody').scrollTop=0;
   }
@@ -615,9 +702,13 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
   $('communicationForm').addEventListener('submit',async e=>{
    e.preventDefault();if(busy)return;
    if(ocrActive){M.toast('Wait for reading to finish, or select Stop reading before saving.','warning');return;}
-   if(!$('communicationForm').reportValidity())return;
-   const payload=Object.fromEntries(Object.entries(fieldInputs).map(([key,id])=>[key,$(id).value.trim()]));
-   if(isMemo()){
+   const draft = readEditorFields();
+   const numberOnly = editing !== null && !file && !remoteAttachmentRemoved && !canRouteMemo() &&
+     originalEditorFields && draft.controlNo !== originalEditorFields.controlNo &&
+     Object.keys(draft).every(key => key === 'controlNo' || draft[key] === originalEditorFields[key]);
+   if (!numberOnly && !$('communicationForm').reportValidity()) return;
+   const payload = numberOnly ? {controlNo:draft.controlNo} : draft;
+   if(!numberOnly && isMemo()){
     if(editing)delete payload.office;
     else payload.office='';
    }
@@ -635,12 +726,30 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
      if(mode==='live'){const uploaded=await window.PGENRO_API.uploadDocument(file,'communications');newRemoteUrl=uploaded.url;payload.fileUrl=uploaded.url;}
      newAttachment=M.uuid();await attachmentIO('put',newAttachment,file);attachment={id:newAttachment,name:file.name,type:attachmentMime(file.name)||file.type};
     }
-    payload.attachmentId=attachment?.id||null;payload.fileName=attachment?.name||'';payload.fileType=attachment?.type||'';
-    if(remoteAttachmentRemoved&&!file)payload.fileUrl='';
+    if (!numberOnly) {
+     payload.attachmentId=attachment?.id||null;payload.fileName=attachment?.name||'';payload.fileType=attachment?.type||'';
+     if(remoteAttachmentRemoved&&!file)payload.fileUrl='';
+    }
     // An existing remote attachment URL remains intact when editing other fields.
-    const saved=await persist(payload,editing);if(mode==='live'){records=editing?records.map(r=>String(r.id)===String(editing)?saved:r):[saved,...records];M.storage.set(cacheKey,records);}M.observeRecords('communications',records);render();
+    const savingToDatabase = mode === 'live';
+    const saved = await persist(payload, editing);
+    // Prevent a refresh started before this save from restoring the old number.
+    generation++;
+    if(savingToDatabase){records=editing?records.map(r=>String(r.id)===String(editing)?saved:r):[saved,...records];M.storage.set(cacheKey,records);}
+    M.observeRecords('communications',records);render();
     if(priorAttachment&&priorAttachment!==attachment?.id)attachmentIO('delete',priorAttachment).catch(()=>{});
-    M.audit(editing?'EDIT_RECORD':'ADD_RECORD',`Communication ${payload.controlNo}`);busy=false;$('encodingModal').dataset.busy='false';M.closeModal('encodingModal');M.toast(mode==='local'?'Communication saved in this browser.':'Communication saved successfully.');
+    M.audit(editing?'EDIT_RECORD':'ADD_RECORD',`Communication ${saved.controlNo}`);
+    busy=false;$('encodingModal').dataset.busy='false';
+    if (saved.controlNo !== payload.controlNo) {
+     if (!numberOnly) M.closeModal('encodingModal');
+     const message = M.hasManualControlNumber()
+       ? 'The control number update could not be verified. Refresh the record and check its saved number.'
+       : 'This database needs the Communications control number update. Apply COMMUNICATION_CONTROL_NUMBER_PATCH.sql in Supabase, then try again.';
+     M.toast(message,'error');
+    } else {
+     M.closeModal('encodingModal');
+     M.toast(savingToDatabase ? (numberOnly ? 'Control number updated.' : 'Communication saved successfully.') : 'Communication saved in this browser.');
+    }
    }catch(error){if(newRemoteUrl&&/^(?:[0-9A-Z]{5}|PGRST\d{3})$/.test(error.code||''))window.PGENRO_API.removeDocument(newRemoteUrl).catch(()=>{});if(newAttachment){attachmentIO('delete',newAttachment).catch(()=>{});attachment=null;}M.toast(error.message||'Could not save this record.','error');}
    finally{busy=false;$('encodingModal').dataset.busy='false';$('saveRecordBtn').disabled=false;$('runOcrBtn').disabled=routeCommitted||!file;$('browseDocumentBtn').disabled=$('removeDocumentBtn').disabled=routeCommitted;for(const input of $('communicationForm').querySelectorAll('input,select,textarea'))input.disabled=routeCommitted;}
   });
