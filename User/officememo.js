@@ -742,9 +742,13 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
 
     const documentViewer={version:0,renderVersion:0,abort:null,task:null,pdf:null,render:null,chain:Promise.resolve(),url:'',page:1};
     const docToolbar=$('#memoDocumentToolbar'),docCanvas=$('#memoUserPdfCanvas'),docImage=$('#memoUserDocumentImage'),docText=$('#memoUserDocumentText'),docLabel=$('#memoUserPageLabel'),docDownload=$('#memoUserDownload');
+    const documentPrinter = window.PGENRO_DocumentPreview?.bindPrintButton?.(
+      $('#printMemoUserDocumentBtn'), message => showToast(message, 'error')
+    );
     let pdfLibrary=null;
     function cleanDocumentViewer(){
       documentViewer.version++;documentViewer.renderVersion++;documentViewer.abort?.abort();documentViewer.render?.cancel();
+      documentPrinter?.reset();
       if(documentViewer.task)Promise.resolve(documentViewer.task.destroy()).catch(()=>{});
       if(documentViewer.url)URL.revokeObjectURL(documentViewer.url);
       documentViewer.abort=null;documentViewer.task=null;documentViewer.pdf=null;documentViewer.url='';documentViewer.page=1;
@@ -783,7 +787,8 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
         const blob=await response.blob();if(blob.size>50*1024*1024)throw Error('The attachment exceeds the 50 MB preview limit.');
         if(version!==documentViewer.version)return;
         const bytes=new Uint8Array(await blob.arrayBuffer());if(version!==documentViewer.version)return;
-        documentViewer.url=URL.createObjectURL(blob);docDownload.href=documentViewer.url;docDownload.download=record.fileName||record.id||'document';docToolbar.hidden=false;
+        const filename=record.fileName||record.id||'document';
+        documentViewer.url=URL.createObjectURL(blob);docDownload.href=documentViewer.url;docDownload.download=filename;docToolbar.hidden=false;
         const mime=blob.type.split(';')[0];
         const pdf=new TextDecoder('ascii').decode(bytes.subarray(0,1024)).includes('%PDF-')||mime==='application/pdf';
         $('#memoUserPrevPage').hidden=$('#memoUserNextPage').hidden=docLabel.hidden=!pdf;
@@ -792,11 +797,14 @@ const PGENRO_PageUI = window.PGENRO_ViewerUI;
           const lib=await viewerTimeout(pdfLibrary,15000,'The PDF reader could not load. Use Download document.');if(version!==documentViewer.version)return;
           const task=lib.getDocument({data:bytes,isEvalSupported:false,cMapUrl:new URL('../vendor/pdfjs/cmaps/',location.href).href,cMapPacked:true,standardFontDataUrl:new URL('../vendor/pdfjs/standard_fonts/',location.href).href});documentViewer.task=task;
           documentViewer.pdf=await viewerTimeout(task.promise,20000,'This PDF could not open. Use Download document.');if(version!==documentViewer.version)return;
+          documentPrinter?.setSource({pdf: documentViewer.pdf, title: filename});
           ui.noPdfMessage.classList.add('hidden');ui.pdfFrame.hidden=false;renderDocumentPage();
         }else if(/^image\/(?:png|jpeg|webp|bmp)$/.test(mime)){
           docImage.src=documentViewer.url;docImage.hidden=false;ui.pdfFrame.hidden=false;ui.noPdfMessage.classList.add('hidden');
+          documentPrinter?.setSource({imageUrl: documentViewer.url, title: filename});
         }else if(/^text\//.test(mime)){
           const encoding=bytes[0]===255&&bytes[1]===254?'utf-16le':bytes[0]===254&&bytes[1]===255?'utf-16be':'utf-8';docText.textContent=new TextDecoder(encoding).decode(bytes);docText.hidden=false;ui.pdfFrame.hidden=false;ui.noPdfMessage.classList.add('hidden');
+          documentPrinter?.setSource({textBlob: blob, title: filename});
         }else documentMessage('Document ready to download','Use Download document to open this attachment in its application.');
       }catch(error){if(version===documentViewer.version)documentMessage('Preview unavailable',error.name==='AbortError'?'The attachment took too long to load. Close and reopen the viewer.':error.message);}
       finally{clearTimeout(timer);if(documentViewer.abort===controller)documentViewer.abort=null;}

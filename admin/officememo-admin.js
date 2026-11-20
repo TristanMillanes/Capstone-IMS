@@ -1070,6 +1070,9 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     try{const url=new URL(raw,location.href);if(['https:','http:','blob:'].includes(url.protocol))return url.href;}catch{}return '';
   }
   // Render pages ourselves: Chrome's native PDF plugin cannot run in a sandboxed iframe.
+  const memoPrinter = window.PGENRO_DocumentPreview?.bindPrintButton?.(
+    document.getElementById('printMemoDocumentBtn'), message => showToast(message, 'error')
+  );
   const memoPreview = {generation:0,renderVersion:0,renderPromise:Promise.resolve(),renderTask:null,
     pdfTask:null,pdf:null,abort:null,blobUrl:'',page:1,resizeTimer:null};
   function memoPreviewIsCurrent(generation){
@@ -1077,6 +1080,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
   }
   function cleanupMemoViewer(){
     memoPreview.generation++;memoPreview.renderVersion++;
+    memoPrinter?.reset();
     clearTimeout(memoPreview.resizeTimer);
     memoPreview.abort?.abort();memoPreview.abort=null;
     memoPreview.renderTask?.cancel();memoPreview.renderTask=null;
@@ -1181,12 +1185,14 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
         const pdf=await memoPreviewTimeout(task.promise,20000,'The PDF took too long to open.');
         if(!memoPreviewIsCurrent(generation))return;
         memoPreview.pdf=pdf;memoPreview.page=1;
+        memoPrinter?.setSource({pdf, title: filename});
         adminNoPdfState.classList.add('hidden');memoPdfToolbar.hidden=false;memoPdfStage.hidden=false;
         renderMemoPdfPage();
       }else if(imageType){
         memoAttachmentImage.onload=()=>{
           if(!memoPreviewIsCurrent(generation))return;
           adminNoPdfState.classList.add('hidden');memoPdfStage.hidden=false;memoAttachmentImage.hidden=false;
+          memoPrinter?.setSource({imageUrl: memoPreview.blobUrl, title: filename});
         };
         memoAttachmentImage.onerror=()=>{
           if(memoPreviewIsCurrent(generation))showMemoPreviewState('Image preview unavailable','Use Open in new tab or Download Document to view this attachment.','error');
@@ -1196,6 +1202,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
         const text=await blob.slice(0,1024*1024).text();
         if(!memoPreviewIsCurrent(generation))return;
         memoAttachmentText.textContent=text+(blob.size>1024*1024?'\n\n[Preview limited to 1 MB. Download Document to read the complete file.]':'');
+        memoPrinter?.setSource({textBlob: source, title: filename});
         adminNoPdfState.classList.add('hidden');memoPdfStage.hidden=false;memoAttachmentText.hidden=false;
       }else{
         showMemoPreviewState('Download this attachment','Use Download Document to view this file in its compatible application.');

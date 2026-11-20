@@ -35,7 +35,7 @@
 <link href="admincommunication.css?v=20261027-emerald-v6" rel="stylesheet">
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261120-theme-surfaces">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
-<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261120-responsive-viewers">
+<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261120-responsive-controls">
 <link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261116-optional-ocr">
 <script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
@@ -759,6 +759,8 @@
 
 <a class="btn btn-secondary" hidden="" id="docViewerExternalBtn" rel="noopener noreferrer" target="_blank"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false" data-lucide="external-link" class="lucide lucide-external-link"><path d="M15 3h6v6"></path><path d="M10 14 21 3"></path><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path></svg>Open in new tab</a>
 
+<button class="btn btn-secondary" data-document-print disabled hidden id="printCommunicationDocumentBtn" type="button">Print Document</button>
+
 <button class="btn btn-primary" id="dismissDocViewerBtn" type="button">Close</button>
 
 </div>
@@ -771,9 +773,9 @@
 
 <!-- Start the local interface before external database dependencies. -->
 <script defer src="../shared/ocr-form-fields.js?v=20261116-archival"></script>
-<script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
+<script defer src="../shared/admin-document-preview.js?v=20261120-attachment-print"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="admincommunication.js?v=20261120-manual-control-storage"></script>
+<script defer src="admincommunication.js?v=20261120-attachment-print"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
 <script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>

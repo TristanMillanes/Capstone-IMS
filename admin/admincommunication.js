@@ -775,6 +775,9 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
     try{const url=new URL(raw,location.href);if(['https:','http:','blob:'].includes(url.protocol))return url.href;}catch{}return '';
   }
   // Render pages ourselves: Chrome's native PDF plugin cannot run in a sandboxed iframe.
+  const communicationPrinter = window.PGENRO_DocumentPreview?.bindPrintButton?.(
+    $('printCommunicationDocumentBtn'), message => M.toast(message, 'error')
+  );
   const commPreview = {generation:0,renderVersion:0,renderPromise:Promise.resolve(),renderTask:null,
     pdfTask:null,pdf:null,abort:null,blobUrl:'',page:1,resizeTimer:null};
   function communicationPreviewIsCurrent(generation){
@@ -782,6 +785,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
   }
   function cleanupCommunicationViewer(){
     commPreview.generation++;commPreview.renderVersion++;
+    communicationPrinter?.reset();
     clearTimeout(commPreview.resizeTimer);
     commPreview.abort?.abort();commPreview.abort=null;
     commPreview.renderTask?.cancel();commPreview.renderTask=null;
@@ -891,12 +895,14 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
         const pdf=await communicationPreviewTimeout(task.promise,20000,'The PDF took too long to open.');
         if(!communicationPreviewIsCurrent(generation))return;
         commPreview.pdf=pdf;commPreview.page=1;
+        communicationPrinter?.setSource({pdf, title: filename});
         docViewerFallback.classList.add('hidden');commPdfToolbar.hidden=false;commPdfStage.hidden=false;
         renderCommunicationPdfPage();
       }else if(imageType){
         communicationAttachmentImage.onload=()=>{
           if(!communicationPreviewIsCurrent(generation))return;
           docViewerFallback.classList.add('hidden');commPdfStage.hidden=false;communicationAttachmentImage.hidden=false;
+          communicationPrinter?.setSource({imageUrl: commPreview.blobUrl, title: filename});
         };
         communicationAttachmentImage.onerror=()=>{
           if(communicationPreviewIsCurrent(generation))showCommunicationPreviewState('Image preview unavailable','Use Open in new tab or Download Document to view this attachment.','error');
@@ -906,6 +912,7 @@ function parseLetterDetails(rawText='',header=parseDocumentHeader(rawText)){
         const text=await blob.slice(0,1024*1024).text();
         if(!communicationPreviewIsCurrent(generation))return;
         communicationAttachmentText.textContent=text+(blob.size>1024*1024?'\n\n[Preview limited to 1 MB. Download Document to read the complete file.]':'');
+        communicationPrinter?.setSource({textBlob: source, title: filename});
         docViewerFallback.classList.add('hidden');commPdfStage.hidden=false;communicationAttachmentText.hidden=false;
       }else{
         showCommunicationPreviewState('Download this attachment','Use Download Document to view this file in its compatible application.');

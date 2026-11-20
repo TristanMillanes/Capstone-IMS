@@ -122,6 +122,51 @@
       white-space: normal;
     }
 
+    /* Reserve space for the leading icon and the select arrow. */
+    .pgenro-responsive :is(.ui-affixed-control, .field-with-icon, .select-wrapper:has(> .select-icon)) {
+      position: relative;
+      min-inline-size: 0;
+    }
+
+    .pgenro-responsive :is(.ui-affixed-control > .ui-field-icon,
+      .field-with-icon > :is(i[data-lucide], svg), .select-wrapper > .select-icon) {
+      position: absolute;
+      inset-block-start: 50% !important;
+      inset-block-end: auto !important;
+      inset-inline-start: .75rem !important;
+      inset-inline-end: auto !important;
+      inline-size: 1rem;
+      block-size: 1rem;
+      transform: translateY(-50%) !important;
+      pointer-events: none;
+    }
+
+    .pgenro-responsive .ui-affixed-control > .ui-affixed-field,
+    .pgenro-responsive :is(.field-with-icon, .select-wrapper:has(> .select-icon)) > select {
+      padding-inline-start: 2.5rem !important;
+    }
+
+    .pgenro-responsive :is(.field-with-icon, .select-wrapper:has(> .select-icon)) > select {
+      inline-size: 100%;
+      padding-inline-end: 1.75rem !important;
+      text-overflow: ellipsis;
+    }
+
+    .pgenro-responsive .travel-filter-workspace .travel-search-box {
+      flex: 1 1 20rem !important;
+      min-inline-size: 0 !important;
+    }
+
+    .pgenro-responsive .travel-filter-workspace .filter-group {
+      flex: 2 1 38rem !important;
+      min-inline-size: 0 !important;
+    }
+
+    .pgenro-responsive .travel-filter-workspace .select-wrapper {
+      flex: 1 1 12rem;
+      min-inline-size: min(100%, 12rem);
+    }
+
     .pgenro-responsive :is(input[type="checkbox"], input[type="radio"]) {
       flex-shrink: 0;
     }
@@ -206,12 +251,41 @@
       min-inline-size: 0;
     }
 
-    .pgenro-responsive :is(.status-badge, .badge-status, .table-tag,
-      .file-preview-title, .encoder-result-heading, .ocr-field-badge, .ocr-stats-chip,
+    .pgenro-responsive :is(.file-preview-title, .encoder-result-heading, .ocr-field-badge, .ocr-stats-chip,
       .module-notification-title, .module-notification-copy, .contact-cell) {
       white-space: normal;
       overflow-wrap: anywhere;
       max-inline-size: 100%;
+    }
+
+    .pgenro-responsive table :is(.badge, .badge-status, .status-badge, .status-badge-dot,
+      .status-pill, .table-tag, .type-tag, .type-pill, .role-badge-pill) {
+      max-inline-size: 100%;
+      white-space: normal !important;
+      word-break: normal !important;
+      overflow-wrap: normal !important;
+    }
+
+    .pgenro-responsive .unified-records-table td > :is(.actions, .row-actions, .action-buttons)
+      :is(.action, .row-btn, .btn-action, .btn-icon-action) {
+      flex-shrink: 0;
+    }
+
+    @media (min-width: 54.01rem) {
+      .pgenro-responsive .unified-records-table td > :is(.actions, .row-actions, .action-buttons):has(
+        > :is(.action, .row-btn, .btn-action, .btn-icon-action)) {
+        display: inline-flex !important;
+        flex-wrap: nowrap !important;
+        min-inline-size: max-content !important;
+        gap: .375rem;
+      }
+      .pgenro-responsive #travelOrdersTable .action-column {
+        text-align: end !important;
+      }
+    }
+
+    .pgenro-responsive [data-document-print][hidden] {
+      display: none !important;
     }
 
     .pgenro-responsive :is(.unified-dialog-body, .viewer-page-text, .modal-body,
@@ -313,7 +387,7 @@
     @media (max-width: 64rem) {
       .pgenro-responsive :is(.encoder-upload-header, .encoder-upload-workspace,
         .file-preview-header, .settings-topbar, .viewer-document-tools,
-        .unified-page-header, .records-header, .table-header-row, .toolbar-inner,
+        .unified-page-header, .records-header, .table-header-row, .toolbar-inner, .travel-filter-heading,
         .toolbar-search-filters, .toolbar-filters, .filter-bar, .filter-tools, .communication-table-tools) {
         flex-wrap: wrap !important;
       }
@@ -589,13 +663,13 @@
         display: flex;
         flex-wrap: wrap !important;
         gap: .375rem;
-        min-width: 0;
+        min-inline-size: 0 !important;
         max-width: 100%;
       }
 
       .pgenro-responsive .responsive-registry td :is(.user-cell, .employee-cell,
         .visitor-profile, .memo-subject-cell, .memo-recipient, .service-client-cell,
-        .visitor-contact, .accountable-cell, .badge-status, .status-badge, .contact-cell) {
+        .visitor-contact, .accountable-cell, .contact-cell) {
         min-width: 0 !important;
         max-width: 100% !important;
         white-space: normal !important;
@@ -612,7 +686,7 @@
         -webkit-line-clamp: unset !important;
       }
 
-      .pgenro-responsive .responsive-registry td :is(.btn-action, .row-btn,
+      .pgenro-responsive .responsive-registry td :is(.action, .btn-action, .row-btn,
         .btn-icon-action, .icon-btn-sm, .viewer-bookmark, .viewer-button, .viewer-legacy-details) {
         min-height: var(--read-target) !important;
         min-width: var(--read-target) !important;
@@ -705,6 +779,11 @@
         flex: 1 1 8rem;
         white-space: normal;
         overflow-wrap: anywhere;
+      }
+
+      .pgenro-responsive :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal) .modal-footer {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
     }
 

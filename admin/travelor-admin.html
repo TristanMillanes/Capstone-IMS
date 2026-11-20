@@ -12,7 +12,7 @@
 <link href="travelOR-admin.css?v=20261028-travel-summary-fix-3" rel="stylesheet">
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261120-theme-surfaces">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
-<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261120-responsive-viewers">
+<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261120-responsive-controls">
 <script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
 <body class="pgenro-admin layout-v2 workspace-modern depth-workspace ui-unified pgenro-responsive" data-admin-page="travelOR-admin.html" data-css-scope="admin-travelor" data-requires-auth="admin" data-unified-ui="20261013" data-module-title="Travel Orders" data-design="emerald-v6">
@@ -354,7 +354,7 @@
 <th>Travel Type</th>
 <th>Transportation</th>
 <th>Status</th>
-<th style="text-align: right; width: 160px;">Actions</th>
+<th class="action-column">Actions</th>
 </tr>
 </thead>
 <tbody id="travelOrderBody">
@@ -432,7 +432,7 @@
 <div class="travel-form-grid two-col">
 <div class="field-group full">
 <label for="destination">Destination / Station <span class="required-mark">*</span></label>
-<div class="field-with-icon ui-affixed-control"><i data-lucide="map-pin" class="ui-field-icon"></i><input id="destination" maxlength="220" placeholder="e.g. Municipality of Narra, Southern Palawan — Brgy. Antipolo &amp; Poblacion" required="" class="ui-affixed-field"></div>
+<div class="field-with-icon ui-affixed-control"><i data-lucide="map-pin" class="ui-field-icon"></i><input id="destination" maxlength="220" placeholder="Municipality or city, barangay, and site" required="" class="ui-affixed-field"></div>
 </div>
 <div class="field-group">
 <label for="departureDate">Departure Date <span class="required-mark">*</span></label>
@@ -514,7 +514,8 @@
 </div>
 <div class="header-action-buttons">
 
-<button class="icon-btn close" data-close="printModal" type="button">
+<button aria-label="Print travel order" class="btn btn-secondary" id="printTravelOrderBtn" type="button"><i data-lucide="printer"></i>Print</button>
+<button aria-label="Close travel order details" class="icon-btn close" data-close="printModal" type="button">
 <i data-lucide="x"></i>
 </button>
 </div>
@@ -526,9 +527,8 @@
 <img alt="Provincial Logo" class="tor-seal" onerror="this.onerror=null;this.src='../logo/quezonLLOGO.png';" src="../logo/enro.png">
 <div class="tor-header-text">
 <h4>Republic of the Philippines</h4>
-<h3>PROVINCE OF PALAWAN</h3>
-<h2>PROVINCIAL ENVIRONMENT AND NATURAL RESOURCES OFFICE</h2>
-<p>Provincial Capitol Complex, Puerto Princesa City</p>
+<h3>PROVINCE OF QUEZON</h3>
+<h2>PROVINCIAL GOVERNMENT ENVIRONMENT AND NATURAL RESOURCES OFFICE</h2>
 </div>
 </div>
 <div class="tor-title-bar">
@@ -554,7 +554,7 @@
 </tr>
 <tr>
 <td class="tor-lbl">4. OFFICIAL STATION:</td>
-<td class="tor-val">PGENRO Headquarters, Puerto Princesa City</td>
+<td class="tor-val">PGENRO Headquarters, Quezon Province</td>
 </tr>
 <tr>
 <td class="tor-lbl">5. DESTINATION / ITINERARY:</td>
@@ -610,7 +610,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
-<script defer src="travelOR-admin.js?v=20261120-appearance"></script>
+<script defer src="travelOR-admin.js?v=20261120-registry-print"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

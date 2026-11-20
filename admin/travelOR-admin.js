@@ -289,6 +289,9 @@ function bindUIEvents() {
   $("returnDate")?.addEventListener("change", updateTravelFormUX);
 
   // Modal dismiss buttons
+  $("printTravelOrderBtn")?.addEventListener("click", () => {
+    if ($("printModal").classList.contains("open")) window.print();
+  });
   document.querySelectorAll("[data-close]").forEach((btn) => {
     btn.onclick = () => closeModal(btn.dataset.close);
   });
@@ -419,7 +422,7 @@ function rowHTML(tor) {
         ${escapeHTML(status)}
       </button>
     </td>
-    <td data-label="Actions">
+    <td class="action-column" data-label="Actions">
       <div class="actions">
         <button class="action preview" type="button" aria-label="View ${escapeHTML(tor.tor_no || "travel order")}" title="View travel order details" data-preview="${escapeHTML(tor.id)}"><i data-lucide="search"></i></button>
         <button class="action approve" type="button" aria-label="Advance status for ${escapeHTML(tor.tor_no || "travel order")}" title="Advance Status" data-status="${escapeHTML(tor.id)}"><i data-lucide="check"></i></button>

@@ -17,7 +17,7 @@
 <link href="officememo-admin.css?v=20261027-emerald-v6" rel="stylesheet">
 <link rel="stylesheet" href="../shared/theme-layout.css?v=20261120-theme-surfaces">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
-<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261120-responsive-viewers">
+<link rel="stylesheet" href="../shared/responsive-layout.css?v=20261120-responsive-controls">
 <link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261116-optional-ocr">
 <script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
 </head>
@@ -565,6 +565,7 @@
 <i data-lucide="download"></i> Download Document
 </a>
 <a class="btn btn-secondary" hidden="" id="openPdfNewTabBtn" rel="noopener noreferrer" target="_blank"><i data-lucide="external-link"></i>Open in new tab</a>
+<button class="btn btn-secondary" data-document-print disabled hidden id="printMemoDocumentBtn" type="button">Print Document</button>
 <button class="btn btn-primary" id="dismissViewPdfBtn" type="button">Close</button>
 </div>
 </div>
@@ -600,9 +601,9 @@
 <script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/ocr-form-fields.js?v=20261115-memo-issuer"></script>
-<script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
+<script defer src="../shared/admin-document-preview.js?v=20261120-attachment-print"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="officememo-admin.js?v=20261120-appearance"></script>
+<script defer src="officememo-admin.js?v=20261120-attachment-print"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>
