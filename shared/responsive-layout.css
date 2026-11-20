@@ -220,6 +220,77 @@
       scroll-padding-block: 1rem;
     }
 
+    /* The document stage scrolls within the space left by the dialog controls. */
+    .pgenro-responsive :is(#viewPdfModal, #viewDocumentModal, #serviceFileModal) > [role="dialog"],
+    .pgenro-responsive #viewMemoModal > .viewer-panel {
+      display: flex;
+      flex-direction: column;
+      box-sizing: border-box;
+      width: min(72rem, 100%) !important;
+      min-width: 0 !important;
+      max-width: calc(100vw - 2 * var(--read-gutter)) !important;
+      height: min(54rem, calc(100vh - 2 * var(--read-gutter))) !important;
+      height: min(54rem, calc(var(--ui-viewport-height, 100dvh) - 2 * var(--read-gutter))) !important;
+      max-height: calc(var(--ui-viewport-height, 100dvh) - 2 * var(--read-gutter)) !important;
+      min-height: 0 !important;
+      overflow: hidden !important;
+    }
+
+    .pgenro-responsive :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal) .modal-body {
+      display: flex;
+      flex: 1 1 auto;
+      height: auto !important;
+      min-height: 0 !important;
+      max-height: none !important;
+      overflow: hidden !important;
+    }
+
+    .pgenro-responsive :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal) .pdf-viewer-box {
+      flex: 1 1 auto;
+      width: 100%;
+      height: auto !important;
+      min-width: 0;
+      min-height: 0 !important;
+    }
+
+    .pgenro-responsive :is(.pdf-preview-stage, .memo-document-stage, .service-file-pages, .viewer-document-stage) {
+      flex: 1 1 auto;
+      min-inline-size: 0;
+      min-height: 0 !important;
+      max-inline-size: 100%;
+      overflow: auto;
+      overscroll-behavior: contain;
+    }
+
+    .pgenro-responsive :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal)
+      :is(.doc-viewer-fallback, .no-pdf-placeholder) {
+      min-height: 0 !important;
+      overflow: auto;
+    }
+
+    .pgenro-responsive :is(.pdf-preview-toolbar, .memo-document-toolbar, .service-file-toolbar, .viewer-document-tools) {
+      flex-wrap: wrap !important;
+      flex-shrink: 0;
+      min-width: 0;
+      gap: .5rem;
+    }
+
+    .pgenro-responsive :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, #serviceFileModal)
+      :is(.modal-header, .modal-footer, .service-file-actions) {
+      flex-shrink: 0;
+      min-width: 0;
+    }
+
+    .pgenro-responsive :is(.doc-viewer-heading, .doc-viewer-titles, .modal-title-group,
+      .viewer-document-heading) {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+
+    .pgenro-responsive :is(.pdf-preview-toolbar, .memo-document-toolbar) :is(button, select) {
+      max-inline-size: 100%;
+    }
+
     .pgenro-responsive #encodingModalBody > .encoder-ocr-result {
       margin-top: .75rem;
     }
@@ -241,8 +312,25 @@
 
     @media (max-width: 64rem) {
       .pgenro-responsive :is(.encoder-upload-header, .encoder-upload-workspace,
-        .file-preview-header, .settings-topbar, .viewer-document-tools) {
-        flex-wrap: wrap;
+        .file-preview-header, .settings-topbar, .viewer-document-tools,
+        .unified-page-header, .records-header, .table-header-row, .toolbar-inner,
+        .toolbar-search-filters, .toolbar-filters, .filter-bar, .filter-tools, .communication-table-tools) {
+        flex-wrap: wrap !important;
+      }
+
+      .pgenro-responsive :is(.unified-page-header, .records-header, .table-header-row,
+        .toolbar-inner, .toolbar-search-filters) > * {
+        min-inline-size: 0;
+        max-inline-size: 100%;
+      }
+
+      .pgenro-responsive :is(.toolbar-inner, .toolbar-search-filters) >
+        :is(.toolbar-search, .toolbar-filters, .search-field, .filter-group) {
+        flex: 1 1 14rem;
+      }
+
+      .pgenro-responsive :is(.kpi-grid, .stats-grid, .metrics-grid) {
+        grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)) !important;
       }
 
       .pgenro-responsive :is(.form-group, .field-group, .input-group,
@@ -554,23 +642,24 @@
     }
 
     @media (max-width: 43.75rem) {
-      .pgenro-responsive :is(.unified-dialog, .portal-panel, .settings-form,
+      .pgenro-responsive :is(.unified-dialog, .modal-body, .portal-panel, .settings-form,
         .request-form-main, .ics-form-panel, .supply-request-form,
         .attendance-filters) :is(.form-grid, .form-row, .settings-form-grid,
         .memo-details-grid, .ics-form-grid, .request-form-grid, .field-grid,
-        .form-grid-2, .form-grid-3, .form-grid-4, .service-form-grid) {
+        .form-grid-2, .form-grid-3, .form-grid-4, .form-grid-5, .service-form-grid, .travel-form-grid) {
         grid-template-columns: minmax(0, 1fr) !important;
       }
 
-      .pgenro-responsive :is(.unified-dialog, .settings-form, .ics-form-panel,
-        .request-form-main) :is(.form-grid, .form-grid-2, .form-grid-3, .form-grid-4) > * {
+      .pgenro-responsive :is(.unified-dialog, .modal-body, .settings-form, .ics-form-panel,
+        .request-form-main) :is(.form-grid, .form-grid-2, .form-grid-3, .form-grid-4,
+        .form-grid-5, .service-form-grid, .travel-form-grid) > * {
         grid-column: 1 / -1;
         min-width: 0;
       }
 
       .pgenro-responsive :is(.portal-shell.visitor-shell, .app-shell,
         .request-workspace, .ics-workspace, .encoder-meta-grid, .encoder-content-grid,
-        .settings-form-grid, .memo-details-grid, .supply-form-grid) {
+        .settings-form-grid, .memo-details-grid, .supply-form-grid, .toolbar-search-filters) {
         grid-template-columns: minmax(0, 1fr) !important;
       }
 
@@ -601,6 +690,22 @@
         .unified-page-header, .settings-heading) :is(.header-copy, .header-title, .header-actions) {
         min-width: 0;
       }
+
+      .pgenro-responsive :is(.unified-page-header, .table-header-row, .records-header) > .header-actions {
+        flex-basis: 100%;
+      }
+
+      .pgenro-responsive :is(.pdf-page-controls, .memo-document-toolbar) button {
+        min-inline-size: var(--read-target);
+        min-height: var(--read-target);
+      }
+
+      .pgenro-responsive :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, #serviceFileModal)
+        :is(.modal-footer, .service-file-downloads) > :is(button, a) {
+        flex: 1 1 8rem;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
     }
 
     @media (max-width: 30rem) {
@@ -629,13 +734,15 @@
       }
     }
 
-    @media (max-width: 23rem) {
-      .pgenro-responsive {
-        --read-gutter: .75rem;
-      }
-
+    @media (max-width: 28rem) {
       .pgenro-responsive .responsive-registry > tbody > tr {
         grid-template-columns: minmax(0, 1fr) !important;
+      }
+    }
+
+    @media (max-width: 23rem) {
+      body.pgenro-responsive {
+        --read-gutter: .75rem;
       }
 
       .pgenro-responsive.pgenro-user .depth-topbar-breadcrumb {
@@ -651,6 +758,13 @@
 
       .pgenro-responsive :is(.modal-action-buttons, .request-form-actions, .form-controls) > :is(button, a) {
         flex: 1 1 100%;
+      }
+    }
+
+    @media (max-height: 36rem) {
+      .pgenro-responsive :is(.pdf-preview-toolbar, .memo-document-toolbar, .viewer-document-tools) {
+        max-height: 30dvh;
+        overflow: auto;
       }
     }
 

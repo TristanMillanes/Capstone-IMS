@@ -4,6 +4,7 @@ html[data-theme="light"] {
   color-scheme:light;
   --app-ink:#193b2d;--app-muted:#52695e;--app-subtle:#5b7166;
   --app-surface:#fff;--app-soft:#f0f6f3;--app-border:#cbdcd2;--app-accent:#066c4f;
+  --app-control-border:#6c8779;
   --app-tint:#e5f3eb;--app-danger:#b42335;--app-danger-bg:#fff0f3;--app-warning:#87500e;--app-warning-bg:#fff3da;
   --app-info:#235f99;--app-info-bg:#e8f2ff;
 }
@@ -11,6 +12,7 @@ html[data-theme="dark"] {
   color-scheme:dark;
   --app-ink:#ecf8f0;--app-muted:#b3cbbf;--app-subtle:#a4c1b1;
   --app-surface:#102a23;--app-soft:#183a2f;--app-border:#3b6151;--app-accent:#8ee7bd;
+  --app-control-border:#749989;
   --app-tint:#1d4936;--app-danger:#ffadb8;--app-danger-bg:#462d35;--app-warning:#ffda91;--app-warning-bg:#44351e;
   --app-info:#b0d7ff;--app-info-bg:#193b53;
 }
@@ -466,5 +468,123 @@ html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui
   }
   html[data-theme="dark"] body.pgenro-public-visitor #successModal .modal-kicker {
     color: var(--app-accent);
+  }
+}
+
+/* Shared colors for file controls and the area around the document. */
+@media screen {
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, #serviceFileModal, .ui-document-preview)
+    :is(.pdf-viewer-box, .pdf-preview-toolbar, .memo-document-toolbar, .service-file-toolbar, .service-file-actions) {
+    background: var(--app-surface);
+    color: var(--app-ink);
+    border-color: var(--app-border);
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, #serviceFileModal, .ui-document-preview)
+    :is(.pdf-preview-stage, .memo-document-stage, .service-file-pages, #pdfFrame) {
+    background: var(--app-soft);
+    color: var(--app-ink);
+    scrollbar-color: var(--app-subtle) var(--app-soft);
+  }
+
+  html[data-theme] :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal) :is(#memoPdfZoom, #commPdfZoom, #memoUserZoom),
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, .ui-document-preview)
+    :is(.pdf-preview-toolbar, .memo-document-toolbar) :is(button, select) {
+    background-color: var(--app-soft);
+    color: var(--app-ink);
+    border-color: var(--app-control-border);
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, .ui-document-preview)
+    :is(.pdf-preview-toolbar, .memo-document-toolbar) button:hover:enabled {
+    background-color: var(--app-tint);
+    color: var(--app-accent);
+    border-color: var(--app-accent);
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, .ui-document-preview)
+    :is(.pdf-preview-toolbar, .memo-document-toolbar) button:disabled {
+    color: var(--app-muted);
+    opacity: 1;
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, .ui-document-preview)
+    :is(.pdf-preview-toolbar, .memo-document-toolbar) :is(button, select, a):focus-visible {
+    outline: 2px solid var(--app-accent) !important;
+    outline-offset: 2px !important;
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal, .ui-document-preview)
+    :is(.pdf-preview-status, .reader-page-label, .reader-status, .reader-zoom-label) {
+    color: var(--app-muted);
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth] #viewMemoModal #memoUserDownload {
+    color: var(--app-accent);
+  }
+
+  html[data-theme] :is(#viewPdfModal, #viewDocumentModal) :is(#memoAttachmentText, #docViewerText),
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth] :is(.memo-document-stage, .ui-document-preview) pre {
+    background: var(--app-surface);
+    color: var(--app-ink);
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal, #viewMemoModal) :is(.no-pdf-placeholder, .doc-viewer-fallback) {
+    background: var(--app-soft);
+    color: var(--app-ink);
+    border-color: var(--app-border);
+  }
+
+  html[data-theme] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#viewPdfModal, #viewDocumentModal) :is(.no-pdf-placeholder, .doc-viewer-fallback)[data-state="error"] h3 {
+    color: var(--app-danger);
+  }
+
+  /* Older form panels and progress notices share the same dark surfaces. */
+  html[data-theme="dark"] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(.file-preview-card, .ocr-stop-controls, .workspace-busy-message, .ocr-review-note,
+        .ics-modal-header, .ics-modal-body, .ics-modal-footer, .modal-content-box, .drawer-panel) {
+    background: var(--app-surface);
+    color: var(--app-ink);
+    border-color: var(--app-border);
+  }
+
+  html[data-theme="dark"] body.depth-workspace.ui-unified[data-requires-auth]
+    :is(#orderForm, #employeeFormModal, #profileModal .monitor-panel, .modal-body, .ics-modal-body, .drawer-panel, .settings-panel)
+    :is(input:not(:where([type="hidden"], [type="checkbox"], [type="radio"], [type="file"], [type="button"],
+                         [type="submit"], [type="reset"], [type="color"], [type="range"], [type="image"])), select, textarea):not(
+      :where([aria-invalid="true"], .invalid, .invalid-field)),
+  html[data-theme="dark"] body:is(.service-request-page, .public-property-page, .pgenro-public-visitor)
+    :is(.service-form-field, .ics-form-field, .input-wrap)
+    :is(input:not(:where([type="checkbox"], [type="radio"], [type="hidden"], [type="file"])), select, textarea):not(
+      :where([aria-invalid="true"], .invalid, .invalid-field)) {
+    background-color: var(--app-soft);
+    color: var(--app-ink);
+    border-color: var(--app-border);
+  }
+}
+
+@layer viewer {
+  @media screen {
+    html[data-theme] body.pgenro-user :is(.viewer-document-dialog, #viewMemoModal) {
+      --viewer-bg: var(--app-soft);
+      --viewer-surface: var(--app-surface);
+      --viewer-text: var(--app-ink);
+      --viewer-muted: var(--app-muted);
+      --viewer-line: var(--app-border);
+      --viewer-tint: var(--app-tint);
+      --viewer-green: var(--app-accent);
+    }
+    html[data-theme] body.pgenro-user .viewer-document-tools {
+      background-color: var(--viewer-surface);
+    }
   }
 }
