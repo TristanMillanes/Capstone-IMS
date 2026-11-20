@@ -10,6 +10,12 @@ Install Python 3 and Tesseract OCR, then double-click **START_SYSTEM.bat** on Wi
 
 For manual startup, see [FIXES_AND_SETUP.md](FIXES_AND_SETUP.md). For Docker/Render hosting, see [docs/DEPLOYMENT_RENDER.md](docs/DEPLOYMENT_RENDER.md).
 
+## Control numbers and appearance
+
+Enter the assigned control number before saving a communication, office memo, inventory item, or attendance record. The OCR reader can fill the other document details.
+
+Use the header button or account preferences to switch between Light and Dark. The browser saves each workspace's selected appearance.
+
 ## Set up accounts
 
 Follow [UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md](UPDATE_EMPLOYEE_ATTENDANCE_AND_INVENTORY.md) for automatic Employee creation/linking during registration, private personal attendance and inventory stock movements through the pencil button. Apply the auto-sync SQL patch last and redeploy `employee-register` as described there. Login uses the employee ID and password, with `@pgenro.ims` added automatically.
@@ -31,6 +37,6 @@ Run **SETUP_FIRST_ADMIN.bat** to create **Admin001** with your chosen password a
 | account | Compatibility login controller |
 | docs | Deployment guide |
 
-Required PDF/Word templates, fonts, icons and library licenses are included. Nested ZIP archives, duplicate SQL/docs trees, developer test fixtures, generated screenshots, temporary OCR files and historical update reports have been removed.
+The project includes the PDF and Word templates, fonts, icons, library licenses, and Supabase setup files. The Windows startup script builds the local Python environment when it first runs.
 
 The source package does not apply SQL, deploy Supabase functions or create hosted accounts automatically. Follow the setup guide before using the employee ID login in your live system.

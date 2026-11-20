@@ -1,88 +1,131 @@
-/* Workspace appearance. Runs before CSS on Admin, User and public pages. */
+/* Apply the workspace theme before the page styles load. */
 (() => {
   'use strict';
-  if (window.PGENRO_UserTheme) return;
+  if (window.PGENRO_Theme) return;
+
   const root = document.documentElement;
-  const valid = value => value === 'dark' || value === 'light';
-  const read = key => { try { return localStorage.getItem(key); } catch { return null; } };
-  function preferences(value = read('pgenro_preferences')) {
-    try { const parsed = JSON.parse(value || '{}'); return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {}; }
-    catch { return {}; }
-  }
+  const toggleSelector = '.user-appearance-toggle, #appearanceThemeBtn';
+  const adminKey = 'pgenro_admin_theme';
+  const userKey = 'pgenro_user_theme';
+  const preferencesKey = 'pgenro_preferences';
   const isSettings = /\/SettingIMS\//i.test(location.pathname);
-  const adminScope = /\/admin\//i.test(location.pathname) || (isSettings && new URLSearchParams(location.search).get('from') === 'admin');
-  let themeKey = adminScope ? 'pgenro_admin_theme' : 'pgenro_user_theme';
-  let theme = valid(read(themeKey)) ? read(themeKey) : preferences().theme;
-  theme = valid(theme) ? theme : 'light';
-  const icon = dark => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${dark ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>' : '<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>'}</svg>`;
+  const fromAdmin = isSettings && new URLSearchParams(location.search).get('from') === 'admin';
+  let key = /\/admin\//i.test(location.pathname) || fromAdmin ? adminKey : userKey;
+  let selected = read(key);
+  let profileTheme = readProfileTheme(read(preferencesKey));
+  let theme;
+
+  function isTheme(value) {
+    return value === 'light' || value === 'dark';
+  }
+
+  function read(name) {
+    try { return localStorage.getItem(name); } catch { return null; }
+  }
+
+  function readProfileTheme(value) {
+    try { return JSON.parse(value || '{}')?.theme; } catch { return undefined; }
+  }
+
+  function icon(dark) {
+    const shape = dark
+      ? '<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/>'
+      : '<path d="M20.9 12.5A9 9 0 1 1 11.5 3a6.3 6.3 0 0 0 9.4 9.5Z"/>';
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + shape + '</svg>';
+  }
+
   function render() {
     const dark = theme === 'dark';
-    document.querySelectorAll('.user-appearance-toggle,#appearanceThemeBtn').forEach(button => {
+    const label = dark ? 'Switch to light mode' : 'Switch to dark mode';
+    for (const button of document.querySelectorAll(toggleSelector)) {
       if (button.dataset.appearance !== theme) button.innerHTML = icon(dark);
       button.dataset.appearance = theme;
       button.setAttribute('aria-pressed', String(dark));
-      button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
-      button.title = button.getAttribute('aria-label');
-    });
-    const appearanceSelect = document.getElementById('appearanceThemeSelect');
-    if (appearanceSelect) appearanceSelect.value = theme;
-    if (isSettings) document.querySelectorAll('input[name="theme"]').forEach(input => {
-      if (valid(input.value)) input.checked = input.value === theme;
-    });
+      button.setAttribute('aria-label', label);
+      button.title = label;
+    }
+    const select = document.getElementById('appearanceThemeSelect');
+    if (select) select.value = theme;
+    if (isSettings) {
+      for (const radio of document.querySelectorAll('input[name="theme"]')) {
+        radio.checked = radio.value === theme;
+      }
+    }
     document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', theme);
     document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#101d1b' : '#f3f6f5');
   }
-  function apply(value, persist = false) {
-    const next = valid(value) ? value : 'light', changed = next !== theme;
+
+  function apply() {
+    const next = isTheme(selected) ? selected : isTheme(profileTheme) ? profileTheme : 'light';
+    const changed = next !== theme;
     theme = next;
     if (root.dataset.theme !== theme) root.dataset.theme = theme;
     if (root.dataset.pgenroTheme !== theme) root.dataset.pgenroTheme = theme;
-    root.style.colorScheme = theme;
-    if (persist) {
-      try {
-        localStorage.setItem(themeKey, theme);
-        localStorage.setItem('pgenro_preferences', JSON.stringify({...preferences(), theme}));
-      } catch { /* Appearance still works when browser storage is unavailable. */ }
-    }
     render();
-    if (changed) document.dispatchEvent(new CustomEvent('pgenro:themechange', {detail:{theme}}));
+    if (changed) document.dispatchEvent(new CustomEvent('pgenro:themechange', {detail: {theme}}));
   }
-  apply(theme);
+
+  function set(value) {
+    if (!isTheme(value)) return;
+    selected = value;
+    try { localStorage.setItem(key, value); } catch { /* Keep the current page usable. */ }
+    apply();
+  }
+
+  apply();
   window.PGENRO_Theme = window.PGENRO_UserTheme = Object.freeze({
-    get: () => theme, set: value => apply(value, true),
-    setScope: role => {
+    get: () => theme,
+    set,
+    setScope(role, preferences) {
       if (!isSettings) return;
-      themeKey = role === 'admin' ? 'pgenro_admin_theme' : 'pgenro_user_theme';
-      apply(valid(read(themeKey)) ? read(themeKey) : preferences().theme);
-    },
-    sync: prefs => apply(valid(read(themeKey)) ? read(themeKey) : prefs?.theme || theme)
-  });
-  new MutationObserver(records => {
-    const record = records.filter(item => valid(root.getAttribute(item.attributeName))).at(-1);
-    if (record) apply(root.getAttribute(record.attributeName));
-  }).observe(root, {attributes:true, attributeFilter:['data-theme','data-pgenro-theme']});
-  window.addEventListener('storage', event => {
-    if (event.key === themeKey) apply(valid(event.newValue) ? event.newValue : preferences().theme);
-    else if (event.key === 'pgenro_preferences') apply(valid(read(themeKey)) ? read(themeKey) : preferences(event.newValue).theme);
-    else if (event.key === null) apply('light');
-  });
-  function init() {
-    if (!document.querySelector('.user-appearance-toggle')) {
-      const header = document.querySelector('.public-header,.portal-topbar');
-      if (header) {
-        const button = document.createElement('button');
-        button.type = 'button'; button.className = 'user-appearance-toggle';
-        header.append(button);
+      const nextKey = role === 'admin' ? adminKey : userKey;
+      if (nextKey !== key) {
+        key = nextKey;
+        selected = read(key);
       }
+      profileTheme = preferences?.theme ?? readProfileTheme(read(preferencesKey));
+      apply();
+    },
+    sync(preferences) {
+      profileTheme = preferences?.theme;
+      apply();
+    }
+  });
+
+  window.addEventListener('storage', event => {
+    if (event.key === key) selected = event.newValue;
+    else if (event.key === preferencesKey) profileTheme = readProfileTheme(event.newValue);
+    else if (event.key === null) selected = profileTheme = null;
+    else return;
+    apply();
+  });
+  window.addEventListener('pageshow', event => {
+    if (!event.persisted) return;
+    selected = read(key);
+    profileTheme = readProfileTheme(read(preferencesKey));
+    apply();
+  });
+
+  function init() {
+    const header = document.querySelector('.public-header, .portal-topbar');
+    if (header && !document.querySelector(toggleSelector)) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'user-appearance-toggle';
+      header.append(button);
     }
     document.addEventListener('click', event => {
-      const button = event.target.closest?.('.user-appearance-toggle');
-      if (!button) return;
-      apply(theme === 'dark' ? 'light' : 'dark', true);
+      if (event.target.closest?.(toggleSelector)) set(theme === 'dark' ? 'light' : 'dark');
     });
-    window.addEventListener('pageshow', () => apply(valid(read(themeKey)) ? read(themeKey) : theme));
+    document.addEventListener('change', event => {
+      if (event.target.id === 'appearanceThemeSelect' ||
+          (isSettings && event.target.matches('input[name="theme"]:checked'))) {
+        set(event.target.value);
+      }
+    });
     render();
   }
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once:true});
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, {once: true});
   else init();
 })();

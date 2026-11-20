@@ -108,4 +108,4 @@ The repaired Edge Functions always return `Access-Control-Allow-Origin: *` and h
 
 ## Files that are canonical
 
-Use the top-level `supabase/` folder for Supabase CLI deployment. `User/supabase/` is kept as a synchronized reference copy for convenience. The website files are under `User/`, the Admin interface is under `admin/`, and the shared public Supabase client config is `shared/supabase.js`.
+Use the top-level `supabase/` folder for Supabase CLI deployment. The website files are under `User/`, the Admin interface is under `admin/`, and the shared public Supabase client config is `shared/supabase.js`.

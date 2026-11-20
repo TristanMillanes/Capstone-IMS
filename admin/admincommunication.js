@@ -329,7 +329,7 @@
   const routeJournalKey='pgenro_memo_routes';
   let routeCommitted=false,remoteAttachmentRemoved=false,memoDraftId=null;
   const commOcrValues=new Map(),commManualFields=new Set();
-  const ocrFormIds=new Set(Object.values(fieldInputs));
+  const ocrFormIds=new Set(Object.values(fieldInputs).filter(id=>id!=='controlNoInput'));
   let ocrActive=false,lastOcr=null;
   for(const id of ocrFormIds)$(id).addEventListener('input',()=>{commManualFields.add(id);setFieldState(id,'edited','Your manual edit is kept.');});
   const isMemo=()=>$('docTypeSelect').value==='Memorandum';
@@ -345,6 +345,7 @@
    $('officeInput').placeholder=outgoing?'Person or office receiving this communication':'Originating person or printed signatory';
    $('dateFieldLabel').textContent=routeToMemos?'Date issued':outgoing?'Date released':'Date received';
    $('controlFieldLabel').textContent=routeToMemos?'Memo number':'Control number';
+   $('controlNoInput').placeholder=routeToMemos?'Enter memo number':'Enter control number';
    $('saveRecordBtn').querySelector('span').textContent=routeCommitted?'Finish Move to Office Memos':routeToMemos?'Save to Office Memos':editing?'Save Changes':'Save Record';
   }
   $('docTypeSelect').addEventListener('change',refreshOcrMapping);
@@ -1178,7 +1179,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     const needsReview=fieldState?.state==='review'||data.needsReview?.includes(key)||
      (key==='receivedFrom'&&data.receivedFromNeedsReview)||
      ['body','subject','fallback','address-block','letterhead','approval','footer-name','prepared-by'].includes(data[key+'Source']);
-    const applied=applyOcrValue(id,value,id!=='controlNoInput'&&(!needsReview||!editing));
+    const applied=applyOcrValue(id,value,!needsReview||!editing);
     if(applied){
      setFieldState(id,needsReview?'review':'detected',fieldState?.evidence||data.fieldEvidence?.[key]||'Detected from the uploaded document.');
     }else if(!value){
@@ -1194,9 +1195,8 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    const memo=isMemo(),routeToMemos=canRouteMemo();
    const dateKey=routeToMemos?'date':outgoing?'releasedDate':'receivedDate';
    const officeKey=outgoing?'recipient':'receivedFrom';
-   const numberKey=routeToMemos?'memoNo':'controlNo';
    const keys={
-    controlNoInput:numberKey,dateInput:dateKey,subjectInput:'subject',statusSelect:'status',
+    dateInput:dateKey,subjectInput:'subject',statusSelect:'status',
     actionTakenInput:'actionTaken',remarksInput:'remarks'
    };
    if(!memo)keys.officeInput=officeKey;
@@ -1210,7 +1210,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    updateDestination();
    const required=[...$('communicationForm').querySelectorAll('input[required],select[required],textarea[required]')];
    for(const input of required){
-    if(!input.value.trim()&&!commManualFields.has(input.id)){
+    if(ocrFormIds.has(input.id)&&!input.value.trim()&&!commManualFields.has(input.id)){
      setFieldState(input.id,'missing',data.fieldEvidence?.[keys[input.id]]||'Enter this value manually.');
     }
    }
@@ -1235,7 +1235,7 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
    notes.push(...(data.warnings||[]),...(result?.warnings||[]));
    review.textContent=['Read '+pageCount+' '+(pageCount===1?'page':'pages')+'.',...new Set(notes)].join(' ');
    $('communicationMemoReview').hidden=!data.isMemo;
-   $('communicationMemoReview').textContent=routeToMemos?'Confirm the memo number, issue date and subject.':'Check the document type and save destination.';
+   $('communicationMemoReview').textContent=routeToMemos?'Enter the memo number and confirm the issue date and subject.':'Check the document type and save destination.';
    const filled=[...commOcrValues.keys()].filter(id=>['detected','review'].includes($(id).dataset.ocrState)).length;
    const missing=required.filter(input=>!input.value.trim()).length;
    $('ocrFieldSummary').textContent=filled+' '+(filled===1?'field':'fields')+' detected. '+
@@ -1459,35 +1459,11 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     if (!document.body.classList.contains('pgenro-admin') || document.body.dataset.modernWorkspaceReady) return;
     document.body.dataset.modernWorkspaceReady = 'true';
     const renderIcons = () => window.PGENRO_Module?.renderIcons?.();
-    const themeButton = document.getElementById('appearanceThemeBtn');
-    const themeSelect = document.getElementById('appearanceThemeSelect');
     const preferenceKey = 'pgenro_admin_preferences';
-    const themeKey = 'pgenro_admin_theme';
     function readPreferences() {
       try { const value = JSON.parse(localStorage.getItem(preferenceKey) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
       catch { return {}; }
     }
-    function applyTheme(value, remember = false) {
-      const theme = value === 'dark' ? 'dark' : 'light';
-      document.documentElement.dataset.theme = theme;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0f1d18' : '#f5f7f8');
-      if (remember) { try { localStorage.setItem(themeKey, theme); } catch {} }
-      if (themeButton) {
-        const label = theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance';
-        themeButton.setAttribute('aria-label', label);
-        themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
-        themeButton.title = label;
-        const icon = document.createElement('i');
-        icon.dataset.lucide = theme === 'dark' ? 'sun' : 'moon';
-        themeButton.replaceChildren(icon);
-      }
-      if (themeSelect) themeSelect.value = theme;
-      renderIcons();
-    }
-    applyTheme(document.documentElement.dataset.theme);
-    themeButton?.addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
-    themeSelect?.addEventListener('change', () => applyTheme(themeSelect.value, true));
-
     function syncDensity() {
       const compact = Boolean(readPreferences().compact);
       document.body.classList.toggle('compact-mode', compact);
@@ -1519,11 +1495,10 @@ async function extractDocument(source,progress=()=>{},operation=readerRuntime.op
     syncDensity();
     document.getElementById('compactModeToggle')?.addEventListener('change', syncDensity);
     document.getElementById('resetAdminPrefsBtn')?.addEventListener('click', () => {
-      try { localStorage.removeItem(themeKey); } catch {}
-      applyTheme('light'); syncDensity();
+      window.PGENRO_Theme?.set('light');
+      syncDensity();
     });
     window.addEventListener('storage', event => {
-      if (event.key === themeKey || event.key === null) applyTheme(event.newValue);
       if (event.key === preferenceKey || event.key === null) syncDensity();
     });
 

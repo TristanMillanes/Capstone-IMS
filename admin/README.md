@@ -10,7 +10,6 @@ All eleven pages now use a modern administrative workspace: a clean light sideba
 
 The desktop profile control includes the current administrator's name and role. Phone layouts keep separate appearance, notification and profile controls. A complete set of 139 local vector icons covers the interface and existing controllers; icons added later by tables, OCR states and attachment controls also render. Table toolbars offer comfortable or compact row spacing. Theme and density choices are remembered across modules and synchronized between open tabs. Empty registries retain their real status messages with a clearer visual treatment. The supplied Supabase, authorization, OCR, chart and record-controller code is retained.
 
-See `verification/MODERN_UI.md` and `verification/ui-modern.json` for the current checks. Other validation reports describe earlier updates.
 
 Replace the `admin/` folder in your existing PGENRO application with this folder. Serve the application through HTTP or HTTPS and open `admin/admin.html`. All eleven pages retain their own HTML, CSS and JavaScript; no new shared UI files are required.
 
@@ -52,7 +51,7 @@ The Office Memos dashboard now shows a six-month issuance chart, attachment cove
 
 The centered form supports multiline recipients, subjects and remarks. It accurately labels PDF/image/DOCX/text attachments, opens the file chooser by clicking the dropzone, protects the draft during busy actions, and returns from preview to the same draft. Mobile layouts were checked at 320, 390 and 768 px. Toast feedback stays compact.
 
-Communications and Office Memos use the same page-owned parsing rules. Printed header numbers, series, labeled recipients, subject, date and issuing office are extracted. Wrapped text and inline labels are supported, and subject extraction stops at body paragraphs. Ambiguous numeric dates, invalid dates and missing fields are marked for manual review. Optional issuing office/remarks are not fabricated. OCR fills empty/generated values while preserving your manual edits; replacing a file clears its stale automatic values. Correct extracted text and use **Recheck fields from text** when needed. Extracted text remains available after saving/editing through the existing memo record format; no new database columns or global UI files are required.
+Communications and Office Memos share OCR rules. Enter the control or memo number in the form. Printed header numbers, series, labeled recipients, subject, date and issuing office are extracted. Wrapped text and inline labels are supported, and subject extraction stops at body paragraphs. Ambiguous numeric dates, invalid dates and missing fields are marked for manual review. Optional issuing office/remarks are not fabricated. OCR fills empty/generated values while preserving your manual edits; replacing a file clears its stale automatic values. Correct extracted text and use **Recheck fields from text** when needed. Extracted text remains available after saving/editing through the existing memo record format; no new database columns or global UI files are required.
 
 The original routing is retained: **Communications upload → Run OCR → review the fields → Save to Office Memos → memo dashboard**. The original attachment follows the record. The dashboard displays the newly saved memorandum after successful upload.
 
@@ -67,7 +66,7 @@ The original routing is retained: **Communications upload → Run OCR → review
 - User creation, editing, suspension and deletion continue through the existing administrator service. Inactive accounts are no longer mistaken for active accounts, self-delete/access changes are blocked, and partial bulk failures keep the displayed registry accurate.
 - Inventory movements continue through the existing atomic stock movement RPC. Excess stock issuance is blocked; an adjustment to zero works. Searches, movement history, reports and exports use current records.
 - Visitors support registration, editing, departure, reopening, deletion and passes. Category filters include all form and recorded purposes. Today's departure count uses the departure date, and confirmed changes update the registry/cache immediately.
-- ICS keeps its original fields, calculated values, detail view and official print layout; control numbers are generated and duplicate control numbers are checked.
+- Enter the assigned control number when creating an ICS record. The form checks for duplicate control numbers.
 - Office Memo CRUD, pinning, search, pagination, attachments and filtered CSV export work without seeded sample records. PDF/image/TXT/DOCX reading uses the local OCR service when available and retains the browser reader fallback. Both modules have a Stop reading control. Preview returns to an unfinished form, and DOCX attachments offer a download. File limits and safe preview URLs are validated.
 - Module notifications detect newly added record IDs; initial loads, ordinary edits and filters do not create fake notifications. Visible connection/debug badges were removed while database handling remains active.
 - CSV downloads escape formula-like text. Missing backend access shows empty or read-only cached states rather than fake successful writes.
@@ -83,11 +82,3 @@ The account helpers must continue to handle `create`, `update`, `set_status`, `d
 Keep `logo/enro.png` and `User/login.html` in their existing locations outside `admin/`. A simple P letter mark appears if the logo image is unavailable. Sign out continues to use the existing login route.
 
 The official Supabase SDK and document reader libraries require network access. Fonts use the existing Google Fonts include; icons are rendered locally. The dashboard has native chart fallbacks. Workspace backup/restore manages local browser caches and preferences; it does not back up or restore the hosted database.
-
-## Validation
-
-See `verification/MODERN_UI.md` for this update. `VERIFICATION.md`, `verification/UI_REFRESH.md` and older reports are historical; their claims do not describe the current redesign. Current checks cover both appearances on all eleven pages at five widths, menu and form bounds, focus return, toolbar spacing, dynamic local icons, reduced motion, and saved preferences. The supplied parser, routing and upload regression suites are also run.
-
-Database responses were simulated; the existing Supabase bootstrap is retained and the hosted database was not modified or verified. Keep the existing integration and verify the deployed application with your authorized administrator account. OCR quality depends on the source document; review unclear or missing values before saving.
-
-Run `node verification/memo-parser.test.cjs`, `node verification/memorandum-routing.test.cjs` and `node verification/communication-upload.test.cjs` from `admin/` for the included dependency-free regression checks. With Playwright and Chromium installed in a test environment, run `node verification/ui-modern.test.cjs` for the browser checks.

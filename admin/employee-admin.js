@@ -1472,12 +1472,6 @@
       saveLocalEmployees();
     }
 
-    function nextMonitoringControl(rows, kind, date) {
-      const prefix = `${kind === "ceremony" ? "FC" : "UM"}-${date.slice(0, 4)}-`;
-      const numbers = rows.map(row => String(row.control_number || "").startsWith(prefix) ? Number(String(row.control_number).slice(prefix.length)) || 0 : 0);
-      return prefix + String(Math.max(0, ...numbers) + 1).padStart(4, "0");
-    }
-
     async function saveMonitoringRecord(kind, event) {
       event.preventDefault();
       if (monitorSaving) return;
@@ -1485,14 +1479,15 @@
       if (!emp) return;
       const form = monitorEl(kind, "Form");
       showFormFeedback(kind + "Feedback");
-      monitorEl(kind, "Control").setCustomValidity("");
+      const controlInput = monitorEl(kind, "Control");
+      const controlNumber = controlInput.value.trim();
+      controlInput.setCustomValidity(controlNumber ? "" : "Enter a control number.");
       monitorEl(kind, "Date").setCustomValidity("");
       if (!form.reportValidity()) return;
       const employeeId = emp.id;
       const editKey = monitorEditing[kind];
       const draft = monitoringDraft[kind];
       const date = monitorEl(kind, "Date").value;
-      const control = monitorEl(kind, "Control").value.trim();
       const recordStatus = monitorEl(kind, "Status").value;
       const activity = kind === "ceremony" ? monitorEl(kind, "Activity").value : "";
       const remarks = monitorEl(kind, "Remarks").value.trim();
@@ -1507,7 +1502,6 @@
         const rows = monitorRecords(latest, kind).map(row => ({...row}));
         const index = editKey == null ? -1 : rows.findIndex((row, i) => monitorRowKey(row, i) === editKey);
         if (editKey != null && (index < 0 || rowFingerprint(rows[index]) !== draft?.fingerprint)) throw new Error("This monitoring record changed in another session. Cancel the edit and select it again.");
-        const controlNumber = control || nextMonitoringControl(rows, kind, date);
         if (rows.some((row, i) => i !== index && String(row.control_number || "").toLowerCase() === controlNumber.toLowerCase())) throw new Error("This control number already exists for this employee. Use a unique control number.");
         if (rows.some((row, i) => i !== index && String(row.date || "").slice(0, 10) === date && (kind === "uniform" || activityValue(row) === activity))) throw new Error(kind === "uniform" ? "A uniform record already exists for this employee on this date. Edit that record instead." : "This employee already has a record for this activity on this date. Edit that record instead.");
         const timestamp = new Date().toISOString();
@@ -1849,35 +1843,11 @@
     if (!document.body.classList.contains('pgenro-admin') || document.body.dataset.modernWorkspaceReady) return;
     document.body.dataset.modernWorkspaceReady = 'true';
     const renderIcons = () => window.PGENRO_Module?.renderIcons?.();
-    const themeButton = document.getElementById('appearanceThemeBtn');
-    const themeSelect = document.getElementById('appearanceThemeSelect');
     const preferenceKey = 'pgenro_admin_preferences';
-    const themeKey = 'pgenro_admin_theme';
     function readPreferences() {
       try { const value = JSON.parse(localStorage.getItem(preferenceKey) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
       catch { return {}; }
     }
-    function applyTheme(value, remember = false) {
-      const theme = value === 'dark' ? 'dark' : 'light';
-      document.documentElement.dataset.theme = theme;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0f1d18' : '#f5f7f8');
-      if (remember) { try { localStorage.setItem(themeKey, theme); } catch {} }
-      if (themeButton) {
-        const label = theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance';
-        themeButton.setAttribute('aria-label', label);
-        themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
-        themeButton.title = label;
-        const icon = document.createElement('i');
-        icon.dataset.lucide = theme === 'dark' ? 'sun' : 'moon';
-        themeButton.replaceChildren(icon);
-      }
-      if (themeSelect) themeSelect.value = theme;
-      renderIcons();
-    }
-    applyTheme(document.documentElement.dataset.theme);
-    themeButton?.addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
-    themeSelect?.addEventListener('change', () => applyTheme(themeSelect.value, true));
-
     function syncDensity() {
       const compact = Boolean(readPreferences().compact);
       document.body.classList.toggle('compact-mode', compact);
@@ -1909,11 +1879,10 @@
     syncDensity();
     document.getElementById('compactModeToggle')?.addEventListener('change', syncDensity);
     document.getElementById('resetAdminPrefsBtn')?.addEventListener('click', () => {
-      try { localStorage.removeItem(themeKey); } catch {}
-      applyTheme('light'); syncDensity();
+      window.PGENRO_Theme?.set('light');
+      syncDensity();
     });
     window.addEventListener('storage', event => {
-      if (event.key === themeKey || event.key === null) applyTheme(event.newValue);
       if (event.key === preferenceKey || event.key === null) syncDensity();
     });
 

@@ -2,7 +2,7 @@ Latest account update (4 November 2026): read [EMPLOYEE_ACCOUNT_SETUP.md](EMPLOY
 
 Latest frontend repair (4 November 2026): read [FRONTEND_FIXES_2026-11-04.md](FRONTEND_FIXES_2026-11-04.md) for the current light/dark visibility, alignment, mobile and legacy-entry fixes.
 
-# PGENRO IMS — corrected system, 3 November 2026
+# PGENRO IMS — Start here
 
 ## Run this copy
 
@@ -40,14 +40,3 @@ The previous User viewer improvements are included: direct **View file** actions
 The supplied Supabase configuration, SQL patches and Edge Function source are retained. This repair did **not** run SQL, deploy functions, change database permissions or modify hosted records.
 
 An already configured installation can use the corrected frontend with its existing backend. If the account service or database setup is missing, follow `ADMIN_USER_SETUP.md` and the bundled `supabase/ADMIN_USER_ACCESS_PATCH.sql` / `supabase/ADMIN_USER_DIRECTORY_RPC_FIX.sql` instructions. The default account function is `supabase/functions/admin-users`. Attachment setup is documented in `FIXES_AND_SETUP.md`; public Service Request setup is in `PUBLIC_SERVICE_REQUEST_SETUP.md`.
-
-## Verification
-
-Current results are in `verification/frontend/` and `verification/current/source-results.json`. Older reports elsewhere in `verification/` describe earlier builds.
-
-- 21 functional browser checks passed using the actual Flask server and production frontend, with local Supabase/Auth/Storage fixtures. These cover both account-directory contracts, role denial, Admin/User settings, eight Admin editors and saves, five mobile private PDF viewers, official PDF/Word generation, navigation and logout.
-- 28 main pages were reviewed at 1440, 1024, 768, 390 and 320 px: no uncaught JavaScript errors, missing local assets or page-width overflow in these scenarios.
-- All 201 local script/stylesheet references passed server checks, alongside six module/document asset checks, six legacy redirects and seven blocked source paths.
-- Syntax checks passed for 43 JavaScript files, 40 stylesheets and three production Python files.
-
-No live backend was contacted by these tests. Real credentials, deployed RLS/storage policies, real account emails and printer output still require checking in your configured installation. OCR recognition accuracy was not re-benchmarked for this frontend repair.

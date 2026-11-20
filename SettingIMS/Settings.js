@@ -23,7 +23,6 @@ const PGENRO_PageUI = (() => {
 
   const ADMIN_ROLES = new Set(['admin']);
   const normalizeRole = v => String(v || '').trim().toLowerCase().replace(/\s+/g,' ');
-  const safeStoredPreferences = () => { try { return JSON.parse(localStorage.getItem('pgenro_preferences') || '{}') || {}; } catch { return {}; } };
   const fmtDate = v => {
     if (!v) return 'Not recorded';
     const d = new Date(v);
@@ -66,7 +65,6 @@ const PGENRO_PageUI = (() => {
   function populateProfile(p) {
     profile = p;
     isAdmin = ADMIN_ROLES.has(normalizeRole(p?.role));
-    window.PGENRO_UserTheme?.setScope(isAdmin ? 'admin' : 'user');
     $('#profileNameDisplay').textContent = p?.full_name || p?.username || 'PGENRO User';
     $('#profileRoleDisplay').textContent = p?.role || p?.position || 'Authorized Personnel';
     $('#profileInitials').textContent = initials(p?.full_name || p?.username);
@@ -86,11 +84,7 @@ const PGENRO_PageUI = (() => {
     if (back) back.href = isAdmin ? '../admin/admin.html' : '../User/homepage.html';
 
     const prefs = p?.preferences && typeof p.preferences === 'object' ? p.preferences : {};
-    const storedPrefs = safeStoredPreferences();
-    const selectedTheme=window.PGENRO_UserTheme?.get() || localStorage.getItem(isAdmin ? 'pgenro_admin_theme' : 'pgenro_user_theme');
-    const theme = ['dark','light'].includes(selectedTheme) ? selectedTheme : ['dark','light'].includes(prefs.theme) ? prefs.theme : (['dark','light'].includes(storedPrefs.theme) ? storedPrefs.theme : 'light');
-    const themeInput = $(`input[name="theme"][value="${theme}"]`);
-    if (themeInput) themeInput.checked = true;
+    window.PGENRO_Theme?.setScope(isAdmin ? 'admin' : 'user', prefs);
     $('#compactToggle').checked = !!prefs.compact;
     $('#reduceMotionToggle').checked = !!prefs.reduceMotion;
     $('#emailNotificationsToggle').checked = prefs.emailNotifications !== false;
@@ -127,10 +121,8 @@ const PGENRO_PageUI = (() => {
   }
 
   function applyPreferences(prefs) {
-    prefs={...prefs,theme:prefs.theme||window.PGENRO_UserTheme?.get()||'light'};
-    localStorage.setItem('pgenro_preferences', JSON.stringify(prefs));
-    window.PGENRO_UserTheme?.set(prefs.theme || 'light');
-    document.documentElement.dataset.pgenroTheme = prefs.theme || 'light';
+    try { localStorage.setItem('pgenro_preferences', JSON.stringify(prefs)); } catch {}
+    window.PGENRO_Theme?.set(prefs.theme);
     document.body.classList.toggle('pgenro-compact', !!prefs.compact);
     document.body.classList.toggle('pgenro-reduced-motion', !!prefs.reduceMotion);
   }
@@ -199,9 +191,6 @@ const PGENRO_PageUI = (() => {
         toast(err.message?.includes('update_my_preferences') ? 'Preferences saved locally. Run SAFE_SETTINGS_PATCH.sql to sync them to Supabase.' : (err.message || 'Preferences saved locally.'), 'error');
       } finally { if (button) button.disabled = false; }
     });
-
-    $('input[name="theme"][value="light"]')?.addEventListener('change', () => { if ($('input[name="theme"][value="light"]').checked) window.PGENRO_UserTheme?.set('light'); });
-    $('input[name="theme"][value="dark"]')?.addEventListener('change', () => { if ($('input[name="theme"][value="dark"]').checked) window.PGENRO_UserTheme?.set('dark'); });
 
     $('#systemSettingsForm')?.addEventListener('submit', async e => {
       e.preventDefault();

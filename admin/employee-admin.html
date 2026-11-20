@@ -6,7 +6,7 @@
 <meta content="light" name="color-scheme">
 <title>PGENRO IMS | Employee Profiles Admin</title>
 <meta content="#063d32" name="theme-color">
-<script src="../User/user-theme.js?v=20261106-theme-ui-1"></script>
+<script src="../User/user-theme.js?v=20261120-appearance"></script>
 <!-- Google Fonts -->
 <link href="https://fonts.googleapis.com" rel="preconnect">
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
@@ -15,7 +15,7 @@
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Core Admin Stylesheets Matching admin.html -->
 <link href="employee-admin.css?v=20261027-emerald-v6" rel="stylesheet">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261120-appearance">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 <link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
 <script defer src="../shared/responsive-tables.js?v=20261114-readable"></script>
@@ -790,7 +790,7 @@
 <form class="monitor-editor" id="ceremonyForm">
 <div class="monitor-editor-heading"><h4 id="ceremonyEditorTitle">Add Record</h4><span class="monitor-edit-tag" hidden="" id="ceremonyEditTag">Editing</span></div>
 <div aria-live="polite" class="form-feedback" hidden="" id="ceremonyFeedback" role="status"></div>
-<div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number</label><input aria-describedby="ceremonyControlHelp" class="form-control" id="ceremonyControl" maxlength="80" placeholder="e.g. FC-2026-0001" type="text"><small class="field-help" id="ceremonyControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" required="" type="date"></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required=""><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required=""><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="ceremonyControl">Control Number <span>*</span></label><input class="form-control" id="ceremonyControl" maxlength="80" placeholder="Enter control number" autocomplete="off" required type="text"></div><div class="form-group"><label for="ceremonyDate">Date <span>*</span></label><input class="form-control" id="ceremonyDate" required="" type="date"></div><div class="form-group"><label for="ceremonyStatus">Status <span>*</span></label><select class="form-control" id="ceremonyStatus" required=""><option value="">Select an option</option><option value="PRESENT">Present</option><option value="ABSENT">Absent</option><option value="OFFICIAL BUSINESS">Official Business (O.B.)</option><option value="LEAVE">Leave</option><option value="LATE">Late</option></select></div><div class="form-group"><label for="ceremonyActivity">Name of Activity <span>*</span></label><select class="form-control" id="ceremonyActivity" required=""><option value="">Select an activity</option><option value="FLAG CEREMONY">01. Flag Ceremony</option><option value="FLAG RETREAT">02. Flag Retreat</option><option value="HOLIDAY CELEBRATION">03. Holiday Celebration</option><option value="OTHERS">04. Others</option></select></div><div class="form-group full"><label for="ceremonyRemarks">Remarks</label><textarea class="form-control" id="ceremonyRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
 <div class="monitor-editor-actions"><button class="btn btn-primary" id="ceremonySave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="ceremonyClear" type="button">Clear</button></div>
 </form>
 <div class="monitor-report">
@@ -810,7 +810,7 @@
 <form class="monitor-editor" id="uniformForm">
 <div class="monitor-editor-heading"><h4 id="uniformEditorTitle">Add Record</h4><span class="monitor-edit-tag" hidden="" id="uniformEditTag">Editing</span></div>
 <div aria-live="polite" class="form-feedback" hidden="" id="uniformFeedback" role="status"></div>
-<div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number</label><input aria-describedby="uniformControlHelp" class="form-control" id="uniformControl" maxlength="80" placeholder="e.g. UM-2026-0001" type="text"><small class="field-help" id="uniformControlHelp">Leave blank to generate automatically.</small></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" required="" type="date"></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required=""><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
+<div class="monitor-editor-fields"><div class="form-group"><label for="uniformControl">Control Number <span>*</span></label><input class="form-control" id="uniformControl" maxlength="80" placeholder="Enter control number" autocomplete="off" required type="text"></div><div class="form-group"><label for="uniformDate">Date <span>*</span></label><input class="form-control" id="uniformDate" required="" type="date"></div><div class="form-group"><label for="uniformStatus">Compliant <span>*</span></label><select class="form-control" id="uniformStatus" required=""><option value="">Select an option</option><option value="YES">Yes — compliant</option><option value="NO">No — noncompliant</option></select></div><div class="form-group full"><label for="uniformRemarks">Remarks</label><textarea class="form-control" id="uniformRemarks" maxlength="2000" placeholder="Optional notes" rows="3"></textarea></div></div>
 <div class="monitor-editor-actions"><button class="btn btn-primary" id="uniformSave" type="submit"><i data-lucide="save"></i><span>Save Record</span></button><button class="btn btn-ghost" id="uniformClear" type="button">Clear</button></div>
 </form>
 <div class="monitor-report">
@@ -837,7 +837,7 @@
 <!-- Shared System Scripts -->
 <script defer src="../shared/user-modules.js?v=20261108-inventory-roles"></script>
 <script defer src="../shared/supabase.js?v=20261108-inventory-roles"></script>
-<script defer src="employee-admin.js?v=20261103-frontend-fix"></script>
+<script defer src="employee-admin.js?v=20261120-appearance"></script>
 <div aria-hidden="true" class="modal-overlay" id="workspaceJumpModal">
 <div aria-labelledby="workspaceJumpTitle" aria-modal="true" class="modal-container workspace-jump-dialog" role="dialog">
 <div class="modal-header"><div><h2 id="workspaceJumpTitle">Jump to a module</h2><p>Your records and workspace tools, in one place.</p></div><button aria-label="Close module search" id="workspaceJumpClose" type="button">×</button></div>

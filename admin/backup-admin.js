@@ -312,7 +312,7 @@
       for(const [key,value]of pending.entries){localStorage.setItem(key,value);applied++;}
       const count=pending.entries.length,name=pending.name;
       await M.audit('RESTORE_BACKUP',`Restored ${count} local workspace keys from ${name}.`,{module:'Backups'});
-      if(pending.entries.some(([key])=>key==='pgenro_admin_theme'))document.documentElement.dataset.theme=localStorage.getItem('pgenro_admin_theme')||'light';
+      if(pending.entries.some(([key])=>key==='pgenro_admin_theme'))window.PGENRO_Theme?.set(localStorage.getItem('pgenro_admin_theme'));
       document.body.classList.toggle('compact-mode',Boolean(M.storage.get('pgenro_admin_preferences',{}).compact));
       error('backupRestoreError','');render();M.toast(`${count} local workspace keys restored.`);
       busy=false;delete $('backupReviewModal').dataset.busy;close();
@@ -467,32 +467,13 @@
 })();
 
 
-/* Appearance and navigation belong to this page; no extra shared UI script. */
+/* Keep the profile and workspace density in sync. */
 (() => {
   'use strict';
   function init() {
     const M = window.PGENRO_Module;
     const $ = id => document.getElementById(id);
-    const setTheme = (value, remember = false) => {
-      const theme = value === 'dark' ? 'dark' : 'light';
-      document.documentElement.dataset.theme = theme;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0d2119' : '#f4f7f5');
-      if (remember) { try { localStorage.setItem('pgenro_admin_theme', theme); } catch {} }
-      const button = $('appearanceThemeBtn');
-      if (button) {
-        button.setAttribute('aria-pressed', String(theme === 'dark'));
-        button.setAttribute('aria-label', theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance');
-        button.title = button.getAttribute('aria-label');
-        const icon = document.createElement('i'); icon.dataset.lucide = theme === 'dark' ? 'sun' : 'moon'; button.replaceChildren(icon);
-      }
-      if ($('appearanceThemeSelect')) $('appearanceThemeSelect').value = theme;
-      M.renderIcons();
-    };
-    setTheme(document.documentElement.dataset.theme);
-    $('appearanceThemeBtn')?.addEventListener('click', () => setTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
-    $('appearanceThemeSelect')?.addEventListener('change', event => setTheme(event.target.value, true));
     window.addEventListener('storage', event => {
-      if (event.key === 'pgenro_admin_theme') setTheme(event.newValue);
       if (event.key === 'pgenro_admin_preferences') document.body.classList.toggle('compact-mode', Boolean(M.storage.get(event.key, {}).compact));
     });
     const syncProfile = () => {

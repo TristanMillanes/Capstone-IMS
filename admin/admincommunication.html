@@ -16,7 +16,7 @@
 
 <meta content="#063d32" name="theme-color">
 
-<script src="../User/user-theme.js?v=20261106-theme-ui-1"></script>
+<script src="../User/user-theme.js?v=20261120-appearance"></script>
 
 <!-- Google Fonts -->
 
@@ -33,7 +33,7 @@
 <!-- External Stylesheets -->
 
 <link href="admincommunication.css?v=20261027-emerald-v6" rel="stylesheet">
-<link rel="stylesheet" href="../shared/theme-layout.css?v=20261108-dark-mode">
+<link rel="stylesheet" href="../shared/theme-layout.css?v=20261120-appearance">
 <link rel="stylesheet" href="module-access.css?v=20261108-inventory-roles">
 <link rel="stylesheet" href="../shared/responsive-layout.css?v=20261114-readable">
 <link rel="stylesheet" href="../shared/admin-document-intake.css?v=20261116-optional-ocr">
@@ -627,7 +627,7 @@
             <p class="communication-memo-review" id="communicationMemoReview" role="status" hidden></p>
             <div class="form-grid encoder-meta-grid">
               <div class="form-group"><label for="typeSelect">Communication type <span class="required-mark">*</span></label><select class="form-control" id="typeSelect" required><option value="">Select type</option><option value="Incoming">Incoming</option><option value="Outgoing">Outgoing</option></select></div>
-              <div class="form-group"><label for="controlNoInput"><span id="controlFieldLabel">Control number</span> <span class="required-mark">*</span></label><input class="form-control" id="controlNoInput" type="text" placeholder="Enter the reference number" required></div>
+              <div class="form-group"><label for="controlNoInput"><span id="controlFieldLabel">Control number</span> <span class="required-mark">*</span></label><input class="form-control" id="controlNoInput" type="text" placeholder="Enter control number" autocomplete="off" required></div>
               <div class="form-group">
                 <label for="docTypeSelect">Document type <span class="required-mark">*</span></label>
                 <select class="form-control" id="docTypeSelect" required>
@@ -773,7 +773,7 @@
 <script defer src="../shared/ocr-form-fields.js?v=20261116-archival"></script>
 <script defer src="../shared/admin-document-preview.js?v=20261116-optional-ocr"></script>
 <script defer src="../shared/admin-ocr-service.js?v=20261114-document-intake"></script>
-<script defer src="admincommunication.js?v=20261116-archival"></script>
+<script defer src="admincommunication.js?v=20261120-appearance"></script>
 
 <!-- The SDK and gateway load in sequence without blocking DOMContentLoaded. -->
 <script src="../shared/user-modules.js?v=20261108-inventory-roles"></script>

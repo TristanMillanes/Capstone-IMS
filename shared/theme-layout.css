@@ -1,17 +1,28 @@
-/* Shared appearance corrections. Load last. Screen rules never recolor printed documents.
-   6 November 2026: paired component colors, dialogs, actions and native controls. */
+/* Shared workspace colors, dialogs and native controls. */
 @media screen {
 html[data-theme="light"] {
+  color-scheme:light;
   --app-ink:#193b2d;--app-muted:#52695e;--app-subtle:#5b7166;
   --app-surface:#fff;--app-soft:#f0f6f3;--app-border:#cbdcd2;--app-accent:#066c4f;
   --app-tint:#e5f3eb;--app-danger:#b42335;--app-danger-bg:#fff0f3;--app-warning:#87500e;--app-warning-bg:#fff3da;
   --app-info:#235f99;--app-info-bg:#e8f2ff;
 }
 html[data-theme="dark"] {
+  color-scheme:dark;
   --app-ink:#ecf8f0;--app-muted:#b3cbbf;--app-subtle:#a4c1b1;
   --app-surface:#102a23;--app-soft:#183a2f;--app-border:#3b6151;--app-accent:#8ee7bd;
   --app-tint:#1d4936;--app-danger:#ffadb8;--app-danger-bg:#462d35;--app-warning:#ffda91;--app-warning-bg:#44351e;
   --app-info:#b0d7ff;--app-info-bg:#193b53;
+}
+html[data-theme] {
+  background-color:var(--app-soft);
+}
+html[data-theme] body {
+  color-scheme:inherit;
+}
+html[data-theme] :is(#appearanceThemeBtn,.user-appearance-toggle,#appearanceThemeSelect):focus-visible {
+  outline:2px solid var(--app-accent);
+  outline-offset:3px;
 }
 html[data-theme] body.pgenro-admin.layout-v2.workspace-modern.depth-workspace.ui-unified[data-unified-ui][data-design] {
   --text-muted:var(--app-muted);--text-light:var(--app-subtle);

@@ -1299,35 +1299,11 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     if (!document.body.classList.contains('pgenro-admin') || document.body.dataset.modernWorkspaceReady) return;
     document.body.dataset.modernWorkspaceReady = 'true';
     const renderIcons = () => window.PGENRO_Module?.renderIcons?.();
-    const themeButton = document.getElementById('appearanceThemeBtn');
-    const themeSelect = document.getElementById('appearanceThemeSelect');
     const preferenceKey = 'pgenro_admin_preferences';
-    const themeKey = 'pgenro_admin_theme';
     function readPreferences() {
       try { const value = JSON.parse(localStorage.getItem(preferenceKey) || '{}'); return value && typeof value === 'object' && !Array.isArray(value) ? value : {}; }
       catch { return {}; }
     }
-    function applyTheme(value, remember = false) {
-      const theme = value === 'dark' ? 'dark' : 'light';
-      document.documentElement.dataset.theme = theme;
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#0f1d18' : '#f5f7f8');
-      if (remember) { try { localStorage.setItem(themeKey, theme); } catch {} }
-      if (themeButton) {
-        const label = theme === 'dark' ? 'Switch to light appearance' : 'Switch to dark appearance';
-        themeButton.setAttribute('aria-label', label);
-        themeButton.setAttribute('aria-pressed', String(theme === 'dark'));
-        themeButton.title = label;
-        const icon = document.createElement('i');
-        icon.dataset.lucide = theme === 'dark' ? 'sun' : 'moon';
-        themeButton.replaceChildren(icon);
-      }
-      if (themeSelect) themeSelect.value = theme;
-      renderIcons();
-    }
-    applyTheme(document.documentElement.dataset.theme);
-    themeButton?.addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark', true));
-    themeSelect?.addEventListener('change', () => applyTheme(themeSelect.value, true));
-
     function syncDensity() {
       const compact = Boolean(readPreferences().compact);
       document.body.classList.toggle('compact-mode', compact);
@@ -1359,11 +1335,10 @@ window.PGENRO_USER_MANAGEMENT_SCRIPT_BUILD = '20261103-frontend-fix';
     syncDensity();
     document.getElementById('compactModeToggle')?.addEventListener('change', syncDensity);
     document.getElementById('resetAdminPrefsBtn')?.addEventListener('click', () => {
-      try { localStorage.removeItem(themeKey); } catch {}
-      applyTheme('light'); syncDensity();
+      window.PGENRO_Theme?.set('light');
+      syncDensity();
     });
     window.addEventListener('storage', event => {
-      if (event.key === themeKey || event.key === null) applyTheme(event.newValue);
       if (event.key === preferenceKey || event.key === null) syncDensity();
     });
 
